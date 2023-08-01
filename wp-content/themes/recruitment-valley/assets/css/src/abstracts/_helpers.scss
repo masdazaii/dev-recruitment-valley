@@ -1,0 +1,9 @@
+// ----------------------------------------------------------------------------
+// This file contains CSS helper classes or extendable properties
+// ----------------------------------------------------------------------------
+
+%clearfix {
+	content: "";
+	clear: both;
+	display: table;
+}
