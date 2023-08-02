@@ -23,8 +23,23 @@ class LoginService
 
     public function logout(WP_REST_Request $request)
     {
-        $body = $request->get_header('authorization');
-        $response = $this->loginController->logout($body);
+        // $body = $request->get_header('authorization');
+        // $response = $this->loginController->logout($body);
+        // return ResponseHelper::build($response);
+    }
+
+    public function forgotPassword( WP_REST_Request $request )
+    {
+        $body = $request->get_params();
+        $response = $this->loginController->forgot_password($body);
         return ResponseHelper::build($response);
     }
+
+    public function resetPassword(WP_REST_Request $request)
+    {
+        $body = $request->get_params();
+        $response = $this->loginController->reset_password($body);
+        return ResponseHelper::build($response);
+    }
+
 }

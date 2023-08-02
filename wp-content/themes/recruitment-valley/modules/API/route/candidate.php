@@ -30,27 +30,27 @@ class CandidateEndpoint
                 // 'welcome' => [
                 //     'url'                   =>  'welcome',
                 //     'methods'               =>  'GET',
-                //     'permission_callback'   => '__return_true',
+                //     'permission_callback'   => [ $authMiddleware, 'check_token' ],
                 //     'callback'              =>  [$loginService, 'login']
                 // ],
-                'register' => [
-                    'url'                   =>  'register',
-                    'methods'               =>  'POST',
-                    'permission_callback'   => '__return_true',
-                    'callback'              =>  [$registrationService, 'register']
-                ],
-                'validate-otp' => [
-                    'url'                   => 'validate-otp',
-                    'methods'               => 'POST',
-                    'permission_calback'    => '__return_true',
-                    'callback'              => [$registrationService, 'validateOTP']
-                ],
-                'login' => [
-                    'url'                   =>  'login',
-                    'methods'               =>  'POST',
-                    'permission_callback'   => '__return_true',
-                    'callback'              =>  [$loginService, 'login']
-                ]
+                // 'register' => [
+                //     'url'                   =>  'register',
+                //     'methods'               =>  'POST',
+                //     'permission_callback'   => '__return_true',
+                //     'callback'              =>  [$registrationService, 'register']
+                // ],
+                // 'validate-otp' => [
+                //     'url'                   => 'validate-otp',
+                //     'methods'               => 'POST',
+                //     'permission_calback'    => '__return_true',
+                //     'callback'              => [$registrationService, 'validateOTP']
+                // ],
+                // 'login' => [
+                //     'url'                   =>  'login',
+                //     'methods'               =>  'POST',
+                //     'permission_callback'   => '__return_true',
+                //     'callback'              =>  [$loginService, 'login']
+                // ]
             ]
 
         ];
