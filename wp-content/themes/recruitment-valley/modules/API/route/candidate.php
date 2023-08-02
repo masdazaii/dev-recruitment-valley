@@ -50,6 +50,13 @@ class CandidateEndpoint
                     'methods'               =>  'POST',
                     'permission_callback'   => '__return_true',
                     'callback'              =>  [$loginService, 'login']
+                ],
+                'logout' => [
+                    'url'                   =>  'logout',
+                    'methods'               =>  'POST',
+                    // 'permission_callback'   => '__return_true',
+                    'permission_callback'   => [$authMiddleware, 'check_token'],
+                    'callback'              => [$loginService, 'logout']
                 ]
             ]
 

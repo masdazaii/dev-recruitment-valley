@@ -96,7 +96,7 @@ Thumbs.db
 wp-content/mu-plugins/
 !wp-content/plugins/
 !wp-content/themes/
-wp-content/theme/recruitment-valley/vendor
+wp-content/themes/recruitment-valley/vendor/
 
 # ignore these plugins from the core
 #wp-content/plugins/hello.php

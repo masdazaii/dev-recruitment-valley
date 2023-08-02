@@ -23,7 +23,8 @@ class LoginService
 
     public function logout(WP_REST_Request $request)
     {
-        $body = $request->get_header('authorization');
+        $body = $request->get_header('Authorization');
+        // print('<pre>'.print_r($body, true).'</pre>');
         $response = $this->loginController->logout($body);
         return ResponseHelper::build($response);
     }
