@@ -1,11 +1,12 @@
 <?php
+
 /**
  * Autoloading
  *
  * @package Madeindonesia
  */
 
-defined( 'ABSPATH' ) || die( "Can't access directly" );
+defined('ABSPATH') || die("Can't access directly");
 
 $API = [
     __DIR__ . '/constant/*.php',
@@ -15,8 +16,8 @@ $API = [
     __DIR__ . '/route/*.php',
 ];
 
-foreach ( $API as $path ) {
-    foreach ( glob( $path ) as $file ) {
+foreach ($API as $path) {
+    foreach (glob($path) as $file) {
         require_once $file;
     }
 }

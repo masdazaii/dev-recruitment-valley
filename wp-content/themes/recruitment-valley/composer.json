@@ -1,5 +1,6 @@
 {
     "require": {
-        "tgmpa/tgm-plugin-activation": "^2.6"
+        "tgmpa/tgm-plugin-activation": "^2.6",
+        "firebase/php-jwt": "^6.8"
     }
 }

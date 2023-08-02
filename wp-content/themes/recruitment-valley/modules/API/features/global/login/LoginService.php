@@ -2,6 +2,7 @@
 
 namespace Global;
 
+use WP_REST_Request;
 use ResponseHelper;
 
 class LoginService
@@ -13,9 +14,11 @@ class LoginService
         $this->loginController = new LoginController;
     }
 
-    public function login()
+    public function login(WP_REST_Request $request)
     {
-        $response = $this->loginController->login(); 
+        $body = $request->get_body();
+        // print('<pre>' . print_r($req, true) . '</pre>');
+        $response = $this->loginController->login($body);
         return ResponseHelper::build($response);
     }
 }
