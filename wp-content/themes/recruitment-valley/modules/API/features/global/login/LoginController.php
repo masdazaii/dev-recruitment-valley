@@ -93,8 +93,28 @@ class LoginController
         ];
     }
 
-    public function logout($request)
+    public function logout($jwtoken)
     {
+        if (!isset($jwtoken) || $jwtoken === '') {
+            return [
+                "message"   => "Token is not provided.",
+                "status"    => 403
+            ];
+        }
+
+        $key     = JWT_SECRET ?? "+3;@54)g|X?V%lWf+^4@3Xuu55*])bPX ftl1b>Nrd|w/]v[>bVgQm(m.#fAyAOV";
+        $payload = JWT::decode($jwtoken, new Key($key, 'HS256'));
+
+        // Set jwt to blacklist
+        // $_SESSION['JWT_BLACKLIST'][] = $jwtoken;
+
+        // Remove refresh token from meta
+        update_user_meta($payload->user_id, 'refresh_token', '');
+
+        return [
+            "message"   => "User logged out succesfully.",
+            "status"    => 200
+        ];
     }
 
     public function forgot_password( $request )
