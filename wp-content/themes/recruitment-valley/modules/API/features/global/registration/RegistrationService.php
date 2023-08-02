@@ -2,6 +2,7 @@
 
 namespace Global;
 
+use WP_REST_Request;
 use ResponseHelper;
 
 class RegistrationService
@@ -13,9 +14,17 @@ class RegistrationService
         $this->registrationController = new RegistrationController;
     }
 
-    public function registration()
+    public function register(WP_REST_Request $request)
     {
-        $response = $this->registrationController->registration();
+        $body = $request->get_params();
+        $response = $this->registrationController->registration($body);
+        return ResponseHelper::build($response);
+    }
+
+    public function validateOTP(WP_REST_Request $request)
+    {
+        $body = $request->get_params();
+        $response = $this->registrationController->validateOTP($body);
         return ResponseHelper::build($response);
     }
 }

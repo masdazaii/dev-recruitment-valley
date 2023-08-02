@@ -3,7 +3,7 @@
 
 class ResponseHelper
 {
-    public static function build( array $response )
+    public static function build(array $response)
     {
         $wp_rest_response = new WP_REST_Response();
         $wp_rest_response->set_status($response['status']);

@@ -9,7 +9,6 @@
 defined('ABSPATH') || die("Can't access directly");
 
 $API = [
-    __DIR__ . '/handler/*.php',
     __DIR__ . '/constant/*.php',
     __DIR__ . '/helpers/*.php',
     __DIR__ . '/middleware/*.php',

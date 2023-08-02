@@ -15,7 +15,6 @@ class CandidateEndpoint
     public function __construct()
     {
         $this->endpoint = $this->candidateEndpoints();
-        $this->loginService = new LoginService;
     }
 
     public function candidateEndpoints(): array
@@ -28,17 +27,23 @@ class CandidateEndpoint
             'path' => 'candidate',
             'endpoints' =>
             [
-                'welcome' => [
-                    'url'                   =>  'welcome',
-                    'methods'               =>  'GET',
-                    'permission_callback'   =>  [$authMiddleware, 'check_token'],
-                    'callback'              =>  [$loginService, 'login']
-                ],
-                'registration' => [
-                    'url'                   =>  'registration',
+                // 'welcome' => [
+                //     'url'                   =>  'welcome',
+                //     'methods'               =>  'GET',
+                //     'permission_callback'   => '__return_true',
+                //     'callback'              =>  [$loginService, 'login']
+                // ],
+                'register' => [
+                    'url'                   =>  'register',
                     'methods'               =>  'POST',
                     'permission_callback'   => '__return_true',
-                    'callback'              =>  [$registrationService, 'registration', 'test']
+                    'callback'              =>  [$registrationService, 'register']
+                ],
+                'validate-otp' => [
+                    'url'                   => 'validate-otp',
+                    'methods'               => 'POST',
+                    'permission_calback'    => '__return_true',
+                    'callback'              => [$registrationService, 'validateOTP']
                 ],
                 'login' => [
                     'url'                   =>  'login',

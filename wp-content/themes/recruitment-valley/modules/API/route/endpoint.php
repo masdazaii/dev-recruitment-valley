@@ -25,6 +25,9 @@ class Endpoint
         $candidateEndpoint = new CandidateEndpoint;
         $this->candidateEndpoint = $candidateEndpoint->get();
 
+        $companyEndpoint = new CompanyEndpoint;
+        $this->companyEndpoint = $companyEndpoint->get();
+
         add_action('rest_api_init', [$this, 'register_endpoint']);
     }
 
@@ -37,7 +40,10 @@ class Endpoint
     public function register_endpoint()
     {
         $candidate = $this->candidateEndpoint;
+        $company = $this->companyEndpoint;
+
         $this->_run_list_endpoint($this->API, $this->version, $candidate["path"], $candidate["endpoints"]);
+        $this->_run_list_endpoint($this->API, $this->version, $company["path"], $company["endpoints"]);
     }
 
     /**
