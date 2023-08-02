@@ -12,9 +12,8 @@ class RegistrationController
     {
         if (!isset($request["email"]) || !isset($request["password"])) {
             return [
-                "success"       => false,
                 "message"       => "Invalid Input.",
-                "statusCode"    => 400
+                "status"    => 400
             ];
         }
 
@@ -26,9 +25,8 @@ class RegistrationController
 
         if (is_wp_error($addUser)) {
             return [
-                "success"       => false,
                 "message"       => "Registration Failed.",
-                "statusCode"    => 500
+                "status"    => 500
             ];
         }
 
@@ -50,9 +48,8 @@ class RegistrationController
         wp_mail($request["email"], "One Time Password", "Your OTP : " . $otp);
 
         return [
-            "success"       => true,
             "message"       => "We have sent an OTP code to your email. Please check your email and type in the code.",
-            "statusCode"    => 201
+            "status"    => 201
         ];
     }
 
@@ -64,12 +61,11 @@ class RegistrationController
             $message = !isset($request['otp']) ? 'OTP is required.' : '';
 
             return [
-                "success"        => false,
                 "message"       => $message,
                 "errors"        => [
                     "otp"       => "OTP is required"
                 ],
-                "statusCode"    => 400
+                "status"    => 400
             ];
         }
 
@@ -82,31 +78,28 @@ class RegistrationController
         /** Validate OTP */
         if ($otpMetaValue !== $request['otp']) {
             return [
-                "success"        => false,
                 "message"       => "OTP is invalid.",
                 "data"        => [
                     "otp"       => "OTP is invalid"
                 ],
-                "statusCode"    => 400
+                "status"    => 400
             ];
         }
 
         $now = time();
         if (strtotime($otpExpiredMetaValue) > $now) {
             return [
-                "success"        => false,
                 "message"       => "Invalid Input.",
                 "errors"        => [
                     "otp"       => "OTP is invalid"
                 ],
-                "statusCode"    => 400
+                "status"    => 400
             ];
         }
 
         return [
-            "success"       => true,
             "message"       => "OTP is valid.",
-            "statusCode"    => 200
+            "status"    => 200
         ];
     }
 }

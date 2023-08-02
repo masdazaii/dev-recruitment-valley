@@ -11,7 +11,6 @@ class Endpoint
 {
     private $API        = "mi";
     private $version    = "v1";
-    private $hello      = "hello";
 
     private $candidateEndpoint = [];
     private $companyEndpoint = [];

@@ -4,6 +4,7 @@ namespace Route;
 
 use Global\LoginService;
 use Global\RegistrationService;
+use Middleware\AuthMiddleware;
 
 class CandidateEndpoint
 {
@@ -19,7 +20,8 @@ class CandidateEndpoint
     public function candidateEndpoints(): array
     {
         $loginService = new LoginService;
-        $RegistrationService = new RegistrationService;
+        $registrationService = new RegistrationService;
+        $authMiddleware = new AuthMiddleware;
 
         $endpoint = [
             'path' => 'candidate',
@@ -35,13 +37,13 @@ class CandidateEndpoint
                     'url'                   =>  'register',
                     'methods'               =>  'POST',
                     'permission_callback'   => '__return_true',
-                    'callback'              =>  [$RegistrationService, 'register']
+                    'callback'              =>  [$registrationService, 'register']
                 ],
                 'validate-otp' => [
                     'url'                   => 'validate-otp',
                     'methods'               => 'POST',
                     'permission_calback'    => '__return_true',
-                    'callback'              => [$RegistrationService, 'validateOTP']
+                    'callback'              => [$registrationService, 'validateOTP']
                 ],
                 'login' => [
                     'url'                   =>  'login',
