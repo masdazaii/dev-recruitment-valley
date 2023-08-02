@@ -3,6 +3,7 @@
 namespace Route;
 
 use Global\LoginService;
+use Global\RegistrationService;
 
 class CandidateEndpoint
 {
@@ -16,9 +17,10 @@ class CandidateEndpoint
         $this->loginService = new LoginService;
     }
 
-    public function candidateEndpoints() : array
+    public function candidateEndpoints(): array
     {
         $loginService = new LoginService;
+        $RegistrationService = new RegistrationService;
         $endpoint = [
             'path' => 'candidate',
             'endpoints' =>
@@ -28,9 +30,21 @@ class CandidateEndpoint
                     'methods'               =>  'GET',
                     'permission_callback'   => '__return_true',
                     'callback'              =>  [$loginService, 'login']
+                ],
+                'registration' => [
+                    'url'                   =>  'registration',
+                    'methods'               =>  'POST',
+                    'permission_callback'   => '__return_true',
+                    'callback'              =>  [$RegistrationService, 'registration', 'test']
+                ],
+                'login' => [
+                    'url'                   =>  'login',
+                    'methods'               =>  'POST',
+                    'permission_callback'   => '__return_true',
+                    'callback'              =>  [$loginService, 'login']
                 ]
-            ] 
-            
+            ]
+
         ];
 
         return $endpoint;
