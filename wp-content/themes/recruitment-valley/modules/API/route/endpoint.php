@@ -5,7 +5,7 @@ namespace Route;
 /**
  * This file is created for the purpose of registering API endpoints
  */
-defined( 'ABSPATH' ) || die( "Can't access directly" );
+defined('ABSPATH') || die("Can't access directly");
 
 class Endpoint
 {
@@ -25,10 +25,10 @@ class Endpoint
     {
         $candidateEndpoint = new CandidateEndpoint;
         $this->candidateEndpoint = $candidateEndpoint->get();
-        
+
         add_action('rest_api_init', [$this, 'register_endpoint']);
     }
-    
+
     /**
      * register_endpoint
      * register api endpoint
@@ -53,7 +53,7 @@ class Endpoint
     private function _run_list_endpoint($API, $version, $endpoint, $_endpoint_list)
     {
         $root = "{$API}/{$version}/{$endpoint}";
-        foreach($_endpoint_list as $args){
+        foreach ($_endpoint_list as $args) {
             register_rest_route($root, $args['url'], $args);
         }
     }
