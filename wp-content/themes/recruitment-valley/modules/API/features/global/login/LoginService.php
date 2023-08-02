@@ -16,9 +16,15 @@ class LoginService
 
     public function login(WP_REST_Request $request)
     {
-        $body = $request->get_body();
-        // print('<pre>' . print_r($req, true) . '</pre>');
+        $body = $request->get_params();
         $response = $this->loginController->login($body);
+        return ResponseHelper::build($response);
+    }
+
+    public function logout(WP_REST_Request $request)
+    {
+        $body = $request->get_header('authorization');
+        $response = $this->loginController->logout($body);
         return ResponseHelper::build($response);
     }
 }

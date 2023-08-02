@@ -50,8 +50,8 @@ class LoginController
             // "iat" => $issuedAt,
             // "nbf" => $issuedAt,
             // "exp" => $expireAccessToken,
-            // "sub" => $user->user_id,
-            "user_id" => $user->user_id,
+            // "sub" => $user->ID,
+            "user_id" => $user->ID,
             "role" => $user->user_role[0],
             "setup_status" => false
         ];
@@ -61,9 +61,9 @@ class LoginController
         $payloadRefreshToken = [
             // "iat" => $issuedAt,
             // "nbf" => $issuedAt,
-            // "sub" => $user->user_id,
+            // "sub" => $user->ID,
             // "exp" => $expireRefreshToken,
-            "user_id" => $user->user_id
+            "user_id" => $user->ID
         ];
 
         return [
@@ -84,26 +84,8 @@ class LoginController
         // ];
     }
 
-    public function logout()
+    public function logout($request)
     {
-        /** Get Content-type Header */
-        $contentType = isset($_SERVER['CONTENT_TYPE']) ? $_SERVER['CONTENT_TYPE'] : '';
-
-        if (stripos($contentType, 'application/json')) {
-            $json = file_get_contents('php://input');
-            $data = json_decode($json);
-            $request = [
-                "email"     => sanitize_email($data["email"]),
-                "password"  => sanitize_text_field($data["password"]),
-                "remember"  => $data["rememberMe"]
-            ];
-        } else if (stripos($contentType, 'application/x-www-form-urlencoded')) {
-            $request = [
-                "email"     => sanitize_email($_POST["email"]),
-                "password"  => sanitize_text_field($_POST["password"]),
-                "remember"  => $_POST["rememberMe"]
-            ];
-        }
     }
 }
 
