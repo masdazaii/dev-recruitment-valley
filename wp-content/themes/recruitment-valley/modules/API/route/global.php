@@ -51,6 +51,12 @@ class GlobalEndpoint
                     'permission_callback'   => '__return_true',
                     'callback'              =>  [$loginService, 'login']
                 ],
+                'logout' => [
+                    'url'                   =>  'logout',
+                    'methods'               =>  'POST',
+                    'permission_callback'   => [$authMiddleware, "check_token"],
+                    'callback'              =>  [$loginService, 'logout']
+                ],
                 'forgot-password' => [
                     'url'                   =>  'forgot-password',
                     'methods'               =>  'POST',
@@ -62,7 +68,7 @@ class GlobalEndpoint
                     'methods'               =>  'POST',
                     'permission_callback'   => '__return_true',
                     'callback'              =>  [$loginService, 'resetPassword']
-                ]
+                ],
             ]
 
         ];
