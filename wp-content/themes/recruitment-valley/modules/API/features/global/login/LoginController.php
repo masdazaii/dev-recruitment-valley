@@ -4,12 +4,22 @@ namespace Global;
 
 require_once get_stylesheet_directory() . "/vendor/firebase/php-jwt/src/JWT.php";
 
+use Constant\Message;
 use Firebase\JWT\JWT as JWT;
 use Firebase\JWT\Key;
 use DateTimeImmutable;
 
 class LoginController
 {
+    private $_message;
+
+    private $reset_password_url = "dev-recruitment-valley.test";
+
+    public function __construct()
+    {
+        $this->_message = new Message;
+    }
+
     public function login($request)
     {
         /** !is */
@@ -49,14 +59,14 @@ class LoginController
         wp_set_auth_cookie($checkUser->ID, $credentials["remember"], is_ssl());
 
         $key     = JWT_SECRET ?? "+3;@54)g|X?V%lWf+^4@3Xuu55*])bPX ftl1b>Nrd|w/]v[>bVgQm(m.#fAyAOV";
-        // $issuedAt     = new DateTimeImmutable();
+        $issuedAt     = new DateTimeImmutable();
 
         /** For Access Token */
-        // $expireAccessToken  = $issuedAt->modify("+60 minutes")->getTimestamp(); // valid until 60 minutes after toket issued
+        $expireAccessToken  = $issuedAt->modify("+60 minutes")->getTimestamp(); // valid until 60 minutes after toket issued
         $payloadAccessToken = [
             // "iat" => $issuedAt,
             // "nbf" => $issuedAt,
-            // "exp" => $expireAccessToken,
+            "exp" => $expireAccessToken,
             // "sub" => $user->ID,
             "user_id" => $user->ID,
             "role" => $user->user_role[0],
@@ -64,12 +74,12 @@ class LoginController
         ];
 
         /** For Refresh Token */
-        // $expireRefreshToken  = $issuedAt->modify("+120 minutes")->getTimestamp(); // valid until 60 minutes after toket issued
+        $expireRefreshToken  = $issuedAt->modify("+120 minutes")->getTimestamp(); // valid until 60 minutes after toket issued
         $payloadRefreshToken = [
             // "iat" => $issuedAt,
             // "nbf" => $issuedAt,
             // "sub" => $user->ID,
-            // "exp" => $expireRefreshToken,
+            "exp" => $expireRefreshToken,
             "user_id" => $user->ID
         ];
 
@@ -104,6 +114,123 @@ class LoginController
         return [
             "message"   => "User logged out succesfully.",
             "status"    => 200
+        ];
+    }
+
+    public function forgot_password( $request )
+    {
+        $email = $request["email"];
+
+        if(!isset($email) || $email == "")
+        {
+            return [
+                "message" => $this->_message->get('auth.forgot_password.required_email'),
+                "status" => 400
+            ];
+        }
+
+        $user = get_user_by('email', $email);
+
+        if(!$user)
+        {
+            return [
+                "message" => $this->_message->get('auth.not_found_user'),
+                "status" => 400
+            ];
+        }
+
+        $user_login = $user->user_login;
+        $key = wp_generate_uuid4();
+
+        update_user_meta($user->ID, "reset_password_key", $key);
+
+        $reset_password_token = base64_encode($user_login."_".$key);
+        $reset_password_url = $this->reset_password_url. "?key=" . $reset_password_token;
+
+        $subject = 'Password Reset';
+        $message = '<p>Hallo ' . $user_login . '</p>
+        <p>Please click on the following link to reset your password: </p>  <a href="' . $reset_password_url . '">' . $reset_password_url . '</a>';
+
+        $headers = array(
+            'Content-Type: text/html; charset=UTF-8',
+            'From: Recruitment Valley <info@recruitmentvalley.com>',
+        );
+
+        $email_sent = wp_mail($user->user_email, $subject, $message, $headers);
+
+        if($email_sent)
+        {
+            return [
+                "status" => 200,
+                "message" => $this->_message->get("auth.forgot_password.email_sent")
+            ];
+        }else{
+            return [
+                "status" => 400,
+                "message" => $this->_message->get("auth.forgot_password.email_not_sent")
+            ];
+        }
+    }
+
+    public function reset_password($request)
+    {
+        $newPassword = $request["newPassword"];
+        $repeatPassword = $request["repeatNewPassword"];
+        $key = base64_decode($request["key"]);
+
+        $errors = [];
+
+        if(!isset($newPassword) || $newPassword === "")
+        {
+            array_push( $errors, ["key" => "newPassword", "message" => $this->_message->get("auth.reset_password.new_password_required")]);
+        }
+
+        if(!isset($repeatPassword) || $repeatPassword === "")
+        {
+            array_push($errors, ["key" => "repeatNewPassword", "message" => $this->_message->get("auth.reset_password.repeat_password_required")]);
+        }
+
+        if($repeatPassword !== $repeatPassword)
+        {
+            array_push($errors, ["key" => "passwordMissmatch", "message" => $this->_message->get("auth.reset_password.password_missmatch")]);
+        }
+
+        if(count($errors) > 0)
+        {
+            return [
+                "status" => 400,
+                "message" => $errors
+            ];
+        }
+
+        $user_login = explode("_",$key)[0];
+        $reset_password_key = explode("_",$key)[1];
+
+        $user = get_user_by('login', $user_login );
+
+        if(!$user)
+        {
+            return [
+                "status" => 400,
+                "message" => $this->_message->get("auth.not_found_user")
+            ];
+        }
+
+        $user_reset_password_key = get_user_meta($user->ID, "reset_password_key", true);
+
+        if($reset_password_key !== $user_reset_password_key)
+        {
+            return [
+                "status" => 400,
+                "message" => $this->_message->get("auth.reset_password.incorrect_key"),
+            ];
+        }
+
+        reset_password($user, $newPassword);
+
+        return [
+            "status" => 200,
+            "message" => $this->_message->get('auth.reset_password.success'),
         ];
     }
 }

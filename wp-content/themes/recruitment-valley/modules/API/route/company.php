@@ -28,24 +28,6 @@ class CompanyEndpoint
                 //     'permission_callback'   => '__return_true',
                 //     'callback'              =>  [$RegistrationService, 'register']
                 // ],
-                'register' => [
-                    'url'                   =>  'register',
-                    'methods'               =>  'POST',
-                    'permission_callback'   => '__return_true',
-                    'callback'              =>  [$RegistrationService, 'register']
-                ],
-                'validate-otp' => [
-                    'url'                   => 'validate-otp',
-                    'methods'               => 'POST',
-                    'permission_calback'    => '__return_true',
-                    'callback'              => [$RegistrationService, 'validateOTP']
-                ],
-                'login' => [
-                    'url'                   =>  'login',
-                    'methods'               =>  'POST',
-                    'permission_callback'   => '__return_true',
-                    'callback'              =>  [$loginService, 'login']
-                ]
             ]
         ];
 

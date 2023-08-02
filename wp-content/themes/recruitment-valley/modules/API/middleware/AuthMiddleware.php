@@ -3,13 +3,9 @@
 namespace Middleware;
 
 use Constant\Message;
-use Exception;
-use Firebase\JWT\BeforeValidException;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use MI_WP_Error;
-use ResponseHelper;
 use UnexpectedValueException;
 use WP_Error;
 use WP_REST_Request;
@@ -32,9 +28,8 @@ class AuthMiddleware
         {
             return new WP_Error("rest_forbidden", $this->_message->get('auth.invalid_token'), array("status" => 401));
         }
-
         try {
-            $decodedToken = JWT::decode($token, new Key(JWT_SECRET, 'HS256'));
+            $decodedToken = JWT::decode($token, new Key(JWT_SECRET, "HS256" ));
             return $request;
         }catch (ExpiredException $e){
             return new WP_Error("rest_forbidden", $this->_message->get('auth.expired'), array("status" => 402));
