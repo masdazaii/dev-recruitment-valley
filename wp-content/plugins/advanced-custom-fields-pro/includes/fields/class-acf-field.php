@@ -2,16 +2,22 @@
 
 if ( ! class_exists( 'acf_field' ) ) :
 
+	#[AllowDynamicProperties]
 	class acf_field {
 
-		// vars
-		var $name = '',
-		$label    = '',
-		$category = 'basic',
-		$defaults = array(),
-		$l10n     = array(),
-		$public   = true;
-
+		// field information properties.
+		public $name          = '';
+		public $label         = '';
+		public $category      = 'basic';
+		public $description   = '';
+		public $doc_url       = false;
+		public $tutorial_url  = false;
+		public $preview_image = false;
+		public $pro           = false;
+		public $defaults      = array();
+		public $l10n          = array();
+		public $public        = true;
+		public $show_in_rest  = true;
 
 		/*
 		*  __construct
@@ -34,10 +40,15 @@ if ( ! class_exists( 'acf_field' ) ) :
 			// register info
 			acf_register_field_type_info(
 				array(
-					'label'    => $this->label,
-					'name'     => $this->name,
-					'category' => $this->category,
-					'public'   => $this->public,
+					'label'         => $this->label,
+					'name'          => $this->name,
+					'category'      => $this->category,
+					'description'   => $this->description,
+					'doc_url'       => $this->doc_url,
+					'tutorial_url'  => $this->tutorial_url,
+					'preview_image' => $this->preview_image,
+					'pro'           => $this->pro,
+					'public'        => $this->public,
 				)
 			);
 
@@ -49,6 +60,7 @@ if ( ! class_exists( 'acf_field' ) ) :
 			$this->add_field_action( 'acf/delete_value', array( $this, 'delete_value' ), 10, 3 );
 
 			// field
+			$this->add_field_filter( 'acf/validate_rest_value', array( $this, 'validate_rest_value' ), 10, 3 );
 			$this->add_field_filter( 'acf/validate_field', array( $this, 'validate_field' ), 10, 1 );
 			$this->add_field_filter( 'acf/load_field', array( $this, 'load_field' ), 10, 1 );
 			$this->add_field_filter( 'acf/update_field', array( $this, 'update_field' ), 10, 1 );
@@ -71,6 +83,9 @@ if ( ! class_exists( 'acf_field' ) ) :
 			$this->add_action( 'acf/field_group/admin_head', array( $this, 'field_group_admin_head' ), 10, 0 );
 			$this->add_action( 'acf/field_group/admin_footer', array( $this, 'field_group_admin_footer' ), 10, 0 );
 
+			foreach ( acf_get_combined_field_type_settings_tabs() as $tab_key => $tab_label ) {
+				$this->add_field_action( "acf/field_group/render_field_settings_tab/{$tab_key}", array( $this, "render_field_{$tab_key}_settings" ), 9, 1 );
+			}
 		}
 
 
@@ -266,6 +281,79 @@ if ( ! class_exists( 'acf_field' ) ) :
 			// return
 			return $l10n;
 
+		}
+
+		/**
+		 * Add additional validation for fields being updated via the REST API.
+		 *
+		 * @param bool  $valid
+		 * @param mixed $value
+		 * @param array $field
+		 *
+		 * @return bool|WP_Error
+		 */
+		public function validate_rest_value( $valid, $value, $field ) {
+			return $valid;
+		}
+
+		/**
+		 * Return the schema array for the REST API.
+		 *
+		 * @param array $field
+		 * @return array
+		 */
+		public function get_rest_schema( array $field ) {
+			$schema = array(
+				'type'     => array( 'string', 'null' ),
+				'required' => ! empty( $field['required'] ),
+			);
+
+			if ( isset( $field['default_value'] ) && '' !== $field['default_value'] ) {
+				$schema['default'] = $field['default_value'];
+			}
+
+			return $schema;
+		}
+
+		/**
+		 * Return an array of links for addition to the REST API response. Each link is an array and must have both `rel` and
+		 * `href` keys. The `href` key must be a REST API resource URL. If a link is marked as `embeddable`, the `_embed` URL
+		 * parameter will trigger WordPress to dispatch an internal sub request and load the object within the same request
+		 * under the `_embedded` response property.
+		 *
+		 * e.g;
+		 *    [
+		 *        [
+		 *            'rel' => 'acf:post',
+		 *            'href' => 'https://example.com/wp-json/wp/v2/posts/497',
+		 *            'embeddable' => true,
+		 *        ],
+		 *        [
+		 *            'rel' => 'acf:user',
+		 *            'href' => 'https://example.com/wp-json/wp/v2/users/2',
+		 *            'embeddable' => true,
+		 *        ],
+		 *    ]
+		 *
+		 * @param mixed      $value The raw (unformatted) field value.
+		 * @param string|int $post_id
+		 * @param array      $field
+		 * @return array
+		 */
+		public function get_rest_links( $value, $post_id, array $field ) {
+			return array();
+		}
+
+		/**
+		 * Apply basic formatting to prepare the value for default REST output.
+		 *
+		 * @param mixed      $value
+		 * @param string|int $post_id
+		 * @param array      $field
+		 * @return mixed
+		 */
+		public function format_value_for_rest( $value, $post_id, array $field ) {
+			return $value;
 		}
 
 	}
