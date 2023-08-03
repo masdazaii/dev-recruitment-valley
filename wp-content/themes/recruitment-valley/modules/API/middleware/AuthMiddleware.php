@@ -12,7 +12,7 @@ use WP_REST_Request;
 use WpOrg\Requests\Response;
 
 class AuthMiddleware
-{   
+{
     private $_message;
 
     public function __construct()
@@ -24,15 +24,16 @@ class AuthMiddleware
     {
         $token = $request->get_header('Authorization');
 
-        if($token == "")
-        {
+        if ($token == "") {
             return new WP_Error("rest_forbidden", $this->_message->get('auth.invalid_token'), array("status" => 401));
         }
         try {
-            $decodedToken = JWT::decode($token, new Key(JWT_SECRET, "HS256" ));
+            $decodedToken = JWT::decode($token, new Key(JWT_SECRET, "HS256"));
+            $request->user_id = $decodedToken->user_id;
+
             return $request;
-        }catch (ExpiredException $e){
-            return new WP_Error("rest_forbidden", $this->_message->get('auth.expired'), array("status" => 401));
+        } catch (ExpiredException $e) {
+            return new WP_Error("rest_forbidden", $this->_message->get('auth.expired'), array("status" => 402));
         } catch (UnexpectedValueException $e) {
             return new WP_Error("rest_forbidden", $this->_message->get('auth.invalid_token'), array("status" => 401));
         }

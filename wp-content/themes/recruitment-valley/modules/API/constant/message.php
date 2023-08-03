@@ -1,6 +1,7 @@
 <?php
 
 namespace Constant;
+
 class Message
 {
     public $list;
@@ -29,6 +30,11 @@ class Message
                 ],
                 'not_found_user' => __("User was not found"),
             ],
+            'profile' => [
+                'setup' => [
+                    'success' =>  __("success setup profile", THEME_DOMAIN)
+                ]
+            ]
         ];
     }
 
@@ -36,7 +42,7 @@ class Message
     {
         $keys = explode('.', $message_location);
         $message = $this->list;
-        
+
         foreach ($keys as $key) {
             if (isset($message[$key])) {
                 $message = $message[$key];

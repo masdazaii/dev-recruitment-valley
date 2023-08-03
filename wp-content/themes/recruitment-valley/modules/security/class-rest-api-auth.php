@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Api Auth
  *
@@ -7,19 +8,21 @@
 
 namespace BD\Security;
 
-defined( 'ABSPATH' ) || die( "Can't access directly" );
+defined('ABSPATH') || die("Can't access directly");
 
 use WP_Error;
 
 /**
  * Api Auth class
  */
-class Rest_API_Auth {
+class Rest_API_Auth
+{
 
 	/**
 	 * Setup the flow
 	 */
-	public function __construct() {
+	public function __construct()
+	{
 		add_filter('rest_endpoints', [$this, 'secure_default_endpoints']);
 	}
 
@@ -34,7 +37,6 @@ class Rest_API_Auth {
 		}
 
 		return $endpoints;
-
 	}
 }
 
