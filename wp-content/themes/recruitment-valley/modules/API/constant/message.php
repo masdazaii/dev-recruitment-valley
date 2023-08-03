@@ -34,6 +34,13 @@ class Message
                 'setup' => [
                     'success' =>  __("success setup profile", THEME_DOMAIN)
                 ]
+            ],
+            'input' => [
+                'invalid_input'   => __("Input is invalid.", THEME_DOMAIN),
+                'failed_to_store' => __("Failed to store data.", THEME_DOMAIN),
+            ],
+            'contact' => [
+                'success'   => __("Success send contact message.", THEME_DOMAIN)
             ]
         ];
     }
