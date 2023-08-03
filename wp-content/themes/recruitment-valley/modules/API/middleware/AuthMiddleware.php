@@ -32,7 +32,7 @@ class AuthMiddleware
             $decodedToken = JWT::decode($token, new Key(JWT_SECRET, "HS256" ));
             return $request;
         }catch (ExpiredException $e){
-            return new WP_Error("rest_forbidden", $this->_message->get('auth.expired'), array("status" => 402));
+            return new WP_Error("rest_forbidden", $this->_message->get('auth.expired'), array("status" => 401));
         } catch (UnexpectedValueException $e) {
             return new WP_Error("rest_forbidden", $this->_message->get('auth.invalid_token'), array("status" => 401));
         }
