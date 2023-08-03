@@ -64,21 +64,15 @@ class LoginController
         /** For Access Token */
         $expireAccessToken  = $issuedAt->modify("+60 minutes")->getTimestamp(); // valid until 60 minutes after toket issued
         $payloadAccessToken = [
-            // "iat" => $issuedAt,
-            // "nbf" => $issuedAt,
             "exp" => $expireAccessToken,
-            // "sub" => $user->ID,
             "user_id" => $user->ID,
-            "role" => $user->user_role[0],
+            "role" => $user->roles[0],
             "setup_status" => false
         ];
 
         /** For Refresh Token */
         $expireRefreshToken  = $issuedAt->modify("+120 minutes")->getTimestamp(); // valid until 60 minutes after toket issued
         $payloadRefreshToken = [
-            // "iat" => $issuedAt,
-            // "nbf" => $issuedAt,
-            // "sub" => $user->ID,
             "exp" => $expireRefreshToken,
             "user_id" => $user->ID
         ];
@@ -87,7 +81,7 @@ class LoginController
             "message" => "Login success.",
             "data" => [
                 "token" => JWT::encode($payloadAccessToken, $key, 'HS256'),
-                "refreshToken" => JWT::encode($payloadRefreshToken, $key, 'HS256')
+                "refreshToken" => JWT::encode($payloadRefreshToken, $key, 'HS256'),
             ],
             "status" => 200
         ];
