@@ -2,6 +2,8 @@
 
 namespace Route;
 
+use Candidate\Profile\ProfileController;
+use Candidate\Profile\SetupProfileController;
 use Global\LoginService;
 use Global\RegistrationService;
 use Middleware\AuthMiddleware;
@@ -51,6 +53,12 @@ class CandidateEndpoint
                 //     'permission_callback'   => '__return_true',
                 //     'callback'              =>  [$loginService, 'login']
                 // ]
+                'profile-setup' => [
+                    'url'                   =>  'profile/setup',
+                    'methods'               =>  'POST',
+                    'permission_callback'   => [$authMiddleware, 'check_token'],
+                    'callback'              =>  [new ProfileController(), 'setup'],
+                ]
             ]
 
         ];
