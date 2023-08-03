@@ -1,5 +1,7 @@
 <?php
 
+namespace PostType;
+
 class Job extends RegisterCPT
 {
     public function __construct()
@@ -66,3 +68,4 @@ class Job extends RegisterCPT
         }
     }
 }
+new Job();
