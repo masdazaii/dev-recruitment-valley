@@ -29,6 +29,11 @@ class RegistrationController
 
             if (wp_check_password($request['password'], $userExist->user_pass, $userExist->ID)) {
                 $addUser = $userExist->ID;
+            } else {
+                $addUser = wp_update_user([
+                    "ID"    => $userExist->ID,
+                    "user_pass"  => $request["password"]
+                ]);
             }
         } else {
             $addUser = wp_insert_user([
@@ -40,7 +45,7 @@ class RegistrationController
 
         if (is_wp_error($addUser)) {
             return [
-                "message"   => "Registration Failed. ".$addUser->get_error_message(),
+                "message"   => "Registration Failed. " . $addUser->get_error_message(),
                 "status"    => 400
             ];
         }

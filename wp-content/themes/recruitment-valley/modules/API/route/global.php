@@ -30,16 +30,16 @@ class GlobalEndpoint
             'endpoints' =>
             [
                 'welcome' => [
-                    'url'                   =>  'welcome',
-                    'methods'               =>  'GET',
-                    'permission_callback'   => [ $authMiddleware, 'check_token' ],
-                    'callback'              =>  [$loginService, 'login']
+                    'url'                   => 'welcome',
+                    'methods'               => 'GET',
+                    'permission_callback'   => [$authMiddleware, 'check_token'],
+                    'callback'              => [$loginService, 'login']
                 ],
                 'register' => [
-                    'url'                   =>  'register',
-                    'methods'               =>  'POST',
+                    'url'                   => 'register',
+                    'methods'               => 'POST',
                     'permission_callback'   => '__return_true',
-                    'callback'              =>  [$registrationService, 'register']
+                    'callback'              => [$registrationService, 'register']
                 ],
                 'validate-otp' => [
                     'url'                   => 'validate-otp',
@@ -48,34 +48,34 @@ class GlobalEndpoint
                     'callback'              => [$registrationService, 'validateOTP']
                 ],
                 'login' => [
-                    'url'                   =>  'login',
-                    'methods'               =>  'POST',
+                    'url'                   => 'login',
+                    'methods'               => 'POST',
                     'permission_callback'   => '__return_true',
-                    'callback'              =>  [$loginService, 'login']
+                    'callback'              => [$loginService, 'login']
                 ],
                 'logout' => [
-                    'url'                   =>  'logout',
-                    'methods'               =>  'POST',
+                    'url'                   => 'logout',
+                    'methods'               => 'POST',
                     'permission_callback'   => [$authMiddleware, "check_token"],
-                    'callback'              =>  [$loginService, 'logout']
+                    'callback'              => [$loginService, 'logout']
                 ],
                 'forgot-password' => [
-                    'url'                   =>  'forgot-password',
-                    'methods'               =>  'POST',
+                    'url'                   => 'forgot-password',
+                    'methods'               => 'POST',
                     'permission_callback'   => '__return_true',
-                    'callback'              =>  [$loginService, 'forgotPassword']
+                    'callback'              => [$loginService, 'forgotPassword']
                 ],
                 'reset-password' => [
-                    'url'                   =>  'reset-password',
-                    'methods'               =>  'POST',
+                    'url'                   => 'reset-password',
+                    'methods'               => 'POST',
                     'permission_callback'   => '__return_true',
-                    'callback'              =>  [$loginService, 'resetPassword']
+                    'callback'              => [$loginService, 'resetPassword']
                 ],
                 'refresh-token' => [
                     'url'                   => 'refresh-token',
-                    'methods'               =>  'POST',
+                    'methods'               => 'POST',
                     'permission_callback'   => '__return_true',
-                    'callback'              =>  [$refreshTokenService, 'refresh']
+                    'callback'              => [$refreshTokenService, 'refresh']
                 ]
             ]
 
