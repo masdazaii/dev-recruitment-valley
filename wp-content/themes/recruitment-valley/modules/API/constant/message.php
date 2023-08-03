@@ -13,6 +13,8 @@ class Message
                 'unauthenticate' => __('Unauthorized', THEME_DOMAIN),
                 'invalid_token' => __('Unauthorized', THEME_DOMAIN),
                 'expired' => __('Unauthorized', THEME_DOMAIN),
+                'generate_token_success' => __('Success generating token', THEME_DOMAIN),
+                'generate_token_error' => __('Something error when generating token', THEME_DOMAIN),
                 'forgot_password' => [
                     "required_email" => __('Email was required', THEME_DOMAIN),
                     "email_sent" => __('Email already sent', THEME_DOMAIN),

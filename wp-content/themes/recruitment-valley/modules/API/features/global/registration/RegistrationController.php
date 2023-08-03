@@ -41,7 +41,7 @@ class RegistrationController
         if (is_wp_error($addUser)) {
             return [
                 "message"   => "Registration Failed. ".$addUser->get_error_message(),
-                "status"    => 500
+                "status"    => 400
             ];
         }
 
