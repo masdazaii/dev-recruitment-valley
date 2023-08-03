@@ -26,7 +26,7 @@ class GlobalEndpoint
         $authMiddleware = new AuthMiddleware;
 
         $endpoint = [
-            'path' => '',
+            'path' => 'auth',
             'endpoints' =>
             [
                 'welcome' => [

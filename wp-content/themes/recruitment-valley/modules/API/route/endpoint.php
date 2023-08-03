@@ -67,7 +67,7 @@ class Endpoint
 
         if($endpoint !== "")
         {
-            $root = "/{$endpoint}";
+            $root .= "/{$endpoint}";
         }
 
         foreach ($_endpoint_list as $args) {
