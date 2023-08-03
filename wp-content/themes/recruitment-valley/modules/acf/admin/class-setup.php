@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package BornDigital
  */
@@ -33,20 +34,20 @@ class Setup
 		$this->url = MODULES_URL . '/acf';
 
 		add_action('acf/init', array($this, 'load_acf_fields'));
-		add_action( 'admin_enqueue_scripts', array($this, 'acf_custom_js') );
+		add_action('admin_enqueue_scripts', array($this, 'acf_custom_js'));
 	}
 
 	public function load_acf_fields()
 	{
 		$is_public_env = defined('IS_LOCAL') && IS_LOCAL ? false : true;
 		if ($is_public_env) {
-			if (file_exists(__DIR__ . '/../fields/bd-acf-fields.php') ) {
+			if (file_exists(__DIR__ . '/../fields/bd-acf-fields.php')) {
 				include  __DIR__ . '/../fields/bd-acf-fields.php';
 			}
-			
-			add_action( 'admin_menu', function() {
-				remove_menu_page( 'edit.php?post_type=acf-field-group' );
-			}, 100 );
+
+			add_action('admin_menu', function () {
+				remove_menu_page('edit.php?post_type=acf-field-group');
+			}, 100);
 		}
 	}
 
@@ -55,7 +56,7 @@ class Setup
 
 		$screen = get_current_screen();
 
-		if ($screen->id == 'custom-fields_page_acf-tools' && !isset($_GET['keys'])) {
+		if ($screen->id == 'acf_page_acf-tools' && !isset($_GET['keys'])) {
 			wp_enqueue_style(
 				'bd-acf-css',
 				$this->url . '/assets/acf-export-to-theme.css',
@@ -66,7 +67,7 @@ class Setup
 			wp_enqueue_script(
 				'bd-acf-js',
 				$this->url . '/assets/acf-export-to-theme.js',
-				[ 'jquery' ],
+				['jquery'],
 				'auto',
 				true
 			);
@@ -76,10 +77,7 @@ class Setup
 				'action'  => 'generate_acf_file',
 				'nonce'   => wp_create_nonce('GenerateAcfFile'),
 			));
-
 		}
-
-
 	}
 }
 
