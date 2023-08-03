@@ -5,6 +5,7 @@ namespace Route;
 use Global\LoginService;
 use Global\RegistrationService;
 use Middleware\AuthMiddleware;
+use RefreshToken\RefreshTokenService;
 
 class GlobalEndpoint
 {
@@ -21,6 +22,7 @@ class GlobalEndpoint
     {
         $loginService = new LoginService;
         $registrationService = new RegistrationService;
+        $refreshTokenService = new RefreshTokenService;
         $authMiddleware = new AuthMiddleware;
 
         $endpoint = [
@@ -69,6 +71,12 @@ class GlobalEndpoint
                     'permission_callback'   => '__return_true',
                     'callback'              =>  [$loginService, 'resetPassword']
                 ],
+                'refresh-token' => [
+                    'url'                   => 'refresh-token',
+                    'methods'               =>  'POST',
+                    'permission_callback'   => '__return_true',
+                    'callback'              =>  [$refreshTokenService, 'refresh']
+                ]
             ]
 
         ];

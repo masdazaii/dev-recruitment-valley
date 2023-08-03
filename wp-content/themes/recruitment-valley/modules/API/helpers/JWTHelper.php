@@ -6,29 +6,30 @@ use Firebase\JWT\JWT as JWT;
 
 class JWTHelper
 {
-    private $registeredClaims;
-    private $issuedAt;
+    private static $registeredClaims = [];
+    private static $issuedAt;
 
     public function __construct()
     {
-        $this->issuedAt = new DateTimeImmutable;
+        self::$issuedAt = new DateTimeImmutable;
 
-        $this->registeredClaims = [
-            "iat" => $this->issuedAt,
-            "iat" => $this->issuedAt,
-            "nbf" => $this->issuedAt
+        self::$registeredClaims = [
+            "iat" => self::$issuedAt,
+            "nbf" => self::$issuedAt    
         ];
     }
 
-    public function generate(array $claims, string $timeToLive, $algorithm = 'HS256')
+    public static function generate(array $claims, string $timeToLive, $algorithm = 'HS256')
     {
         $key    = JWT_SECRET ?? "+3;@54)g|X?V%lWf+^4@3Xuu55*])bPX ftl1b>Nrd|w/]v[>bVgQm(m.#fAyAOV";
 
-        $payload = array_merge($claims, $this->registeredClaims);
+        $payload = array_merge($claims, self::$registeredClaims);
 
-        $issuedAt = $this->issuedAt;
+        $issuedAt = self::$issuedAt;
         $payload['exp'] = $issuedAt->modify($timeToLive)->getTimestamp();
 
         return JWT::encode($payload, $key, $algorithm);
     }
 }
+
+new JWTHelper();
