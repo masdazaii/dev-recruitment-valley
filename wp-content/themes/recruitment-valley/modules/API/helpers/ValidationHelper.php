@@ -21,7 +21,7 @@ class ValidationHelper
                     $check = self::_require($request[$key], $key);
                     if (!$check['is_valid']) {
                         $response['is_valid'] = false;
-                        $response[$key][] = $check['message'];
+                        $response['fields'][$key][] = $check['message'];
                     }
                     break;
             }
@@ -33,10 +33,15 @@ class ValidationHelper
     private static function _require($data, $key = null)
     {
         if (!isset($data) || $data == '') {
+            $key_message = $key ?? '';
             return [
                 'is_valid'  => false,
-                'message'   => 'Field ' . $key ?? '' . ' is required.'
+                'message'   => 'Field ' . $key_message . ' is required.'
             ];
         }
+
+        return [
+            'is_valid'  => true,
+        ];
     }
 }

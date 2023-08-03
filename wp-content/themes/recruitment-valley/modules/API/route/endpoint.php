@@ -51,10 +51,10 @@ class Endpoint
         $company = $this->companyEndpoint;
         $global = $this->globalEndpoint;
         $vacancy = $this->vacancyEndpoint;
-
-        // $this->_run_list_endpoint($this->API, $this->version, $candidate["path"], $candidate["endpoints"]);
-        // $this->_run_list_endpoint($this->API, $this->version, $company["path"], $company["endpoints"]);
+        
         $this->_run_list_endpoint($this->API, $this->version, $vacancy["path"], $vacancy["endpoints"]);
+        $this->_run_list_endpoint($this->API, $this->version, $candidate["path"], $candidate["endpoints"]);
+        $this->_run_list_endpoint($this->API, $this->version, $company["path"], $company["endpoints"]);
         $this->_run_list_endpoint($this->API, $this->version, $global["path"], $global["endpoints"]);
     }
 
@@ -71,8 +71,7 @@ class Endpoint
     {
         $root = "{$API}/{$version}";
 
-        if($endpoint !== "")
-        {
+        if ($endpoint !== "") {
             $root .= "/{$endpoint}";
         }
 
