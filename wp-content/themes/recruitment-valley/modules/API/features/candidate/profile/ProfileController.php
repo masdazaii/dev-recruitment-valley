@@ -46,7 +46,8 @@ class ProfileController
                 'last_name'       => $fields['lastName'],
             ];
 
-            $files = ModelHelper::handle_upload('cv');
+            $cv = ModelHelper::handle_upload('cv');
+            $image = ModelHelper::handle_upload('image');
 
             wp_update_user($userdata);
             update_field('ucaa_date_of_birth', $fields['dateOfBirth'], 'user_' . $user_id);
@@ -56,9 +57,13 @@ class ProfileController
             update_field('ucaa_city', $fields['city'], 'user_' . $user_id);
             update_field('ucaa_linkedin_url_page', $fields['linkedinPage'], 'user_' . $user_id);
             update_field('ucaa_is_full_registered', 1, 'user_' . $user_id);
-            if ($files) {
-                $cv_id = wp_insert_attachment($files['cv']['attachment'], $files['cv']['file']);
+            if ($cv) {
+                $cv_id = wp_insert_attachment($cv['cv']['attachment'], $cv['cv']['file']);
                 update_field('ucaa_cv', $cv_id, 'user_' . $user_id);
+            }
+            if ($image) {
+                $image_id = wp_insert_attachment($image['image']['attachment'], $image['image']['file']);
+                update_field('ucaa_image', $image_id, 'user_' . $user_id);
             }
 
             $wpdb->query('COMMIT');

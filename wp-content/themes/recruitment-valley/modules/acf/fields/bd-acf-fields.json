@@ -119,6 +119,31 @@
                 "placeholder": ""
             },
             {
+                "key": "field_64cc95d35fb5b",
+                "label": "Image",
+                "name": "ucaa_image",
+                "aria-label": "",
+                "type": "image",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "return_format": "array",
+                "library": "all",
+                "min_width": "",
+                "min_height": "",
+                "min_size": "",
+                "max_width": "",
+                "max_height": "",
+                "max_size": "",
+                "mime_types": "",
+                "preview_size": "medium"
+            },
+            {
                 "key": "field_64cb4a1a2a302",
                 "label": "CV",
                 "name": "ucaa_cv",
@@ -565,6 +590,31 @@
                 "max_size": "",
                 "mime_types": "",
                 "insert": "append",
+                "preview_size": "medium"
+            },
+            {
+                "key": "field_64cc95fe35065",
+                "label": "Image",
+                "name": "ucma_image",
+                "aria-label": "",
+                "type": "image",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "return_format": "array",
+                "library": "all",
+                "min_width": "",
+                "min_height": "",
+                "min_size": "",
+                "max_width": "",
+                "max_height": "",
+                "max_size": "",
+                "mime_types": "",
                 "preview_size": "medium"
             }
         ],

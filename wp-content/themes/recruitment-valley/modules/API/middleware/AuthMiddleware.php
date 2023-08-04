@@ -25,7 +25,7 @@ class AuthMiddleware
         $this->check_token($request);
         $user = get_user_by('ID', $request->user_id);
 
-        if (!in_array('candidate', $user->roles))
+        if (!$user || !in_array('candidate', $user->roles))
             return new WP_Error("rest_unauthorized", $this->_message->get('auth.invalid_token'), array("status" => 401));
 
         return $request;
