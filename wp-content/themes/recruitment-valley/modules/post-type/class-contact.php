@@ -1,4 +1,7 @@
 <?php
+
+namespace PostType;
+
 defined('ABSPATH') || die("Direct access not allowed");
 
 class ContactCPT extends RegisterCPT
@@ -13,6 +16,7 @@ class ContactCPT extends RegisterCPT
         add_action('init', [$this, 'contactCreateCPT']);
         add_filter('manage_contacts_posts_columns', [$this, 'contactColumn'], 10, 1);
         add_action('manage_contacts_posts_custom_column', [$this, 'contactRow'], 10, 2);
+        add_filter('post_row_actions', [$this, 'contactActionLink'], 10, 1);
     }
 
     public function contactCreateCPT()
@@ -51,7 +55,7 @@ class ContactCPT extends RegisterCPT
                 echo get_post_meta($post_id, '_contact_email', true);
                 break;
             case 'phone':
-                echo get_the_content($post_id, '_contact_phone', true);
+                echo get_post_meta($post_id, '_contact_phone', true);
                 break;
             case 'content':
                 echo get_the_content(null, false, $post_id);
@@ -59,6 +63,16 @@ class ContactCPT extends RegisterCPT
             case 'submit':
                 echo get_the_date('Y/m/d H:i:s T', $post_id);
         }
+    }
+
+    public function contactActionLink($actions)
+    {
+        if (get_post_type() === 'contacts') {
+            unset($actions['edit']); // Edit action link
+            unset($actions['inline hide-if-no-js']); // Quick edit action link
+            unset($actions['view']); // View action link
+        }
+        return $actions;
     }
 }
 

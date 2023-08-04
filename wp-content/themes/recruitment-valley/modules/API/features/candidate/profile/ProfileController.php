@@ -29,7 +29,7 @@ class ProfileController
             "phoneNumber" => "required",
             "phoneNumberCode" => "required",
             "country" => "required",
-            "place" => "required",
+            "city" => "required",
             "linkedinPage" => "required",
         ]);
 
@@ -53,7 +53,7 @@ class ProfileController
             update_field('ucaa_phone', $fields['phoneNumber'], 'user_' . $user_id);
             update_field('ucaa_phone_code', $fields['phoneNumberCode'], 'user_' . $user_id);
             update_field('ucaa_country', $fields['country'], 'user_' . $user_id);
-            update_field('ucaa_place', $fields['place'], 'user_' . $user_id);
+            update_field('ucaa_city', $fields['city'], 'user_' . $user_id);
             update_field('ucaa_linkedin_url_page', $fields['linkedinPage'], 'user_' . $user_id);
             update_field('ucaa_is_full_registered', 1, 'user_' . $user_id);
             if ($files) {

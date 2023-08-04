@@ -23,8 +23,7 @@ class RefreshTokenController
     {
         $token = $request["refresh_token"];
 
-        if($token == "")
-        {
+        if ($token == "") {
             return [
                 "status" => 401,
                 "message" => $this->_message->get("auth.invalid_token")
@@ -36,7 +35,15 @@ class RefreshTokenController
 
             $user = get_user_by('id', $decodedToken->user_id);
 
-            if(!$user){
+            /** If token not same as refresh_token meta */
+            if ($token !== get_user_meta($decodedToken->user_id, 'refresh_token', true)) {
+                return [
+                    "status" => 401,
+                    "message" => $this->_message->get("auth.invalid_token")
+                ];
+            }
+
+            if (!$user) {
                 return [
                     "status" => 401,
                     "message" => $this->_message->get("auth.invalid_token")
@@ -45,21 +52,20 @@ class RefreshTokenController
 
             $payloadNewAccessToken = [
                 "user_id" => $user->ID,
-                "role" => $user->user_role,
+                "role" => $user->roles[0],
                 "setup_status" => false
             ];
 
             $payloadNewrefreshToken = [
                 "user_id" => $user->ID,
-                "role" => $user->user_role,
+                "role" => $user->roles[0],
                 "setup_status" => false
             ];
 
             $newToken = JWTHelper::generate($payloadNewAccessToken, "+60  minutes");
             $newRefreshToken = JWTHelper::generate($payloadNewrefreshToken, "+120 minutes");
 
-            if($newToken && $newRefreshToken)
-            {
+            if ($newToken && $newRefreshToken) {
                 return [
                     "status" => 201,
                     "message" => $this->_message->get('auth.generate_token_success'),
@@ -68,13 +74,13 @@ class RefreshTokenController
                         "refreshToken" => $newRefreshToken
                     ]
                 ];
-            }else{
+            } else {
                 return [
                     "status" => 500,
                     "message" => $this->_message->get('auth.generate_token_error')
                 ];
             }
-        } catch ( DomainException $e) {
+        } catch (DomainException $e) {
             return [
                 "status" => 401,
                 "message" => $e->getMessage()
@@ -90,6 +96,5 @@ class RefreshTokenController
                 "message" => $e->getMessage()
             ];
         }
-
     }
 }

@@ -56,7 +56,7 @@ class CandidateEndpoint
                 'profile-setup' => [
                     'url'                   =>  'profile/setup',
                     'methods'               =>  'POST',
-                    'permission_callback'   => [$authMiddleware, 'check_token'],
+                    'permission_callback'   => [$authMiddleware, 'check_token_candidate'],
                     'callback'              =>  [new ProfileController(), 'setup'],
                 ]
             ]
