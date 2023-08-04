@@ -65,6 +65,8 @@ class RefreshTokenController
             $newToken = JWTHelper::generate($payloadNewAccessToken, "+60  minutes");
             $newRefreshToken = JWTHelper::generate($payloadNewrefreshToken, "+120 minutes");
 
+            update_user_meta($user->ID, "refresh_token", $newRefreshToken);
+
             if ($newToken && $newRefreshToken) {
                 return [
                     "status" => 201,
