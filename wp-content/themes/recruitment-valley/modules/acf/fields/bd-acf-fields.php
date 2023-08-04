@@ -87,8 +87,8 @@ acf_add_local_field_group(array(
 		),
 		array(
 			'key' => 'field_64cb49fb2a300',
-			'label' => 'Place',
-			'name' => 'ucaa_place',
+			'label' => 'City',
+			'name' => 'ucaa_city',
 			'aria-label' => '',
 			'type' => 'text',
 			'instructions' => '',
@@ -249,8 +249,8 @@ acf_add_local_field_group(array(
 		),
 		array(
 			'key' => 'field_64cb4b340651a',
-			'label' => 'Place',
-			'name' => 'ucma_place',
+			'label' => 'City',
+			'name' => 'ucma_city',
 			'aria-label' => '',
 			'type' => 'text',
 			'instructions' => '',
