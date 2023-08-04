@@ -26,7 +26,7 @@ class AuthMiddleware
         $user = get_user_by('ID', $request->user_id);
 
         if (!$user || !in_array('candidate', $user->roles))
-            return new WP_Error("rest_unauthorized", $this->_message->get('auth.invalid_token'), array("status" => 401));
+            return new WP_Error("rest_unauthorized", $this->_message->get('auth.invalid_token'), array("status" => 403));
 
         return $request;
     }
@@ -36,7 +36,7 @@ class AuthMiddleware
         $token = $request->get_header('Authorization');
 
         if ($token == "") {
-            return new WP_Error("rest_forbidden", $this->_message->get('auth.invalid_token'), array("status" => 401));
+            return new WP_Error("rest_forbidden", $this->_message->get('auth.invalid_token'), array("status" => 403));
         }
         try {
             $decodedToken = JWT::decode($token, new Key(JWT_SECRET, "HS256"));
@@ -44,9 +44,9 @@ class AuthMiddleware
 
             return $request;
         } catch (ExpiredException $e) {
-            return new WP_Error("rest_forbidden", $this->_message->get('auth.expired'), array("status" => 401));
+            return new WP_Error("rest_forbidden", $this->_message->get('auth.expired'), array("status" => 403));
         } catch (UnexpectedValueException $e) {
-            return new WP_Error("rest_forbidden", $this->_message->get('auth.invalid_token'), array("status" => 401));
+            return new WP_Error("rest_forbidden", $this->_message->get('auth.invalid_token'), array("status" => 403));
         }
     }
 }

@@ -28,8 +28,23 @@ class Message
                     "incorrect_key" => __("Incorrect key for requested user", THEME_DOMAIN),
                     'success' => __("success reset password", THEME_DOMAIN),
                 ],
-                'not_found_user' => __("User was not found"),
-                'unfinish_registration' => __("Unfinished registration.", THEME_DOMAIN)
+                'not_found_user' => __("User was not found", THEME_DOMAIN),
+                'unfinish_registration' => __("Unfinished registration.", THEME_DOMAIN),
+                'invalid_credential' => __("Credentials is invalid.", THEME_DOMAIN),
+                'required_credential' => __("Credentials is required.", THEME_DOMAIN),
+                'login_success' => __("Login succes.", THEME_DOMAIN),
+                'logout_success' => __("User logged out succesfully.", THEME_DOMAIN),
+                'token_not_provided' => __("Token is not provided.", THEME_DOMAIN),
+            ],
+            'registration' => [
+                'email_required' => __("Email is required.", THEME_DOMAIN),
+                'otp_required' => __("OTP is required.", THEME_DOMAIN),
+                'otp_invalid' => __("OTP is invalid.", THEME_DOMAIN),
+                'otp_expired' => __("OTP is expired.", THEME_DOMAIN),
+                'failed_verify_otp' => __("System Error, failed to verify OTP.", THEME_DOMAIN),
+                'success_verify_otp' => __("OTP is verified!.", THEME_DOMAIN),
+                'already_registered_user' => __("User is already registered.", THEME_DOMAIN),
+                'registration_success' => __("We have sent an OTP code to your email. Please check your email and type in the code.", THEME_DOMAIN)
             ],
             'profile' => [
                 'setup' => [
