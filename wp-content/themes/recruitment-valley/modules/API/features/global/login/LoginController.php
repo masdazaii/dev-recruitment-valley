@@ -66,7 +66,7 @@ class LoginController
             "exp" => $expireAccessToken,
             "user_id" => $user->ID,
             "role" => $user->roles[0],
-            "setup_status" => false
+            "setup_status" => get_field("ucaa_is_full_registered", "user_".$user->ID),
         ];
 
         /** For Refresh Token */
