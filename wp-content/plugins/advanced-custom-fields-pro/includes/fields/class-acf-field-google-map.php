@@ -1,7 +1,7 @@
 <?php
 
 if ( ! class_exists( 'acf_field_google_map' ) ) :
-
+	#[AllowDynamicProperties]
 	class acf_field_google_map extends acf_field {
 
 
@@ -23,7 +23,10 @@ if ( ! class_exists( 'acf_field_google_map' ) ) :
 			// vars
 			$this->name           = 'google_map';
 			$this->label          = __( 'Google Map', 'acf' );
-			$this->category       = 'jquery';
+			$this->category       = 'advanced';
+			$this->description    = __( 'An interactive UI for selecting a location using Google Maps. Requires a Google Maps API key and additional configuration to display correctly.', 'acf' );
+			$this->preview_image  = acf_get_url() . '/assets/images/field-type-previews/field-preview-google-map.png';
+			$this->doc_url        = acf_add_url_utm_tags( 'https://www.advancedcustomfields.com/resources/google-map/', 'docs', 'field-type-selection' );
 			$this->defaults       = array(
 				'height'     => '',
 				'center_lat' => '',
@@ -61,7 +64,7 @@ if ( ! class_exists( 'acf_field_google_map' ) ) :
 				)
 			);
 
-			// bail ealry if no enqueue
+			// bail early if no enqueue
 			if ( ! acf_get_setting( 'enqueue_google_maps' ) ) {
 				return;
 			}
@@ -72,7 +75,7 @@ if ( ! class_exists( 'acf_field_google_map' ) ) :
 				'client'    => acf_get_setting( 'google_api_client' ),
 				'libraries' => 'places',
 				'ver'       => 3,
-				'callback'  => '',
+				'callback'  => 'Function.prototype',
 				'language'  => acf_get_locale(),
 			);
 
@@ -138,7 +141,7 @@ if ( ! class_exists( 'acf_field_google_map' ) ) :
 			}
 
 			?>
-<div <?php acf_esc_attr_e( $attrs ); ?>>
+<div <?php echo acf_esc_attrs( $attrs ); ?>>
 	
 			<?php
 			acf_hidden_input(
@@ -189,12 +192,12 @@ if ( ! class_exists( 'acf_field_google_map' ) ) :
 			acf_render_field_setting(
 				$field,
 				array(
-					'label'        => __( 'Center', 'acf' ),
-					'instructions' => __( 'Center the initial map', 'acf' ),
-					'type'         => 'text',
-					'name'         => 'center_lat',
-					'prepend'      => 'lat',
-					'placeholder'  => $this->default_values['center_lat'],
+					'label'       => __( 'Center', 'acf' ),
+					'hint'        => __( 'Center the initial map', 'acf' ),
+					'type'        => 'text',
+					'name'        => 'center_lat',
+					'prepend'     => 'lat',
+					'placeholder' => $this->default_values['center_lat'],
 				)
 			);
 
@@ -202,13 +205,13 @@ if ( ! class_exists( 'acf_field_google_map' ) ) :
 			acf_render_field_setting(
 				$field,
 				array(
-					'label'        => __( 'Center', 'acf' ),
-					'instructions' => __( 'Center the initial map', 'acf' ),
-					'type'         => 'text',
-					'name'         => 'center_lng',
-					'prepend'      => 'lng',
-					'placeholder'  => $this->default_values['center_lng'],
-					'_append'      => 'center_lat',
+					'label'       => __( 'Center', 'acf' ),
+					'hint'        => __( 'Center the initial map', 'acf' ),
+					'type'        => 'text',
+					'name'        => 'center_lng',
+					'prepend'     => 'lng',
+					'placeholder' => $this->default_values['center_lng'],
+					'_append'     => 'center_lat',
 				)
 			);
 
@@ -300,6 +303,82 @@ if ( ! class_exists( 'acf_field_google_map' ) ) :
 
 			// Return default.
 			return false;
+		}
+
+		/**
+		 * Return the schema array for the REST API.
+		 *
+		 * @param array $field
+		 * @return array
+		 */
+		public function get_rest_schema( array $field ) {
+			return array(
+				'type'       => array( 'object', 'null' ),
+				'required'   => ! empty( $field['required'] ),
+				'properties' => array(
+					'address'           => array(
+						'type' => 'string',
+					),
+					'lat'               => array(
+						'type' => array( 'string', 'float' ),
+					),
+					'lng'               => array(
+						'type' => array( 'string', 'float' ),
+					),
+					'zoom'              => array(
+						'type' => array( 'string', 'int' ),
+					),
+					'place_id'          => array(
+						'type' => 'string',
+					),
+					'name'              => array(
+						'type' => 'string',
+					),
+					'street_number'     => array(
+						'type' => array( 'string', 'int' ),
+					),
+					'street_name'       => array(
+						'type' => 'string',
+					),
+					'street_name_short' => array(
+						'type' => 'string',
+					),
+					'city'              => array(
+						'type' => 'string',
+					),
+					'state'             => array(
+						'type' => 'string',
+					),
+					'state_short'       => array(
+						'type' => 'string',
+					),
+					'post_code'         => array(
+						'type' => array( 'string', 'int' ),
+					),
+					'country'           => array(
+						'type' => 'string',
+					),
+					'country_short'     => array(
+						'type' => 'string',
+					),
+				),
+			);
+		}
+
+		/**
+		 * Apply basic formatting to prepare the value for default REST output.
+		 *
+		 * @param mixed      $value
+		 * @param string|int $post_id
+		 * @param array      $field
+		 * @return mixed
+		 */
+		public function format_value_for_rest( $value, $post_id, array $field ) {
+			if ( ! $value ) {
+				return null;
+			}
+
+			return acf_format_numerics( $value );
 		}
 	}
 

@@ -21,10 +21,13 @@ if ( ! class_exists( 'acf_field_post_object' ) ) :
 		function initialize() {
 
 			// vars
-			$this->name     = 'post_object';
-			$this->label    = __( 'Post Object', 'acf' );
-			$this->category = 'relational';
-			$this->defaults = array(
+			$this->name          = 'post_object';
+			$this->label         = __( 'Post Object', 'acf' );
+			$this->category      = 'relational';
+			$this->description   = __( 'An interactive and customizable UI for picking one or many posts, pages or post type items with the option to search. ', 'acf' );
+			$this->preview_image = acf_get_url() . '/assets/images/field-type-previews/field-preview-post-object.png';
+			$this->doc_url       = acf_add_url_utm_tags( 'https://www.advancedcustomfields.com/resources/post-object/', 'docs', 'field-type-selection' );
+			$this->defaults      = array(
 				'post_type'     => array(),
 				'taxonomy'      => array(),
 				'allow_null'    => 0,
@@ -131,6 +134,17 @@ if ( ! class_exists( 'acf_field_post_object' ) ) :
 			} else {
 
 				$args['post_type'] = acf_get_post_types();
+
+			}
+
+			// post status
+			if ( ! empty( $options['post_status'] ) ) {
+
+				$args['post_status'] = acf_get_array( $options['post_status'] );
+
+			} elseif ( ! empty( $field['post_status'] ) ) {
+
+				$args['post_status'] = acf_get_array( $field['post_status'] );
 
 			}
 
@@ -352,10 +366,7 @@ if ( ! class_exists( 'acf_field_post_object' ) ) :
 		*
 		*  @param   $field  - an array holding all the field's data
 		*/
-
 		function render_field_settings( $field ) {
-
-			// default_value
 			acf_render_field_setting(
 				$field,
 				array(
@@ -371,7 +382,21 @@ if ( ! class_exists( 'acf_field_post_object' ) ) :
 				)
 			);
 
-			// default_value
+			acf_render_field_setting(
+				$field,
+				array(
+					'label'        => __( 'Filter by Post Status', 'acf' ),
+					'instructions' => '',
+					'type'         => 'select',
+					'name'         => 'post_status',
+					'choices'      => acf_get_pretty_post_statuses(),
+					'multiple'     => 1,
+					'ui'           => 1,
+					'allow_null'   => 1,
+					'placeholder'  => __( 'Any post status', 'acf' ),
+				)
+			);
+
 			acf_render_field_setting(
 				$field,
 				array(
@@ -387,31 +412,6 @@ if ( ! class_exists( 'acf_field_post_object' ) ) :
 				)
 			);
 
-			// allow_null
-			acf_render_field_setting(
-				$field,
-				array(
-					'label'        => __( 'Allow Null?', 'acf' ),
-					'instructions' => '',
-					'name'         => 'allow_null',
-					'type'         => 'true_false',
-					'ui'           => 1,
-				)
-			);
-
-			// multiple
-			acf_render_field_setting(
-				$field,
-				array(
-					'label'        => __( 'Select multiple values?', 'acf' ),
-					'instructions' => '',
-					'name'         => 'multiple',
-					'type'         => 'true_false',
-					'ui'           => 1,
-				)
-			);
-
-			// return_format
 			acf_render_field_setting(
 				$field,
 				array(
@@ -427,8 +427,39 @@ if ( ! class_exists( 'acf_field_post_object' ) ) :
 				)
 			);
 
+			acf_render_field_setting(
+				$field,
+				array(
+					'label'        => __( 'Select Multiple', 'acf' ),
+					'instructions' => 'Allow content editors to select multiple values',
+					'name'         => 'multiple',
+					'type'         => 'true_false',
+					'ui'           => 1,
+				)
+			);
+
 		}
 
+		/**
+		 * Renders the field settings used in the "Validation" tab.
+		 *
+		 * @since 6.0
+		 *
+		 * @param array $field The field settings array.
+		 * @return void
+		 */
+		function render_field_validation_settings( $field ) {
+			acf_render_field_setting(
+				$field,
+				array(
+					'label'        => __( 'Allow Null', 'acf' ),
+					'instructions' => '',
+					'name'         => 'allow_null',
+					'type'         => 'true_false',
+					'ui'           => 1,
+				)
+			);
+		}
 
 		/*
 		*  load_value()
@@ -578,6 +609,179 @@ if ( ! class_exists( 'acf_field_post_object' ) ) :
 			// return
 			return $posts;
 
+		}
+
+		/**
+		 * Validates post object fields updated via the REST API.
+		 *
+		 * @param bool  $valid
+		 * @param int   $value
+		 * @param array $field
+		 *
+		 * @return bool|WP_Error
+		 */
+		public function validate_rest_value( $valid, $value, $field ) {
+			if ( is_null( $value ) ) {
+				return $valid;
+			}
+
+			$param = sprintf( '%s[%s]', $field['prefix'], $field['name'] );
+			$data  = array( 'param' => $param );
+			$value = is_array( $value ) ? $value : array( $value );
+
+			$invalid_posts    = array();
+			$post_type_errors = array();
+			$taxonomy_errors  = array();
+
+			foreach ( $value as $post_id ) {
+				if ( is_string( $post_id ) ) {
+					continue;
+				}
+
+				$post_type = get_post_type( $post_id );
+				if ( ! $post_type ) {
+					$invalid_posts[] = $post_id;
+					continue;
+				}
+
+				if (
+					is_array( $field['post_type'] ) &&
+					! empty( $field['post_type'] ) &&
+					! in_array( $post_type, $field['post_type'] )
+				) {
+					$post_type_errors[] = $post_id;
+				}
+
+				if ( is_array( $field['taxonomy'] ) && ! empty( $field['taxonomy'] ) ) {
+					$found = false;
+					foreach ( $field['taxonomy'] as $taxonomy_term ) {
+						$decoded = acf_decode_taxonomy_term( $taxonomy_term );
+						if ( $decoded && is_object_in_term( $post_id, $decoded['taxonomy'], $decoded['term'] ) ) {
+							$found = true;
+							break;
+						}
+					}
+
+					if ( ! $found ) {
+						$taxonomy_errors[] = $post_id;
+					}
+				}
+			}
+
+			if ( count( $invalid_posts ) ) {
+				$error         = sprintf(
+					__( '%1$s must have a valid post ID.', 'acf' ),
+					$param
+				);
+				$data['value'] = $invalid_posts;
+				return new WP_Error( 'rest_invalid_param', $error, $data );
+			}
+
+			if ( count( $post_type_errors ) ) {
+				$error         = sprintf(
+					_n(
+						'%1$s must be of post type %2$s.',
+						'%1$s must be of one of the following post types: %2$s',
+						count( $field['post_type'] ),
+						'acf'
+					),
+					$param,
+					count( $field['post_type'] ) > 1 ? implode( ', ', $field['post_type'] ) : $field['post_type'][0]
+				);
+				$data['value'] = $post_type_errors;
+
+				return new WP_Error( 'rest_invalid_param', $error, $data );
+			}
+
+			if ( count( $taxonomy_errors ) ) {
+				$error         = sprintf(
+					_n(
+						'%1$s must have term %2$s.',
+						'%1$s must have one of the following terms: %2$s',
+						count( $field['taxonomy'] ),
+						'acf'
+					),
+					$param,
+					count( $field['taxonomy'] ) > 1 ? implode( ', ', $field['taxonomy'] ) : $field['taxonomy'][0]
+				);
+				$data['value'] = $taxonomy_errors;
+
+				return new WP_Error( 'rest_invalid_param', $error, $data );
+			}
+
+			return $valid;
+		}
+
+		/**
+		 * Return the schema array for the REST API.
+		 *
+		 * @param array $field
+		 * @return array
+		 */
+		public function get_rest_schema( array $field ) {
+			$schema = array(
+				'type'     => array( 'integer', 'array', 'null' ),
+				'required' => ! empty( $field['required'] ),
+				'items'    => array(
+					'type' => 'integer',
+				),
+			);
+
+			if ( empty( $field['allow_null'] ) ) {
+				$schema['minItems'] = 1;
+			}
+
+			if ( empty( $field['multiple'] ) ) {
+				$schema['maxItems'] = 1;
+			}
+
+			return $schema;
+		}
+
+		/**
+		 * @see \acf_field::get_rest_links()
+		 * @param mixed      $value The raw (unformatted) field value.
+		 * @param int|string $post_id
+		 * @param array      $field
+		 * @return array
+		 */
+		public function get_rest_links( $value, $post_id, array $field ) {
+			$links = array();
+
+			if ( empty( $value ) ) {
+				return $links;
+			}
+
+			foreach ( (array) $value as $object_id ) {
+				if ( ! $post_type = get_post_type( $object_id ) ) {
+					continue;
+				}
+
+				if ( ! $post_type_object = get_post_type_object( $post_type ) ) {
+					continue;
+				}
+
+				$rest_base = acf_get_object_type_rest_base( $post_type_object );
+				$links[]   = array(
+					'rel'        => $post_type_object->name === 'attachment' ? 'acf:attachment' : 'acf:post',
+					'href'       => rest_url( sprintf( '/wp/v2/%s/%s', $rest_base, $object_id ) ),
+					'embeddable' => true,
+				);
+			}
+
+			return $links;
+		}
+
+		/**
+		 * Apply basic formatting to prepare the value for default REST output.
+		 *
+		 * @param mixed      $value
+		 * @param string|int $post_id
+		 * @param array      $field
+		 * @return mixed
+		 */
+		public function format_value_for_rest( $value, $post_id, array $field ) {
+			return acf_format_numerics( $value );
 		}
 
 	}

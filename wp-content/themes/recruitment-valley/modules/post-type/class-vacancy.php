@@ -1,16 +1,18 @@
 <?php
 
-class Job extends RegisterCPT
+namespace PostType;
+
+class Vacancy extends RegisterCPT
 {
     public function __construct()
     {
-        add_action('init', [$this, 'RegisterJobCPT']);
+        add_action('init', [$this, 'RegisterVacancyCPT']);
     }
 
-    public function RegisterJobCPT()
+    public function RegisterVacancyCPT()
     {
-        $title = __('Jobs', THEME_DOMAIN);
-        $slug = 'job';
+        $title = __('Vacancies', THEME_DOMAIN);
+        $slug = 'vacancy';
         $args = [
             'menu_position' => 5
         ];
@@ -66,3 +68,4 @@ class Job extends RegisterCPT
         }
     }
 }
+new Vacancy();

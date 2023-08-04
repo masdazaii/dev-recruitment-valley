@@ -35,6 +35,14 @@ class RefreshTokenController
 
             $user = get_user_by('id', $decodedToken->user_id);
 
+            /** If token not same as refresh_token meta */
+            if ($token !== get_user_meta($decodedToken->user_id, 'refresh_token', true)) {
+                return [
+                    "status" => 401,
+                    "message" => $this->_message->get("auth.invalid_token")
+                ];
+            }
+
             if (!$user) {
                 return [
                     "status" => 401,
