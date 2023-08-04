@@ -4,7 +4,12 @@ namespace Vacancy;
 
 class Vacancy
 {
+    public $vacancy = 'vacancy';
+    
     public $vacancy_id;
+
+    public $title;
+
     public $description;
     public $term;
     public $apply_from_this_platform;
@@ -49,6 +54,11 @@ class Vacancy
     public function setDescription($description)
     {
         $this->description = $description;
+    }
+
+    public function setTitle($term)
+    {
+        $this->term = $term;
     }
 
     public function setTerm($term)
@@ -120,6 +130,11 @@ class Vacancy
     public function getDescription()
     {
         return $this->description;
+    }
+
+    public function getTitle()
+    {
+        return $this->title;
     }
 
     public function getTerm()

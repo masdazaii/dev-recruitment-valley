@@ -41,6 +41,10 @@ class Message
             ],
             'contact' => [
                 'success'   => __("Success send contact message.", THEME_DOMAIN)
+            ],
+            'vacancy' => [
+                "get_all" => __("Success get vacancies"),
+                "not_found" => __("there is no vancancy found base on your criteria", THEME_DOMAIN),
             ]
         ];
     }
