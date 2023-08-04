@@ -39,6 +39,13 @@ class LoginController
             ];
         }
 
+        if (!get_user_meta($user->ID, 'otp_is_verified', true)) {
+            return [
+                "message" => $this->_message->get('auth.unfinish_registration'),
+                "status" => 400
+            ];
+        }
+
         $credentials = [
             "user_login"    => $user->user_login,
             "user_password" => $request["password"],
@@ -66,7 +73,7 @@ class LoginController
             "exp" => $expireAccessToken,
             "user_id" => $user->ID,
             "role" => $user->roles[0],
-            "setup_status" => get_field("ucaa_is_full_registered", "user_".$user->ID) ?? false,
+            "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
         ];
 
         /** For Refresh Token */

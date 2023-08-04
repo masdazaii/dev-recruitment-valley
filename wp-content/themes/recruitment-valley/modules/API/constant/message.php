@@ -29,6 +29,7 @@ class Message
                     'success' => __("success reset password", THEME_DOMAIN),
                 ],
                 'not_found_user' => __("User was not found"),
+                'unfinish_registration' => __("Unfinished registration.", THEME_DOMAIN)
             ],
             'profile' => [
                 'setup' => [
