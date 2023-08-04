@@ -35,9 +35,8 @@ class ContactCPT extends RegisterCPT
     public function contactColumn($column_name)
     {
         unset($column_name['date']);
-        $column_name['title'] = __('Company Name');
-        $column_name['name'] = __('Sender Name');
-        $column_name['email'] = __('Email Address');
+        $column_name['title'] = __('Sender');
+        // $column_name['email'] = __('Email Address');
         $column_name['phone'] = __('Phone Number');
         $column_name['content'] = __('Contact Message');
         $column_name['submit'] = __('Submited On');
@@ -47,18 +46,18 @@ class ContactCPT extends RegisterCPT
 
     public function contactRow($column_name, $post_id)
     {
+
         switch ($column_name) {
-            case 'name':
-                echo get_post_meta($post_id, '_contact_name', true);
-                break;
             case 'email':
-                echo get_post_meta($post_id, '_contact_email', true);
+                echo get_field('email', $post_id, true);
                 break;
             case 'phone':
-                echo get_post_meta($post_id, '_contact_phone', true);
+                echo '(' . get_field('phone_number_code_area', $post_id, true) . ') ' . get_field('phone_number', $post_id, true);
                 break;
             case 'content':
-                echo get_the_content(null, false, $post_id);
+                $content = substr(get_the_content(null, false, $post_id), 0, 100);
+                $content .= '...';
+                echo $content;
                 break;
             case 'submit':
                 echo get_the_date('Y/m/d H:i:s T', $post_id);
@@ -68,7 +67,7 @@ class ContactCPT extends RegisterCPT
     public function contactActionLink($actions)
     {
         if (get_post_type() === 'contacts') {
-            unset($actions['edit']); // Edit action link
+            // unset($actions['edit']); // Edit action link
             unset($actions['inline hide-if-no-js']); // Quick edit action link
             unset($actions['view']); // View action link
         }
