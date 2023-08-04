@@ -4,7 +4,12 @@ namespace Vacancy;
 
 class Vacancy
 {
+    public $vacancy = 'vacancy';
+
     public $vacancy_id;
+
+    public $title;
+
     public $description;
     public $term;
     public $apply_from_this_platform;
@@ -19,6 +24,21 @@ class Vacancy
     public $twitter_url;
     public $gallery;
     public $reviews;
+    public $is_paid;
+
+    // acf field
+    public $acf_is_paid = "is_paid";
+    public $acf_apply_from_this_platform = "apply_from_this_platform";
+    public $acf_application_process_title = "application_process_title" ;
+    public $acf_application_process_description = "application_process_description";
+    public $acf_application_process_step = "application_process_step";
+    public $acf_video_url = "video_url";
+    public $acf_facebook_url = "facebook_url";
+    public $acf_linkedin_url = "linkedin_url";
+    public $acf_instagram_url = "instagram_url";
+    public $acf_twitter_url = "twitter_url";
+    public $acf_gallery = "gallery";
+    public $acf_reviews = "reviews";
 
     public $vacancy_property = [
         "description",
@@ -37,6 +57,24 @@ class Vacancy
         "reviews",
     ];
 
+    public function getAcfProperties()
+    {
+        $vacancy_id = $this->vacancy_id;
+
+        $properties = get_field_objects($vacancy_id);
+
+        $formatted_acf = [];
+
+        foreach ($this->vacancy_property as $key => $property) {
+            if(isset($properties[$property]))
+            {
+                $formatted_acf[$property] = $properties[$property]["value"];
+            }
+        }
+
+        return $formatted_acf;
+    }
+
     public function __construct( $vacancy_id = false )
     {
         if($vacancy_id)
@@ -49,6 +87,11 @@ class Vacancy
     public function setDescription($description)
     {
         $this->description = $description;
+    }
+
+    public function setTitle($term)
+    {
+        $this->term = $term;
     }
 
     public function setTerm($term)
@@ -120,6 +163,11 @@ class Vacancy
     public function getDescription()
     {
         return $this->description;
+    }
+
+    public function getTitle()
+    {
+        return $this->title;
     }
 
     public function getTerm()

@@ -21,12 +21,12 @@ class VacancyEndpoint
             'path' => '',
             'endpoints' =>
             [
-                'vacancies' => [
-                    'url'                   =>  'vacancies',
-                    'methods'               =>  'GET',
-                    'permission_callback'   => '__return_true',
-                    'callback'              =>  [$vacancyCrudService, 'create']
-                ]
+                // 'vacancies' => [
+                //     'url'                   =>  'vacancies',
+                //     'methods'               =>  'GET',
+                //     'permission_callback'   => '__return_true',
+                //     'callback'              =>  [$vacancyCrudService, 'create']
+                // ]
             ]
 
         ];
