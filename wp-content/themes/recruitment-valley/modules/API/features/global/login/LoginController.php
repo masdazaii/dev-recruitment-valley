@@ -77,7 +77,7 @@ class LoginController
         ];
 
         // store refresh token to db
-        add_user_meta($user->ID, 'refresh_token', JWT::encode($payloadRefreshToken, $key, 'HS256'));
+        update_user_meta($user->ID, 'refresh_token', JWT::encode($payloadRefreshToken, $key, 'HS256'));
 
         return [
             "message" => "Login success.",

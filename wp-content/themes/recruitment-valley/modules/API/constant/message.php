@@ -40,11 +40,6 @@ class Message
                 'failed_to_store' => __("Failed to store data.", THEME_DOMAIN),
             ],
             'contact' => [
-                'success'   => __("Success send contact message.", THEME_DOMAIN)
-            ],
-            'vacancy' => [
-                "get_all" => __("Success get vacancies"),
-                "not_found" => __("there is no vancancy found base on your criteria", THEME_DOMAIN),
                 'invalid_input' => [
                     'phone_number_required' => __("Phone number is required.", THEME_DOMAIN),
                     'phone_number_code_required' => __("Phone number code is required.", THEME_DOMAIN),
@@ -57,6 +52,10 @@ class Message
                     'message_required' => __("Message is required.", THEME_DOMAIN),
                 ],
                 'success'   => __("We have received your submission. We will reach back to you soon!", THEME_DOMAIN)
+            ],
+            'vacancy' => [
+                "get_all" => __("Success get vacancies"),
+                "not_found" => __("there is no vancancy found base on your criteria", THEME_DOMAIN),
             ]
         ];
     }
