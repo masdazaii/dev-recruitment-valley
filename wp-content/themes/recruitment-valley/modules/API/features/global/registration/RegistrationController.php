@@ -2,17 +2,25 @@
 
 namespace Global;
 
+use Constant\Message;
 use DateTimeImmutable;
 use WP_User;
 use Helper\OTPHelper as OTP;
 
 class RegistrationController
 {
+    private $_message;
+
+    public function __construct()
+    {
+        $this->_message = new Message;
+    }
+
     public function registration($request)
     {
         if (!isset($request["email"]) || !isset($request["password"])) {
             return [
-                "message"   => "Invalid Input.",
+                "message"   => $this->_message->get('auth.required_credential'),
                 "status"    => 400
             ];
         }
@@ -22,7 +30,7 @@ class RegistrationController
             $userValidated = get_user_meta($userExist->ID, 'otp_is_verified', true);
             if ($userValidated && $userValidated == '1') {
                 return [
-                    "message"   => "User is already registered.",
+                    "message"   => $this->_message->get('registration.already_registered_user'),
                     "status"    => 400
                 ];
             }
@@ -69,7 +77,7 @@ class RegistrationController
         wp_mail($request["email"], "One Time Password", "Your OTP : " . $otp);
 
         return [
-            "message"   => "We have sent an OTP code to your email. Please check your email and type in the code.",
+            "message"   => $this->_message->get('registration.registration_success'),
             "status"    => 201
         ];
     }
@@ -77,15 +85,12 @@ class RegistrationController
     public function validateOTP($request)
     {
         if (!isset($request['otp']) || !isset($request['email'])) {
-            $message = !isset($request['email']) ? 'Email is required.' : '';
-            $message = !isset($request['otp']) ? 'OTP is required.' : '';
+            $message = !isset($request['email']) ? $this->_message->get('registration.email_required') : '';
+            $message = !isset($request['otp']) ? $this->_message->get('registration.otp_required') : '';
 
             return [
-                "message"       => $message,
-                "errors"        => [
-                    "otp"       => "OTP is required"
-                ],
-                "status"    => 400
+                "message" => $message,
+                "status"  => 400
             ];
         }
 
@@ -98,36 +103,30 @@ class RegistrationController
         /** Validate OTP */
         if ($otpMetaValue !== $request['otp']) {
             return [
-                "message"       => "OTP is invalid.",
-                "errors"        => [
-                    "otp"       => "OTP is invalid"
-                ],
-                "status"    => 400
+                "message" => $this->_message->get('registration.otp_invalid'),
+                "status"  => 400
             ];
         }
 
         $now = time();
         if (strtotime($otpExpiredMetaValue) < $now) {
             return [
-                "message"       => "OTP is expired.",
-                "errors"        => [
-                    "otp"       => "OTP is expired"
-                ],
-                "status"    => 400
+                "message" => $this->_message->get('registration.otp_expired'),
+                "status"  => 400
             ];
         }
 
         $setOTPVerified = update_user_meta($user->ID, "otp_is_verified", "1");
         if (!$setOTPVerified) {
             return [
-                "message"   => "System Error, failed to verify otp.",
+                "message"   => $this->_message->get('registration.failed_verify_otp'),
                 "status"    => 500
             ];
         }
 
         return [
-            "message"       => "OTP is valid.",
-            "status"    => 200
+            "message" => $this->_message->get('registration.success_verify_otp'),
+            "status"  => 200
         ];
     }
 }
