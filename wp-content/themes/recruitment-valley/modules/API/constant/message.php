@@ -40,6 +40,17 @@ class Message
                 'failed_to_store' => __("Failed to store data.", THEME_DOMAIN),
             ],
             'contact' => [
+                'invalid_input' => [
+                    'phone_number_required' => __("Phone number is required.", THEME_DOMAIN),
+                    'phone_number_code_required' => __("Phone number code is required.", THEME_DOMAIN),
+                    'email_required' => __("Email is required.", THEME_DOMAIN),
+                    'email_invalid' => __("Email is invalid.", THEME_DOMAIN),
+                    'company_name_required' => __("Company name is required.", THEME_DOMAIN),
+                    'company_sender_name_required' => __("Name is required.", THEME_DOMAIN),
+                    'job_seeker_first_name_required' => __("First name is required.", THEME_DOMAIN),
+                    'job_seeker_last_name_required' => __("Last name is required.", THEME_DOMAIN),
+                    'message_required' => __("Message is required.", THEME_DOMAIN),
+                ],
                 'success'   => __("Success send contact message.", THEME_DOMAIN)
             ]
         ];
