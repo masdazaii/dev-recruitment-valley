@@ -53,13 +53,13 @@ class RefreshTokenController
             $payloadNewAccessToken = [
                 "user_id" => $user->ID,
                 "role" => $user->roles[0],
-                "setup_status" => get_field("ucaa_is_full_registered", "user_".$user->ID)
+                "setup_status" => get_field("ucaa_is_full_registered", "user_".$user->ID) ?? false,
             ];
 
             $payloadNewrefreshToken = [
                 "user_id" => $user->ID,
                 "role" => $user->roles[0],
-                "setup_status" => get_field("ucaa_is_full_registered", "user_".$user->ID)
+                "setup_status" => get_field("ucaa_is_full_registered", "user_".$user->ID) ?? false,
             ];
 
             $newToken = JWTHelper::generate($payloadNewAccessToken, "+60  minutes");
