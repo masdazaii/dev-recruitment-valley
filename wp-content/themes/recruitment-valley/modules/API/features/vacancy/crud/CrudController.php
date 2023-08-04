@@ -42,34 +42,35 @@ class VacancyCrudController
 
         $params = $request;
 
-        $page = $params["page"];
+        // $page = $params["page"];
 
-        $search = $params["search"];
+        // $search = $params["search"];
 
-        $city = $params["city"];
+        // $city = $params["city"];
 
-        $education = $params["education"];
+        // $education = $params["education"];
 
-        $role = $params["role"];
+        // $role = $params["role"];
 
-        $sector = $params["sector"];
+        // $sector = $params["sector"];
 
-        $hoursPerWeek = $params["hoursPerWeek"];
+        // $hoursPerWeek = $params["hoursPerWeek"];
 
-        $salaryStart = $params["salaryStart"];
+        // $salaryStart = $params["salaryStart"];
 
-        $salaryEnd = $params["salaryEnd"];
+        // $salaryEnd = $params["salaryEnd"];
 
-        $vacancy = new Vacancy;
+        // $vacancy = new Vacancy;
 
-        $postsPerPage = $params["postPerPage"];
+        // $postsPerPage = $params["postPerPage"];
 
         $args = [
             "post_type" => "vacancy",
             "numberposts" => -1,
             "offset" => 10,
             "order" => "ASC",
-            "paged" => $page
+            "post_status" => "publish",
+            // "paged" => $page
         ];
 
         $vacancies = get_posts( $args );
@@ -83,7 +84,7 @@ class VacancyCrudController
             ];
         }else{
             return [
-                "status" => 204,
+                "status" => 404,
                 "message" => $this->_message->get("vacancy.not_found"),
                 "data" => $vacancies
             ];
