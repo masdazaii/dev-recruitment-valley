@@ -51,7 +51,7 @@ class Message
                     'job_seeker_last_name_required' => __("Last name is required.", THEME_DOMAIN),
                     'message_required' => __("Message is required.", THEME_DOMAIN),
                 ],
-                'success'   => __("Success send contact message.", THEME_DOMAIN)
+                'success'   => __("We have received your submission. We will reach back to you soon!", THEME_DOMAIN)
             ]
         ];
     }
