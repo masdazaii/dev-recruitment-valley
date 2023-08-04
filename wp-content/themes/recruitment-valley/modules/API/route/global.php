@@ -105,11 +105,17 @@ class GlobalEndpoint
                     'permission_callback'   => [$authMiddleware, 'check_token'],
                     'callback'              => [$loginService, 'login']
                 ],
-                'contact' => [
-                    'url'                   => 'contact',
+                'contactEmployer' => [
+                    'url'                   => '/contact/employer',
                     'methods'               => 'POST',
                     'permission_callback'   => '__return_true',
-                    'callback'              => [$contactService, 'sendContact']
+                    'callback'              => [$contactService, 'sendContactEmployer']
+                ],
+                'contactJobSeeker' => [
+                    'url'                   => '/contact/job-seeker',
+                    'methods'               => 'POST',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$contactService, 'sendContactJobSeeker']
                 ],
             ]
 

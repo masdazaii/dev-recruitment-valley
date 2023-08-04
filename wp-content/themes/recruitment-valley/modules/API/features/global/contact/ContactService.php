@@ -14,10 +14,17 @@ class ContactService
         $this->contactController = new ContactController;
     }
 
-    public function sendContact(WP_REST_Request $request)
+    public function sendContactEmployer(WP_REST_Request $request)
     {
         $body = $request->get_params();
-        $response = $this->contactController->sendContact($body);
+        $response = $this->contactController->sendContact($body, 'company');
+        return ResponseHelper::build($response);
+    }
+
+    public function sendContactJobSeeker(WP_REST_Request $request)
+    {
+        $body = $request->get_params();
+        $response = $this->contactController->sendContact($body, 'candidate');
         return ResponseHelper::build($response);
     }
 }
