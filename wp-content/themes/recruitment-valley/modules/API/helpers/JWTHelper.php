@@ -14,8 +14,8 @@ class JWTHelper
         self::$issuedAt = new DateTimeImmutable;
 
         self::$registeredClaims = [
-            "iat" => self::$issuedAt,
-            "nbf" => self::$issuedAt    
+            // "iat" => self::$issuedAt,
+            // "nbf" => self::$issuedAt
         ];
     }
 

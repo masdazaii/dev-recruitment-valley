@@ -21,11 +21,12 @@ class ContactController
         if (!$validate['is_valid']) {
             return [
                 "message"    => $this->_message->get('input.invalid_input'),
-                "statusCode" => 400
+                "status" => 400
             ];
         }
 
         $arguments = [
+            'post_name'     => $permalink ?? '',
             'post_title'    => $request['company-name'],
             'post_content'  => $request['message'],
             'post_date'     => date('Y-m-d H:i:s', time()),
@@ -33,27 +34,27 @@ class ContactController
             'post_status'   => 'publish',
             'ping_status'   => 'closed',
             'post_parent'   => 0,
-            'post_name'     => $permalink ?? '',
             'post_author'   => get_current_user_id(),
             'post_type'     => 'contacts',
             'comment_status' => 'closed',
             'page_template'  => 'default'
         ];
 
-        $postID = wp_insert_post($arguments, false, true);
+        $contactID = wp_insert_post($arguments, false, true);
 
-        if (!$postID) {
+        if (!$contactID) {
             return [
                 "message"    => $this->_message->get('input.failed_to_store'),
-                "statusCode" => 400
+                "status" => 400
             ];
         }
-        $metaMail = update_post_meta($message, '_message_email', $this->data['contact-message-email']);
-        $metaName = update_post_meta($message, '_message_name', $this->data['contact-message-name']);
+        $metaName = update_post_meta($contactID, '_contact_name', $request['name']);
+        $metaMail = update_post_meta($contactID, '_contact_email', $request['email']);
+        $metaName = update_post_meta($contactID, '_contact_phone', $request['phone-number']);
 
         return [
             "message"    => $this->_message->get('contact.success'),
-            "statusCode" => 400
+            "status" => 200
         ];
     }
 

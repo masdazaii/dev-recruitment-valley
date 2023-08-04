@@ -32,8 +32,7 @@ class LoginController
 
         $user = get_user_by("email", $request["email"]);
 
-        if(!$user)
-        {
+        if (!$user) {
             return [
                 "message" => "Invalid Input.",
                 "status" => 400
@@ -77,6 +76,9 @@ class LoginController
             "user_id" => $user->ID
         ];
 
+        // store refresh token to db
+        add_user_meta($user->ID, 'refresh_token', JWT::encode($payloadRefreshToken, $key, 'HS256'));
+
         return [
             "message" => "Login success.",
             "data" => [
@@ -111,12 +113,11 @@ class LoginController
         ];
     }
 
-    public function forgot_password( $request )
+    public function forgot_password($request)
     {
         $email = $request["email"];
 
-        if(!isset($email) || $email == "")
-        {
+        if (!isset($email) || $email == "") {
             return [
                 "message" => $this->_message->get('auth.forgot_password.required_email'),
                 "status" => 400
@@ -125,8 +126,7 @@ class LoginController
 
         $user = get_user_by('email', $email);
 
-        if(!$user)
-        {
+        if (!$user) {
             return [
                 "message" => $this->_message->get('auth.not_found_user'),
                 "status" => 400
@@ -138,8 +138,8 @@ class LoginController
 
         update_user_meta($user->ID, "reset_password_key", $key);
 
-        $reset_password_token = base64_encode($user_login."_".$key);
-        $reset_password_url = $this->reset_password_url. "?key=" . $reset_password_token;
+        $reset_password_token = base64_encode($user_login . "_" . $key);
+        $reset_password_url = $this->reset_password_url . "?key=" . $reset_password_token;
 
         $subject = 'Password Reset';
         $message = '<p>Hallo ' . $user_login . '</p>
@@ -152,13 +152,12 @@ class LoginController
 
         $email_sent = wp_mail($user->user_email, $subject, $message, $headers);
 
-        if($email_sent)
-        {
+        if ($email_sent) {
             return [
                 "status" => 200,
                 "message" => $this->_message->get("auth.forgot_password.email_sent")
             ];
-        }else{
+        } else {
             return [
                 "status" => 400,
                 "message" => $this->_message->get("auth.forgot_password.email_not_sent")
@@ -174,36 +173,31 @@ class LoginController
 
         $errors = [];
 
-        if(!isset($newPassword) || $newPassword === "")
-        {
-            array_push( $errors, ["key" => "newPassword", "message" => $this->_message->get("auth.reset_password.new_password_required")]);
+        if (!isset($newPassword) || $newPassword === "") {
+            array_push($errors, ["key" => "newPassword", "message" => $this->_message->get("auth.reset_password.new_password_required")]);
         }
 
-        if(!isset($repeatPassword) || $repeatPassword === "")
-        {
+        if (!isset($repeatPassword) || $repeatPassword === "") {
             array_push($errors, ["key" => "repeatNewPassword", "message" => $this->_message->get("auth.reset_password.repeat_password_required")]);
         }
 
-        if($repeatPassword !== $repeatPassword)
-        {
+        if ($repeatPassword !== $repeatPassword) {
             array_push($errors, ["key" => "passwordMissmatch", "message" => $this->_message->get("auth.reset_password.password_missmatch")]);
         }
 
-        if(count($errors) > 0)
-        {
+        if (count($errors) > 0) {
             return [
                 "status" => 400,
                 "message" => $errors
             ];
         }
 
-        $user_login = explode("_",$key)[0];
-        $reset_password_key = explode("_",$key)[1];
+        $user_login = explode("_", $key)[0];
+        $reset_password_key = explode("_", $key)[1];
 
-        $user = get_user_by('login', $user_login );
+        $user = get_user_by('login', $user_login);
 
-        if(!$user)
-        {
+        if (!$user) {
             return [
                 "status" => 400,
                 "message" => $this->_message->get("auth.not_found_user")
@@ -212,8 +206,7 @@ class LoginController
 
         $user_reset_password_key = get_user_meta($user->ID, "reset_password_key", true);
 
-        if($reset_password_key !== $user_reset_password_key)
-        {
+        if ($reset_password_key !== $user_reset_password_key) {
             return [
                 "status" => 400,
                 "message" => $this->_message->get("auth.reset_password.incorrect_key"),
