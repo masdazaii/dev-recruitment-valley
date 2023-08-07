@@ -76,6 +76,12 @@ class AuthEndpoint
                     'methods'               => 'POST',
                     'permission_callback'   => '__return_true',
                     'callback'              => [$refreshTokenService, 'refresh']
+                ],
+                'resend-otp' => [
+                    'url'                   => 'resend-otp',
+                    'methods'               => 'POST',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$registrationService, 'resendOTP']
                 ]
             ]
 

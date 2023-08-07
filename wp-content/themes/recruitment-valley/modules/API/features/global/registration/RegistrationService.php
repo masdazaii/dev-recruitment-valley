@@ -27,4 +27,11 @@ class RegistrationService
         $response = $this->registrationController->validateOTP($body);
         return ResponseHelper::build($response);
     }
+
+    public function resendOTP(WP_REST_Request $request)
+    {
+        $body = $request->get_params();
+        $response = $this->registrationController->resendOTP($body);
+        return ResponseHelper::build($response);
+    }
 }

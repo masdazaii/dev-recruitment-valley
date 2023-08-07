@@ -113,13 +113,13 @@ class ContactController
         }
 
         /** Validate Email */
-        // if (!isset($request['email']) || $request['email'] === "") {
-        //     $response['is_valid'] = false;
-        //     $response['errors']['email'][] = $this->_message->get('contact.invalid_input.email_required');
-        // } else if (!filter_var($request['reservation-email'], FILTER_VALIDATE_EMAIL)) {
-        //     $result['is_valid'] = false;
-        //     $response['errors']['email'][] = $this->_message->get('contact.invalid_input.email_invalid');
-        // }
+        if (!isset($request['email']) || $request['email'] === "") {
+            $response['is_valid'] = false;
+            $response['errors']['email'][] = $this->_message->get('contact.invalid_input.email_required');
+        } else if (!filter_var($request['reservation-email'], FILTER_VALIDATE_EMAIL)) {
+            $result['is_valid'] = false;
+            $response['errors']['email'][] = $this->_message->get('contact.invalid_input.email_invalid');
+        }
 
         if ($from === 'company') {
             /** Validate Company Name */

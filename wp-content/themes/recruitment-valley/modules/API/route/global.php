@@ -8,6 +8,7 @@ use Global\ContactService;
 use Middleware\AuthMiddleware;
 use RefreshToken\RefreshTokenService;
 use Vacancy\VacancyCrudService;
+use Vacancy\Term\VacancyTermService;
 
 class GlobalEndpoint
 {
@@ -26,6 +27,7 @@ class GlobalEndpoint
         $loginService = new LoginService;
         $contactService = new ContactService;
         $crudVacancyService = new VacancyCrudService;
+        $termVacancyService = new VacancyTermService;
         $authMiddleware = new AuthMiddleware;
 
         $endpoint = [
@@ -55,6 +57,12 @@ class GlobalEndpoint
                     'methods'               => 'GET',
                     'permission_callback'   => '__return_true',
                     'callback'              => [$crudVacancyService, 'getAll']
+                ],
+                'vacanciesFilter' => [
+                    'url'                   => '/vacancies/filters',
+                    'methods'               => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$termVacancyService, 'getAll']
                 ]
             ]
 

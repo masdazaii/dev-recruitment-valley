@@ -1,0 +1,73 @@
+<?php
+
+namespace Vacancy\Term;
+
+use Constant\Message;
+use Model\Term;
+use Model\Taxonomy;
+
+class VacancyTermController
+{
+    private $_message;
+    private $termModel;
+
+    public function __construct()
+    {
+        $this->_message = new Message;
+        $this->termModel = new Term;
+    }
+
+    public function createFreeJob($request)
+    {
+        $vacancy = new Vacancy;
+
+        $vacancy->setTitle($request["title"]);
+        $vacancy->setDescription($request["description"]);
+        $vacancy->setApplyFromThisPlatform($request["apply_from_this_platform"]);
+        // $vacancy = new Vacancy();
+        // return [
+        //     "status" => 200,
+        //     "data" => $vacancy->getPropeties()
+        // ];
+
+
+
+    }
+
+    public function getAllTerm($parameters)
+    {
+        /** Get Taxonomy */
+        $taxonomies = get_object_taxonomies('vacancy', 'names');
+        foreach ($taxonomies as $value) {
+            /** Get Terms each taxonomy */
+            $termData[$value] = $this->_setResponse($this->termModel->selectTerm($value, []));
+        }
+
+        return [
+            "status" => 200,
+            "message" => $this->_message->get('vacancy.term.get_term_success'),
+            "meta" => [
+                "currentPage" => $parameters['page'],
+                "totalPage"   => 'count_data_perpage'
+            ],
+            "data" => $termData
+        ];
+    }
+
+    private function _setResponse($terms)
+    {
+        $response = [];
+
+        foreach ($terms as $key => $value) {
+            $term = [
+                'label' => $value->name,
+                'value' => $value->term_id,
+                'total' => $value->count
+            ];
+
+            array_push($response, $term);
+        }
+
+        return $response;
+    }
+}
