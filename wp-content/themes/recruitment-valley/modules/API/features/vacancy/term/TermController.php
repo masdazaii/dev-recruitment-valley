@@ -46,10 +46,6 @@ class VacancyTermController
         return [
             "status" => 200,
             "message" => $this->_message->get('vacancy.term.get_term_success'),
-            "meta" => [
-                "currentPage" => $parameters['page'],
-                "totalPage"   => 'count_data_perpage'
-            ],
             "data" => $termData
         ];
     }

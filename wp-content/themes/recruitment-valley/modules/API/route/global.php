@@ -40,13 +40,13 @@ class GlobalEndpoint
                     'permission_callback'   => [$authMiddleware, 'check_token'],
                     'callback'              => [$loginService, 'login']
                 ],
-                'contactEmployer' => [
+                'contact-employer' => [
                     'url'                   => '/contact/employer',
                     'methods'               => 'POST',
                     'permission_callback'   => '__return_true',
                     'callback'              => [$contactService, 'sendContactEmployer']
                 ],
-                'contactJobSeeker' => [
+                'contact-job-seeker' => [
                     'url'                   => '/contact/job-seeker',
                     'methods'               => 'POST',
                     'permission_callback'   => '__return_true',
@@ -58,7 +58,7 @@ class GlobalEndpoint
                     'permission_callback'   => '__return_true',
                     'callback'              => [$crudVacancyService, 'getAll']
                 ],
-                'vacanciesFilter' => [
+                'vacancies-filter' => [
                     'url'                   => '/vacancies/filters',
                     'methods'               => 'GET',
                     'permission_callback'   => '__return_true',
