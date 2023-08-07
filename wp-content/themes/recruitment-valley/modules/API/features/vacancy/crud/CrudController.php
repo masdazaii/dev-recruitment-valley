@@ -3,6 +3,7 @@
 namespace Vacancy;
 
 use Constant\Message;
+use WP_Post;
 
 class VacancyCrudController
 {
@@ -37,9 +38,6 @@ class VacancyCrudController
 
     public function getAll( $request )
     {
-
-        
-
         $params = $request;
 
         // $page = $params["page"];
@@ -87,6 +85,30 @@ class VacancyCrudController
                 "status" => 404,
                 "message" => $this->_message->get("vacancy.not_found"),
                 "data" => $vacancies
+            ];
+        }
+    }
+
+    public function get( $request )
+    {
+        $vacancy = new Vacancy;
+
+        $vacancySlug = $request['vacancy_slug'];
+
+        $vacancy = get_page_by_path($vacancySlug, OBJECT, 'vacancy');
+
+        if($vacancy instanceof WP_Post)
+        {
+            return [
+                "status" => 200,
+                "message" => $this->_message->get("vacancy.get_all"),
+                "data" => $vacancy
+            ];
+        }else{
+            return [
+                "status" => 404,
+                "message" => $this->_message->get("vacancy.not_found"),
+                // "data" => []
             ];
         }
     }

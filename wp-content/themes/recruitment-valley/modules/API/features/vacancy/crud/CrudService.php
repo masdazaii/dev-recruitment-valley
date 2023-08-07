@@ -29,6 +29,22 @@ class VacancyCrudService
         $response = $this->vacancyCrudController->getAll($params);
         $this->vacancyResponse->setCollection($response["data"]);
         $formattedResponse = $this->vacancyResponse->format();
-        return ResponseHelper::build($formattedResponse);
+        $response["data"] = $formattedResponse;
+        return ResponseHelper::build($response);
+    }
+
+    public function get( WP_REST_Request $request )
+    {
+        $params = $request->get_params();
+        $response = $this->vacancyCrudController->get($params);
+
+        if(isset($response["data"]))
+        {
+            $this->vacancyResponse->setCollection($response["data"]);
+            $formattedResponse = $this->vacancyResponse->formatSingle();
+            $response["data"] = $formattedResponse;
+        }
+        
+        return ResponseHelper::build($response);
     }
 }
