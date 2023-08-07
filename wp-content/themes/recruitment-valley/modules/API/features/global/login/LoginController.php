@@ -25,7 +25,7 @@ class LoginController
         /** !is */
         if (!isset($request["email"]) || !isset($request["password"]) || $request["email"] == "" || $request["password"] == "") {
             return [
-                "message" => "Invalid Input.",
+                "message" => $this->_message->get('auth.not_found_user'),
                 "status" => 400
             ];
         }
@@ -34,7 +34,14 @@ class LoginController
 
         if (!$user) {
             return [
-                "message" => "Invalid Input.",
+                "message" => $this->_message->get('auth.not_found_user'),
+                "status" => 400
+            ];
+        }
+
+        if (!get_user_meta($user->ID, 'otp_is_verified', true)) {
+            return [
+                "message" => $this->_message->get('auth.unfinish_registration'),
                 "status" => 400
             ];
         }
@@ -49,7 +56,7 @@ class LoginController
 
         if (is_wp_error($checkUser)) {
             return [
-                "message" => "Credentials is invalid.",
+                "message" => $this->_message->get('auth.invalid_credential'),
                 "status" => 400
             ];
         }
@@ -66,7 +73,7 @@ class LoginController
             "exp" => $expireAccessToken,
             "user_id" => $user->ID,
             "role" => $user->roles[0],
-            "setup_status" => get_field("ucaa_is_full_registered", "user_".$user->ID) ?? false,
+            "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
         ];
 
         /** For Refresh Token */
@@ -80,7 +87,7 @@ class LoginController
         update_user_meta($user->ID, 'refresh_token', JWT::encode($payloadRefreshToken, $key, 'HS256'));
 
         return [
-            "message" => "Login success.",
+            "message" => $this->_message->get("auth.login_success"),
             "data" => [
                 "token" => JWT::encode($payloadAccessToken, $key, 'HS256'),
                 "refreshToken" => JWT::encode($payloadRefreshToken, $key, 'HS256'),
@@ -93,7 +100,7 @@ class LoginController
     {
         if (!isset($jwtoken) || $jwtoken === '') {
             return [
-                "message"   => "Token is not provided.",
+                "message"   => $this->_message->get("auth.token_not_provided"),
                 "status"    => 403
             ];
         }
@@ -108,7 +115,7 @@ class LoginController
         update_user_meta($payload->user_id, 'refresh_token', '');
 
         return [
-            "message"   => "User logged out succesfully.",
+            "message"   => $this->_message->get("auth.logout_success"),
             "status"    => 200
         ];
     }
