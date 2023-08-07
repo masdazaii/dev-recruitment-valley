@@ -14,23 +14,6 @@ class VacancyCrudController
         $this->_message = new Message;
     }
 
-    public function createFreeJob( $request )
-    {
-        $vacancy = new Vacancy;
-
-        $vacancy->setTitle($request["title"]);
-        $vacancy->setDescription($request["description"]);
-        $vacancy->setApplyFromThisPlatform($request["apply_from_this_platform"]); 
-        // $vacancy = new Vacancy();
-        // return [
-        //     "status" => 200,
-        //     "data" => $vacancy->getPropeties()
-        // ];
-        
-
-
-    }
-
     public function show()
     {
 
@@ -82,7 +65,7 @@ class VacancyCrudController
             ];
         }else{
             return [
-                "status" => 404,
+                "status" => 200,
                 "message" => $this->_message->get("vacancy.not_found"),
                 "data" => $vacancies
             ];
@@ -111,5 +94,74 @@ class VacancyCrudController
                 // "data" => []
             ];
         }
+    }
+
+    public function createFree( $request )
+    {
+        $payload = [
+            "title" => $request["name"],
+            // "sector" => $request["sector"],
+            // "role" => $request["role"],
+            "description" => $request["description"],
+            // "type" => $request["type"],
+            // "location" => $request["location"],
+            // "education" => $request["education"],
+            // "workingHours" => $request["workingHours"],
+            "salary_start" => $request["salaryStart"],
+            "salary_end" => $request["salaryEnd"],
+            "external_url" => $request["externalUrl"],
+            "apply_from_this_platform" => isset($request["externalUrl"]) ? true : false,
+            "is_paid" => false,
+            "user_id" => $request["user_id"],
+            "taxonomy" => [
+                "sector" => $request["sector"],
+                "role" => $request["role"],
+                "working-hours" => $request["workingHours"],
+                "location" => $request["location"],
+                "education" => $request["education"],
+                "type" => $request["employmentType"],
+                "status" => [31] // set free job become pending category
+            ],
+        ];
+
+        try {
+            $vacancyModel = new Vacancy;
+
+            $vacancyModel->storePost($payload);
+            $vacancyModel->setTaxonomy($payload["taxonomy"]);
+            $vacancyModel->setProp($vacancyModel->acf_description, $payload["description"]);
+            $vacancyModel->setProp($vacancyModel->acf_is_paid, $payload["is_paid"]);
+            $vacancyModel->setProp($vacancyModel->acf_salary_start, $payload["salary_start"]);
+            $vacancyModel->setProp($vacancyModel->acf_salary_end, $payload["salary_end"]);
+            $vacancyModel->setProp($vacancyModel->acf_apply_from_this_platform, $payload["apply_from_this_platform"]);
+            
+            if($payload["apply_from_this_platform"])
+            {
+                $vacancyModel->setProp($vacancyModel->acf_external_url, $payload["external_url"]);
+            }
+
+            return [
+                "status" => 201,
+                "message" => $this->_message->get("vacancy.create.free.success"),
+            ];
+        } catch (\Throwable $th) {
+            return [
+                "status" => 500,
+                "message" => $this->_message->get("vacancy.create.fail"),
+            ];
+        } catch (\WP_Error $e)
+        {
+            return [
+                "status" => 500,
+                "message" => $this->_message->get("vacancy.create.fail"),
+            ];
+        }
+
+
+    }
+
+    public function createPaid( $request )
+    {
+
     }
 }

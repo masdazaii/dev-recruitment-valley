@@ -72,6 +72,12 @@ class Message
             'vacancy' => [
                 "get_all" => __("Success get vacancies"),
                 "not_found" => __("there is no vancancy found base on your criteria", THEME_DOMAIN),
+                "create" => [
+                    "free" => [
+                        "success" => __("We have received your vacancy submission. We will review your vacancy in up to 2 business days", THEME_DOMAIN),
+                        "fail" => __("Error creating free job", THEME_DOMAIN),
+                    ]
+                ]
             ]
         ];
     }
