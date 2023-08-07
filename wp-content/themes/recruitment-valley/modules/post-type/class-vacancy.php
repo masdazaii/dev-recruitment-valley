@@ -61,6 +61,12 @@ class Vacancy extends RegisterCPT
                     'label' => __("Status", THEME_DOMAIN),
                 ]
             ],
+            [
+                "name" => "location",
+                "arguments" => [
+                    'label' => __("Location", THEME_DOMAIN),
+                ]
+            ],
         ];
 
         foreach ($taxonomies as $key => $taxonomy) {

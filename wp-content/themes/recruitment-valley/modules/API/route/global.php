@@ -55,6 +55,12 @@ class GlobalEndpoint
                     'methods'               => 'GET',
                     'permission_callback'   => '__return_true',
                     'callback'              => [$crudVacancyService, 'getAll']
+                ],
+                'vacancies_single' => [
+                    'url'                   => 'vacancies/(?P<vacancy_slug>[a-zA-Z0-9-]+)',
+                    'methods'               => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$crudVacancyService, 'get']
                 ]
             ]
 

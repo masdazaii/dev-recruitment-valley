@@ -37,9 +37,6 @@ class VacancyCrudController
 
     public function getAll( $request )
     {
-
-        
-
         $params = $request;
 
         // $page = $params["page"];
@@ -87,6 +84,35 @@ class VacancyCrudController
                 "status" => 404,
                 "message" => $this->_message->get("vacancy.not_found"),
                 "data" => $vacancies
+            ];
+        }
+    }
+
+    public function get( $request )
+    {
+        $vacancyModel = new Vacancy( $request );
+
+        $vacancySlug = $request['vacancy_slug'];
+
+        $vacancy = get_posts([
+            'post_name'   => $vacancySlug,
+            'post_type'   => 'vacancy',
+            'post_status' => 'publish',
+            'numberposts' => -1
+        ]);
+
+        if($vacancy > 0)
+        {
+            return [
+                "status" => 200,
+                "message" => $this->_message->get("vacancy.get_all"),
+                "data" => array_shift($vacancy)
+            ];
+        }else{
+            return [
+                "status" => 404,
+                "message" => $this->_message->get("vacancy.not_found"),
+                // "data" => []
             ];
         }
     }
