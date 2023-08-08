@@ -8,11 +8,13 @@ use WP_Query;
 
 class VacancyCrudController
 {
+    private $_posttype = 'vacancy';
     private $_message;
 
     public function __construct()
     {
         $this->_message = new Message;
+        add_filter('posts_search', [$this, 'filterVacancySearch'], 10, 2);
     }
 
     public function show()
@@ -97,7 +99,7 @@ class VacancyCrudController
         $offset = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['postPerPage']) + 1);
 
         $args = [
-            "post_type" => "vacancy",
+            "post_type" => $this->_posttype,
             // "numberposts" => $filters['postPerPage'],
             // "numberposts" => -1,
             "posts_per_page" => $filters['postPerPage'],
@@ -306,5 +308,31 @@ class VacancyCrudController
 
     public function createPaid($request)
     {
+    }
+
+    public function filterVacancySearch($search,  $query)
+    {
+        global $wpdb;
+
+        if ($query->is_search && $query->get('post-type') == $this->_posttype) {
+            $searchKeyword = $query->get('s');
+
+            if (!empty($searchKeyword)) {
+                if (is_string($searchKeyword)) {
+                    $arrayOfKeyword = explode(' ', $searchKeyword);
+                    $regexPattern = '';
+                    for ($i = 0; $i < count($arrayOfKeyword); $i++) {
+                        $regexPattern .= $arrayOfKeyword[$i];
+                        if ($i < (count($arrayOfKeyword) - 1)) {
+                            $regexPattern .= '|';
+                        }
+                    }
+                    $search = "AND $wpdb->posts.post_title REGEXP '(" . esc_sql($regexPattern) . ")'";
+                    // $search = "AND $wpdb->posts.post_title LIKE '%" . esc_sql($regexPattern) . "%'";
+                }
+            }
+        }
+
+        return $search;
     }
 }
