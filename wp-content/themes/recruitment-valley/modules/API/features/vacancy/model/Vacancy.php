@@ -2,6 +2,8 @@
 
 namespace Vacancy;
 
+use WP_Post;
+
 class Vacancy
 {
     public $vacancy = 'vacancy';
@@ -52,41 +54,7 @@ class Vacancy
     public $acf_country = "country";
     public $acf_salary_start = "salary_start";
     public $acf_salary_end = "salary_end";
-
-    public $vacancy_property = [
-        "description",
-        "term",
-        "apply_from_this_platform",
-        "location",
-        "application_process_title",
-        "application_process_description",
-        "application_process_step",
-        "video_url",
-        "facebook_url",
-        "linkedin_url",
-        "instagram_url",
-        "twitter_url",
-        "gallery",
-        "reviews",
-    ];
-
-    public function getAcfProperties()
-    {
-        $vacancy_id = $this->vacancy_id;
-
-        $properties = get_field_objects($vacancy_id);
-
-        $formatted_acf = [];
-
-        foreach ($this->vacancy_property as $key => $property) {
-            if(isset($properties[$property]))
-            {
-                $formatted_acf[$property] = $properties[$property]["value"];
-            }
-        }
-
-        return $formatted_acf;
-    }
+    public $acf_external_url = "external_url";
 
     public function __construct( $vacancy_id = false )
     {
@@ -167,9 +135,26 @@ class Vacancy
         $this->gallery = $gallery;
     }
 
+    // public function setRole($roles)
+    // {
+    //     $this->setTaxonomy($roles, 'role');
+    // }
+
+    // public function setSector($sectores)
+    // {
+    //     $this->setTaxonomy($sectores, 'sector');
+    // }
+
     public function setReviews($reviews)
     {
         $this->reviews = $reviews;
+    }
+
+    public function setTaxonomy($taxonomies )
+    {
+        foreach ($taxonomies as $taxonomy => $terms) {
+            wp_set_post_terms($this->vacancy_id, $terms, $taxonomy);
+        }
     }
 
     // Getter methods
@@ -268,6 +253,11 @@ class Vacancy
         return $this->getProp($this->acf_salary_end);
     }
 
+    public function setProp($acf_field, $value)
+    {
+        return update_field($acf_field, $value, $this->vacancy_id );
+    } 
+
     public function getProp( $acf_field, $single = true )
     {
         return get_field($acf_field, $this->vacancy_id, $single);
@@ -319,5 +309,21 @@ class Vacancy
         }
 
         return $groupedTax;
+    }
+
+    public function storePost( $payload)
+    {
+        $args = [
+            "post_title" => $payload["title"],
+            "post_author" => $payload["user_id"],
+            "post_type" => $this->vacancy,
+            "post_status" => "publish"
+        ];
+
+        $vacancy = wp_insert_post($args);
+        
+        $this->vacancy_id = $vacancy;
+
+        return $vacancy;
     }
 }
