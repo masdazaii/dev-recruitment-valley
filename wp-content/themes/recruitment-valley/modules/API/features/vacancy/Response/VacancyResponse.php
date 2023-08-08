@@ -10,46 +10,46 @@ class VacancyResponse
 
     // public function __construct()
     // {
-    //     $this->vacancyCollection = $vacancyCollection;    
+    //     $this->vacancyCollection = $vacancyCollection;
     // }
 
-    public function setCollection( $vacancyCollection )
+    public function setCollection($vacancyCollection)
     {
         $this->vacancyCollection = $vacancyCollection;
     }
 
     public function format()
     {
-        $formattedResponse = array_map(function(WP_Post $vacancy){
+        $formattedResponse = array_map(function (WP_Post $vacancy) {
             $vacancyModel = new Vacancy($vacancy->ID);
-            $vacancyTaxonomy = $vacancyModel->getTaxonomy( true );
+            $vacancyTaxonomy = $vacancyModel->getTaxonomy(true);
             return [
                 "id" => $vacancy->ID,
                 "slug" => $vacancy->post_name,
                 "name" => $vacancy->post_title,
                 "city" => $vacancyModel->getCity(),
-                "education"=> $vacancyTaxonomy["education"] ,
-                "employmentType"=> $vacancyTaxonomy["type"],
-                "location"=> $vacancyTaxonomy["location"],
-                "role"=> $vacancyTaxonomy["role"],
-                "sector"=> $vacancyTaxonomy["sector"],
-                "hoursPerWeek"=> $vacancyTaxonomy["working-hours"],
+                "education" => $vacancyTaxonomy["education"]  ?? null,
+                "employmentType" => $vacancyTaxonomy["type"] ?? null,
+                "location" => $vacancyTaxonomy["location"] ?? null,
+                "role" => $vacancyTaxonomy["role"] ?? null,
+                "sector" => $vacancyTaxonomy["sector"] ?? null,
+                "hoursPerWeek" => $vacancyTaxonomy["working-hours"] ?? null,
                 // "salaryRange"=> "2500-3000",
                 "salaryStart" => $vacancyModel->getSalaryStart(),
                 "salaryEnd" => $vacancyModel->getSalaryEnd(),
-                "thumbnail"=> $vacancyModel->getThumbnail(),
-                "description"=> $vacancyModel->getDescription(),
+                "thumbnail" => $vacancyModel->getThumbnail(),
+                "description" => $vacancyModel->getDescription(),
                 "taxonomy" => $vacancyTaxonomy,
             ];
         }, $this->vacancyCollection);
-        
+
         return $formattedResponse;
     }
 
     public function formatSingle()
     {
         $vacancyModel = new Vacancy($this->vacancyCollection->ID);
-        $vacancyTaxonomy = $vacancyModel->getTaxonomy( false );
+        $vacancyTaxonomy = $vacancyModel->getTaxonomy(false);
         $formattedResponse = [
             "id" => $this->vacancyCollection->ID,
             "isPaid" => $vacancyModel->getIsPaid(),
@@ -66,7 +66,7 @@ class VacancyResponse
                 "email" => "",
                 "socialMedia" => [],
                 "website" => ""
-            ] , // later get company here
+            ], // later get company here
             "contents" => [
                 "description" => $vacancyModel->getDescription(),
                 "term" => $vacancyModel->getTerm(),
@@ -77,8 +77,8 @@ class VacancyResponse
             "steps" => [],
             "salaryStart" => $vacancyModel->getSalaryStart(),
             "salaryEnd" => $vacancyModel->getSalaryEnd(),
-            "thumbnail"=> $vacancyModel->getThumbnail(),
-            "description"=> $vacancyModel->getDescription(),
+            "thumbnail" => $vacancyModel->getThumbnail(),
+            "description" => $vacancyModel->getDescription(),
         ];
 
         return $formattedResponse;

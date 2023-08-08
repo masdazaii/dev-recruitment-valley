@@ -68,8 +68,7 @@ class LoginController
         $issuedAt     = new DateTimeImmutable();
 
         /** For Access Token */
-        // $expireAccessToken  = $issuedAt->modify("+60 minutes")->getTimestamp(); // valid until 60 minutes after toket issued
-        $expireAccessToken  = $issuedAt->modify("+20 seconds")->getTimestamp(); // valid until 60 minutes after toket issued
+        $expireAccessToken  = $issuedAt->modify("+60 minutes")->getTimestamp(); // valid until 60 minutes after toket issued
         $payloadAccessToken = [
             "exp" => $expireAccessToken,
             "user_id" => $user->ID,
@@ -78,8 +77,7 @@ class LoginController
         ];
 
         /** For Refresh Token */
-        // $expireRefreshToken  = $issuedAt->modify("+120 minutes")->getTimestamp(); // valid until 60 minutes after toket issued
-        $expireRefreshToken  = $issuedAt->modify("+1 minutes")->getTimestamp(); // valid until 60 minutes after toket issued
+        $expireRefreshToken  = $issuedAt->modify("+120 minutes")->getTimestamp(); // valid until 60 minutes after toket issued
         $payloadRefreshToken = [
             "exp" => $expireRefreshToken,
             "user_id" => $user->ID
