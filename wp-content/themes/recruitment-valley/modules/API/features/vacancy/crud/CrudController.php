@@ -162,6 +162,77 @@ class VacancyCrudController
 
     public function createPaid( $request )
     {
+        $payload = [
+            "title" => $request["name"],
+            "description" => $request["description"],
+            "term" => $request["terms"],
+            "salary_start" => $request["salaryStart"],
+            "salary_end" => $request["salaryEnd"],
+            "external_url" => $request["externalUrl"],
+            "apply_from_this_platform" => isset($request["externalUrl"]) ? true : false,
+            "is_paid" => true,
+            "user_id" => $request["user_id"],
+            "application_process_title" => $request["applicationProcedureTitle"],
+            "application_process_description" => $request["applicationProcedureText"],
+            "video_url" => $request["video"],
+            "facebook_url" => $request["facebook"],
+            "linkedin_url" => $request["linkedin"],
+            "instagram_url" => $request["instagram"],
+            "twitter_url" => $request["twitter"],
+            "reviews" => $request["review"],
+            "taxonomy" => [
+                "sector" => $request["sector"],
+                "role" => $request["role"],
+                "working-hours" => $request["workingHours"],
+                "location" => $request["location"],
+                "education" => $request["education"],
+                "type" => $request["employmentType"],
+                "status" => [32] // set free job become pending category
+            ],
+            "application_process_step" => $request["applicationProcedureSteps"],
+        ];
+
+        try {
+            $vacancyModel = new Vacancy;
+            $vacancyModel->storePost($payload);
+            $vacancyModel->setTaxonomy($payload["taxonomy"]);
+
+            foreach ($payload as $acf_field => $value) {
+                if($acf_field !== "taxonomy")
+                {
+                    $vacancyModel->setProp($acf_field, $value, is_array($value));
+                }
+            }
+            // $vacancyModel->setProp($vacancyModel->acf_description, $payload["description"]);
+            // $vacancyModel->setProp($vacancyModel->acf_is_paid, $payload["is_paid"]);
+            // $vacancyModel->setProp($vacancyModel->acf_salary_start, $payload["salary_start"]);
+            // $vacancyModel->setProp($vacancyModel->acf_salary_end, $payload["salary_end"]);
+            // $vacancyModel->setProp($vacancyModel->acf_apply_from_this_platform, $payload["apply_from_this_platform"]);
+            // $vacancyModel->setProp($vacancyModel->acf_application_process_title, $payload["application_process_title"]);
+            // $vacancyModel->setProp($vacancyModel->acf_application_process_description, $payload["application_process_description"]);
+            // $vacancyModel->setProp($vacancyModel->acf_video_url, $payload["video_url"] );
+            // $vacancyModel->setProp($vacancyModel->acf_facebook_url, )
+
+            return [
+                "status" => 201,
+                "message" => $this->_message->get("vacancy.create.paid.success"),
+            ];
+
+        } catch (\Throwable $th) {
+            return [
+                "status" => 500,
+                // "message" => $this->_message->get("vacancy.create.paid.fail"),
+                "message" => $th->getMessage(),
+                
+            ];
+        } catch (\WP_Error $e)
+        {
+            return [
+                "status" => 500,
+                "message" => $e->get_error_message(),
+                // "message" => $this->_message->get("vacancy.create.paid.fail"),
+            ];
+        }
 
     }
 }

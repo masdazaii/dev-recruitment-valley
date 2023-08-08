@@ -102,7 +102,15 @@ class Vacancy
 
     public function setApplicationProcessStep($application_process_step)
     {
-        $this->application_process_step = $application_process_step;
+        $steps = [];
+
+        foreach ($application_process_step as $key => $step) {
+            array_push($steps,[
+                "recruitment_step" => $step
+            ]);
+        }
+
+        update_field($this->acf_application_process_step, $steps,$this->vacancy_id);
     }
 
     public function setVideoUrl($video_url)
@@ -135,19 +143,14 @@ class Vacancy
         $this->gallery = $gallery;
     }
 
-    // public function setRole($roles)
-    // {
-    //     $this->setTaxonomy($roles, 'role');
-    // }
-
-    // public function setSector($sectores)
-    // {
-    //     $this->setTaxonomy($sectores, 'sector');
-    // }
-
     public function setReviews($reviews)
     {
-        $this->reviews = $reviews;
+        $existing_repeater_data = get_field($this->acf_reviews, $this->vacancy_id, true);
+        // Add the new data to the existing repeater data
+        
+        $updated_repeater_data = $existing_repeater_data ? array_merge($existing_repeater_data, $reviews) : $reviews;
+        // Update the repeater field with the new data
+        return update_field($this->acf_reviews, $updated_repeater_data, $this->vacancy_id);
     }
 
     public function setTaxonomy($taxonomies )
@@ -253,8 +256,18 @@ class Vacancy
         return $this->getProp($this->acf_salary_end);
     }
 
-    public function setProp($acf_field, $value)
+    public function setProp($acf_field, $value, $repeater = false)
     {
+        if($repeater)
+        {
+            switch ($acf_field){
+                case $this->acf_application_process_step:
+                    return $this->setApplicationProcessStep($value);
+                case $this->acf_reviews:
+                    return $this->setReviews($value);
+            }
+        }
+
         return update_field($acf_field, $value, $this->vacancy_id );
     } 
 

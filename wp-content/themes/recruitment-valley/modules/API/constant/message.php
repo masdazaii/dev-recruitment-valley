@@ -76,6 +76,11 @@ class Message
                     "free" => [
                         "success" => __("We have received your vacancy submission. We will review your vacancy in up to 2 business days", THEME_DOMAIN),
                         "fail" => __("Error creating free job", THEME_DOMAIN),
+                    ],
+                    "paid" => [
+                        "success" => __("We have received your vacancy submission", THEME_DOMAIN),
+                        "fail" => __("Error creating paid job", THEME_DOMAIN),
+                        
                     ]
                 ]
             ]
