@@ -71,15 +71,16 @@ class VacancyResponse
                 "description" => $vacancyModel->getDescription(),
                 "term" => $vacancyModel->getTerm(),
             ],
-            "videoId" => "",
-            "gallery" => [],
-            "reviews" => [],
-            "steps" => [],
-            // "salaryStart" => $vacancyModel->getSalaryStart(),
-            // "salaryEnd" => $vacancyModel->getSalaryEnd(),
-            "thumbnail" => $vacancyModel->getThumbnail(),
-            "description" => $vacancyModel->getDescription(),
+            "videoId" => $vacancyModel->getVideoUrl(),
+            "gallery" => $vacancyModel->getGallery(),
+            "reviews" => $vacancyModel->getReviews(),
+            "steps" => $vacancyModel->getApplicationProcessStep(),
+            "salaryStart" => $vacancyModel->getSalaryStart(),
+            "salaryEnd" => $vacancyModel->getSalaryEnd(),
+            "thumbnail"=> $vacancyModel->getThumbnail(),
         ];
+
+        // $formattedResponse = get_field($vacancyModel->acf_application_process_step,$this->vacancyCollection->ID);
 
         return $formattedResponse;
     }
