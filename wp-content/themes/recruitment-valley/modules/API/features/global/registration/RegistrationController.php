@@ -7,6 +7,11 @@ use DateTimeImmutable;
 use WP_User;
 use Helper\OTPHelper as OTP;
 
+/**
+ * Note: for registration and reserndOTP
+ * both has generate otp and send otp to email,
+ * suggests to create a private function to handle those 2 proccess.
+ */
 class RegistrationController
 {
     private $_message;
@@ -95,6 +100,12 @@ class RegistrationController
         }
 
         $user = get_user_by("email", $request["email"]);
+        if (!$user) {
+            return [
+                "message" => $this->_message->get('auth.not_found_user'),
+                "status"  => 400
+            ];
+        }
 
         /** Get user otp meta id */
         $otpMetaValue = get_user_meta($user->ID, 'otp', true);
@@ -127,6 +138,52 @@ class RegistrationController
         return [
             "message" => $this->_message->get('registration.success_verify_otp'),
             "status"  => 200
+        ];
+    }
+
+    public function resendOTP($request)
+    {
+        if (!isset($request['email']) || !is_email($request['email'])) {
+            $message = !isset($request['email']) ? $this->_message->get('registration.email_required') : $this->_message->get('registration.email_invalid');
+
+            return [
+                "message" => $message,
+                "status"  => 400
+            ];
+        }
+
+        $user = get_user_by("email", $request["email"]);
+        if (!$user) {
+            return [
+                "message" => $this->_message->get('registration.not_registered'),
+                "status"  => 400
+            ];
+        }
+
+        /** Create OTP */
+        $otp = OTP::generate(6);
+        $otpCreatedAt = new DateTimeImmutable();
+        $otpExpiredAt = $otpCreatedAt->modify("+10 minute")->format("Y-m-d H:i:s");
+        update_user_meta($user, "otp", $otp);
+        update_user_meta($user, "otp_expired", $otpExpiredAt);
+        update_user_meta($user, "otp_is_verified", "0"); // Set OTP verified status, if 1 => true / validated, 0 => false / invalid
+
+        /** Send OTP code */
+        $sendMail = wp_mail($request["email"], "One Time Password", "Your OTP : " . $otp);
+
+        if (!$sendMail) {
+            return [
+                "message"   => $this->_message->get('registration.new_otp_failed'),
+                "status"    => 500
+            ];
+        }
+
+        return [
+            "message"   => $this->_message->get('registration.new_otp_success'),
+            "data"      => [
+                "otp"   => $otp
+            ],
+            "status"    => 200
         ];
     }
 }

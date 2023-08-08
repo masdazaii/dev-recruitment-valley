@@ -38,13 +38,17 @@ class Message
             ],
             'registration' => [
                 'email_required' => __("Email is required.", THEME_DOMAIN),
+                'email_invalid' => __("Email is invalid.", THEME_DOMAIN),
                 'otp_required' => __("OTP is required.", THEME_DOMAIN),
                 'otp_invalid' => __("OTP is invalid.", THEME_DOMAIN),
                 'otp_expired' => __("OTP is expired.", THEME_DOMAIN),
+                'new_otp_success' => __("Sucess get new OTP code.", THEME_DOMAIN),
+                'new_otp_failed' => __("Failed to send new OTP code.", THEME_DOMAIN),
                 'failed_verify_otp' => __("System Error, failed to verify OTP.", THEME_DOMAIN),
                 'success_verify_otp' => __("OTP is verified!.", THEME_DOMAIN),
                 'already_registered_user' => __("User is already registered.", THEME_DOMAIN),
-                'registration_success' => __("We have sent an OTP code to your email. Please check your email and type in the code.", THEME_DOMAIN)
+                'registration_success' => __("We have sent an OTP code to your email. Please check your email and type in the code.", THEME_DOMAIN),
+                'not_registered' => __("User with given email, not yet registered.", THEME_DOMAIN)
             ],
             'profile' => [
                 'setup' => [
@@ -72,6 +76,9 @@ class Message
             'vacancy' => [
                 "get_all" => __("Success get vacancies"),
                 "not_found" => __("there is no vancancy found base on your criteria", THEME_DOMAIN),
+                "term" => [
+                    'get_term_success' => __("Success get vacancies' filters.", THEME_DOMAIN),
+                ],
                 "create" => [
                     "free" => [
                         "success" => __("We have received your vacancy submission. We will review your vacancy in up to 2 business days", THEME_DOMAIN),

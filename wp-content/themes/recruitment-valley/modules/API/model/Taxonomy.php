@@ -8,13 +8,12 @@ class Taxonomy
 {
     public $taxonomy;
 
-    public function __construct( $taxonomy)
+    public function __construct($taxonomy)
     {
         $tax = get_taxonomy($taxonomy);
-        if($tax)
-        {
+        if ($tax) {
             $this->taxonomy = $tax;
-        } 
+        }
     }
 
     public function isTaxonomy()

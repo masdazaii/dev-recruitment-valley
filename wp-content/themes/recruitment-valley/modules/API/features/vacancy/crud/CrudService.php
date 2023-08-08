@@ -23,7 +23,7 @@ class VacancyCrudService
     //     return ResponseHelper::build($response);
     // }
 
-    public function getAll( WP_REST_Request $request )
+    public function getAll(WP_REST_Request $request)
     {
         $params = $request->get_params();
         $response = $this->vacancyCrudController->getAll($params);
@@ -33,13 +33,12 @@ class VacancyCrudService
         return ResponseHelper::build($response);
     }
 
-    public function get( WP_REST_Request $request )
+    public function get(WP_REST_Request $request)
     {
         $params = $request->get_params();
         $response = $this->vacancyCrudController->get($params);
 
-        if(isset($response["data"]))
-        {
+        if (isset($response["data"])) {
             $this->vacancyResponse->setCollection($response["data"]);
             $formattedResponse = $this->vacancyResponse->formatSingle();
             $response["data"] = $formattedResponse;
@@ -48,7 +47,7 @@ class VacancyCrudService
         return ResponseHelper::build($response);
     }
 
-    public function createFreeJob( WP_REST_Request $request)
+    public function createFreeJob(WP_REST_Request $request)
     {
         $params = $request->get_params();
         $params["user_id"] = $request->user_id;
