@@ -4,14 +4,17 @@ namespace Vacancy;
 
 use Constant\Message;
 use WP_Post;
+use WP_Query;
 
 class VacancyCrudController
 {
+    private $_posttype = 'vacancy';
     private $_message;
 
     public function __construct()
     {
         $this->_message = new Message;
+        add_filter('posts_search', [$this, 'filterVacancySearch'], 10, 2);
     }
 
     public function show()
@@ -96,8 +99,10 @@ class VacancyCrudController
         $offset = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['postPerPage']) + 1);
 
         $args = [
-            "post_type" => "vacancy",
-            "numberposts" => $filters['postPerPage'],
+            "post_type" => $this->_posttype,
+            // "numberposts" => $filters['postPerPage'],
+            // "numberposts" => -1,
+            "posts_per_page" => $filters['postPerPage'],
             "offset" => $offset,
             "order" => "ASC",
             "post_status" => "publish",
@@ -204,13 +209,15 @@ class VacancyCrudController
             $args['s'] = $filters['search'];
         }
 
+        // $vacancies = get_posts($args);
+        $vacancies = new WP_Query($args);
+
         return [
             'message' => $this->_message->get('vacancy.get_all'),
-            'data'    => get_posts($args),
-            'args'    => $args,
+            'data'    => $vacancies->posts,
             'meta'    => [
                 'currentPage' => $filters['page'],
-                'totalPage' => 10
+                'totalPage' => $vacancies->max_num_pages
             ],
             'status'  => 200
         ];
@@ -301,5 +308,31 @@ class VacancyCrudController
 
     public function createPaid($request)
     {
+    }
+
+    public function filterVacancySearch($search,  $query)
+    {
+        global $wpdb;
+
+        if ($query->is_search && $query->get('post-type') == $this->_posttype) {
+            $searchKeyword = $query->get('s');
+
+            if (!empty($searchKeyword)) {
+                if (is_string($searchKeyword)) {
+                    $arrayOfKeyword = explode(' ', $searchKeyword);
+                    $regexPattern = '';
+                    for ($i = 0; $i < count($arrayOfKeyword); $i++) {
+                        $regexPattern .= $arrayOfKeyword[$i];
+                        if ($i < (count($arrayOfKeyword) - 1)) {
+                            $regexPattern .= '|';
+                        }
+                    }
+                    $search = "AND $wpdb->posts.post_title REGEXP '(" . esc_sql($regexPattern) . ")'";
+                    // $search = "AND $wpdb->posts.post_title LIKE '%" . esc_sql($regexPattern) . "%'";
+                }
+            }
+        }
+
+        return $search;
     }
 }
