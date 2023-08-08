@@ -4,6 +4,7 @@ namespace Vacancy;
 
 use Constant\Message;
 use WP_Post;
+use WP_Query;
 
 class VacancyCrudController
 {
@@ -97,7 +98,9 @@ class VacancyCrudController
 
         $args = [
             "post_type" => "vacancy",
-            "numberposts" => $filters['postPerPage'],
+            // "numberposts" => $filters['postPerPage'],
+            // "numberposts" => -1,
+            "posts_per_page" => $filters['postPerPage'],
             "offset" => $offset,
             "order" => "ASC",
             "post_status" => "publish",
@@ -204,13 +207,15 @@ class VacancyCrudController
             $args['s'] = $filters['search'];
         }
 
+        // $vacancies = get_posts($args);
+        $vacancies = new WP_Query($args);
+
         return [
             'message' => $this->_message->get('vacancy.get_all'),
-            'data'    => get_posts($args),
-            'args'    => $args,
+            'data'    => $vacancies->posts,
             'meta'    => [
                 'currentPage' => $filters['page'],
-                'totalPage' => 10
+                'totalPage' => $vacancies->max_num_pages
             ],
             'status'  => 200
         ];
