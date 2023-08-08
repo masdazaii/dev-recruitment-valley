@@ -4,6 +4,8 @@ namespace Route;
 
 use Global\LoginService;
 use Global\RegistrationService;
+use Middleware\AuthMiddleware;
+use Vacancy\VacancyCrudService;
 
 class CompanyEndpoint
 {
@@ -16,18 +18,18 @@ class CompanyEndpoint
 
     public function companyEndpoints()
     {
-        $loginService = new LoginService;
-        $RegistrationService = new RegistrationService;
+        $authMiddleware = new AuthMiddleware;
+        $vacancyCrudService = new VacancyCrudService;
 
         $endpoint = [
             'path'  => 'company',
             'endpoints' => [
-                // 'welcome_company' => [
-                //     'url'                   =>  'welcome-company',
-                //     'methods'               =>  'GET',
-                //     'permission_callback'   => '__return_true',
-                //     'callback'              =>  [$RegistrationService, 'register']
-                // ],
+                'create_free_job' => [
+                    'url'                   =>  'vacancy/free',
+                    'methods'               =>  'POST',
+                    'permission_callback'   => [$authMiddleware, 'check_token'],
+                    'callback'              =>  [$vacancyCrudService, 'createFreeJob']
+                ],
             ]
         ];
 

@@ -75,8 +75,8 @@ class VacancyResponse
             "gallery" => [],
             "reviews" => [],
             "steps" => [],
-            "salaryStart" => $vacancyModel->getSalaryStart(),
-            "salaryEnd" => $vacancyModel->getSalaryEnd(),
+            // "salaryStart" => $vacancyModel->getSalaryStart(),
+            // "salaryEnd" => $vacancyModel->getSalaryEnd(),
             "thumbnail" => $vacancyModel->getThumbnail(),
             "description" => $vacancyModel->getDescription(),
         ];

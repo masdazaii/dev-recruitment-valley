@@ -14,23 +14,6 @@ class VacancyCrudController
         $this->_message = new Message;
     }
 
-    public function createFreeJob($request)
-    {
-        $vacancy = new Vacancy;
-
-        $vacancy->setTitle($request["title"]);
-        $vacancy->setDescription($request["description"]);
-        $vacancy->setApplyFromThisPlatform($request["apply_from_this_platform"]);
-        // $vacancy = new Vacancy();
-        // return [
-        //     "status" => 200,
-        //     "data" => $vacancy->getPropeties()
-        // ];
-
-
-
-    }
-
     public function show()
     {
     }
@@ -105,9 +88,9 @@ class VacancyCrudController
             'education'     => array_key_exists('education', $request) ? explode(',', $request['education']) : NULL,
             'role'          => array_key_exists('role', $request) ? explode(',', $request['role']) : NULL,
             'sector'        => array_key_exists('sector', $request) ? explode(',', $request['sector']) : NULL,
-            'hoursPerWeek'  => array_key_exists('hoursPerWeek', $request) ? explode(',', $request['hoursPerWeek']) : NULL,
-            'employmentType' => array_key_exists('employmentType', $request) ? explode(',', $request['employmentType']) : NULL,
-            'location'       => array_key_exists('location', $request) ? explode(',', $request['location']) : NULL,
+            'working-hours' => array_key_exists('hoursPerWeek', $request) ? explode(',', $request['hoursPerWeek']) : NULL,
+            'type'          => array_key_exists('employmentType', $request) ? explode(',', $request['employmentType']) : NULL,
+            'location'      => array_key_exists('location', $request) ? explode(',', $request['location']) : NULL,
         ];
 
         $offset = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['postPerPage']) + 1);
@@ -126,7 +109,7 @@ class VacancyCrudController
             if ($value && $value !== null && !empty($value)) {
                 if (!array_key_exists('tax_query', $args)) {
                     $args['tax_query'] = [
-                        "relation" => 'AND'
+                        "relation" => 'OR'
                     ];
                 }
 
@@ -141,24 +124,24 @@ class VacancyCrudController
 
         /** Set meta query */
         if (($filters['salaryStart'] !== '' && isset($filters['salaryStart'])) || ($filters['salaryEnd'] !== '' && isset($filters['salaryEnd']))) {
-            if (!array_key_exists('meta_query', $args)) {
-                $args['meta_query'] = [
-                    "relation" => 'OR'
-                ];
-            }
-
             // If salaryStart and salaryEnd exist + more than 0
             if ($filters['salaryStart'] && $filters['salaryEnd'] && $filters['salaryEnd'] > 0) {
+                if (!array_key_exists('meta_query', $args)) {
+                    $args['meta_query'] = [
+                        "relation" => 'OR'
+                    ];
+                }
+
                 array_push($args['meta_query'], [
                     'relation' => 'AND',
                     [
-                        'key' => '_salary_start',
+                        'key' => 'salary_start',
                         'value' => $filters['salaryEnd'],
                         'type' => 'NUMERIC',
                         'compare' => '<=',
                     ],
                     [
-                        'key' => '_salary_end',
+                        'key' => 'salary_end',
                         'value' => $filters['salaryStart'],
                         'type' => 'NUMERIC',
                         'compare' => '>=',
@@ -167,41 +150,47 @@ class VacancyCrudController
                 array_push($args['meta_query'], [
                     'relation' => 'AND',
                     [
-                        'key' => '_salary_start',
+                        'key' => 'salary_start',
                         'value' => $filters['salaryStart'],
                         'type' => 'NUMERIC',
                         'compare' => '<=',
                     ],
                     [
-                        'key' => '_salary_end',
+                        'key' => 'salary_end',
                         'value' => $filters['salaryEnd'],
                         'type' => 'NUMERIC',
                         'compare' => '>=',
                     ],
                 ]);
             } else if ($filters['salaryStart'] || $filters['salaryEnd']) { // if only one of them is filled
+                if (!array_key_exists('meta_query', $args)) {
+                    $args['meta_query'] = [
+                        "relation" => 'AND'
+                    ];
+                }
+
                 if ($filters['salaryStart'] && !isset($filters['salaryEnd'])) { // if start is filled but other is empty
                     array_push($args['meta_query'], [
-                        'key' => '_salary_start',
+                        'key' => 'salary_start',
                         'value' => $filters['salaryStart'],
                         'type' => 'NUMERIC',
                         'compare' => '<=',
                     ]);
                     array_push($args['meta_query'], [
-                        'key' => '_salary_end',
+                        'key' => 'salary_end',
                         'value' => $filters['salaryStart'],
                         'type' => 'NUMERIC',
                         'compare' => '>=',
                     ]);
                 } else { // vice versa
                     array_push($args['meta_query'], [
-                        'key' => '_salary_start',
+                        'key' => 'salary_start',
                         'value' => $filters['salaryEnd'],
                         'type' => 'NUMERIC',
                         'compare' => '<=',
                     ]);
                     array_push($args['meta_query'], [
-                        'key' => '_salary_end',
+                        'key' => 'salary_end',
                         'value' => $filters['salaryEnd'],
                         'type' => 'NUMERIC',
                         'compare' => '>=',
@@ -216,9 +205,13 @@ class VacancyCrudController
         }
 
         return [
-            'message' => 'Success',
+            'message' => $this->_message->get('vacancy.get_all'),
             'data'    => get_posts($args),
-            // 'args'    => $args,
+            'args'    => $args,
+            'meta'    => [
+                'currentPage' => $filters['page'],
+                'totalPage' => 10
+            ],
             'status'  => 200
         ];
     }
@@ -244,5 +237,69 @@ class VacancyCrudController
                 // "data" => []
             ];
         }
+    }
+
+    public function createFree($request)
+    {
+        $payload = [
+            "title" => $request["name"],
+            // "sector" => $request["sector"],
+            // "role" => $request["role"],
+            "description" => $request["description"],
+            // "type" => $request["type"],
+            // "location" => $request["location"],
+            // "education" => $request["education"],
+            // "workingHours" => $request["workingHours"],
+            "salary_start" => $request["salaryStart"],
+            "salary_end" => $request["salaryEnd"],
+            "external_url" => $request["externalUrl"],
+            "apply_from_this_platform" => isset($request["externalUrl"]) ? true : false,
+            "is_paid" => false,
+            "user_id" => $request["user_id"],
+            "taxonomy" => [
+                "sector" => $request["sector"],
+                "role" => $request["role"],
+                "working-hours" => $request["workingHours"],
+                "location" => $request["location"],
+                "education" => $request["education"],
+                "type" => $request["employmentType"],
+                "status" => [31] // set free job become pending category
+            ],
+        ];
+
+        try {
+            $vacancyModel = new Vacancy;
+
+            $vacancyModel->storePost($payload);
+            $vacancyModel->setTaxonomy($payload["taxonomy"]);
+            $vacancyModel->setProp($vacancyModel->acf_description, $payload["description"]);
+            $vacancyModel->setProp($vacancyModel->acf_is_paid, $payload["is_paid"]);
+            $vacancyModel->setProp($vacancyModel->acf_salary_start, $payload["salary_start"]);
+            $vacancyModel->setProp($vacancyModel->acf_salary_end, $payload["salary_end"]);
+            $vacancyModel->setProp($vacancyModel->acf_apply_from_this_platform, $payload["apply_from_this_platform"]);
+
+            if ($payload["apply_from_this_platform"]) {
+                $vacancyModel->setProp($vacancyModel->acf_external_url, $payload["external_url"]);
+            }
+
+            return [
+                "status" => 201,
+                "message" => $this->_message->get("vacancy.create.free.success"),
+            ];
+        } catch (\Throwable $th) {
+            return [
+                "status" => 500,
+                "message" => $this->_message->get("vacancy.create.fail"),
+            ];
+        } catch (\WP_Error $e) {
+            return [
+                "status" => 500,
+                "message" => $this->_message->get("vacancy.create.fail"),
+            ];
+        }
+    }
+
+    public function createPaid($request)
+    {
     }
 }
