@@ -992,7 +992,7 @@ acf_add_local_field_group(array(
 			'append' => '',
 		),
 		array(
-			'key' => 'field_64cb57abd3673',
+			'key' => 'field_64d1e8d53a35d',
 			'label' => 'Application process step',
 			'name' => 'application_process_step',
 			'aria-label' => '',
@@ -1014,9 +1014,9 @@ acf_add_local_field_group(array(
 			'rows_per_page' => 20,
 			'sub_fields' => array(
 				array(
-					'key' => 'field_64cb57c3d3674',
-					'label' => 'step',
-					'name' => 'step',
+					'key' => 'field_64d1e8e33a35e',
+					'label' => 'Recruitment Step',
+					'name' => 'recruitment_step',
 					'aria-label' => '',
 					'type' => 'text',
 					'instructions' => '',
@@ -1032,7 +1032,7 @@ acf_add_local_field_group(array(
 					'placeholder' => '',
 					'prepend' => '',
 					'append' => '',
-					'parent_repeater' => 'field_64cb57abd3673',
+					'parent_repeater' => 'field_64d1e8d53a35d',
 				),
 			),
 		),
@@ -1230,8 +1230,8 @@ acf_add_local_field_group(array(
 				),
 				array(
 					'key' => 'field_64cb58c4d367e',
-					'label' => 'Description',
-					'name' => 'description',
+					'label' => 'Text',
+					'name' => 'text',
 					'aria-label' => '',
 					'type' => 'textarea',
 					'instructions' => '',
