@@ -879,6 +879,26 @@
                 "placeholder": "",
                 "prepend": "",
                 "append": ""
+            },
+            {
+                "key": "field_64d318e02fd81",
+                "label": "Company Name",
+                "name": "ucma_company_name",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
             }
         ],
         "location": [
