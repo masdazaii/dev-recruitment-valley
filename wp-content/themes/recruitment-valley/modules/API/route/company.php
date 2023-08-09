@@ -44,6 +44,24 @@ class CompanyEndpoint
                     'permission_callback'   => [$authMiddleware, 'check_token_company'],
                     'callback'              =>  [$profile, 'get']
                 ],
+                'profile_post_address' => [
+                    'url'                   => 'profile/address',
+                    'methods'               => 'Post',
+                    'permission_callback'   => [$authMiddleware, 'check_token_company'],
+                    'callback'              =>  [$profile, 'post_address']
+                ],
+                'profile_post_socials' => [
+                    'url'                   => 'profile/socials',
+                    'methods'               => 'Post',
+                    'permission_callback'   => [$authMiddleware, 'check_token_company'],
+                    'callback'              =>  [$profile, 'post_socials']
+                ],
+                'profile_post_information' => [
+                    'url'                   => 'profile/information',
+                    'methods'               => 'Post',
+                    'permission_callback'   => [$authMiddleware, 'check_token_company'],
+                    'callback'              =>  [$profile, 'post_information']
+                ],
             ]
         ];
 

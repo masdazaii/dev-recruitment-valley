@@ -9,6 +9,7 @@ use Helper\ValidationHelper;
 use Model\ModelHelper;
 use ResponseHelper;
 use WP_REST_Request;
+use WP_REST_Response;
 
 class ProfileController
 {
@@ -58,6 +59,153 @@ class ProfileController
             ],
             'information' => Helper::isset($user_data_acf, 'ucma_short_decription'),
             'gallery' => $galleries
+        ];
+    }
+
+    public function post_address(WP_REST_Request $request)
+    {
+        $user_id = $request->user_id;
+
+        $fields = $request->get_body();
+        $fields = (array)json_decode($fields);
+
+        $validate = ValidationHelper::validate($fields, [
+            "country" => "required",
+            "city" => "required",
+            "street" => "required",
+            "postcode" => "required",
+        ]);
+        if (!$validate['is_valid']) wp_send_json_error(['validation' => $validate['fields'], 'status' => 400], 400);
+
+        global $wpdb;
+        try {
+            $wpdb->query('START TRANSACTION');
+            update_field('ucma_country', $fields['country'], 'user_' . $user_id);
+            update_field('ucma_street', $fields['street'], 'user_' . $user_id);
+            update_field('ucma_city', $fields['city'], 'user_' . $user_id);
+            update_field('ucma_postcode', $fields['postcode'], 'user_' . $user_id);
+
+            $wpdb->query('COMMIT');
+        } catch (Error $e) {
+            $wpdb->query('ROLLBACK');
+            return wp_send_json_error(['error' => $e, 'status' => 500], 500);
+        }
+
+        return [
+            'message' => $this->message->get("profile.update.success")
+        ];
+    }
+
+    public function post_socials(WP_REST_Request $request)
+    {
+        $user_id = $request->user_id;
+
+        $fields = $request->get_body();
+        $fields = (array)json_decode($fields);
+
+        global $wpdb;
+        try {
+            $wpdb->query('START TRANSACTION');
+            update_field('ucma_facebook_url', Helper::isset($fields, 'facebook'), 'user_' . $user_id);
+            update_field('ucma_linkedin_url', Helper::isset($fields, 'linkedin'), 'user_' . $user_id);
+            update_field('ucma_instagram_url', Helper::isset($fields, 'instagram'), 'user_' . $user_id);
+            update_field('ucma_twitter_url', Helper::isset($fields, 'twitter'), 'user_' . $user_id);
+
+            $wpdb->query('COMMIT');
+        } catch (Error $e) {
+            $wpdb->query('ROLLBACK');
+            return wp_send_json_error(['error' => $e, 'status' => 500], 500);
+        }
+
+        return [
+            'message' => $this->message->get("profile.update.success")
+        ];
+    }
+
+    public function post_detail(WP_REST_Request $request)
+    {
+        $user_id = $request->user_id;
+
+        $fields = $request->get_body();
+        $fields = (array)json_decode($fields);
+
+        $validate = ValidationHelper::validate($fields, [
+            "companyName" => "required",
+            "employees" => "required",
+            "phoneCode" => "required",
+            "phoneNumber" => "required",
+            "email" => "required",
+        ]);
+        if (!$validate['is_valid']) wp_send_json_error(['validation' => $validate['fields'], 'status' => 400], 400);
+
+        global $wpdb;
+        try {
+            $wpdb->query('START TRANSACTION');
+            $userdata = [
+                'ID'            => $user_id,
+                'email'         => $fields['email'],
+                'last_name'     => $fields['lastName'],
+            ];
+
+            wp_update_user($userdata);
+            update_field('ucma_employees', Helper::isset($fields, 'employees'), 'user_' . $user_id);
+            update_field('ucma_phone_code', Helper::isset($fields, 'phoneCode'), 'user_' . $user_id);
+            update_field('ucma_phone', Helper::isset($fields, 'phoneNumber'), 'user_' . $user_id);
+            update_field('ucma_sector', Helper::isset($fields, 'sector'), 'user_' . $user_id);
+            update_field('ucma_website_url', Helper::isset($fields, 'website'), 'user_' . $user_id);
+            update_field('ucma_kvk_number', Helper::isset($fields, 'kvk'), 'user_' . $user_id);
+            update_field('ucma_btw_number', Helper::isset($fields, 'btw'), 'user_' . $user_id);
+
+            $wpdb->query('COMMIT');
+        } catch (Error $e) {
+            $wpdb->query('ROLLBACK');
+            return wp_send_json_error(['error' => $e, 'status' => 500], 500);
+        }
+
+        return [
+            'message' => $this->message->get("profile.update.success")
+        ];
+    }
+
+    public function post_information(WP_REST_Request $request)
+    {
+        $user_id = $request->user_id;
+
+        $fields = $request->get_body_params();
+
+        $validate = ValidationHelper::validate($fields, [
+            "sortDescription" => "required",
+        ]);
+        if (!$validate['is_valid']) wp_send_json_error(['validation' => $validate['fields'], 'status' => 400], 400);
+
+
+        global $wpdb;
+        try {
+            $wpdb->query('START TRANSACTION');
+
+            $galleries = ModelHelper::handle_uploads('gallery', 'test');
+
+            update_field('ucma_short_decription', Helper::isset($fields, 'sortDescription'), 'user_' . $user_id);
+            update_field('ucma_company_video_url', Helper::isset($fields, 'videoUrl'), 'user_' . $user_id);
+
+            $current_gallery = maybe_unserialize(get_user_meta($user_id, 'ucma_gallery_photo'));
+            $current_gallery = isset($current_gallery[0]) ? $current_gallery[0] : [];
+            if ($galleries) {
+                $gallery_ids = $current_gallery;
+                foreach ($galleries as $key => $gallery) {
+                    $gallery_ids[] = wp_insert_attachment($gallery['attachment'], $gallery['file']);
+                }
+                update_field('ucma_gallery_photo', $gallery_ids, 'user_' . $user_id);
+            }
+
+            $wpdb->query('COMMIT');
+        } catch (Error $e) {
+            $wpdb->query('ROLLBACK');
+            return wp_send_json_error(['error' => $e, 'status' => 500], 500);
+        }
+
+        return [
+            'message' => $this->message->get("profile.update.success")
         ];
     }
 }
