@@ -19,4 +19,22 @@ class ProfileService
         $response = $this->setupProfileController->get($request);
         return ResponseHelper::build($response);
     }
+
+    public function post_address(WP_REST_Request $request)
+    {
+        $response = $this->setupProfileController->post_address($request);
+        return ResponseHelper::build($response);
+    }
+
+    public function post_socials(WP_REST_Request $request)
+    {
+        $response = $this->setupProfileController->post_socials($request);
+        return ResponseHelper::build($response);
+    }
+
+    public function post_information(WP_REST_Request $request)
+    {
+        $response = $this->setupProfileController->post_information($request);
+        return ResponseHelper::build($response);
+    }
 }
