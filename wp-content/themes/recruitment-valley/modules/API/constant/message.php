@@ -38,6 +38,8 @@ class Message
             ],
             'registration' => [
                 'email_required' => __("Email is required.", THEME_DOMAIN),
+                'email_wrong' => __("Please input valid email.", THEME_DOMAIN),
+                'role_wrong' => __("Please select valid role.", THEME_DOMAIN),
                 'email_invalid' => __("Email is invalid.", THEME_DOMAIN),
                 'otp_required' => __("OTP is required.", THEME_DOMAIN),
                 'otp_invalid' => __("OTP is invalid.", THEME_DOMAIN),
@@ -94,7 +96,8 @@ class Message
             'candidate' => [
                 "apply_vacancy" => [
                     "apply_success" => __("Success apply this job.", THEME_DOMAIN),
-                    "apply_failed" => __("Failed apply this job.", THEME_DOMAIN)
+                    "apply_failed" => __("Failed apply this job.", THEME_DOMAIN),
+                    "expired_job" => __("Failed, the job already expired", THEME_DOMAIN),
                 ]
             ]
         ];

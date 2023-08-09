@@ -86,4 +86,21 @@ class AuthMiddleware
         $request->set_param('user_id', $handleToken->user_id);
         return true;
     }
+
+    public function authorize_company(WP_REST_Request $request)
+    {
+        $allowed = ['company'];
+        $handleToken = $this->_handle_token($request);
+
+        if (is_wp_error($handleToken)) {
+            return $handleToken;
+        }
+
+        if (!in_array(strtolower($handleToken->role), $allowed)) {
+            return new WP_Error("rest_forbidden", $this->_message->get('auth.unauthenticate'), array("status" => 403));
+        }
+
+        $request->user_id = $handleToken->user_id;
+        return true;
+    }
 }

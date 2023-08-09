@@ -39,7 +39,6 @@ class VacancyResponse
                 "salaryEnd" => $vacancyModel->getSalaryEnd(),
                 "thumbnail" => $vacancyModel->getThumbnail(),
                 "description" => $vacancyModel->getDescription(),
-                "taxonomy" => $vacancyTaxonomy,
             ];
         }, $this->vacancyCollection);
 
