@@ -27,11 +27,14 @@ class ProfileController
         $user_data_acf = Helper::isset($user_data, 'acf');
         $galleries = Helper::isset($user_data_acf, 'ucma_gallery_photo') ?? [];
         $galleries = array_map(function ($gallery) {
-            return [
-                'id' => $gallery['ID'],
+            static $i = 0;
+            $result = [
+                'id' => $gallery['ID'] . "-" . $i,
                 'title' => $gallery['title'],
                 'url' => $gallery['url'],
             ];
+            $i++;
+            return $result;
         }, $galleries);
 
         return [
@@ -197,6 +200,36 @@ class ProfileController
                 }
                 update_field('ucma_gallery_photo', $gallery_ids, 'user_' . $user_id);
             }
+
+            $wpdb->query('COMMIT');
+        } catch (Error $e) {
+            $wpdb->query('ROLLBACK');
+            return wp_send_json_error(['error' => $e, 'status' => 500], 500);
+        }
+
+        return [
+            'message' => $this->message->get("profile.update.success")
+        ];
+    }
+
+    public function delete_gallery(WP_REST_Request $request)
+    {
+        $user_id = $request->user_id;
+        $gallery_id_index = $request->get_param('id');
+
+        global $wpdb;
+        try {
+            $wpdb->query('START TRANSACTION');
+
+            $current_gallery = maybe_unserialize(get_user_meta($user_id, 'ucma_gallery_photo'));
+            $current_gallery = isset($current_gallery[0]) ? $current_gallery[0] : [];
+
+            $gallery_index = explode("-", $gallery_id_index)[1];
+            $gallery_id = explode("-", $gallery_id_index)[0];
+            if (isset($current_gallery[$gallery_index]) && $current_gallery[$gallery_index] == $gallery_id) {
+                unset($current_gallery[$gallery_index]);
+            }
+            update_field('ucma_gallery_photo', $current_gallery, 'user_' . $user_id);
 
             $wpdb->query('COMMIT');
         } catch (Error $e) {

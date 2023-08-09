@@ -62,6 +62,17 @@ class CompanyEndpoint
                     'permission_callback'   => [$authMiddleware, 'check_token_company'],
                     'callback'              =>  [$profile, 'post_information']
                 ],
+                'profile_delete_gallery' => [
+                    'url'                   => 'profile/gallery/(?P<id>[-\w]+)',
+                    'methods'               => 'DELETE',
+                    'permission_callback'   => [$authMiddleware, 'check_token_company'],
+                    'args' => [
+                        'id' => [
+                            'type'        => 'string',
+                        ]
+                    ],
+                    'callback'              =>  [$profile, 'delete_gallery']
+                ],
             ]
         ];
 

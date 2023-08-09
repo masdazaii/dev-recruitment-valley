@@ -37,4 +37,10 @@ class ProfileService
         $response = $this->setupProfileController->post_information($request);
         return ResponseHelper::build($response);
     }
+
+    public function delete_gallery(WP_REST_Request $request)
+    {
+        $response = $this->setupProfileController->delete_gallery($request);
+        return ResponseHelper::build($response);
+    }
 }
