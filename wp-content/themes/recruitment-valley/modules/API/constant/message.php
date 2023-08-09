@@ -54,7 +54,10 @@ class Message
             ],
             'profile' => [
                 'setup' => [
-                    'success' =>  __("success setup profile", THEME_DOMAIN)
+                    'success' =>  __("success setup profile", THEME_DOMAIN),
+                ],
+                'update' => [
+                    'success' =>  __("success update profile", THEME_DOMAIN),
                 ]
             ],
             'input' => [
@@ -89,7 +92,7 @@ class Message
                     "paid" => [
                         "success" => __("We have received your vacancy submission", THEME_DOMAIN),
                         "fail" => __("Error creating paid job", THEME_DOMAIN),
-                        
+
                     ]
                 ]
             ],
