@@ -85,6 +85,12 @@ class Message
                         "fail" => __("Error creating free job", THEME_DOMAIN),
                     ]
                 ]
+            ],
+            'candidate' => [
+                "apply_vacancy" => [
+                    "apply_success" => __("Success apply this job.", THEME_DOMAIN),
+                    "apply_failed" => __("Failed apply this job.", THEME_DOMAIN)
+                ]
             ]
         ];
     }
