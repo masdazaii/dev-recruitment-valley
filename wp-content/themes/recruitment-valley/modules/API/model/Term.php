@@ -19,12 +19,7 @@ class Term
         ];
     }
 
-    // public function getTerm()
-    // {
-
-    // }
-
-    public function selectTerm($taxonomy, $filters)
+    public function selectTerm($taxonomy, $filters = [])
     {
         if (!$taxonomy) {
             return;

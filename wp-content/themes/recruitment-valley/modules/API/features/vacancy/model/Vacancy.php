@@ -65,6 +65,11 @@ class Vacancy
         }
     }
 
+    public function setId( $vacancyId )
+    {
+        $this->vacancy_id = $vacancyId;
+    }
+
     // Setter methods
     public function setDescription($description)
     {
@@ -142,6 +147,18 @@ class Vacancy
     public function setGallery($gallery)
     {
         $this->gallery = $gallery;
+    }
+    
+    /**
+     * setStatus
+     * accepted status => declined , close, open, processing
+     *
+     * @param  mixed $status
+     * @return void
+     */
+    public function setStatus($status)
+    {
+        return wp_set_post_terms($this->vacancy_id,$status, 'status');
     }
 
     public function setReviews($reviews)
@@ -242,6 +259,12 @@ class Vacancy
     {
         return $this->getProp($this->acf_country);
     }
+
+    // public function getStatus()
+    // {
+    //     $status = get_the_terms($this->vacancy_id, 'status');
+    //     return $status;
+    // }
 
     public function getReviews()
     {
@@ -356,5 +379,26 @@ class Vacancy
         $this->vacancy_id = $vacancy;
 
         return $vacancy;
+    }
+
+    
+    public function getByStatus( $status )
+    {
+        $args = [
+            "post_type" => $this->vacancy,
+            "post_status" => "publish",
+            "tax_query" => [
+                [
+                    'taxonomy' => $status,
+                    'field' => 'slug',
+                    'terms' => array( $status ),
+                    'operator' => 'IN'
+                ]
+            ],
+        ];
+
+        $vacancies = get_posts( $args );
+
+        return $vacancies;
     }
 }
