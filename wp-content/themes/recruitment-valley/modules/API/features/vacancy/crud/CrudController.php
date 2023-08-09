@@ -250,13 +250,7 @@ class VacancyCrudController
     {
         $payload = [
             "title" => $request["name"],
-            // "sector" => $request["sector"],
-            // "role" => $request["role"],
             "description" => $request["description"],
-            // "type" => $request["type"],
-            // "location" => $request["location"],
-            // "education" => $request["education"],
-            // "workingHours" => $request["workingHours"],
             "salary_start" => $request["salaryStart"],
             "salary_end" => $request["salaryEnd"],
             "external_url" => $request["externalUrl"],
@@ -284,7 +278,8 @@ class VacancyCrudController
             $vacancyModel->setProp($vacancyModel->acf_salary_start, $payload["salary_start"]);
             $vacancyModel->setProp($vacancyModel->acf_salary_end, $payload["salary_end"]);
             $vacancyModel->setProp($vacancyModel->acf_apply_from_this_platform, $payload["apply_from_this_platform"]);
-
+            $vacancyModel->setProp($vacancyModel->acf_expired_at, date("Y-m-d H:i:s"));
+            
             if ($payload["apply_from_this_platform"]) {
                 $vacancyModel->setProp($vacancyModel->acf_external_url, $payload["external_url"]);
             }

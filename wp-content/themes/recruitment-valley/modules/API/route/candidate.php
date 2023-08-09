@@ -4,9 +4,12 @@ namespace Route;
 
 use Candidate\Profile\ProfileController;
 use Candidate\Profile\SetupProfileController;
+use Candidate\Vacancy\VacancyAppliedService;
 use Global\LoginService;
 use Global\RegistrationService;
 use Middleware\AuthMiddleware;
+
+use WP_REST_Request;
 
 class CandidateEndpoint
 {
@@ -23,6 +26,7 @@ class CandidateEndpoint
     {
         $loginService = new LoginService;
         $registrationService = new RegistrationService;
+        $vacancyAppliedService = new VacancyAppliedService;
         $authMiddleware = new AuthMiddleware;
 
         $endpoint = [
@@ -58,6 +62,12 @@ class CandidateEndpoint
                     'methods'               =>  'POST',
                     'permission_callback'   => [$authMiddleware, 'check_token_candidate'],
                     'callback'              =>  [new ProfileController(), 'setup'],
+                ],
+                'apply-job' => [
+                    'url'                   => 'apply',
+                    'methods'               => 'POST',
+                    'permission_callback'   => [$authMiddleware, 'authorize_candidate'],
+                    'callback'              => [$vacancyAppliedService, 'applyVacancy'],
                 ]
             ]
 

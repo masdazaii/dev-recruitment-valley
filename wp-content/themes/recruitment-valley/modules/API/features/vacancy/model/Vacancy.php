@@ -55,6 +55,7 @@ class Vacancy
     public $acf_salary_start = "salary_start";
     public $acf_salary_end = "salary_end";
     public $acf_external_url = "external_url";
+    public $acf_expired_at = "expired_at";
 
     public function __construct( $vacancy_id = false )
     {
@@ -168,7 +169,8 @@ class Vacancy
 
     public function getTitle()
     {
-        return $this->title;
+        $vacancy = get_post($this->vacancy_id);
+        return $vacancy->post_title;
     }
 
     public function getTerm()
@@ -256,6 +258,11 @@ class Vacancy
         return $this->getProp($this->acf_salary_end);
     }
 
+    public function getExpiredAt()
+    {
+        return $this->getProp($this->acf_expired_at);
+    }
+
     public function setProp($acf_field, $value, $repeater = false)
     {
         if($repeater)
@@ -269,7 +276,18 @@ class Vacancy
         }
 
         return update_field($acf_field, $value, $this->vacancy_id );
-    } 
+    }
+
+    public function getAuthor()
+    {
+        $vacancy = get_post($this->vacancy_id);
+        return $vacancy->post_author;
+    }
+    
+    public function getByAuthor()
+    {
+
+    }
 
     public function getProp( $acf_field, $single = true )
     {

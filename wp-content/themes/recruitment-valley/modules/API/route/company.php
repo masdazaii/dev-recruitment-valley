@@ -29,13 +29,13 @@ class CompanyEndpoint
                 'create_free_job' => [
                     'url'                   =>  'vacancy/free',
                     'methods'               =>  'POST',
-                    'permission_callback'   => [$authMiddleware, 'check_token'],
+                    'permission_callback'   => [$authMiddleware, 'authorize_company'],
                     'callback'              =>  [$vacancyCrudService, 'createFreeJob']
                 ],
                 'create_paid_job' => [
                     'url'                   =>  'vacancy/paid',
                     'methods'               =>  'POST',
-                    'permission_callback'   => [$authMiddleware, 'check_token'],
+                    'permission_callback'   => [$authMiddleware, 'authorize_company'],
                     'callback'              =>  [$vacancyCrudService, 'createPaidJob']
                 ],
                 'profile_get' => [
