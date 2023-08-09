@@ -2,6 +2,7 @@
 
 namespace Route;
 
+use Company\Profile\ProfileService;
 use Global\LoginService;
 use Global\RegistrationService;
 use Middleware\AuthMiddleware;
@@ -20,6 +21,7 @@ class CompanyEndpoint
     {
         $authMiddleware = new AuthMiddleware;
         $vacancyCrudService = new VacancyCrudService;
+        $profile = new ProfileService;
 
         $endpoint = [
             'path'  => 'company',
@@ -35,6 +37,12 @@ class CompanyEndpoint
                     'methods'               =>  'POST',
                     'permission_callback'   => [$authMiddleware, 'check_token'],
                     'callback'              =>  [$vacancyCrudService, 'createPaidJob']
+                ],
+                'profile_get' => [
+                    'url'                   =>  'profile',
+                    'methods'               =>  'Get',
+                    'permission_callback'   => [$authMiddleware, 'check_token_company'],
+                    'callback'              =>  [$profile, 'get']
                 ],
             ]
         ];

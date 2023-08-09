@@ -839,6 +839,46 @@
                 "max_size": "",
                 "mime_types": "",
                 "preview_size": "medium"
+            },
+            {
+                "key": "field_64d3094e568c3",
+                "label": "Sector",
+                "name": "ucma_sector",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_64d3095d568c4",
+                "label": "Employees",
+                "name": "ucma_employees",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
             }
         ],
         "location": [
