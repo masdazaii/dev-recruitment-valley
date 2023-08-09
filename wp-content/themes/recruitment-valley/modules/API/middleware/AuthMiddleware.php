@@ -3,6 +3,7 @@
 namespace Middleware;
 
 use Constant\Message;
+use Exception;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -48,5 +49,41 @@ class AuthMiddleware
         } catch (UnexpectedValueException $e) {
             return new WP_Error("rest_forbidden", $this->_message->get('auth.invalid_token'), array("status" => 403));
         }
+    }
+
+    /** Function to handle and authorize user role */
+    private function _handle_token($request)
+    {
+        $token = $request->get_header('Authorization');
+
+        if ($token == "") {
+            return new WP_Error("rest_forbidden", $this->_message->get('auth.invalid_token'), array("status" => 403));
+        }
+        try {
+            $decodedToken = JWT::decode($token, new Key(JWT_SECRET, "HS256"));
+
+            return $decodedToken;
+        } catch (ExpiredException $e) {
+            return new WP_Error("rest_forbidden", $this->_message->get('auth.expired'), array("status" => 403));
+        } catch (UnexpectedValueException $e) {
+            return new WP_Error("rest_forbidden", $this->_message->get('auth.invalid_token'), array("status" => 403));
+        }
+    }
+
+    public function authorize_candidate(WP_REST_Request $request)
+    {
+        $allowed = ['candidate'];
+        $handleToken = $this->_handle_token($request);
+
+        if (is_wp_error($handleToken)) {
+            return $handleToken;
+        }
+
+        if (!in_array(strtolower($handleToken->role), $allowed)) {
+            return new WP_Error("rest_forbidden", $this->_message->get('auth.unauthenticate'), array("status" => 403));
+        }
+
+        $request->set_param('user_id', $handleToken->user_id);
+        return true;
     }
 }

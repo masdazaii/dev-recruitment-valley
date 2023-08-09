@@ -90,6 +90,12 @@ class Message
                         
                     ]
                 ]
+            ],
+            'candidate' => [
+                "apply_vacancy" => [
+                    "apply_success" => __("Success apply this job.", THEME_DOMAIN),
+                    "apply_failed" => __("Failed apply this job.", THEME_DOMAIN)
+                ]
             ]
         ];
     }
