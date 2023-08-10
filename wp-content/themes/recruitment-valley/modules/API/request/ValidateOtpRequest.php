@@ -1,11 +1,10 @@
 <?php
 
 namespace Request;
-
-use V\Rules\Validator;
 use WP_REST_Request;
+use V\Rules\Validator;
 
-class RegisterRequest
+class ValidateOtpRequest implements MiRequest
 {
     private $_request;
     private $_validator;
@@ -16,16 +15,15 @@ class RegisterRequest
         $this->_validator = new Validator($this->_request->get_params(), $this->rules());
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
-            "email" => ["required", "email"],
-            "password" => ["required"],
-            "accountType" => ["required", "in:candidate,company"]
+            "email" => ['email', 'required'],
+            "otp" => ['required', 'numeric'],
         ];
     }
 
-    public function validate()
+    public function validate() : bool
     {
         return $this->_validator->validate();
     }
@@ -35,12 +33,12 @@ class RegisterRequest
         return $this->_validator->sanitize();
     }
 
-    public function getData()
+    public function getData() : array
     {
         return $this->_validator->getData();
     }
 
-    public function getErrors()
+    public function getErrors() : array
     {
         return [
             "status" => 400,

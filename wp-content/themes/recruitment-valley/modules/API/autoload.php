@@ -13,6 +13,7 @@ $API = [
     __DIR__ . '/validator/*.php',
     __DIR__ . '/validator/*/*.php',
     __DIR__ . '/helpers/*.php',
+    __DIR__ . '/request/RequestInterface.php',
     __DIR__ . '/request/*.php',
     __DIR__ . '/middleware/*.php',
     __DIR__ . '/features/*/*/*.php',

@@ -2,7 +2,8 @@
 
 namespace Global;
 
-use RegisterRequest;
+use Request\RegisterRequest;
+use Request\ValidateOtpRequest;
 use WP_REST_Request;
 use ResponseHelper;
 
@@ -34,6 +35,17 @@ class RegistrationService
 
     public function validateOTP(WP_REST_Request $request)
     {
+        $validateOtpRequest = new ValidateOtpRequest($request);
+
+        if(!$validateOtpRequest->validate())
+        {
+            $errors = $validateOtpRequest->getErrors();
+            return ResponseHelper::build($errors);
+        }
+
+        $validateOtpRequest->sanitize();
+        $body = $validateOtpRequest->getData();
+
         $body = $request->get_params();
         $response = $this->registrationController->validateOTP($body);
         return ResponseHelper::build($response);
