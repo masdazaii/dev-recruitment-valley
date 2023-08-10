@@ -89,6 +89,7 @@ class VacancyResponse
         $formattedResponse = array_map(function (WP_Post $vacancy) {
             $vacancyModel = new Vacancy($vacancy->ID);
             $vacancyTaxonomy = $vacancyModel->getTaxonomy(true);
+            
             return [
                 "id" => $vacancy->ID,
                 "name" => $vacancy->post_title,
@@ -97,7 +98,7 @@ class VacancyResponse
                 "sector" => $vacancyTaxonomy["sector"] ?? null,
                 "vacancyType" => $vacancyModel->getIsPaid() ? "Paid" : "Free",
                 "expiredAt" => strtotime($vacancyModel->getExpiredAt()),
-                "status" => $vacancyModel["status"],
+                "status" => $vacancyTaxonomy["status"][0]["name"] ?? null,
             ];
         }, $this->vacancyCollection);
 
