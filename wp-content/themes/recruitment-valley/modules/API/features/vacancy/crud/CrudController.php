@@ -279,10 +279,12 @@ class VacancyCrudController
             $vacancyModel->setProp($vacancyModel->acf_salary_end, $payload["salary_end"]);
             $vacancyModel->setProp($vacancyModel->acf_apply_from_this_platform, $payload["apply_from_this_platform"]);
             $vacancyModel->setProp($vacancyModel->acf_expired_at, date("Y-m-d H:i:s"));
-            
+
             if ($payload["apply_from_this_platform"]) {
                 $vacancyModel->setProp($vacancyModel->acf_external_url, $payload["external_url"]);
             }
+
+            $vacancyModel->setStatus('open');
 
             return [
                 "status" => 201,
@@ -344,15 +346,8 @@ class VacancyCrudController
                     $vacancyModel->setProp($acf_field, $value, is_array($value));
                 }
             }
-            // $vacancyModel->setProp($vacancyModel->acf_description, $payload["description"]);
-            // $vacancyModel->setProp($vacancyModel->acf_is_paid, $payload["is_paid"]);
-            // $vacancyModel->setProp($vacancyModel->acf_salary_start, $payload["salary_start"]);
-            // $vacancyModel->setProp($vacancyModel->acf_salary_end, $payload["salary_end"]);
-            // $vacancyModel->setProp($vacancyModel->acf_apply_from_this_platform, $payload["apply_from_this_platform"]);
-            // $vacancyModel->setProp($vacancyModel->acf_application_process_title, $payload["application_process_title"]);
-            // $vacancyModel->setProp($vacancyModel->acf_application_process_description, $payload["application_process_description"]);
-            // $vacancyModel->setProp($vacancyModel->acf_video_url, $payload["video_url"] );
-            // $vacancyModel->setProp($vacancyModel->acf_facebook_url, )
+
+            $vacancyModel->setStatus('open');
 
             return [
                 "status" => 201,
