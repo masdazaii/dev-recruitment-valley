@@ -3,6 +3,7 @@
 namespace Vacancy;
 
 use WP_Post;
+use WP_Query;
 
 class Vacancy
 {
@@ -306,11 +307,6 @@ class Vacancy
         $vacancy = get_post($this->vacancy_id);
         return $vacancy->post_author;
     }
-    
-    public function getByAuthor()
-    {
-
-    }
 
     public function getProp( $acf_field, $single = true )
     {
@@ -400,5 +396,19 @@ class Vacancy
         $vacancies = get_posts( $args );
 
         return $vacancies;
+    }
+
+    public function allSlug()
+    {
+        $args = array(
+            'post_type' => $this->vacancy,
+            'posts_per_page' => -1, // Retrieve all posts of the type
+            'fields' => 'post_name', // Retrieve only post IDs to improve performance
+            'post_status' => "publish"
+        );
+        
+        $vacancySitemap = get_posts($args);
+
+        return $vacancySitemap;
     }
 }

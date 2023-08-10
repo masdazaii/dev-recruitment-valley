@@ -19,6 +19,7 @@ $API = [
     __DIR__ . '/features/*/*/*.php',
     __DIR__ . '/model/*.php',
     __DIR__ . '/route/global.php',
+    __DIR__ . '/route/sitemap.php',
     __DIR__ . '/route/*.php',
 ];
 

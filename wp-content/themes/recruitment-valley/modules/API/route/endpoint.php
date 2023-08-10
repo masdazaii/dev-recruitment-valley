@@ -17,6 +17,7 @@ class Endpoint
     private $authEndpoint = [];
     private $globalEndpoint = [];
     private $vacancyEndpoint = [];
+    private $sitemapEndpoint = [];
 
     /**
      * __construct
@@ -40,6 +41,9 @@ class Endpoint
         $vacancyEndpoint = new VacancyEndpoint;
         $this->vacancyEndpoint = $vacancyEndpoint->get();
 
+        $sitemapEndpoint = new SitemapEndpoint;
+        $this->sitemapEndpoint = $sitemapEndpoint->get();
+
         add_action('rest_api_init', [$this, 'register_endpoint']);
     }
 
@@ -56,12 +60,14 @@ class Endpoint
         $global = $this->globalEndpoint;
         $auth = $this->authEndpoint;
         $vacancy = $this->vacancyEndpoint;
+        $sitemap = $this->sitemapEndpoint;
 
         $this->_run_list_endpoint($this->API, $this->version, $vacancy["path"], $vacancy["endpoints"]);
         $this->_run_list_endpoint($this->API, $this->version, $candidate["path"], $candidate["endpoints"]);
         $this->_run_list_endpoint($this->API, $this->version, $company["path"], $company["endpoints"]);
         $this->_run_list_endpoint($this->API, $this->version, $global["path"], $global["endpoints"]);
         $this->_run_list_endpoint($this->API, $this->version, $auth["path"], $auth["endpoints"]);
+        $this->_run_list_endpoint($this->API, $this->version, $sitemap['path'], $sitemap["endpoints"]);
     }
 
     /**
