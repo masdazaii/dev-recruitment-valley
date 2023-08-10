@@ -38,6 +38,8 @@ class Message
             ],
             'registration' => [
                 'email_required' => __("Email is required.", THEME_DOMAIN),
+                'email_wrong' => __("Please input valid email.", THEME_DOMAIN),
+                'role_wrong' => __("Please select valid role.", THEME_DOMAIN),
                 'email_invalid' => __("Email is invalid.", THEME_DOMAIN),
                 'otp_required' => __("OTP is required.", THEME_DOMAIN),
                 'otp_invalid' => __("OTP is invalid.", THEME_DOMAIN),
@@ -92,6 +94,24 @@ class Message
                         "fail" => __("Error creating paid job", THEME_DOMAIN),
 
                     ]
+                ]
+            ],
+            'candidate' => [
+                "apply_vacancy" => [
+                    "apply_success" => __("Success apply this job.", THEME_DOMAIN),
+                    "apply_failed" => __("Failed apply this job.", THEME_DOMAIN)
+                ],
+                "favorite" => [
+                    "vacancy_not_found" => __("Vacancy not found.", THEME_DOMAIN),
+                    "add_success" => __("Success add favorite jobs", THEME_DOMAIN),
+                    "add_failed" => __("Failed add favorite jobs", THEME_DOMAIN),
+                    "already_exists" => __("Already in your favorites", THEME_DOMAIN),
+                    "empty" => __("Your have no favorites jobs", THEME_DOMAIN),
+                    "get_success" => __("Success get favorite jobs", THEME_DOMAIN),
+                    "delete_success" => __("Success delete favorite job", THEME_DOMAIN),
+                    "delete_failed" => __("Failed delete favorite job", THEME_DOMAIN),
+                    "apply_failed" => __("Failed apply this job.", THEME_DOMAIN),
+                    "expired_job" => __("Failed, the job already expired", THEME_DOMAIN),
                 ]
             ]
         ];

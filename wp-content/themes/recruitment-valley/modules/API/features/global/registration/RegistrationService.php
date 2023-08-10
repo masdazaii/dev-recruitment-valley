@@ -2,6 +2,7 @@
 
 namespace Global;
 
+use RegisterRequest;
 use WP_REST_Request;
 use ResponseHelper;
 
@@ -16,7 +17,17 @@ class RegistrationService
 
     public function register(WP_REST_Request $request)
     {
-        $body = $request->get_params();
+        $registerRequest = new RegisterRequest($request);
+
+        if(!$registerRequest->validate())
+        {
+            $errors = $registerRequest->getErrors();
+            return ResponseHelper::build($errors);
+        }
+
+        $registerRequest->sanitize();
+        $body = $registerRequest->getData();
+
         $response = $this->registrationController->registration($body);
         return ResponseHelper::build($response);
     }

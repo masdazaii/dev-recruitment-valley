@@ -55,6 +55,7 @@ class Vacancy
     public $acf_salary_start = "salary_start";
     public $acf_salary_end = "salary_end";
     public $acf_external_url = "external_url";
+    public $acf_expired_at = "expired_at";
 
     public function __construct( $vacancy_id = false )
     {
@@ -62,6 +63,11 @@ class Vacancy
         {
             $this->vacancy_id = $vacancy_id;
         }
+    }
+
+    public function setId( $vacancyId )
+    {
+        $this->vacancy_id = $vacancyId;
     }
 
     // Setter methods
@@ -142,6 +148,18 @@ class Vacancy
     {
         $this->gallery = $gallery;
     }
+    
+    /**
+     * setStatus
+     * accepted status => declined , close, open, processing
+     *
+     * @param  mixed $status
+     * @return void
+     */
+    public function setStatus($status)
+    {
+        return wp_set_post_terms($this->vacancy_id,$status, 'status');
+    }
 
     public function setReviews($reviews)
     {
@@ -168,7 +186,8 @@ class Vacancy
 
     public function getTitle()
     {
-        return $this->title;
+        $vacancy = get_post($this->vacancy_id);
+        return $vacancy->post_title;
     }
 
     public function getTerm()
@@ -241,6 +260,12 @@ class Vacancy
         return $this->getProp($this->acf_country);
     }
 
+    // public function getStatus()
+    // {
+    //     $status = get_the_terms($this->vacancy_id, 'status');
+    //     return $status;
+    // }
+
     public function getReviews()
     {
         return $this->getProp($this->acf_reviews);
@@ -256,6 +281,11 @@ class Vacancy
         return $this->getProp($this->acf_salary_end);
     }
 
+    public function getExpiredAt()
+    {
+        return $this->getProp($this->acf_expired_at);
+    }
+
     public function setProp($acf_field, $value, $repeater = false)
     {
         if($repeater)
@@ -269,7 +299,18 @@ class Vacancy
         }
 
         return update_field($acf_field, $value, $this->vacancy_id );
-    } 
+    }
+
+    public function getAuthor()
+    {
+        $vacancy = get_post($this->vacancy_id);
+        return $vacancy->post_author;
+    }
+    
+    public function getByAuthor()
+    {
+
+    }
 
     public function getProp( $acf_field, $single = true )
     {
@@ -338,5 +379,26 @@ class Vacancy
         $this->vacancy_id = $vacancy;
 
         return $vacancy;
+    }
+
+    
+    public function getByStatus( $status )
+    {
+        $args = [
+            "post_type" => $this->vacancy,
+            "post_status" => "publish",
+            "tax_query" => [
+                [
+                    'taxonomy' => $status,
+                    'field' => 'slug',
+                    'terms' => array( $status ),
+                    'operator' => 'IN'
+                ]
+            ],
+        ];
+
+        $vacancies = get_posts( $args );
+
+        return $vacancies;
     }
 }

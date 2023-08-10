@@ -80,7 +80,9 @@ class LoginController
         $expireRefreshToken  = $issuedAt->modify("+120 minutes")->getTimestamp(); // valid until 60 minutes after toket issued
         $payloadRefreshToken = [
             "exp" => $expireRefreshToken,
-            "user_id" => $user->ID
+            "user_id" => $user->ID,
+            "role" => $user->roles[0],
+            "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
         ];
 
         // store refresh token to db

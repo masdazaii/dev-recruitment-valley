@@ -3,6 +3,8 @@
 namespace Route;
 
 use Company\Profile\ProfileService;
+use Company\Vacancy\VacancyController;
+use Company\Vacancy\VacancyService;
 use Global\LoginService;
 use Global\RegistrationService;
 use Middleware\AuthMiddleware;
@@ -21,6 +23,7 @@ class CompanyEndpoint
     {
         $authMiddleware = new AuthMiddleware;
         $vacancyCrudService = new VacancyCrudService;
+        $vacancyService = new VacancyService;
         $profile = new ProfileService;
 
         $endpoint = [
@@ -29,13 +32,13 @@ class CompanyEndpoint
                 'create_free_job' => [
                     'url'                   =>  'vacancy/free',
                     'methods'               =>  'POST',
-                    'permission_callback'   => [$authMiddleware, 'check_token'],
+                    'permission_callback'   => [$authMiddleware, 'authorize_company'],
                     'callback'              =>  [$vacancyCrudService, 'createFreeJob']
                 ],
                 'create_paid_job' => [
                     'url'                   =>  'vacancy/paid',
                     'methods'               =>  'POST',
-                    'permission_callback'   => [$authMiddleware, 'check_token'],
+                    'permission_callback'   => [$authMiddleware, 'authorize_company'],
                     'callback'              =>  [$vacancyCrudService, 'createPaidJob']
                 ],
                 'profile_get' => [
@@ -73,6 +76,18 @@ class CompanyEndpoint
                     ],
                     'callback'              =>  [$profile, 'delete_gallery']
                 ],
+                'status_vacancy_count' => [
+                    'url'                   => 'dashboard/vacancy/status',
+                    'methods'               => 'GET',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company'],
+                    'callback'              => [$vacancyService, 'getCountbyStatus']
+                ],
+                'vacancies' => [
+                    'url'                   => 'vacancies',
+                    'methods'               => 'GET',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company'],
+                    'callback'              => [$vacancyService, 'getAll']
+                ]
             ]
         ];
 
