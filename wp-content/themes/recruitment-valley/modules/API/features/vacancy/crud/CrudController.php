@@ -160,8 +160,8 @@ class VacancyCrudController
             'message' => $this->_message->get('vacancy.get_all'),
             'data'    => $vacancies->posts,
             'meta'    => [
-                'currentPage' => $filters['page'],
-                'totalPage' => $vacancies->max_num_pages
+                'currentPage' => intval($filters['page']),
+                'totalPage' => $vacancies->max_num_pages,
             ],
             'status'  => 200
         ];
@@ -285,8 +285,7 @@ class VacancyCrudController
             $vacancyModel->setTaxonomy($payload["taxonomy"]);
 
             foreach ($payload as $acf_field => $value) {
-                if($acf_field !== "taxonomy")
-                {
+                if ($acf_field !== "taxonomy") {
                     $vacancyModel->setProp($acf_field, $value, is_array($value));
                 }
             }
@@ -297,23 +296,20 @@ class VacancyCrudController
                 "status" => 201,
                 "message" => $this->_message->get("vacancy.create.paid.success"),
             ];
-
         } catch (\Throwable $th) {
             return [
                 "status" => 500,
                 // "message" => $this->_message->get("vacancy.create.paid.fail"),
                 "message" => $th->getMessage(),
-                
+
             ];
-        } catch (\WP_Error $e)
-        {
+        } catch (\WP_Error $e) {
             return [
                 "status" => 500,
                 "message" => $e->get_error_message(),
                 // "message" => $this->_message->get("vacancy.create.paid.fail"),
             ];
         }
-
     }
 
     public function filterVacancySearch($search,  $query)
