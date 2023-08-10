@@ -2,6 +2,8 @@
 
 namespace Global;
 
+use Request\ForgotPasswordRequest;
+use Request\LoginRequest;
 use WP_REST_Request;
 use ResponseHelper;
 
@@ -16,7 +18,15 @@ class LoginService
 
     public function login(WP_REST_Request $request)
     {
-        $body = $request->get_params();
+        $loginRequest = new LoginRequest($request);
+        if(!$loginRequest->validate())
+        {
+            $errors = $loginRequest->getErrors();
+            return ResponseHelper::build($errors);
+        }
+
+        $loginRequest->sanitize();
+        $body = $loginRequest->getData();
         $response = $this->loginController->login($body);
         return ResponseHelper::build($response);
     }
@@ -30,7 +40,16 @@ class LoginService
 
     public function forgotPassword( WP_REST_Request $request )
     {
-        $body = $request->get_params();
+        $forgotPasswordRequest = new ForgotPasswordRequest($request);
+        if(!$forgotPasswordRequest->validate())
+        {
+            $errors = $forgotPasswordRequest->getErrors();
+            return ResponseHelper::build($errors);
+        }
+
+        $forgotPasswordRequest->sanitize();
+        $body = $forgotPasswordRequest->getData();
+        
         $response = $this->loginController->forgot_password($body);
         return ResponseHelper::build($response);
     }
