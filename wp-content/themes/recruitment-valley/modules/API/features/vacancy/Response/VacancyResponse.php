@@ -39,7 +39,6 @@ class VacancyResponse
                 "salaryEnd" => $vacancyModel->getSalaryEnd(),
                 "thumbnail" => $vacancyModel->getThumbnail(),
                 "description" => $vacancyModel->getDescription(),
-                "taxonomy" => $vacancyTaxonomy,
             ];
         }, $this->vacancyCollection);
 
@@ -71,15 +70,37 @@ class VacancyResponse
                 "description" => $vacancyModel->getDescription(),
                 "term" => $vacancyModel->getTerm(),
             ],
-            "videoId" => "",
-            "gallery" => [],
-            "reviews" => [],
-            "steps" => [],
-            // "salaryStart" => $vacancyModel->getSalaryStart(),
-            // "salaryEnd" => $vacancyModel->getSalaryEnd(),
+            "videoId" => $vacancyModel->getVideoUrl(),
+            "gallery" => $vacancyModel->getGallery(),
+            "reviews" => $vacancyModel->getReviews(),
+            "steps" => $vacancyModel->getApplicationProcessStep(),
+            "salaryStart" => $vacancyModel->getSalaryStart(),
+            "salaryEnd" => $vacancyModel->getSalaryEnd(),
             "thumbnail" => $vacancyModel->getThumbnail(),
-            "description" => $vacancyModel->getDescription(),
         ];
+
+        // $formattedResponse = get_field($vacancyModel->acf_application_process_step,$this->vacancyCollection->ID);
+
+        return $formattedResponse;
+    }
+
+    public function formatCompany()
+    {
+        $formattedResponse = array_map(function (WP_Post $vacancy) {
+            $vacancyModel = new Vacancy($vacancy->ID);
+            $vacancyTaxonomy = $vacancyModel->getTaxonomy(true);
+
+            return [
+                "id" => $vacancy->ID,
+                "name" => $vacancy->post_title,
+                "employmentType" => $vacancyTaxonomy["type"] ?? null,
+                "location" => $vacancyTaxonomy["location"] ?? null,
+                "sector" => $vacancyTaxonomy["sector"] ?? null,
+                "vacancyType" => $vacancyModel->getIsPaid() ? "Paid" : "Free",
+                "expiredAt" => strtotime($vacancyModel->getExpiredAt()),
+                "status" => $vacancyTaxonomy["status"][0]["name"] ?? null,
+            ];
+        }, $this->vacancyCollection);
 
         return $formattedResponse;
     }
@@ -93,7 +114,7 @@ class VacancyResponse
                 "id" => $vacancy->ID,
                 "slug" => $vacancy->post_name,
                 "name" => $vacancy->post_title,
-                "status" => $vacancyTaxonomy['test'] ?? null,
+                "status" => $vacancyTaxonomy['status'] ?? null,
                 "thumbnail" => $vacancyModel->getThumbnail(),
                 "description" => $vacancyModel->getDescription(),
                 "jobPostedDate" => $vacancy->post_date,

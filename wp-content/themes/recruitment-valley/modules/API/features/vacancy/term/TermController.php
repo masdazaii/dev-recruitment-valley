@@ -17,23 +17,6 @@ class VacancyTermController
         $this->termModel = new Term;
     }
 
-    public function createFreeJob($request)
-    {
-        $vacancy = new Vacancy;
-
-        $vacancy->setTitle($request["title"]);
-        $vacancy->setDescription($request["description"]);
-        $vacancy->setApplyFromThisPlatform($request["apply_from_this_platform"]);
-        // $vacancy = new Vacancy();
-        // return [
-        //     "status" => 200,
-        //     "data" => $vacancy->getPropeties()
-        // ];
-
-
-
-    }
-
     public function getAllTerm($parameters)
     {
         /** Get Taxonomy */

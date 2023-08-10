@@ -95,7 +95,7 @@ class FavoriteVacancyController
             "message"   => $this->_message->get('candidate.favorite.get_success'),
             "data"    => $vacancies->posts,
             "meta"    => [
-                "currentPage" => $vacancies->current_page,
+                "currentPage" => intval($filters['page']),
                 "totalPage" => $vacancies->max_num_pages
             ],
             "status"  => 200

@@ -66,7 +66,7 @@ class CandidateEndpoint
                     'callback'              =>  [new ProfileController(), 'setup'],
                 ],
                 'apply-job' => [
-                    'url'                   => 'apply-vacancy',
+                    'url'                   => 'apply',
                     'methods'               => 'POST',
                     'permission_callback'   => [$authMiddleware, 'authorize_candidate'],
                     'callback'              => [$vacancyAppliedService, 'applyVacancy'],

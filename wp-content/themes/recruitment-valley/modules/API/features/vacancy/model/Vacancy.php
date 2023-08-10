@@ -55,6 +55,7 @@ class Vacancy
     public $acf_salary_start = "salary_start";
     public $acf_salary_end = "salary_end";
     public $acf_external_url = "external_url";
+    public $acf_expired_at = "expired_at";
 
     public function __construct( $vacancy_id = false )
     {
@@ -62,6 +63,11 @@ class Vacancy
         {
             $this->vacancy_id = $vacancy_id;
         }
+    }
+
+    public function setId( $vacancyId )
+    {
+        $this->vacancy_id = $vacancyId;
     }
 
     // Setter methods
@@ -102,7 +108,15 @@ class Vacancy
 
     public function setApplicationProcessStep($application_process_step)
     {
-        $this->application_process_step = $application_process_step;
+        $steps = [];
+
+        foreach ($application_process_step as $key => $step) {
+            array_push($steps,[
+                "recruitment_step" => $step
+            ]);
+        }
+
+        update_field($this->acf_application_process_step, $steps,$this->vacancy_id);
     }
 
     public function setVideoUrl($video_url)
@@ -134,20 +148,27 @@ class Vacancy
     {
         $this->gallery = $gallery;
     }
-
-    // public function setRole($roles)
-    // {
-    //     $this->setTaxonomy($roles, 'role');
-    // }
-
-    // public function setSector($sectores)
-    // {
-    //     $this->setTaxonomy($sectores, 'sector');
-    // }
+    
+    /**
+     * setStatus
+     * accepted status => declined , close, open, processing
+     *
+     * @param  mixed $status
+     * @return void
+     */
+    public function setStatus($status)
+    {
+        return wp_set_post_terms($this->vacancy_id,$status, 'status');
+    }
 
     public function setReviews($reviews)
     {
-        $this->reviews = $reviews;
+        $existing_repeater_data = get_field($this->acf_reviews, $this->vacancy_id, true);
+        // Add the new data to the existing repeater data
+        
+        $updated_repeater_data = $existing_repeater_data ? array_merge($existing_repeater_data, $reviews) : $reviews;
+        // Update the repeater field with the new data
+        return update_field($this->acf_reviews, $updated_repeater_data, $this->vacancy_id);
     }
 
     public function setTaxonomy($taxonomies )
@@ -165,7 +186,8 @@ class Vacancy
 
     public function getTitle()
     {
-        return $this->title;
+        $vacancy = get_post($this->vacancy_id);
+        return $vacancy->post_title;
     }
 
     public function getTerm()
@@ -238,6 +260,12 @@ class Vacancy
         return $this->getProp($this->acf_country);
     }
 
+    // public function getStatus()
+    // {
+    //     $status = get_the_terms($this->vacancy_id, 'status');
+    //     return $status;
+    // }
+
     public function getReviews()
     {
         return $this->getProp($this->acf_reviews);
@@ -253,10 +281,36 @@ class Vacancy
         return $this->getProp($this->acf_salary_end);
     }
 
-    public function setProp($acf_field, $value)
+    public function getExpiredAt()
     {
+        return $this->getProp($this->acf_expired_at);
+    }
+
+    public function setProp($acf_field, $value, $repeater = false)
+    {
+        if($repeater)
+        {
+            switch ($acf_field){
+                case $this->acf_application_process_step:
+                    return $this->setApplicationProcessStep($value);
+                case $this->acf_reviews:
+                    return $this->setReviews($value);
+            }
+        }
+
         return update_field($acf_field, $value, $this->vacancy_id );
-    } 
+    }
+
+    public function getAuthor()
+    {
+        $vacancy = get_post($this->vacancy_id);
+        return $vacancy->post_author;
+    }
+    
+    public function getByAuthor()
+    {
+
+    }
 
     public function getProp( $acf_field, $single = true )
     {
@@ -325,5 +379,26 @@ class Vacancy
         $this->vacancy_id = $vacancy;
 
         return $vacancy;
+    }
+
+    
+    public function getByStatus( $status )
+    {
+        $args = [
+            "post_type" => $this->vacancy,
+            "post_status" => "publish",
+            "tax_query" => [
+                [
+                    'taxonomy' => $status,
+                    'field' => 'slug',
+                    'terms' => array( $status ),
+                    'operator' => 'IN'
+                ]
+            ],
+        ];
+
+        $vacancies = get_posts( $args );
+
+        return $vacancies;
     }
 }

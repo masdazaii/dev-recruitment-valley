@@ -5,16 +5,19 @@ namespace Candidate\Profile;
 use WP_REST_Request;
 use ResponseHelper;
 use Constant\Message;
+use Vacancy\VacancyResponse;
 
 class FavoriteVacancyService
 {
     protected $_message;
     public $favoriteVacancyController;
+    public $vacancyResponse;
 
     public function __construct()
     {
-        $this->favoriteVacancyController = new FavoriteVacancyController;
         $this->_message = new Message();
+        $this->favoriteVacancyController = new FavoriteVacancyController;
+        $this->vacancyResponse = new VacancyResponse;
     }
 
     public function addFavoriteVacancy(WP_REST_Request $request)
@@ -37,6 +40,9 @@ class FavoriteVacancyService
     {
         $body = $request->get_params();
         $response = $this->favoriteVacancyController->list($body);
+        $this->vacancyResponse->setCollection($response["data"]);
+        $formattedResponse = $this->vacancyResponse->formatFavorite();
+        $response["data"] = $formattedResponse;
         return ResponseHelper::build($response);
     }
 
