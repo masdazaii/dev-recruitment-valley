@@ -81,6 +81,12 @@ class CompanyEndpoint
                     'methods'               => 'GET',
                     'permission_callback'   => [$authMiddleware, 'authorize_company'],
                     'callback'              => [$vacancyService, 'getCountbyStatus']
+                ],
+                'vacancies' => [
+                    'url'                   => 'vacancies',
+                    'methods'               => 'GET',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company'],
+                    'callback'              => [$vacancyService, 'getAll']
                 ]
             ]
         ];

@@ -21,59 +21,6 @@ class VacancyCrudController
     {
     }
 
-    /** Anggit Syntax start here */
-    // public function getAll($request)
-    // {
-    //     $params = $request;
-
-    //     $page = $params["page"];
-
-    //     $search = $params["search"];
-
-    //     $city = $params["city"];
-
-    //     $education = $params["education"];
-
-    //     $role = $params["role"];
-
-    //     $sector = $params["sector"];
-
-    //     $hoursPerWeek = $params["hoursPerWeek"];
-
-    //     $salaryStart = $params["salaryStart"];
-
-    //     $salaryEnd = $params["salaryEnd"];
-
-    //     $vacancy = new Vacancy;
-
-    //     $postsPerPage = $params["postPerPage"];
-
-    //     $args = [
-    //         "post_type" => "vacancy",
-    //         "numberposts" => -1,
-    //         "offset" => 10,
-    //         "order" => "ASC",
-    //         "post_status" => "publish",
-    //         // "paged" => $page
-    //     ];
-
-    //     $vacancies = get_posts($args);
-
-    //     if (count($vacancies) > 0) {
-    //         return [
-    //             "status" => 200,
-    //             "message" => $this->_message->get("vacancy.get_all"),
-    //             "data" => $vacancies
-    //         ];
-    //     } else {
-    //         return [
-    //             "status" => 404,
-    //             "message" => $this->_message->get("vacancy.not_found"),
-    //             "data" => $vacancies
-    //         ];
-    //     }
-    // }
-
     /** CHANGE STARTS HERE */
     public function getAll($request)
     {
@@ -96,17 +43,14 @@ class VacancyCrudController
             'location'      => array_key_exists('location', $request) ? explode(',', $request['location']) : NULL,
         ];
 
-        $offset = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['postPerPage']) + 1);
+        $offset = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['postPerPage']));
 
         $args = [
             "post_type" => $this->_posttype,
-            // "numberposts" => $filters['postPerPage'],
-            // "numberposts" => -1,
             "posts_per_page" => $filters['postPerPage'],
             "offset" => $offset,
             "order" => "ASC",
             "post_status" => "publish",
-            // "paged" => $page,
         ];
 
         /** Set tax query */
