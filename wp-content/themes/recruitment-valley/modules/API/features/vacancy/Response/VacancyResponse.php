@@ -83,4 +83,23 @@ class VacancyResponse
 
         return $formattedResponse;
     }
+
+    public function formatFavorite()
+    {
+        $formattedResponse = array_map(function (WP_Post $vacancy) {
+            $vacancyModel = new Vacancy($vacancy->ID);
+            $vacancyTaxonomy = $vacancyModel->getTaxonomy(true);
+            return [
+                "id" => $vacancy->ID,
+                "slug" => $vacancy->post_name,
+                "name" => $vacancy->post_title,
+                "status" => $vacancyTaxonomy['test'] ?? null,
+                "thumbnail" => $vacancyModel->getThumbnail(),
+                "description" => $vacancyModel->getDescription(),
+                "jobPostedDate" => $vacancy->post_date,
+            ];
+        }, $this->vacancyCollection);
+
+        return $formattedResponse;
+    }
 }

@@ -9,6 +9,7 @@ use Middleware\AuthMiddleware;
 use RefreshToken\RefreshTokenService;
 use Vacancy\VacancyCrudService;
 use Vacancy\Term\VacancyTermService;
+use Candidate\Profile\FavoriteVacancyService;
 
 class GlobalEndpoint
 {
@@ -29,6 +30,7 @@ class GlobalEndpoint
         $crudVacancyService = new VacancyCrudService;
         $termVacancyService = new VacancyTermService;
         $authMiddleware = new AuthMiddleware;
+        $favoriteVacancyService = new FavoriteVacancyService;
 
         $endpoint = [
             'path' => '',
@@ -70,6 +72,12 @@ class GlobalEndpoint
                     'permission_callback'   => '__return_true',
                     'callback'              => [$termVacancyService, 'getAll']
                 ],
+                'add-favorite' => [
+                    'url'                   => '/vacancies/favorite',
+                    'methods'               => 'POST',
+                    'permission_callback'   => [$authMiddleware, 'authorize_candidate'],
+                    'callback'              => [$favoriteVacancyService, 'addFavoriteVacancy'],
+                ]
             ]
 
         ];

@@ -5,6 +5,7 @@ namespace Route;
 use Candidate\Profile\ProfileController;
 use Candidate\Profile\SetupProfileController;
 use Candidate\Vacancy\VacancyAppliedService;
+use Candidate\Profile\FavoriteVacancyService;
 use Global\LoginService;
 use Global\RegistrationService;
 use Middleware\AuthMiddleware;
@@ -27,6 +28,7 @@ class CandidateEndpoint
         $loginService = new LoginService;
         $registrationService = new RegistrationService;
         $vacancyAppliedService = new VacancyAppliedService;
+        $favoriteVacancyService = new FavoriteVacancyService;
         $authMiddleware = new AuthMiddleware;
 
         $endpoint = [
@@ -68,9 +70,26 @@ class CandidateEndpoint
                     'methods'               => 'POST',
                     'permission_callback'   => [$authMiddleware, 'authorize_candidate'],
                     'callback'              => [$vacancyAppliedService, 'applyVacancy'],
+                ],
+                // 'add-favorite' => [
+                //     'url'                   => 'profile/jobs/favorite',
+                //     'methods'               => 'POST',
+                //     'permission_callback'   => [$authMiddleware, 'authorize_candidate'],
+                //     'callback'              => [$favoriteVacancyService, 'addFavoriteVacancy'],
+                // ],
+                'list-favorite-vacancy' => [
+                    'url'                   => '/profile/jobs/favorite',
+                    'methods'               => 'GET',
+                    'permission_callback'   => [$authMiddleware, 'authorize_candidate'],
+                    'callback'              => [$favoriteVacancyService, 'list'],
+                ],
+                'delete-favorite-vacancy' => [
+                    'url'                   => '/profile/jobs/favorite/(?P<vacancyId>\d+)',
+                    'methods'               => 'DELETE',
+                    'permission_callback'   => [$authMiddleware, 'authorize_candidate'],
+                    'callback'              => [$favoriteVacancyService, 'destroy'],
                 ]
             ]
-
         ];
 
         return $endpoint;
