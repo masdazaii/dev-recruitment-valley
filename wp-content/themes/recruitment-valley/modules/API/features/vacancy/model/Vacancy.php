@@ -2,7 +2,9 @@
 
 namespace Vacancy;
 
+use Helper;
 use WP_Post;
+use WP_Query;
 
 class Vacancy
 {
@@ -40,7 +42,7 @@ class Vacancy
     public $acf_term = "term";
     public $acf_is_paid = "is_paid";
     public $acf_apply_from_this_platform = "apply_from_this_platform";
-    public $acf_application_process_title = "application_process_title" ;
+    public $acf_application_process_title = "application_process_title";
     public $acf_application_process_description = "application_process_description";
     public $acf_application_process_step = "application_process_step";
     public $acf_video_url = "video_url";
@@ -57,15 +59,14 @@ class Vacancy
     public $acf_external_url = "external_url";
     public $acf_expired_at = "expired_at";
 
-    public function __construct( $vacancy_id = false )
+    public function __construct($vacancy_id = false)
     {
-        if($vacancy_id)
-        {
+        if ($vacancy_id) {
             $this->vacancy_id = $vacancy_id;
         }
     }
 
-    public function setId( $vacancyId )
+    public function setId($vacancyId)
     {
         $this->vacancy_id = $vacancyId;
     }
@@ -111,12 +112,12 @@ class Vacancy
         $steps = [];
 
         foreach ($application_process_step as $key => $step) {
-            array_push($steps,[
+            array_push($steps, [
                 "recruitment_step" => $step
             ]);
         }
 
-        update_field($this->acf_application_process_step, $steps,$this->vacancy_id);
+        update_field($this->acf_application_process_step, $steps, $this->vacancy_id);
     }
 
     public function setVideoUrl($video_url)
@@ -148,7 +149,7 @@ class Vacancy
     {
         $this->gallery = $gallery;
     }
-    
+
     /**
      * setStatus
      * accepted status => declined , close, open, processing
@@ -158,20 +159,20 @@ class Vacancy
      */
     public function setStatus($status)
     {
-        return wp_set_post_terms($this->vacancy_id,$status, 'status');
+        return wp_set_post_terms($this->vacancy_id, $status, 'status');
     }
 
     public function setReviews($reviews)
     {
         $existing_repeater_data = get_field($this->acf_reviews, $this->vacancy_id, true);
         // Add the new data to the existing repeater data
-        
+
         $updated_repeater_data = $existing_repeater_data ? array_merge($existing_repeater_data, $reviews) : $reviews;
         // Update the repeater field with the new data
         return update_field($this->acf_reviews, $updated_repeater_data, $this->vacancy_id);
     }
 
-    public function setTaxonomy($taxonomies )
+    public function setTaxonomy($taxonomies)
     {
         foreach ($taxonomies as $taxonomy => $terms) {
             wp_set_post_terms($this->vacancy_id, $terms, $taxonomy);
@@ -217,12 +218,23 @@ class Vacancy
 
     public function getApplicationProcessStep()
     {
-        return $this->getProp($this->acf_application_process_step);
+        $steps = $this->getProp($this->acf_application_process_step);
+        if (!is_array($steps)) return null;
+
+        return array_map(function ($step) {
+            static $i = 0;
+            $result = [
+                'id' => $i,
+                'title' => $step['recruitment_step']
+            ];
+            $i++;
+            return $result;
+        }, $steps);
     }
 
     public function getVideoUrl()
     {
-        return $this->getProp($this->acf_video_url);
+        return Helper::yt_id($this->getProp($this->acf_video_url));
     }
 
     public function getFacebookUrl()
@@ -268,7 +280,17 @@ class Vacancy
 
     public function getReviews()
     {
-        return $this->getProp($this->acf_reviews);
+        $reviews = $this->getProp($this->acf_reviews);
+
+        if (!is_array($reviews)) return null;
+
+        return array_map(function ($review) {
+            return [
+                "name"      => $review['name'],
+                "role"      => $review['role'],
+                "review"    => $review['text'],
+            ];
+        }, $reviews);
     }
 
     public function getSalaryStart()
@@ -288,9 +310,8 @@ class Vacancy
 
     public function setProp($acf_field, $value, $repeater = false)
     {
-        if($repeater)
-        {
-            switch ($acf_field){
+        if ($repeater) {
+            switch ($acf_field) {
                 case $this->acf_application_process_step:
                     return $this->setApplicationProcessStep($value);
                 case $this->acf_reviews:
@@ -298,7 +319,7 @@ class Vacancy
             }
         }
 
-        return update_field($acf_field, $value, $this->vacancy_id );
+        return update_field($acf_field, $value, $this->vacancy_id);
     }
 
     public function getAuthor()
@@ -306,20 +327,15 @@ class Vacancy
         $vacancy = get_post($this->vacancy_id);
         return $vacancy->post_author;
     }
-    
-    public function getByAuthor()
-    {
 
-    }
-
-    public function getProp( $acf_field, $single = true )
+    public function getProp($acf_field, $single = true)
     {
         return get_field($acf_field, $this->vacancy_id, $single);
     }
 
     public function getThumbnail()
     {
-        return wp_get_attachment_image_src( get_post_thumbnail_id( $this->vacancy_id ), "thumbnail")[0] ?? "";
+        return wp_get_attachment_image_src(get_post_thumbnail_id($this->vacancy_id), "thumbnail")[0] ?? "";
     }
 
     public function getPropeties()
@@ -327,7 +343,7 @@ class Vacancy
         return get_object_vars($this);
     }
 
-    public function getTaxonomy( $formatted = false )
+    public function getTaxonomy($formatted = false)
     {
         $taxonomies = get_post_taxonomies($this->vacancy_id);
 
@@ -341,23 +357,20 @@ class Vacancy
 
         $groupedTax = [];
 
-        foreach($taxes as $tax)
-        {
+        foreach ($taxes as $tax) {
             $tempTax = $tax->taxonomy;
             $taxField = [
                 "id" => $tax->term_id,
                 "name" => $tax->name
             ];
 
-            if($formatted)
-            {
-                if(isset($groupedTax[$tempTax]))
-                {
+            if ($formatted) {
+                if (isset($groupedTax[$tempTax])) {
                     array_push($groupedTax[$tempTax], $taxField);
-                }else{
+                } else {
                     $groupedTax[$tempTax] = [$taxField];
                 }
-            }else{
+            } else {
                 array_push($groupedTax, $taxField);
             }
         }
@@ -365,7 +378,7 @@ class Vacancy
         return $groupedTax;
     }
 
-    public function storePost( $payload)
+    public function storePost($payload)
     {
         $args = [
             "post_title" => $payload["title"],
@@ -375,14 +388,14 @@ class Vacancy
         ];
 
         $vacancy = wp_insert_post($args);
-        
+
         $this->vacancy_id = $vacancy;
 
         return $vacancy;
     }
 
-    
-    public function getByStatus( $status )
+
+    public function getByStatus($status)
     {
         $args = [
             "post_type" => $this->vacancy,
@@ -391,14 +404,28 @@ class Vacancy
                 [
                     'taxonomy' => $status,
                     'field' => 'slug',
-                    'terms' => array( $status ),
+                    'terms' => array($status),
                     'operator' => 'IN'
                 ]
             ],
         ];
 
-        $vacancies = get_posts( $args );
+        $vacancies = get_posts($args);
 
         return $vacancies;
+    }
+
+    public function allSlug()
+    {
+        $args = array(
+            'post_type' => $this->vacancy,
+            'posts_per_page' => -1, // Retrieve all posts of the type
+            'fields' => 'post_name', // Retrieve only post IDs to improve performance
+            'post_status' => "publish"
+        );
+        
+        $vacancySitemap = get_posts($args);
+
+        return $vacancySitemap;
     }
 }
