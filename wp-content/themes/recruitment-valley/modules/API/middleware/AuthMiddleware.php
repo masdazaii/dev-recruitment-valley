@@ -90,10 +90,13 @@ class AuthMiddleware
             return $handleToken;
         }
 
-        if (!in_array(strtolower($handleToken->role), $allowed)) {
+        $user = get_user_by('ID', $handleToken->user_id);
+
+        if (!in_array(strtolower($user->roles[0]), $allowed)) {
             return new WP_Error("rest_forbidden", $this->_message->get('auth.unauthenticate'), array("status" => 403));
         }
 
+        // $request->set_param('user_id', $request->user_id); // this will take the user_id of the currently logged in user
         $request->set_param('user_id', $handleToken->user_id);
         return true;
     }
@@ -107,11 +110,22 @@ class AuthMiddleware
             return $handleToken;
         }
 
-        if (!in_array(strtolower($handleToken->role), $allowed)) {
+
+        /** mimazdazai code start here */
+        // if (!in_array(strtolower($handleToken->role), $allowed)) {
+        //     return new WP_Error("rest_forbidden", $this->_message->get('auth.unauthenticate'), array("status" => 403));
+        // }
+
+        // $request->user_id = $handleToken->user_id;
+
+        /** Change start here */
+        $request->set_param('user_id', $handleToken->user_id);
+        $user = get_user_by('ID', $handleToken->user_id);
+
+        if (!in_array(strtolower($user->roles[0]), $allowed)) {
             return new WP_Error("rest_forbidden", $this->_message->get('auth.unauthenticate'), array("status" => 403));
         }
 
-        $request->user_id = $handleToken->user_id;
         return true;
     }
 }

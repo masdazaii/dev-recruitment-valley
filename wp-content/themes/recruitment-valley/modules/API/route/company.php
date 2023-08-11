@@ -87,7 +87,13 @@ class CompanyEndpoint
                     'methods'               => 'GET',
                     'permission_callback'   => [$authMiddleware, 'authorize_company'],
                     'callback'              => [$vacancyService, 'getAll']
-                ]
+                ],
+                'setup-company-profile' => [
+                    'url'                   => '/profile/setup',
+                    'methods'               => 'POST',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company'],
+                    'callback'              => [$profile, 'setup'],
+                ],
             ]
         ];
 

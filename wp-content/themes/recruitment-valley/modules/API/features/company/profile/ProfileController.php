@@ -241,4 +241,24 @@ class ProfileController
             'message' => $this->message->get("profile.update.success")
         ];
     }
+
+    public function setup($request)
+    {
+        global $wpdb;
+
+        try {
+            $wpdb->query('START TRANSACTION');
+
+
+
+            $wpdb->query('COMMIT');
+        } catch (Error $errors) {
+            $wpdb->query('ROLLBACK');
+            return [
+                // "message" => $this->_message->get("company.profile.setup_failed"),
+                "errors" => $errors,
+                "status" => 500
+            ];
+        }
+    }
 }

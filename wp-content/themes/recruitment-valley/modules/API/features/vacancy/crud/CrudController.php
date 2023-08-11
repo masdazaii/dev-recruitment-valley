@@ -26,12 +26,12 @@ class VacancyCrudController
     {
         $vacancy = new Vacancy;
         $filters = [
-            'page' => $request['page'] ?? null,
+            'page' => $request['page'] ?? 1,
             'search' => $request['search'] ?? null,
             'city' => $request['city'] ?? null,
             'salaryStart' => $request['salaryStart'] ?? null,
             'salaryEnd' => $request['salaryEnd'] ?? null,
-            'postPerPage' => $request['perPage'] ?? null
+            'postPerPage' => $request['perPage'] ?? 10
         ];
 
         $taxonomyFilters = [
