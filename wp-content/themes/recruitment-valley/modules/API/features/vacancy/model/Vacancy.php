@@ -159,7 +159,11 @@ class Vacancy
      */
     public function setStatus($status)
     {
-        return wp_set_post_terms($this->vacancy_id, $status, 'status');
+        $termExist = term_exists($status,'status');
+        if($termExist)
+        {
+            return wp_set_post_terms($this->vacancy_id, $termExist["term_id"], 'status');
+        }
     }
 
     public function setReviews($reviews)
@@ -326,6 +330,11 @@ class Vacancy
     {
         $vacancy = get_post($this->vacancy_id);
         return $vacancy->post_author;
+    }
+
+    public function getPublishDate( $format )
+    {
+        return get_post_time($format, true, $this->vacancy_id);
     }
 
     public function getProp($acf_field, $single = true)

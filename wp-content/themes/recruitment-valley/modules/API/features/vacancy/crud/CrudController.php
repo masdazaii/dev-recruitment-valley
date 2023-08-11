@@ -26,12 +26,12 @@ class VacancyCrudController
     {
         $vacancy = new Vacancy;
         $filters = [
-            'page' => $request['page'] ?? null,
+            'page' => isset($request['page']) ? intval($request['page']) : 1,
             'search' => $request['search'] ?? null,
             'city' => $request['city'] ?? null,
             'salaryStart' => $request['salaryStart'] ?? null,
             'salaryEnd' => $request['salaryEnd'] ?? null,
-            'postPerPage' => $request['perPage'] ?? null
+            'postPerPage' => $request['perPage'] ?? 10
         ];
 
         $taxonomyFilters = [
@@ -51,6 +51,7 @@ class VacancyCrudController
             "offset" => $offset,
             "order" => "ASC",
             "post_status" => "publish",
+            'tax_query' => []
         ];
 
         /** Set tax query */
@@ -153,6 +154,14 @@ class VacancyCrudController
             $args['s'] = $filters['search'];
         }
 
+        // only display open job status
+        array_push($args['tax_query'], [
+            'taxonomy' => 'status',
+            'field'     => 'slug',
+            'terms'     => 'open',
+            'compare'  => 'IN'
+        ]);
+
         // $vacancies = get_posts($args);
         $vacancies = new WP_Query($args);
 
@@ -160,7 +169,7 @@ class VacancyCrudController
             'message' => $this->_message->get('vacancy.get_all'),
             'data'    => $vacancies->posts,
             'meta'    => [
-                'currentPage' => intval($filters['page']),
+                'currentPage' => isset($filters['page']) ? intval($filters['page']) : 1,
                 'totalPage' => $vacancies->max_num_pages,
             ],
             'status'  => 200
@@ -228,7 +237,7 @@ class VacancyCrudController
                 $vacancyModel->setProp($vacancyModel->acf_external_url, $payload["external_url"]);
             }
 
-            $vacancyModel->setStatus('open');
+            $vacancyModel->setStatus('processing');
 
             return [
                 "status" => 201,
@@ -337,4 +346,83 @@ class VacancyCrudController
 
         return $search;
     }
+
+    public function update( $request )
+    {
+        $vacancy_id = $request["vacancy_id"];
+        $vacancyModel = new Vacancy( $vacancy_id );
+
+        $vacancyIsPaid = $vacancyModel->getIsPaid();
+
+        $payload = $this->createVacancyPayload( $vacancyIsPaid, $request );
+
+        $vacancyModel->setTaxonomy($payload["taxonomy"]);
+
+        foreach ($payload as $acf_field => $value) {
+            if ($acf_field !== "taxonomy") {
+                $vacancyModel->setProp($acf_field, $value, is_array($value));
+            }
+        }
+    }
+
+    private function createVacancyPayload( $isPaid, $request )
+    {
+        $payload = [];
+
+        if($isPaid)
+        {
+            $payload = [
+                "title" => $request["name"],
+                "description" => $request["description"],
+                "term" => $request["terms"],
+                "salary_start" => $request["salaryStart"],
+                "salary_end" => $request["salaryEnd"],
+                "external_url" => $request["externalUrl"],
+                "apply_from_this_platform" => isset($request["externalUrl"]) ? true : false,
+                "user_id" => $request["user_id"],
+                "application_process_title" => $request["applicationProcedureTitle"],
+                "application_process_description" => $request["applicationProcedureText"],
+                "video_url" => $request["video"],
+                "facebook_url" => $request["facebook"],
+                "linkedin_url" => $request["linkedin"],
+                "instagram_url" => $request["instagram"],
+                "twitter_url" => $request["twitter"],
+                "reviews" => $request["review"],
+                "taxonomy" => [
+                    "sector" => $request["sector"],
+                    "role" => $request["role"],
+                    "working-hours" => $request["workingHours"],
+                    "location" => $request["location"],
+                    "education" => $request["education"],
+                    "type" => $request["employmentType"],
+                    "status" => [32] // set free job become pending category
+                ],
+                "application_process_step" => $request["applicationProcedureSteps"],
+        ];
+        }
+
+        if(!$isPaid)
+        {
+            $payload = [
+                "title" => $request["name"],
+                "description" => $request["description"],
+                "salary_start" => $request["salaryStart"],
+                "salary_end" => $request["salaryEnd"],
+                "external_url" => $request["externalUrl"],
+                "apply_from_this_platform" => isset($request["externalUrl"]) ? true : false,
+                "user_id" => $request["user_id"],
+                "taxonomy" => [
+                    "sector" => $request["sector"],
+                    "role" => $request["role"],
+                    "working-hours" => $request["workingHours"],
+                    "location" => $request["location"],
+                    "education" => $request["education"],
+                    "type" => $request["employmentType"],
+                    "status" => [31] // set free job become pending category
+                ],
+            ];
+        }
+
+        return $payload;
+    } 
 }

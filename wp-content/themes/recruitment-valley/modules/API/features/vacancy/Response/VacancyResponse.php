@@ -2,6 +2,8 @@
 
 namespace Vacancy;
 
+use DateTime;
+use DateTimeImmutable;
 use WP_Post;
 
 class VacancyResponse
@@ -39,6 +41,7 @@ class VacancyResponse
                 "salaryEnd" => $vacancyModel->getSalaryEnd(),
                 "thumbnail" => $vacancyModel->getThumbnail(),
                 "description" => $vacancyModel->getDescription(),
+                "postedDate" => date_format(new DateTime($vacancy->post_date_gmt), "Y-m-d H:i A")
             ];
         }, $this->vacancyCollection);
 
@@ -77,6 +80,7 @@ class VacancyResponse
             "salaryStart" => $vacancyModel->getSalaryStart(),
             "salaryEnd" => $vacancyModel->getSalaryEnd(),
             "thumbnail" => $vacancyModel->getThumbnail(),
+            "postedDate" => $vacancyModel->getPublishDate("Y-m-d H:i A")
         ];
 
         // $formattedResponse = get_field($vacancyModel->acf_application_process_step,$this->vacancyCollection->ID);
