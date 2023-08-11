@@ -55,7 +55,7 @@ class VacancyResponse
             "shortDescription" => $vacancyTaxonomy,
             "title" => $this->vacancyCollection->post_title,
             "company" =>  [
-                "logo" => "",
+                "logo" => "https://picsum.photos/200/300",
                 "name" => "",
                 "about" => "",
                 "maps" => "",

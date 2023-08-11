@@ -11,4 +11,12 @@ class Helper
             return null;
         }
     }
+
+    public static function yt_id($url)
+    {
+        $parts = parse_url($url);
+        parse_str($parts['query'], $query);
+
+        return isset($query['v']) ? $query['v'] : '';
+    }
 }
