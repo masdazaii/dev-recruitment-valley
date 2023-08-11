@@ -113,6 +113,12 @@ class Message
                     "apply_failed" => __("Failed apply this job.", THEME_DOMAIN),
                     "expired_job" => __("Failed, the job already expired", THEME_DOMAIN),
                 ]
+            ],
+            'company' => [
+                "profile" => [
+                    "setup_success" => __("Success setting up your profile", THEME_DOMAIN),
+                    "setup_failed" => __("Failed setting up your profile", THEME_DOMAIN)
+                ]
             ]
         ];
     }

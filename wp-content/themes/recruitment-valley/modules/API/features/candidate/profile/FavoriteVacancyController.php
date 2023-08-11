@@ -21,17 +21,17 @@ class FavoriteVacancyController
 
         $favorites = get_user_meta($request['user_id'], 'favorite_vacancy', true) ?? [];
 
-        if (is_array($favorites) && count($favorites) > 0) {
-            if (in_array($vacancyID, $favorites, false)) {
-                return [
-                    "message" => $this->_message->get('candidate.favorite.already_exists'),
-                    "status" => 400,
-                ];
-            }
-            array_push($favorites, $vacancyID);
-        } else {
-            $favorites = [$vacancyID];
-        }
+        // if (is_array($favorites) && count($favorites) > 0) {
+        //     if (in_array($vacancyID, $favorites, false)) {
+        //         return [
+        //             "message" => $this->_message->get('candidate.favorite.already_exists'),
+        //             "status" => 400,
+        //         ];
+        //     }
+        //     array_push($favorites, $vacancyID);
+        // } else {
+        //     $favorites = [$vacancyID];
+        // }
 
         $storeFav = update_user_meta($request['user_id'], 'favorite_vacancy', array_unique($favorites));
 
