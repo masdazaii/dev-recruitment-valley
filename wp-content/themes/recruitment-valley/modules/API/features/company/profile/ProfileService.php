@@ -54,6 +54,12 @@ class ProfileService
         return ResponseHelper::build($response);
     }
 
+    public function updatePhoto(WP_REST_Request $request)
+    {
+        $response = $this->setupProfileController->updatePhoto($request);
+        return ResponseHelper::build($response);
+    }
+
     public function setup(WP_REST_Request $request)
     {
         $validator = new ValidationHelper('setupCompanyProfile', $request->get_params());

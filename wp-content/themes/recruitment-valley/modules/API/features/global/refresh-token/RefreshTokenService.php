@@ -2,6 +2,7 @@
 
 namespace RefreshToken;
 
+use Request\RefreshTokenRequest;
 use ResponseHelper;
 use WP_REST_Request;
 
@@ -16,7 +17,15 @@ class RefreshTokenService
 
     public function refresh(WP_REST_Request $request)
     {
-        $body = $request->get_params();
+        $refreshTokenRequest = new RefreshTokenRequest($request);
+        if(!$refreshTokenRequest->validate())
+        {
+            $errors = $refreshTokenRequest->getErrors();
+            return ResponseHelper::build($errors);
+        }
+
+        $refreshTokenRequest->sanitize();
+        $body = $refreshTokenRequest->getData();
         $response = $this->refreshTokenController->refresh($body);
         return ResponseHelper::build($response);
     }

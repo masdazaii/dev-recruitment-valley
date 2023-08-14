@@ -28,29 +28,18 @@ class Validator
     public function validate()
     {
         /** Old Validate start here */
-        // foreach ($this->rules as $field => $rules) {
-        //     $value = isset($this->data[$field]) ? $this->data[$field] : null;
+        // die;
 
-        //     foreach ($rules as $rule) {
-        //         list($ruleName, $parameters) = $this->parseRule($rule);
-        //         $ruleInstance = $this->getRuleInstance($ruleName);
-
-        //         if (!$ruleInstance->validate($field, $value, $parameters)) {
-        //             $this->addError($field, $ruleName, $parameters);
-        //         }
-        //     }
-        // }
-        // return empty($this->errors);
-
-        /** Changes start here */
         foreach ($this->rules as $field => $rules) {
-            if (strpos($field, '.*') !== false) {
-                $value = isset($this->data[substr($field, 0, -2)]) ? $this->data[substr($field, 0, -2)] : null;
-                if ($value && !is_array($value)) {
-                    $value = explode(',', $value);
-                }
-            } else {
-                $value = isset($this->data[$field]) ? $this->data[$field] : null;
+            $is_array = str_contains($field, "*");
+            if ($is_array) {
+                $field = substr($field, 0, -2);
+            }
+
+            $value = isset($this->data[$field]) ? $this->data[$field] : null;
+
+            if ($is_array && !is_array($value) && $value) {
+                $value = explode(",", $value);
             }
 
             foreach ($rules as $rule) {
@@ -92,6 +81,8 @@ class Validator
                 return new NumericRule();
             case 'in':
                 return new In();
+            case 'url':
+                return new UrlRule();
             case 'exists':
                 return new ExistsRule();
             case 'not_exists':
@@ -125,16 +116,27 @@ class Validator
         return $this->data;
     }
 
-    public function sanitize()
+    public function sanitize($sanitize = false)
     {
         /** Old sanitize start here */
         // foreach ($this->data as $key => $value) {
         //     if (!isset($this->rules[$key])) {
-        //         unset($this->data[$key]);
-        //         continue;
+        //         if (!isset($this->rules[$key . ".*"])) {
+        //             unset($this->data[$key]);
+        //             continue;
+        //         }
         //     }
 
-        //     $this->data[$key] = sanitize_text_field($value);
+        //     if (is_array($value) || is_object($value) || file_exists($value)) {
+        //         // $sanitizeName = $sanitize[$key];
+        //         // switch ($sanitizeName) :
+        //         //     case "array" :
+
+        //         //     case "arrayofobject" :
+        //         //         default break;
+        //     } else {
+        //         $this->data[$key] = sanitize_text_field($value);
+        //     }
         // }
 
         /** Changes start here */
