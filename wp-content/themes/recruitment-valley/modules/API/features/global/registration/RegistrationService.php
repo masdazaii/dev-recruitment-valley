@@ -3,6 +3,7 @@
 namespace Global;
 
 use Request\RegisterRequest;
+use Request\ResendOtpRequest;
 use Request\ValidateOtpRequest;
 use WP_REST_Request;
 use ResponseHelper;
@@ -53,7 +54,15 @@ class RegistrationService
 
     public function resendOTP(WP_REST_Request $request)
     {
-        $body = $request->get_params();
+        $resendOtpRequest = new ResendOtpRequest($request);
+        if(!$resendOtpRequest->validate())
+        {
+            $errors = $resendOtpRequest->getErrors();
+            return ResponseHelper::build($errors);
+        }
+
+        $resendOtpRequest->sanitize();
+        $body = $resendOtpRequest->getData();
         $response = $this->registrationController->resendOTP($body);
         return ResponseHelper::build($response);
     }

@@ -9,46 +9,46 @@ use V\Rules\Validator;
 class ValidationHelper
 {
     /** Old one */
-    // public static function validate($request, $rules)
-    // {
-    //     $response = [
-    //         'is_valid'  => true,
-    //         'errors'    => []
-    //     ];
+    public static function doValidate($request, $rules)
+    {
+        $response = [
+            'is_valid'  => true,
+            'errors'    => []
+        ];
 
-    //     if (gettype($rules) === 'string') {
-    //         $rules = array_unique(explode('|', $rules));
-    //     }
+        if (gettype($rules) === 'string') {
+            $rules = array_unique(explode('|', $rules));
+        }
 
-    //     foreach ($rules as $key => $value) {
-    //         switch ($value) {
-    //             case 'required':
-    //                 $check = self::_require($request[$key], $key);
-    //                 if (!$check['is_valid']) {
-    //                     $response['is_valid'] = false;
-    //                     $response['fields'][$key][] = $check['message'];
-    //                 }
-    //                 break;
-    //         }
-    //     }
+        foreach ($rules as $key => $value) {
+            switch ($value) {
+                case 'required':
+                    $check = self::_require($request[$key], $key);
+                    if (!$check['is_valid']) {
+                        $response['is_valid'] = false;
+                        $response['fields'][$key][] = $check['message'];
+                    }
+                    break;
+            }
+        }
 
-    //     return $response;
-    // }
+        return $response;
+    }
 
-    // private static function _require($data, $key = null)
-    // {
-    //     if (!isset($data) || $data == '') {
-    //         $key_message = $key ?? '';
-    //         return [
-    //             'is_valid'  => false,
-    //             'message'   => 'Field ' . $key_message . ' is required.'
-    //         ];
-    //     }
+    private static function _require($data, $key = null)
+    {
+        if (!isset($data) || $data == '') {
+            $key_message = $key ?? '';
+            return [
+                'is_valid'  => false,
+                'message'   => 'Field ' . $key_message . ' is required.'
+            ];
+        }
 
-    //     return [
-    //         'is_valid'  => true,
-    //     ];
-    // }
+        return [
+            'is_valid'  => true,
+        ];
+    }
 
     /** New validation props (using new validator thingy) continued here */
     protected $_rules;

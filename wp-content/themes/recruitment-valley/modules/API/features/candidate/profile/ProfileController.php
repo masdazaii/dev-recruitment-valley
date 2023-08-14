@@ -23,7 +23,7 @@ class ProfileController
         $user_id = $request->user_id;
         $fields = $request->get_body_params();
 
-        $validate = ValidationHelper::validate($fields, [
+        $validate = ValidationHelper::doValidate($fields, [
             "firstName" => "required",
             "dateOfBirth" => "required",
             "phoneNumber" => "required",
@@ -75,5 +75,68 @@ class ProfileController
         return [
             'message' => $this->message->get("profile.setup.success")
         ];
+    }
+
+    public function updatePhoto(WP_REST_Request $request)
+    {
+        $user_id = $request->user_id;
+
+        global $wpdb;
+        try {
+            $wpdb->query('START TRANSACTION');
+
+            $cv = ModelHelper::handle_upload('cv');
+            $image = ModelHelper::handle_upload('image');
+
+            if ($image) {
+                $image_id = wp_insert_attachment($image['image']['attachment'], $image['image']['file']);
+                update_field('ucaa_image', $image_id, 'user_' . $user_id);
+            }
+
+            $wpdb->query('COMMIT');
+
+            return [
+                "status" => 200,
+                "message" => $this->message->get("profile.update.photo.success")
+            ];
+
+        } catch (Error $e) {
+            $wpdb->query('ROLLBACK');
+            return [
+                "status" => 500,
+                "message" => $e->getMessage()
+            ];
+        }
+    }
+
+    public function updateCv(WP_REST_Request $request)
+    {
+        $user_id = $request->user_id;
+
+        global $wpdb;
+        try {
+            $wpdb->query('START TRANSACTION');
+
+            $cv = ModelHelper::handle_upload('cv');
+
+            if ($cv) {
+                $cv_id = wp_insert_attachment($cv['cv']['attachment'], $cv['cv']['file']);
+                update_field('ucaa_image', $cv_id, 'user_' . $user_id);
+            }
+
+            $wpdb->query('COMMIT');
+
+            return [
+                "status" => 200,
+                "message" => $this->message->get("profile.update.photo.success")
+            ];
+
+        } catch (Error $e) {
+            $wpdb->query('ROLLBACK');
+            return [
+                "status" => 500,
+                "message" => $e->getMessage()
+            ];
+        }
     }
 }

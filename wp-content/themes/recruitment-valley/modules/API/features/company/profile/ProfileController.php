@@ -242,6 +242,12 @@ class ProfileController
         ];
     }
 
+<<<<<<< HEAD
+    public function updatePhoto( $request )
+    {
+        $userId = $request->user_id;
+
+=======
     public function setup($request)
     {
         global $wpdb;
@@ -260,5 +266,6 @@ class ProfileController
                 "status" => 500
             ];
         }
+>>>>>>> bcd6150e7d46e4aad3084577e70443ea16f02ef4
     }
 }

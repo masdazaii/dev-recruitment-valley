@@ -8,14 +8,23 @@ class NumericRule implements Rule
 {
     public function validate($field, $value, $parameters): bool
     {
-        if ($value == "" || $value == null) {
+        if($value == "" || $value == null || $value == [""])
+        {
             return true;
-        } else if (is_array($value)) {
-            // Loop through value
+        }
+
+        if(is_array($value))
+        {
             foreach ($value as $val) {
-                return is_numeric($val);
+                if(!is_numeric($val))
+                {
+                    return false;
+                    break;
+                }
             }
-        } else {
+
+            return true;
+        }else{
             return is_numeric($value);
         }
     }

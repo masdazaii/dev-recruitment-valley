@@ -27,8 +27,21 @@ class Validator
 
     public function validate()
     {
+        // die;
+
         foreach ($this->rules as $field => $rules) {
+            $is_array = str_contains($field, "*");
+            if($is_array)
+            {
+                $field = substr($field, 0, -2);
+            }
+
             $value = isset($this->data[$field]) ? $this->data[$field] : null;
+
+            if($is_array && !is_array($value) && $value)
+            {
+                $value = explode(",", $value);
+            }
 
             foreach ($rules as $rule) {
                 list($ruleName, $parameters) = $this->parseRule($rule);
@@ -69,6 +82,8 @@ class Validator
                 return new NumericRule();
             case 'in':
                 return new In();
+            case 'url':
+                return new UrlRule();
             case 'exists':
                 return new ExistsRule();
             case 'not_exists':
@@ -102,15 +117,30 @@ class Validator
         return $this->data;
     }
 
-    public function sanitize()
+    public function sanitize( $sanitize = false )
     {
         foreach ($this->data as $key => $value) {
-            if (!isset($this->rules[$key])) {
-                unset($this->data[$key]);
-                continue;
+            if(!isset($this->rules[$key]))
+            {
+                if(!isset($this->rules[$key.".*"]))
+                {
+                    unset($this->data[$key]);
+                    continue;
+                }
             }
 
-            $this->data[$key] = sanitize_text_field($value);
+            if(is_array($value) || is_object($value) ||file_exists($value))
+            {
+                // $sanitizeName = $sanitize[$key];
+                // switch ($sanitizeName) :
+                //     case "array" :
+                        
+                //     case "arrayofobject" :
+                //         default break;
+            }else{
+                $this->data[$key] = sanitize_text_field($value);
+            }
+
         }
     }
 }

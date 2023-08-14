@@ -2,6 +2,10 @@
 
 namespace Vacancy;
 
+use Request\CandidateVacanciesRequest;
+use Request\CreateFreeJobRequest;
+use Request\CreatePaidJobRequest;
+use Request\SingleVacancyRequest;
 use ResponseHelper;
 use WP_REST_Request;
 
@@ -17,15 +21,16 @@ class VacancyCrudService
         $this->vacancyResponse = new VacancyResponse;
     }
 
-    // public function create(WP_REST_Request $request)
-    // {
-    //     $response = $this->vacancyCrudController->create();
-    //     return ResponseHelper::build($response);
-    // }
-
     public function getAll(WP_REST_Request $request)
     {
-        $params = $request->get_params();
+        $getAllRequest = new CandidateVacanciesRequest( $request );
+        if(!$getAllRequest->validate())
+        {
+            $errors = $getAllRequest->getErrors();
+            return ResponseHelper::build($errors);
+        }
+
+        $params = $getAllRequest->getData();
         $response = $this->vacancyCrudController->getAll($params);
         $this->vacancyResponse->setCollection($response["data"]);
         $formattedResponse = $this->vacancyResponse->format();
@@ -35,7 +40,15 @@ class VacancyCrudService
 
     public function get(WP_REST_Request $request)
     {
-        $params = $request->get_params();
+        $singleVacancyRequest = new SingleVacancyRequest($request);
+        if(!$singleVacancyRequest->validate())
+        {
+            $errors = $singleVacancyRequest->getErrors();
+            return ResponseHelper::build($errors);
+        }
+
+        $singleVacancyRequest->sanitize();
+        $params = $singleVacancyRequest->getData();
         $response = $this->vacancyCrudController->get($params);
 
         if (isset($response["data"])) {
@@ -49,7 +62,21 @@ class VacancyCrudService
 
     public function createFreeJob(WP_REST_Request $request)
     {
-        $params = $request->get_params();
+        $createFreeJobRequest = new CreateFreeJobRequest($request);
+        if(!$createFreeJobRequest->validate())
+        {
+            $errors = $createFreeJobRequest->getErrors();
+            return ResponseHelper::build($errors);
+        }
+
+        
+        echo '<pre>';
+        var_dump($createFreeJobRequest->getData());
+        echo '</pre>';die;
+
+        $createFreeJobRequest->sanitize();
+
+        $params = $createFreeJobRequest->getData();
         $params["user_id"] = $request->user_id;
         $response = $this->vacancyCrudController->createFree($params);
         return ResponseHelper::build($response);
@@ -57,10 +84,34 @@ class VacancyCrudService
 
     public function createPaidJob( WP_REST_Request $request)
     {
-        $params = $request->get_params();
+        $createPaidJobRequest = new CreatePaidJobRequest($request);
+        if(!$createPaidJobRequest->validate())
+        {
+            $errors = $createPaidJobRequest->getErrors();
+            return ResponseHelper::build($errors);
+        }
+
+        $createPaidJobRequest->sanitize();
+
+        $params = $createPaidJobRequest->getData();
         $params["user_id"] = $request->user_id;
         $response = $this->vacancyCrudController->createPaid($params);
         return ResponseHelper::build($response);
     }
 
+    public function update(WP_REST_Request $request)
+    {
+        $params = $request->get_params();
+        $params["user_id"] = $request->user_id;
+        $response = $this->vacancyCrudController->update( $params );
+        return ResponseHelper::build($response);
+    }
+
+    public function trash( WP_REST_Request $request)
+    {
+        $params = $request->get_params();
+        $params["user_id"] = $request->user_id;
+        $response = $this->vacancyCrudController->trash($params);
+        return ResponseHelper::build( $response );
+    }
 }

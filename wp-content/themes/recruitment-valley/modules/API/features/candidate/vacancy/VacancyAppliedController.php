@@ -110,7 +110,6 @@ class VacancyAppliedController
         return [
             "message"   => $this->_message->get('candidate.apply_vacancy.apply_success'),
             "data"      => $user->ID,
-            "acf"       => get_fields($user->ID),
             "status"    => 201
         ];
     }
