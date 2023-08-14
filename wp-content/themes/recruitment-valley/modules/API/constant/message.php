@@ -62,7 +62,7 @@ class Message
                         "success" => __("profile photo updated successfully", THEME_DOMAIN)
                     ],
                     'cv' => [
-                        "success" =>  __("profile photo updated successfully", THEME_DOMAIN)
+                        "success" =>  __("CV updated successfully", THEME_DOMAIN)
                     ],
                 ],
             ],

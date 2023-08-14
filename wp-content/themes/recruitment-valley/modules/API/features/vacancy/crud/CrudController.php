@@ -308,7 +308,11 @@ class VacancyCrudController
                 }
             }
 
+            $expiredAt = new DateTimeImmutable();
+            $expiredAt = $expiredAt->modify("+30 days")->format("Y-m-d H:i:s");
+
             $vacancyModel->setStatus('open');
+            $vacancyModel->setProp("expired_at", $expiredAt);
 
             return [
                 "status" => 201,
