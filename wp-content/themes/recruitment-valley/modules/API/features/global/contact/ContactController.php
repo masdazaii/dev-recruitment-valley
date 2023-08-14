@@ -68,17 +68,24 @@ class ContactController
         }
 
         /** Send email to admin */
-        // $admin = get_users('role=Administrator');
+        $adminEmail = get_option('admin_email');
         // $adminHeaders[] = 'From: ' . $request['email'] . '<' . $request['email']  . '>';
-        // $subject = 'NEW MESSAGE - ';
-        // if ($from === 'company') {
-        //     $subject .= $request['companyName'] . ' [' . $request['name'] . ']';
-        // } else {
-        //     $subject .= $request['firstName'] . $request['lastName'];
-        // }
-        // foreach ($admin as $user) {
-        //     wp_mail($user->user_email, $subject, $request['message'], $adminHeaders);
-        // }
+        $subject = 'NEW MESSAGE - ';
+        $body = $request['message'];
+        $body .= '<hr>';
+        $body .= 'Sender data : ' . PHP_EOL;
+
+        if ($from === 'company') {
+            $subject .= $request['companyName'] . ' [' . $request['name'] . ']';
+            $body .= 'Company Name : ' . $request['companyName'] . ' [' . $request['name'] . ']' . PHP_EOL;
+        } else {
+            $subject .= $request['firstName'] . ' - ' . $request['lastName'];
+            $body .= 'Candidate Name : ' . $request['firstName'] . ' - ' . $request['lastName'] . PHP_EOL;
+        }
+        $body .= 'Email : ' . $request['email'] . PHP_EOL;
+        $body .= 'Phone : ' . '(' . $request['phoneNumber'] . ') ' . $request['phoneNumber'] . PHP_EOL;
+
+        wp_mail($adminEmail, $subject, $body);
 
         return [
             "message"    => $this->_message->get('contact.success'),
