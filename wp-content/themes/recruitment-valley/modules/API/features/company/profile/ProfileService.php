@@ -42,9 +42,21 @@ class ProfileService
         return ResponseHelper::build($response);
     }
 
+    public function post_detail(WP_REST_Request $request)
+    {
+        $response = $this->setupProfileController->post_detail($request);
+        return ResponseHelper::build($response);
+    }
+
     public function delete_gallery(WP_REST_Request $request)
     {
         $response = $this->setupProfileController->delete_gallery($request);
+        return ResponseHelper::build($response);
+    }
+
+    public function updatePhoto(WP_REST_Request $request)
+    {
+        $response = $this->setupProfileController->updatePhoto($request);
         return ResponseHelper::build($response);
     }
 
@@ -52,7 +64,7 @@ class ProfileService
     {
         $validator = new ValidationHelper('setupCompanyProfile', $request->get_params());
 
-        if (!$validator->validate()) {
+        if (!$validator->tempValidate()) {
             $errors = $validator->getErrors();
             return ResponseHelper::build([
                 'message' => $this->_message->get('candidate.favorite.vacancy_not_found'),
@@ -60,8 +72,10 @@ class ProfileService
                 'status' => 400
             ]);
         }
-        $validator->sanitize();
+
+        $body = $validator->tempSanitize();
         $body = $validator->getData();
+        // $body = $request->get_params();
         $response = $this->setupProfileController->setup($body);
         return ResponseHelper::build($response);
     }

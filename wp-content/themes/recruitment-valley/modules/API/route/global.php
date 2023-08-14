@@ -69,7 +69,7 @@ class GlobalEndpoint
                 'add-favorite' => [
                     'url'                   => '/vacancies/favorite',
                     'methods'               => 'POST',
-                    'permission_callback'   => [$authMiddleware, 'check_token_candidate'],
+                    'permission_callback'   => [$authMiddleware, 'authorize_candidate'],
                     'callback'              => [$favoriteVacancyService, 'addFavoriteVacancy'],
                 ],
                 'vacancies_single' => [

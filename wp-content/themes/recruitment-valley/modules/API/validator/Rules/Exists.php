@@ -8,7 +8,7 @@ class ExistsRule implements Rule
 {
     public function validate($field, $value, $parameters): bool
     {
-        if ($value == "" || $value == null) {
+        if ($value == "" || $value == null || empty($value)) {
             return true;
         } else {
             $params = explode('/', $parameters[0]);
@@ -16,21 +16,21 @@ class ExistsRule implements Rule
             $type = $params[1];
             $column = $params[2];
 
-            $check = $this->check($value, $table, $type, $column);
-            return $check;
+            if (strpos($field, '.*') !== false) {
+                $checkValue = [];
+                foreach ($value as $key => $values) {
+                    $checkValue[$key] = $this->check($values, $table, $type, $column);
+                }
 
-            // if (is_array($value)) {
-            //     // Loop through value
-            //     foreach ($value as $val) {
-            //         return is_numeric($val);
-            //     }
-            // } else {
-            //     return is_numeric($value);
-            // }
+                return in_array(false, $checkValue) ? false : true;
+            } else {
+                $check = $this->check($value, $table, $type, $column);
+            }
+            return $check;
         }
     }
 
-    public function check($value, $table, $type, $column)
+    public function check($value, $table, $type, $column): bool
     {
         switch ($table) {
             case 'user':
@@ -55,12 +55,18 @@ class ExistsRule implements Rule
 
                 $databaseValue = get_posts($args);
                 return count($databaseValue) < 1 ? false : true;
-                break;
+            case 'term':
+                $checkTerm = get_term_by($column, $value, $type);
+                return $checkTerm ? true : false;
         }
     }
 
     public function getErrorMessage($field, $parameters): string
     {
-        return "The {$field} not found.";
+        if (strpos($field, '.*') !== false) {
+            return "One of the '" . substr($field, 0, -2) . "' value didn't exists.";
+        } else {
+            return "The {$field} didn't exists.";
+        }
     }
 }

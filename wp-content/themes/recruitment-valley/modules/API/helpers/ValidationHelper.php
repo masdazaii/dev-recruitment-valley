@@ -70,6 +70,7 @@ class ValidationHelper
 
         $this->_validator = new Validator($data, $rules);
     }
+
     public function validate()
     {
         return $this->_validator->validate();
@@ -88,5 +89,17 @@ class ValidationHelper
     public function getData()
     {
         return $this->_validator->getData();
+    }
+
+    /** Temporary validation only for setup company */
+    public function tempValidate()
+    {
+        return $this->_validator->tempValidate();
+    }
+
+    /** Temporary sanitazion only for setup company */
+    public function tempSanitize()
+    {
+        return $this->_validator->tempSanitize();
     }
 }
