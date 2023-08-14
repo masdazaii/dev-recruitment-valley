@@ -26,7 +26,7 @@ class ProfileController
         $user_data = ProfileModel::user_data($user_id);
         $user_data_acf = Helper::isset($user_data, 'acf');
         $galleries = Helper::isset($user_data_acf, 'ucma_gallery_photo') ?? [];
-        print('<pre>' . print_r($galleries, true) . '</pre>');
+
         $galleries = array_map(function ($gallery) {
             static $i = 0;
             $result = [
@@ -38,6 +38,17 @@ class ProfileController
             return $result;
         }, $galleries);
 
+        /** Added line Start here */
+        $image = Helper::isset($user_data_acf, 'ucma_image') ?? [];
+        if (!empty($image)) {
+            $image = [
+                'id' => $image['ID'],
+                'title' => $image['title'],
+                'url' => $image['url']
+            ];
+        }
+        /** Added line End here */
+
         return [
             'detail' => [
                 'email' => Helper::isset($user_data, 'user_email'),
@@ -48,6 +59,7 @@ class ProfileController
                 'website' => Helper::isset($user_data_acf, 'ucma_website_url'),
                 'employees' => Helper::isset($user_data_acf, 'ucma_employees'),
                 'btw' => Helper::isset($user_data_acf, 'ucma_btw_number'),
+                'image' => $image, // Added line
             ],
             'socialMedia' => [
                 'facebook' => Helper::isset($user_data_acf, 'ucma_facebook_url'),
@@ -268,6 +280,13 @@ class ProfileController
                 update_field('ucma_gallery_photo', $gallery_ids, 'user_' . $request['user_id']);
             }
 
+            /** Upload Image */
+            $image = ModelHelper::handle_upload('image');
+            if ($image) {
+                $image_id = wp_insert_attachment($image['image']['attachment'], $image['image']['file']);
+                update_field('ucma_image', $image_id, 'user_' . $request['user_id']);
+            }
+
             /** Store ACF */
             update_field('ucma_phone_code', $request['phoneNumberCode'], 'user_' . $request['user_id']);
             update_field('ucma_phone', $request['phoneNumber'], 'user_' . $request['user_id']);
@@ -275,11 +294,11 @@ class ProfileController
             update_field('ucma_street', $request['street'], 'user_' . $request['user_id']);
             update_field('ucma_city', $request['city'], 'user_' . $request['user_id']);
             update_field('ucma_postcode', $request['postCode'], 'user_' . $request['user_id']);
-
+            update_field('ucma_employees', $request['employeesTotal'], 'user_' . $request['user_id']);
+            update_field('ucma_sector', $request['sector'], 'user_' . $request['user_id']);
             update_field('ucma_kvk_number', $request['kvkNumber'], 'user_' . $request['user_id']);
             update_field('ucma_btw_number', $request['btwNumber'], 'user_' . $request['user_id']);
             update_field('ucma_website_url', $request['website'], 'user_' . $request['user_id']);
-            // update_field('ucma_linkedin_page_url', $request['linkedinPage'], 'user_' . $request['user_id']);
             update_field('ucma_linkedin_url', $request['linkedin'], 'user_' . $request['user_id']);
             update_field('ucma_facebook_url', $request['facebook'], 'user_' . $request['user_id']);
             update_field('ucma_instagram_url', $request['instagram'], 'user_' . $request['user_id']);
@@ -300,7 +319,6 @@ class ProfileController
 
         return [
             "message" => $this->message->get("company.profile.setup_success"),
-            'gal' => $galleries,
             "status" => 200
         ];
     }

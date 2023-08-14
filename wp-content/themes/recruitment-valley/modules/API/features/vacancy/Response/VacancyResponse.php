@@ -118,9 +118,9 @@ class VacancyResponse
                 "id" => $vacancy->ID,
                 "slug" => $vacancy->post_name,
                 "name" => $vacancy->post_title,
-                "status" => $vacancyTaxonomy['status'] ?? null,
                 "thumbnail" => $vacancyModel->getThumbnail(),
                 "description" => $vacancyModel->getDescription(),
+                "status" => $vacancyTaxonomy['status'][0]['name'] ?? null,
                 "jobPostedDate" => $vacancy->post_date,
             ];
         }, $this->vacancyCollection);

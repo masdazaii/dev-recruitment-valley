@@ -29,7 +29,7 @@ class FavoriteVacancyService
 
         $validator = new ValidationHelper('addFavorite', $request->get_params(), $extraRules);
 
-        if (!$validator->validate()) {
+        if (!$validator->tempValidate()) {
             $errors = $validator->getErrors();
             return ResponseHelper::build([
                 'message' => $this->_message->get('candidate.favorite.vacancy_not_found'),
@@ -46,7 +46,7 @@ class FavoriteVacancyService
         //     ]);
         // }
 
-        $validator->sanitize();
+        $validator->tempSanitize();
         $body = $validator->getData();
 
         $body = $request->get_params();
