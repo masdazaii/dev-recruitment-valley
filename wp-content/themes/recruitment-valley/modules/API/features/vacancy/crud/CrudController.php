@@ -3,6 +3,7 @@
 namespace Vacancy;
 
 use Constant\Message;
+use DateTimeImmutable;
 use WP_Post;
 use WP_Query;
 
@@ -171,7 +172,6 @@ class VacancyCrudController
                 'currentPage' => isset($filters['page']) ? intval($filters['page']) : 1,
                 'totalPage' => $vacancies->max_num_pages,
             ],
-            'args' => $args,
             'status'  => 200
         ];
     }
@@ -237,7 +237,11 @@ class VacancyCrudController
                 $vacancyModel->setProp($vacancyModel->acf_external_url, $payload["external_url"]);
             }
 
+            $expiredAt = new DateTimeImmutable();
+            $expiredAt = $expiredAt->modify("+30 days")->format("Y-m-d H:i:s");
+
             $vacancyModel->setStatus('processing');
+            $vacancyModel->setProp("expired_at", $expiredAt);
 
             return [
                 "status" => 201,

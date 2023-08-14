@@ -69,11 +69,6 @@ class VacancyCrudService
             return ResponseHelper::build($errors);
         }
 
-        
-        echo '<pre>';
-        var_dump($createFreeJobRequest->getData());
-        echo '</pre>';die;
-
         $createFreeJobRequest->sanitize();
 
         $params = $createFreeJobRequest->getData();

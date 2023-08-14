@@ -304,4 +304,9 @@ class ProfileController
             "status" => 200
         ];
     }
+
+    // public function updatePhoto( WP_REST_Request $request )
+    // {
+    //     $params = $request->user_id;
+    // }
 }
