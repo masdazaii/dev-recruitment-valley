@@ -289,9 +289,9 @@ class ProfileController
 
     public function changeEmail(WP_REST_Request $request)
     {
-        $body = $request->get_body_params();
+        $body = $request->get_params();
         $payload = JWTHelper::check($body["token"]);
-        if(isset($payload["status"]))
+        if(is_array($payload))
         {
             return $payload;
         }
@@ -333,4 +333,34 @@ class ProfileController
         }
 
     }
+
+    public function changePassword( WP_REST_Request $request)
+    {
+        $user_id = $request->user_id;
+        $user = get_user_by('id', $user_id);
+        $body = $request->get_params();
+
+        if (!($user && wp_check_password($body["password"], $user->user_pass, $user->ID))) {
+            return [
+                "status" => 400,
+                "message" => "Incorrect password",
+            ];
+        }
+
+        if($body["newPassword"] !== $body["repeatNewPassword"])
+        {
+            return [
+                "status" => 400,
+                "message" => "new password missmatch",
+            ];
+        }
+
+        wp_set_password($body["newPassword"], $user->ID);
+
+        return [
+            "status" => 200,
+            "message" => "Success, password changed"
+        ];
+    }
+
 }

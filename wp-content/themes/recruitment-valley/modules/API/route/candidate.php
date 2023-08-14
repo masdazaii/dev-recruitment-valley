@@ -121,12 +121,17 @@ class CandidateEndpoint
                     'permission_callback'   => [$authMiddleware, 'check_token'],
                     'callback'              =>  [$profileService, 'changeEmailRequest'],
                 ],
-                'change_email_request' => [
+                'change_email' => [
                     'url'                   =>  'profile/change-email',
                     'methods'               =>  'POST',
-                    'permission_callback'   => [$authMiddleware, 'check_token'],
                     'callback'              =>  [$profileService, 'changeEmail'],
                 ],
+                'change_password' => [
+                    'url'                   =>  'profile/change-password',
+                    'methods'               =>  'POST',
+                    'permission_callback'   => [$authMiddleware, 'check_token'],
+                    'callback'              =>  [$profileService, 'changePassword'],
+                ]
             ]
         ];
 

@@ -55,4 +55,10 @@ class ProfileService
         $response = $this->setupProfileController->changeEmail($request);
         return ResponseHelper::build($response);
     }
+
+    public function changePassword( WP_REST_Request $request )
+    {
+        $response = $this->setupProfileController->changePassword($request);
+        return ResponseHelper::build($response);
+    }
 }

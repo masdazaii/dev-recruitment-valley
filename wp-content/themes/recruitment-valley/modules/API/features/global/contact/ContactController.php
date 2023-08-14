@@ -85,7 +85,16 @@ class ContactController
         $body .= 'Email : ' . $request['email'] . PHP_EOL;
         $body .= 'Phone : ' . '(' . $request['phoneNumber'] . ') ' . $request['phoneNumber'] . PHP_EOL;
 
-        wp_mail($adminEmail, $subject, $body);
+        $headers = array(
+            'Content-Type: text/html; charset=UTF-8'
+        );
+
+        // $template = require_once THEME_DIR . "/templates/email/template-email-create-account-candidate.html";
+
+        // $template_path = get_template_directory() . "/templates/email/template-email-create-account-candidate.html";
+        // $template_content = file_get_contents($template_path);
+
+        wp_mail($adminEmail, $subject, $body, $headers);
 
         return [
             "message"    => $this->_message->get('contact.success'),
