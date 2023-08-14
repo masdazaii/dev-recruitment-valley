@@ -179,7 +179,6 @@ class ProfileController
         $validate = ValidationHelper::doValidate($fields, [
             "sortDescription" => "required",
         ]);
-
         if (!$validate['is_valid']) wp_send_json_error(['validation' => $validate['fields'], 'status' => 400], 400);
 
 
@@ -243,9 +242,10 @@ class ProfileController
         ];
     }
 
-    public function updatePhoto( $request )
-    {
-        $userId = $request->user_id;
-        
-    }
+    // public function updatePhoto( WP_REST_Request $request )
+    // {
+    //     $params = $request->user_id;
+
+
+    // }
 }
