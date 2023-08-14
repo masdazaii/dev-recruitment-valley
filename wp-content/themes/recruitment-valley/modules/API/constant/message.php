@@ -135,6 +135,19 @@ class Message
                     "delete_failed" => __("Failed delete favorite job", THEME_DOMAIN),
                     "apply_failed" => __("Failed apply this job.", THEME_DOMAIN),
                     "expired_job" => __("Failed, the job already expired", THEME_DOMAIN),
+                ],
+                "get" => [
+                    "success" => __("success getting candidate data", THEME_DOMAIN),
+                    "not_found" => __("candidate not found", THEME_DOMAIN)
+                ],
+                "change_email_request" => [
+                    "success" => __("Success, change email request already sent to your email", THEME_DOMAIN),
+                    "not_found" => __("candidate not found", THEME_DOMAIN),
+                    "email_exist" => __("Email already exist", THEME_DOMAIN),
+                ],
+                "change_email" => [
+                    "success" => __("Success, email changed successfully", THEME_DOMAIN),
+                    "fail" => __("Error, something went wrong please contact administrartor", THEME_DOMAIN)
                 ]
             ],
             'company' => [
@@ -146,7 +159,7 @@ class Message
         ];
     }
 
-    public function get($message_location)
+    public function get($message_location) : string|array
     {
         $keys = explode('.', $message_location);
         $message = $this->list;
@@ -155,7 +168,7 @@ class Message
             if (isset($message[$key])) {
                 $message = $message[$key];
             } else {
-                return null; // Key not found, return null or any other default value you prefer.
+                return ""; // Key not found, return null or any other default value you prefer.
             }
         }
 
