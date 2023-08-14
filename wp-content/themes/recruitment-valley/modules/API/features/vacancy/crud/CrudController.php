@@ -36,13 +36,13 @@ class VacancyCrudController
         ];
 
         $taxonomyFilters = [
-            'education'     => array_key_exists('education', $request) ? explode(',', $request['education']) : NULL,
-            'role'          => array_key_exists('role', $request) ? explode(',', $request['role']) : NULL,
-            'sector'        => array_key_exists('sector', $request) ? explode(',', $request['sector']) : NULL,
-            'working-hours' => array_key_exists('hoursPerWeek', $request) ? explode(',', $request['hoursPerWeek']) : NULL,
-            'type'          => array_key_exists('employmentType', $request) ? explode(',', $request['employmentType']) : NULL,
-            'location'      => array_key_exists('location', $request) ? explode(',', $request['location']) : NULL,
-            'experiences'   => array_key_exists('experience', $request) ? explode(',', $request['experience']) : NULL,
+            'education'     => isset($request['education']) && $request['education'] !== "" ? explode(',', $request['education']) : NULL,
+            'role'          => isset($request['role']) && $request['role'] !== "" ? explode(',', $request['role']) : NULL,
+            'sector'        => isset($request['sector']) && $request['sector'] !== "" ? explode(',', $request['sector']) : NULL,
+            'working-hours' => isset($request['hoursPerWeek']) && $request['hoursPerWeek'] !== "" ? explode(',', $request['hoursPerWeek']) : NULL,
+            'type'          => isset($request['employmentType']) && $request['employmentType'] !== "" ? explode(',', $request['employmentType']) : NULL,
+            'location'      => isset($request['location']) && $request['location'] !== "" ? explode(',', $request['location']) : NULL,
+            'experiences'   => isset($request['experience']) && $request['experience'] !== "" ? explode(',', $request['experience']) : NULL,
         ];
 
         $offset = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['postPerPage']));
@@ -57,20 +57,29 @@ class VacancyCrudController
         ];
 
         /** Set tax query */
+        // only display open job status
+        $args['tax_query'] = [
+            "relation" => 'AND',
+            [
+                'taxonomy' => 'status',
+                'field'     => 'slug',
+                'terms'     => 'open',
+                'compare'  => 'IN'
+            ]
+        ];
+
         foreach ($taxonomyFilters as $key => $value) {
             if ($value && $value !== null && !empty($value)) {
-                if (!array_key_exists('tax_query', $args)) {
-                    $args['tax_query'] = [
-                        "relation" => 'OR'
-                    ];
-                }
+                $args['tax_query'][1]['relation'] = 'OR';
 
-                array_push($args['tax_query'], [
-                    'taxonomy' => $key,
-                    'field'     => 'term_id',
-                    'terms'     => $value,
-                    'compare'  => 'IN'
-                ]);
+                if ($value !== null && $value !== "" && !empty($value)) {
+                    array_push($args['tax_query'][1], [
+                        'taxonomy' => $key,
+                        'field'     => 'term_id',
+                        'terms'     => $value,
+                        'compare'  => 'IN'
+                    ]);
+                }
             }
         }
 
@@ -153,14 +162,6 @@ class VacancyCrudController
         if (array_key_exists('search', $filters) && $filters['search'] !== '' && isset($filters['search'])) {
             $args['s'] = $filters['search'];
         }
-
-        // only display open job status
-        array_push($args['tax_query'], [
-            'taxonomy' => 'status',
-            'field'     => 'slug',
-            'terms'     => 'open',
-            'compare'  => 'IN'
-        ]);
 
         // $vacancies = get_posts($args);
         $vacancies = new WP_Query($args);

@@ -51,7 +51,6 @@ class ProfileController
         /** Added line End here */
 
         return [
-            'a' => $user_data,
             'detail' => [
                 // 'email' => Helper::isset($user_data, 'user_email'),
                 'phoneNumber' => Helper::isset($user_data_acf, 'ucma_phone_code') . " " . Helper::isset($user_data_acf, 'ucma_phone'),
@@ -62,8 +61,7 @@ class ProfileController
                 'employees' => Helper::isset($user_data_acf, 'ucma_employees'),
                 'btw' => Helper::isset($user_data_acf, 'ucma_btw_number'),
                 /** Added Line start here */
-                'companyEmail' => Helper::isset($user_data_acf, 'ucma_company_email'), // Added Line
-                'comapnyName' => Helper::isset($user_data_acf, 'ucma_company_name'), // Added Line
+                'companyName' => Helper::isset($user_data_acf, 'ucma_company_name'), // Added Line
                 'image' => $image, // Added line
                 /** Added Line end here */
             ],
@@ -294,7 +292,6 @@ class ProfileController
             }
 
             /** Store Meta && ACF */
-            update_field('ucma_company_email', $request['email'], 'user_' . $request['user_id']);
             update_field('ucma_company_name', $request['companyName'], 'user_' . $request['user_id']);
             update_field('ucma_phone_code', $request['phoneNumberCode'], 'user_' . $request['user_id']);
             update_field('ucma_phone', $request['phoneNumber'], 'user_' . $request['user_id']);
@@ -327,7 +324,6 @@ class ProfileController
 
         return [
             "message" => $this->message->get("company.profile.setup_success"),
-            "data" => $request,
             "status" => 200
         ];
     }
