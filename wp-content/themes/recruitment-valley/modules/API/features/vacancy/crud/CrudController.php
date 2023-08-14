@@ -162,9 +162,9 @@ class VacancyCrudController
             'compare'  => 'IN'
         ]);
 
-        echo '<pre>';
-        var_dump($args);
-        echo '</pre>';die;
+        // echo '<pre>';
+        // var_dump($args);
+        // echo '</pre>';die;
 
         // $vacancies = get_posts($args);
         $vacancies = new WP_Query($args);
