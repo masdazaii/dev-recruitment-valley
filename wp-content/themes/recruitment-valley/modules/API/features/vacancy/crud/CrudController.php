@@ -30,8 +30,8 @@ class VacancyCrudController
             'page' => isset($request['page']) ? intval($request['page']) : 1,
             'search' => $request['search'] ?? null,
             'city' => $request['city'] ?? null,
-            'salaryStart' => $request['salaryStart'] ?? null,
-            'salaryEnd' => $request['salaryEnd'] ?? null,
+            'salaryStart' => isset($request['salaryStart']) ? intval($request['salaryStart']) : 0,
+            'salaryEnd' => isset($request['salaryEnd']) ? intval($request['salaryEnd']) : null,
             'postPerPage' => $request['perPage'] ?? 10
         ];
 
@@ -42,6 +42,7 @@ class VacancyCrudController
             'working-hours' => array_key_exists('hoursPerWeek', $request) ? explode(',', $request['hoursPerWeek']) : NULL,
             'type'          => array_key_exists('employmentType', $request) ? explode(',', $request['employmentType']) : NULL,
             'location'      => array_key_exists('location', $request) ? explode(',', $request['location']) : NULL,
+            'experiences'   => array_key_exists('experience', $request) ? explode(',', $request['experience']) : NULL,
         ];
 
         $offset = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['postPerPage']));
@@ -74,79 +75,77 @@ class VacancyCrudController
         }
 
         /** Set meta query */
-        if (($filters['salaryStart'] !== '' && isset($filters['salaryStart'])) || ($filters['salaryEnd'] !== '' && isset($filters['salaryEnd']))) {
-            // If salaryStart and salaryEnd exist + more than 0
-            if ($filters['salaryStart'] && $filters['salaryEnd'] && $filters['salaryEnd'] > 0) {
-                if (!array_key_exists('meta_query', $args)) {
-                    $args['meta_query'] = [
-                        "relation" => 'OR'
-                    ];
-                }
+        // If salaryStart and salaryEnd exist + more than 0
+        if ($filters['salaryStart'] >= 0 && $filters['salaryStart'] >= 0 && $filters['salaryEnd'] !== null && $filters['salaryEnd'] > 0) {
+            if (!array_key_exists('meta_query', $args)) {
+                $args['meta_query'] = [
+                    "relation" => 'OR'
+                ];
+            }
 
+            array_push($args['meta_query'], [
+                'relation' => 'AND',
+                [
+                    'key' => 'salary_start',
+                    'value' => $filters['salaryStart'],
+                    'type' => 'NUMERIC',
+                    'compare' => '>=',
+                ],
+                [
+                    'key' => 'salary_end',
+                    'value' => $filters['salaryEnd'],
+                    'type' => 'NUMERIC',
+                    'compare' => '<=',
+                ],
+            ]);
+            array_push($args['meta_query'], [
+                'relation' => 'AND',
+                [
+                    'key' => 'salary_start',
+                    'value' => [$filters['salaryStart'], $filters['salaryEnd']],
+                    'type' => 'NUMERIC',
+                    'compare' => 'BETWEEN',
+                ],
+                [
+                    'key' => 'salary_end',
+                    'value' => $filters['salaryEnd'],
+                    'type' => 'NUMERIC',
+                    'compare' => '<=',
+                ],
+            ]);
+        } else if ($filters['salaryStart'] >= 0 || $filters['salaryEnd'] >= 0) { // if only one of them is filled
+            if (!array_key_exists('meta_query', $args)) {
+                $args['meta_query'] = [
+                    "relation" => 'AND'
+                ];
+            }
+
+            if ($filters['salaryStart'] >= 0 && $filters['salaryEnd'] === null) { // if start is filled but other is empty
                 array_push($args['meta_query'], [
-                    'relation' => 'AND',
-                    [
-                        'key' => 'salary_start',
-                        'value' => $filters['salaryEnd'],
-                        'type' => 'NUMERIC',
-                        'compare' => '<=',
-                    ],
-                    [
-                        'key' => 'salary_end',
-                        'value' => $filters['salaryStart'],
-                        'type' => 'NUMERIC',
-                        'compare' => '>=',
-                    ],
+                    'key' => 'salary_start',
+                    'value' => $filters['salaryStart'],
+                    'type' => 'NUMERIC',
+                    'compare' => '>=',
                 ]);
                 array_push($args['meta_query'], [
-                    'relation' => 'AND',
-                    [
-                        'key' => 'salary_start',
-                        'value' => $filters['salaryStart'],
-                        'type' => 'NUMERIC',
-                        'compare' => '<=',
-                    ],
-                    [
-                        'key' => 'salary_end',
-                        'value' => $filters['salaryEnd'],
-                        'type' => 'NUMERIC',
-                        'compare' => '>=',
-                    ],
+                    'key' => 'salary_end',
+                    'value' => $filters['salaryStart'],
+                    'type' => 'NUMERIC',
+                    'compare' => '>=',
                 ]);
-            } else if ($filters['salaryStart'] || $filters['salaryEnd']) { // if only one of them is filled
-                if (!array_key_exists('meta_query', $args)) {
-                    $args['meta_query'] = [
-                        "relation" => 'AND'
-                    ];
-                }
-
-                if ($filters['salaryStart'] && !isset($filters['salaryEnd'])) { // if start is filled but other is empty
-                    array_push($args['meta_query'], [
-                        'key' => 'salary_start',
-                        'value' => $filters['salaryStart'],
-                        'type' => 'NUMERIC',
-                        'compare' => '<=',
-                    ]);
-                    array_push($args['meta_query'], [
-                        'key' => 'salary_end',
-                        'value' => $filters['salaryStart'],
-                        'type' => 'NUMERIC',
-                        'compare' => '>=',
-                    ]);
-                } else { // vice versa
-                    array_push($args['meta_query'], [
-                        'key' => 'salary_start',
-                        'value' => $filters['salaryEnd'],
-                        'type' => 'NUMERIC',
-                        'compare' => '<=',
-                    ]);
-                    array_push($args['meta_query'], [
-                        'key' => 'salary_end',
-                        'value' => $filters['salaryEnd'],
-                        'type' => 'NUMERIC',
-                        'compare' => '>=',
-                    ]);
-                }
+            } else if ($filters['salaryEnd'] !== null) { // vice versa
+                array_push($args['meta_query'], [
+                    'key' => 'salary_start',
+                    'value' => $filters['salaryEnd'],
+                    'type' => 'NUMERIC',
+                    'compare' => '<=',
+                ]);
+                array_push($args['meta_query'], [
+                    'key' => 'salary_end',
+                    'value' => $filters['salaryEnd'],
+                    'type' => 'NUMERIC',
+                    'compare' => '<=',
+                ]);
             }
         }
 
@@ -162,10 +161,6 @@ class VacancyCrudController
             'terms'     => 'open',
             'compare'  => 'IN'
         ]);
-
-        // echo '<pre>';
-        // var_dump($args);
-        // echo '</pre>';die;
 
         // $vacancies = get_posts($args);
         $vacancies = new WP_Query($args);
@@ -360,14 +355,14 @@ class VacancyCrudController
         return $search;
     }
 
-    public function update( $request )
+    public function update($request)
     {
         $vacancy_id = $request["vacancy_id"];
-        $vacancyModel = new Vacancy( $vacancy_id );
+        $vacancyModel = new Vacancy($vacancy_id);
 
         $vacancyIsPaid = $vacancyModel->getIsPaid();
 
-        $payload = $this->createVacancyPayload( $vacancyIsPaid, $request );
+        $payload = $this->createVacancyPayload($vacancyIsPaid, $request);
 
         $vacancyModel->setTaxonomy($payload["taxonomy"]);
 
@@ -383,12 +378,11 @@ class VacancyCrudController
         ];
     }
 
-    public function trash( $request )
+    public function trash($request)
     {
         $vacancy = new Vacancy($request["vacancy_id"]);
 
-        if($request["user_id"] != $vacancy->getAuthor())
-        {
+        if ($request["user_id"] != $vacancy->getAuthor()) {
             return [
                 "status" => 400,
                 "message" => $this->_message->get("vacancy.trash.not_authorized")
@@ -397,7 +391,7 @@ class VacancyCrudController
 
         $trashed = $vacancy->trash();
 
-        if(is_wp_error($trashed)){
+        if (is_wp_error($trashed)) {
             return [
                 "status" => 400,
                 "message" => $this->_message->get("vacancy.trash.fail")
@@ -410,12 +404,11 @@ class VacancyCrudController
         ];
     }
 
-    private function createVacancyPayload( $isPaid, $request )
+    private function createVacancyPayload($isPaid, $request)
     {
         $payload = [];
 
-        if($isPaid)
-        {
+        if ($isPaid) {
             $payload = [
                 "title" => $request["name"],
                 "description" => $request["description"],
@@ -443,11 +436,10 @@ class VacancyCrudController
                     "status" => [32] // set free job become pending category
                 ],
                 "application_process_step" => $request["applicationProcedureSteps"],
-        ];
+            ];
         }
 
-        if(!$isPaid)
-        {
+        if (!$isPaid) {
             $payload = [
                 "title" => $request["name"],
                 "description" => $request["description"],
@@ -469,5 +461,5 @@ class VacancyCrudController
         }
 
         return $payload;
-    } 
+    }
 }

@@ -61,7 +61,7 @@ class LoginController
         $timeToLive = $credentials["remember"] ? "+3 day" : "+60 minutes";
         /** For Access Token */
         $expireAccessToken  = $issuedAt->modify($timeToLive)->getTimestamp(); // valid until 60 minutes after toket issued
-        
+
         $payloadAccessToken = [
             "exp" => $expireAccessToken,
             "user_id" => $user->ID,
