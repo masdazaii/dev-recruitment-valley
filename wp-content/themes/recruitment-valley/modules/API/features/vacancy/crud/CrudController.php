@@ -29,7 +29,7 @@ class VacancyCrudController
             'page' => $request['page'] ?? 1,
             'search' => $request['search'] ?? null,
             'city' => $request['city'] ?? null,
-            'salaryStart' => $request['salaryStart'] ?? null,
+            'salaryStart' => $request['salaryStart'] ?? 0,
             'salaryEnd' => $request['salaryEnd'] ?? null,
             'postPerPage' => $request['perPage'] ?? 10
         ];
@@ -74,7 +74,7 @@ class VacancyCrudController
         /** Set meta query */
         if (($filters['salaryStart'] !== '' && isset($filters['salaryStart'])) || ($filters['salaryEnd'] !== '' && isset($filters['salaryEnd']))) {
             // If salaryStart and salaryEnd exist + more than 0
-            if ($filters['salaryStart'] && $filters['salaryEnd'] && $filters['salaryEnd'] > 0) {
+            if ($filters['salaryStart'] >= 0 && $filters['salaryEnd'] && $filters['salaryEnd'] > 0) {
                 if (!array_key_exists('meta_query', $args)) {
                     $args['meta_query'] = [
                         "relation" => 'OR'
@@ -163,6 +163,8 @@ class VacancyCrudController
                 'currentPage' => intval($filters['page']),
                 'totalPage' => $vacancies->max_num_pages,
             ],
+            'fl' => $filters,
+            'meta' => $args['meta_query'],
             'status'  => 200
         ];
     }

@@ -42,6 +42,12 @@ class ProfileService
         return ResponseHelper::build($response);
     }
 
+    public function post_detail(WP_REST_Request $request)
+    {
+        $response = $this->setupProfileController->post_detail($request);
+        return ResponseHelper::build($response);
+    }
+
     public function delete_gallery(WP_REST_Request $request)
     {
         $response = $this->setupProfileController->delete_gallery($request);
@@ -62,6 +68,7 @@ class ProfileService
         }
         $validator->sanitize();
         $body = $validator->getData();
+        // $body = $request->get_params();
         $response = $this->setupProfileController->setup($body);
         return ResponseHelper::build($response);
     }

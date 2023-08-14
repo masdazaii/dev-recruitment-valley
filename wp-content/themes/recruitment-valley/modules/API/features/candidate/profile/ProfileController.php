@@ -23,7 +23,7 @@ class ProfileController
         $user_id = $request->user_id;
         $fields = $request->get_body_params();
 
-        $validate = ValidationHelper::validate($fields, [
+        $validate = ValidationHelper::doValidate($fields, [
             "firstName" => "required",
             "dateOfBirth" => "required",
             "phoneNumber" => "required",

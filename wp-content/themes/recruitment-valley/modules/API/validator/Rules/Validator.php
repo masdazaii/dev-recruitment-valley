@@ -27,8 +27,31 @@ class Validator
 
     public function validate()
     {
+        /** Old Validate start here */
+        // foreach ($this->rules as $field => $rules) {
+        //     $value = isset($this->data[$field]) ? $this->data[$field] : null;
+
+        //     foreach ($rules as $rule) {
+        //         list($ruleName, $parameters) = $this->parseRule($rule);
+        //         $ruleInstance = $this->getRuleInstance($ruleName);
+
+        //         if (!$ruleInstance->validate($field, $value, $parameters)) {
+        //             $this->addError($field, $ruleName, $parameters);
+        //         }
+        //     }
+        // }
+        // return empty($this->errors);
+
+        /** Changes start here */
         foreach ($this->rules as $field => $rules) {
-            $value = isset($this->data[$field]) ? $this->data[$field] : null;
+            if (strpos($field, '.*') !== false) {
+                $value = isset($this->data[substr($field, 0, -2)]) ? $this->data[substr($field, 0, -2)] : null;
+                if ($value && !is_array($value)) {
+                    $value = explode(',', $value);
+                }
+            } else {
+                $value = isset($this->data[$field]) ? $this->data[$field] : null;
+            }
 
             foreach ($rules as $rule) {
                 list($ruleName, $parameters) = $this->parseRule($rule);
@@ -104,13 +127,43 @@ class Validator
 
     public function sanitize()
     {
-        foreach ($this->data as $key => $value) {
-            if (!isset($this->rules[$key])) {
-                unset($this->data[$key]);
-                continue;
+        /** Old sanitize start here */
+        // foreach ($this->data as $key => $value) {
+        //     if (!isset($this->rules[$key])) {
+        //         unset($this->data[$key]);
+        //         continue;
+        //     }
+
+        //     $this->data[$key] = sanitize_text_field($value);
+        // }
+
+        /** Changes start here */
+        $sanitizedData = [
+            "user_id" => $this->data['user_id']
+        ];
+        foreach ($this->rules as $field => $rules) {
+            /** Set rule real field */
+            if (strpos($field, '.*') !== false) {
+                $theField = substr($field, 0, -2);
+            } else {
+                $theField = $field;
             }
 
-            $this->data[$key] = sanitize_text_field($value);
+            /** Check if request key exist */
+            if (strpos($field, '.*') !== false) {
+                $theField = substr($field, 0, -2);
+                if (array_key_exists($theField, $this->data) && !is_array($this->data[$theField])) {
+                    $arrayValue = explode(',', $this->data[$theField]);
+                    foreach ($arrayValue as $value) {
+                        if ($value) {
+                            $sanitizedData[$theField][] = sanitize_text_field($value);
+                        }
+                    }
+                }
+            } else {
+                $sanitizedData[$field] = isset($this->data[$field]) ? sanitize_text_field($this->data[$field]) : null;
+            }
         }
+        $this->data = $sanitizedData;
     }
 }

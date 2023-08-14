@@ -26,6 +26,7 @@ class ProfileController
         $user_data = ProfileModel::user_data($user_id);
         $user_data_acf = Helper::isset($user_data, 'acf');
         $galleries = Helper::isset($user_data_acf, 'ucma_gallery_photo') ?? [];
+        print('<pre>' . print_r($galleries, true) . '</pre>');
         $galleries = array_map(function ($gallery) {
             static $i = 0;
             $result = [
@@ -72,7 +73,7 @@ class ProfileController
         $fields = $request->get_body();
         $fields = (array)json_decode($fields);
 
-        $validate = ValidationHelper::validate($fields, [
+        $validate = ValidationHelper::doValidate($fields, [
             "country" => "required",
             "city" => "required",
             "street" => "required",
@@ -132,7 +133,7 @@ class ProfileController
         $fields = $request->get_body();
         $fields = (array)json_decode($fields);
 
-        $validate = ValidationHelper::validate($fields, [
+        $validate = ValidationHelper::doValidate($fields, [
             "companyName" => "required",
             "employees" => "required",
             "phoneCode" => "required",
@@ -176,7 +177,7 @@ class ProfileController
 
         $fields = $request->get_body_params();
 
-        $validate = ValidationHelper::validate($fields, [
+        $validate = ValidationHelper::doValidate($fields, [
             "sortDescription" => "required",
         ]);
         if (!$validate['is_valid']) wp_send_json_error(['validation' => $validate['fields'], 'status' => 400], 400);
@@ -249,16 +250,58 @@ class ProfileController
         try {
             $wpdb->query('START TRANSACTION');
 
+            $updateData = [
+                'ID' => $request['user_id'],
+                'firstName' => $request['companyName']
+            ];
+            wp_update_user($updateData);
 
+            /** Upload Gallery */
+            $galleries = ModelHelper::handle_uploads('gallery', $request['user_id']);
+            $current_gallery = maybe_unserialize(get_user_meta($request['user_id'], 'ucma_gallery_photo'));
+            $current_gallery = isset($current_gallery[0]) ? $current_gallery[0] : [];
+            if ($galleries) {
+                $gallery_ids = $current_gallery;
+                foreach ($galleries as $key => $gallery) {
+                    $gallery_ids[] = wp_insert_attachment($gallery['attachment'], $gallery['file']);
+                }
+                update_field('ucma_gallery_photo', $gallery_ids, 'user_' . $request['user_id']);
+            }
+
+            /** Store ACF */
+            update_field('ucma_phone_code', $request['phoneNumberCode'], 'user_' . $request['user_id']);
+            update_field('ucma_phone', $request['phoneNumber'], 'user_' . $request['user_id']);
+            update_field('ucma_country', $request['country'], 'user_' . $request['user_id']);
+            update_field('ucma_street', $request['street'], 'user_' . $request['user_id']);
+            update_field('ucma_city', $request['city'], 'user_' . $request['user_id']);
+            update_field('ucma_postcode', $request['postCode'], 'user_' . $request['user_id']);
+
+            update_field('ucma_kvk_number', $request['kvkNumber'], 'user_' . $request['user_id']);
+            update_field('ucma_btw_number', $request['btwNumber'], 'user_' . $request['user_id']);
+            update_field('ucma_website_url', $request['website'], 'user_' . $request['user_id']);
+            // update_field('ucma_linkedin_page_url', $request['linkedinPage'], 'user_' . $request['user_id']);
+            update_field('ucma_linkedin_url', $request['linkedin'], 'user_' . $request['user_id']);
+            update_field('ucma_facebook_url', $request['facebook'], 'user_' . $request['user_id']);
+            update_field('ucma_instagram_url', $request['instagram'], 'user_' . $request['user_id']);
+            update_field('ucma_twitter_url', $request['twitter'], 'user_' . $request['user_id']);
+            update_field('ucma_short_decription', $request['shortDescription'], 'user_' . $request['user_id']);
+            update_field('ucma_benefit', $request['secondaryEmploymentConditions'], 'user_' . $request['user_id']);
+            update_field('ucma_company_video_url', $request['companyVideo'], 'user_' . $request['user_id']);
 
             $wpdb->query('COMMIT');
         } catch (Error $errors) {
             $wpdb->query('ROLLBACK');
             return [
-                // "message" => $this->_message->get("company.profile.setup_failed"),
+                "message" => $this->message->get("company.profile.setup_failed"),
                 "errors" => $errors,
                 "status" => 500
             ];
         }
+
+        return [
+            "message" => $this->message->get("company.profile.setup_success"),
+            'gal' => $galleries,
+            "status" => 200
+        ];
     }
 }
