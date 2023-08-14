@@ -72,7 +72,7 @@ class ProfileController
         $fields = $request->get_body();
         $fields = (array)json_decode($fields);
 
-        $validate = ValidationHelper::validate($fields, [
+        $validate = ValidationHelper::doValidate($fields, [
             "country" => "required",
             "city" => "required",
             "street" => "required",
@@ -132,7 +132,7 @@ class ProfileController
         $fields = $request->get_body();
         $fields = (array)json_decode($fields);
 
-        $validate = ValidationHelper::validate($fields, [
+        $validate = ValidationHelper::doValidate($fields, [
             "companyName" => "required",
             "employees" => "required",
             "phoneCode" => "required",
@@ -176,9 +176,10 @@ class ProfileController
 
         $fields = $request->get_body_params();
 
-        $validate = ValidationHelper::validate($fields, [
+        $validate = ValidationHelper::doValidate($fields, [
             "sortDescription" => "required",
         ]);
+
         if (!$validate['is_valid']) wp_send_json_error(['validation' => $validate['fields'], 'status' => 400], 400);
 
 
@@ -242,30 +243,9 @@ class ProfileController
         ];
     }
 
-<<<<<<< HEAD
     public function updatePhoto( $request )
     {
         $userId = $request->user_id;
-
-=======
-    public function setup($request)
-    {
-        global $wpdb;
-
-        try {
-            $wpdb->query('START TRANSACTION');
-
-
-
-            $wpdb->query('COMMIT');
-        } catch (Error $errors) {
-            $wpdb->query('ROLLBACK');
-            return [
-                // "message" => $this->_message->get("company.profile.setup_failed"),
-                "errors" => $errors,
-                "status" => 500
-            ];
-        }
->>>>>>> bcd6150e7d46e4aad3084577e70443ea16f02ef4
+        
     }
 }
