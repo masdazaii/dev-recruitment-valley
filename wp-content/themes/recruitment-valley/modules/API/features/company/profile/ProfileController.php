@@ -22,7 +22,8 @@ class ProfileController
 
     public function get(WP_REST_Request $request)
     {
-        $user_id = $request->user_id;
+        // $user_id = $request->user_id;
+        $user_id = $request['user_id']; // Changed Line
         $user_data = ProfileModel::user_data($user_id);
         $user_data_acf = Helper::isset($user_data, 'acf');
         $galleries = Helper::isset($user_data_acf, 'ucma_gallery_photo') ?? [];
@@ -50,8 +51,9 @@ class ProfileController
         /** Added line End here */
 
         return [
+            'a' => $user_data,
             'detail' => [
-                'email' => Helper::isset($user_data, 'user_email'),
+                // 'email' => Helper::isset($user_data, 'user_email'),
                 'phoneNumber' => Helper::isset($user_data_acf, 'ucma_phone_code') . " " . Helper::isset($user_data_acf, 'ucma_phone'),
                 'address' => Helper::isset($user_data_acf, 'ucma_city') . ", " . Helper::isset($user_data_acf, 'ucma_country'),
                 'kvk' => Helper::isset($user_data_acf, 'ucma_kvk_number'),
@@ -59,7 +61,11 @@ class ProfileController
                 'website' => Helper::isset($user_data_acf, 'ucma_website_url'),
                 'employees' => Helper::isset($user_data_acf, 'ucma_employees'),
                 'btw' => Helper::isset($user_data_acf, 'ucma_btw_number'),
+                /** Added Line start here */
+                'companyEmail' => Helper::isset($user_data_acf, 'ucma_company_email'), // Added Line
+                'comapnyName' => Helper::isset($user_data_acf, 'ucma_company_name'), // Added Line
                 'image' => $image, // Added line
+                /** Added Line end here */
             ],
             'socialMedia' => [
                 'facebook' => Helper::isset($user_data_acf, 'ucma_facebook_url'),
@@ -287,7 +293,9 @@ class ProfileController
                 update_field('ucma_image', $image_id, 'user_' . $request['user_id']);
             }
 
-            /** Store ACF */
+            /** Store Meta && ACF */
+            update_field('ucma_company_email', $request['email'], 'user_' . $request['user_id']);
+            update_field('ucma_company_name', $request['companyName'], 'user_' . $request['user_id']);
             update_field('ucma_phone_code', $request['phoneNumberCode'], 'user_' . $request['user_id']);
             update_field('ucma_phone', $request['phoneNumber'], 'user_' . $request['user_id']);
             update_field('ucma_country', $request['country'], 'user_' . $request['user_id']);
@@ -319,6 +327,7 @@ class ProfileController
 
         return [
             "message" => $this->message->get("company.profile.setup_success"),
+            "data" => $request,
             "status" => 200
         ];
     }
