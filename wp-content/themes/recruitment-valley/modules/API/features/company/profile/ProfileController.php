@@ -52,7 +52,7 @@ class ProfileController
 
         return [
             'detail' => [
-                // 'email' => Helper::isset($user_data, 'user_email'),
+                'email' => Helper::isset($user_data, 'user_email'),
                 'phoneNumber' => Helper::isset($user_data_acf, 'ucma_phone_code') . " " . Helper::isset($user_data_acf, 'ucma_phone'),
                 'address' => Helper::isset($user_data_acf, 'ucma_city') . ", " . Helper::isset($user_data_acf, 'ucma_country'),
                 'kvk' => Helper::isset($user_data_acf, 'ucma_kvk_number'),
@@ -292,6 +292,7 @@ class ProfileController
             }
 
             /** Store Meta && ACF */
+            // update_field('ucma_company_email', $request['email'], 'user_' . $request['user_id']);
             update_field('ucma_company_name', $request['companyName'], 'user_' . $request['user_id']);
             update_field('ucma_phone_code', $request['phoneNumberCode'], 'user_' . $request['user_id']);
             update_field('ucma_phone', $request['phoneNumber'], 'user_' . $request['user_id']);
