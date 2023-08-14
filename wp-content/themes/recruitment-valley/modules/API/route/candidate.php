@@ -61,6 +61,12 @@ class CandidateEndpoint
                 //     'permission_callback'   => '__return_true',
                 //     'callback'              =>  [$loginService, 'login']
                 // ]
+                'get_candidate' => [
+                    'url'                   => 'profile',
+                    'methods'               => 'GET',
+                    'permission_callback'   => [$authMiddleware, 'check_token'],
+                    'callback'              => [$profileService, 'get'],
+                ],
                 'profile-setup' => [
                     'url'                   =>  'profile/setup',
                     'methods'               =>  'POST',
@@ -102,7 +108,25 @@ class CandidateEndpoint
                     'methods'               => 'DELETE',
                     'permission_callback'   => [$authMiddleware, 'authorize_candidate'],
                     'callback'              => [$favoriteVacancyService, 'destroy'],
-                ]
+                ],
+                'update_profile' => [
+                    'url'                   =>  'profile/update',
+                    'methods'               =>  'POST',
+                    'permission_callback'   => [$authMiddleware, 'check_token_candidate'],
+                    'callback'              =>  [$profileService, 'updateProfile'],
+                ],
+                'change_email_request' => [
+                    'url'                   =>  'profile/change-email-request',
+                    'methods'               =>  'POST',
+                    'permission_callback'   => [$authMiddleware, 'check_token'],
+                    'callback'              =>  [$profileService, 'changeEmailRequest'],
+                ],
+                'change_email_request' => [
+                    'url'                   =>  'profile/change-email',
+                    'methods'               =>  'POST',
+                    'permission_callback'   => [$authMiddleware, 'check_token'],
+                    'callback'              =>  [$profileService, 'changeEmail'],
+                ],
             ]
         ];
 
