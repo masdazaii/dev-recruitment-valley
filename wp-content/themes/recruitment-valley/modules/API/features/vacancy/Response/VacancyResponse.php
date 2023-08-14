@@ -2,6 +2,8 @@
 
 namespace Vacancy;
 
+use DateTime;
+use DateTimeImmutable;
 use WP_Post;
 
 class VacancyResponse
@@ -39,7 +41,7 @@ class VacancyResponse
                 "salaryEnd" => $vacancyModel->getSalaryEnd(),
                 "thumbnail" => $vacancyModel->getThumbnail(),
                 "description" => $vacancyModel->getDescription(),
-                "taxonomy" => $vacancyTaxonomy,
+                "postedDate" => date_format(new DateTime($vacancy->post_date_gmt), "Y-m-d H:i A")
             ];
         }, $this->vacancyCollection);
 
@@ -56,7 +58,7 @@ class VacancyResponse
             "shortDescription" => $vacancyTaxonomy,
             "title" => $this->vacancyCollection->post_title,
             "company" =>  [
-                "logo" => "",
+                "logo" => "https://picsum.photos/200/300",
                 "name" => "",
                 "about" => "",
                 "maps" => "",
@@ -77,10 +79,51 @@ class VacancyResponse
             "steps" => $vacancyModel->getApplicationProcessStep(),
             "salaryStart" => $vacancyModel->getSalaryStart(),
             "salaryEnd" => $vacancyModel->getSalaryEnd(),
-            "thumbnail"=> $vacancyModel->getThumbnail(),
+            "thumbnail" => $vacancyModel->getThumbnail(),
+            "postedDate" => $vacancyModel->getPublishDate("Y-m-d H:i A")
         ];
 
         // $formattedResponse = get_field($vacancyModel->acf_application_process_step,$this->vacancyCollection->ID);
+
+        return $formattedResponse;
+    }
+
+    public function formatCompany()
+    {
+        $formattedResponse = array_map(function (WP_Post $vacancy) {
+            $vacancyModel = new Vacancy($vacancy->ID);
+            $vacancyTaxonomy = $vacancyModel->getTaxonomy(true);
+
+            return [
+                "id" => $vacancy->ID,
+                "name" => $vacancy->post_title,
+                "employmentType" => $vacancyTaxonomy["type"] ?? null,
+                "location" => $vacancyTaxonomy["location"] ?? null,
+                "sector" => $vacancyTaxonomy["sector"] ?? null,
+                "vacancyType" => $vacancyModel->getIsPaid() ? "Paid" : "Free",
+                "expiredAt" => strtotime($vacancyModel->getExpiredAt()),
+                "status" => $vacancyTaxonomy["status"][0]["name"] ?? null,
+            ];
+        }, $this->vacancyCollection);
+
+        return $formattedResponse;
+    }
+
+    public function formatFavorite()
+    {
+        $formattedResponse = array_map(function (WP_Post $vacancy) {
+            $vacancyModel = new Vacancy($vacancy->ID);
+            $vacancyTaxonomy = $vacancyModel->getTaxonomy(true);
+            return [
+                "id" => $vacancy->ID,
+                "slug" => $vacancy->post_name,
+                "name" => $vacancy->post_title,
+                "thumbnail" => $vacancyModel->getThumbnail(),
+                "description" => $vacancyModel->getDescription(),
+                "status" => $vacancyTaxonomy['status'][0]['name'] ?? null,
+                "jobPostedDate" => $vacancy->post_date,
+            ];
+        }, $this->vacancyCollection);
 
         return $formattedResponse;
     }

@@ -4,9 +4,14 @@ namespace Route;
 
 use Candidate\Profile\ProfileController;
 use Candidate\Profile\SetupProfileController;
+use Candidate\Vacancy\VacancyAppliedService;
+use Candidate\Profile\FavoriteVacancyService;
+use Candidate\Profile\ProfileService;
 use Global\LoginService;
 use Global\RegistrationService;
 use Middleware\AuthMiddleware;
+
+use WP_REST_Request;
 
 class CandidateEndpoint
 {
@@ -23,6 +28,9 @@ class CandidateEndpoint
     {
         $loginService = new LoginService;
         $registrationService = new RegistrationService;
+        $profileService = new ProfileService;
+        $vacancyAppliedService = new VacancyAppliedService;
+        $favoriteVacancyService = new FavoriteVacancyService;
         $authMiddleware = new AuthMiddleware;
 
         $endpoint = [
@@ -58,9 +66,44 @@ class CandidateEndpoint
                     'methods'               =>  'POST',
                     'permission_callback'   => [$authMiddleware, 'check_token_candidate'],
                     'callback'              =>  [new ProfileController(), 'setup'],
+                ],
+                'update_photo' => [
+                    'url'                   =>  'profile/photo',
+                    'methods'               =>  'POST',
+                    'permission_callback'   => [$authMiddleware, 'check_token_candidate'],
+                    'callback'              =>  [$profileService, 'updatePhoto'],
+                ],
+                'update_cv' => [
+                    'url'                   =>  'profile/cv',
+                    'methods'               =>  'POST',
+                    'permission_callback'   => [$authMiddleware, 'check_token_candidate'],
+                    'callback'              =>  [$profileService, 'updateCv'],
+                ],
+                'apply-job' => [
+                    'url'                   => 'apply',
+                    'methods'               => 'POST',
+                    'permission_callback'   => [$authMiddleware, 'authorize_candidate'],
+                    'callback'              => [$vacancyAppliedService, 'applyVacancy'],
+                ],
+                // 'add-favorite' => [
+                //     'url'                   => 'profile/jobs/favorite',
+                //     'methods'               => 'POST',
+                //     'permission_callback'   => [$authMiddleware, 'authorize_candidate'],
+                //     'callback'              => [$favoriteVacancyService, 'addFavoriteVacancy'],
+                // ],
+                'list-favorite-vacancy' => [
+                    'url'                   => '/profile/jobs/favorite',
+                    'methods'               => 'GET',
+                    'permission_callback'   => [$authMiddleware, 'authorize_candidate'],
+                    'callback'              => [$favoriteVacancyService, 'list'],
+                ],
+                'delete-favorite-vacancy' => [
+                    'url'                   => '/profile/jobs/favorite/(?P<vacancyId>\d+)',
+                    'methods'               => 'DELETE',
+                    'permission_callback'   => [$authMiddleware, 'authorize_candidate'],
+                    'callback'              => [$favoriteVacancyService, 'destroy'],
                 ]
             ]
-
         ];
 
         return $endpoint;

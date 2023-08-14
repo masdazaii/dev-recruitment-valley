@@ -30,6 +30,22 @@ class RegistrationController
             ];
         }
 
+        if(!is_email($request["email"]))
+        {
+            return [
+                "message"   => $this->_message->get('registration.email_wrong'),
+                "status"    => 400
+            ];
+        }
+
+        if($request["accountType"] != 'candidate' && $request["accountType"] != 'company' )
+        {
+            return [
+                "message"   => $this->_message->get('registration.role_wrong'),
+                "status"    => 400
+            ];
+        }
+
         $userExist = get_user_by('email', $request['email']);
         if ($userExist) {
             $userValidated = get_user_meta($userExist->ID, 'otp_is_verified', true);

@@ -22,14 +22,6 @@ class LoginController
 
     public function login($request)
     {
-        /** !is */
-        if (!isset($request["email"]) || !isset($request["password"]) || $request["email"] == "" || $request["password"] == "") {
-            return [
-                "message" => $this->_message->get('auth.not_found_user'),
-                "status" => 400
-            ];
-        }
-
         $user = get_user_by("email", $request["email"]);
 
         if (!$user) {
@@ -49,7 +41,7 @@ class LoginController
         $credentials = [
             "user_login"    => $user->user_login,
             "user_password" => $request["password"],
-            "remember"      => $request["remember"] ?? false
+            "remember"      => $request["rememberMe"] ?? false
         ];
 
         $checkUser = wp_signon($credentials, true);
@@ -66,9 +58,10 @@ class LoginController
 
         $key     = JWT_SECRET ?? "+3;@54)g|X?V%lWf+^4@3Xuu55*])bPX ftl1b>Nrd|w/]v[>bVgQm(m.#fAyAOV";
         $issuedAt     = new DateTimeImmutable();
-
+        $timeToLive = $credentials["remember"] ? "+3 day" : "+60 minutes";
         /** For Access Token */
-        $expireAccessToken  = $issuedAt->modify("+60 minutes")->getTimestamp(); // valid until 60 minutes after toket issued
+        $expireAccessToken  = $issuedAt->modify($timeToLive)->getTimestamp(); // valid until 60 minutes after toket issued
+
         $payloadAccessToken = [
             "exp" => $expireAccessToken,
             "user_id" => $user->ID,
@@ -80,7 +73,9 @@ class LoginController
         $expireRefreshToken  = $issuedAt->modify("+120 minutes")->getTimestamp(); // valid until 60 minutes after toket issued
         $payloadRefreshToken = [
             "exp" => $expireRefreshToken,
-            "user_id" => $user->ID
+            "user_id" => $user->ID,
+            "role" => $user->roles[0],
+            "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
         ];
 
         // store refresh token to db

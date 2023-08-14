@@ -38,6 +38,8 @@ class Message
             ],
             'registration' => [
                 'email_required' => __("Email is required.", THEME_DOMAIN),
+                'email_wrong' => __("Please input valid email.", THEME_DOMAIN),
+                'role_wrong' => __("Please select valid role.", THEME_DOMAIN),
                 'email_invalid' => __("Email is invalid.", THEME_DOMAIN),
                 'otp_required' => __("OTP is required.", THEME_DOMAIN),
                 'otp_invalid' => __("OTP is invalid.", THEME_DOMAIN),
@@ -52,8 +54,17 @@ class Message
             ],
             'profile' => [
                 'setup' => [
-                    'success' =>  __("success setup profile", THEME_DOMAIN)
-                ]
+                    'success' =>  __("success setup profile", THEME_DOMAIN),
+                ],
+                'update' => [
+                    'success' =>  __("success update profile", THEME_DOMAIN),
+                    'photo' => [
+                        "success" => __("profile photo updated successfully", THEME_DOMAIN)
+                    ],
+                    'cv' => [
+                        "success" =>  __("CV updated successfully", THEME_DOMAIN)
+                    ],
+                ],
             ],
             'input' => [
                 'invalid_input'   => __("Input is invalid.", THEME_DOMAIN),
@@ -87,8 +98,49 @@ class Message
                     "paid" => [
                         "success" => __("We have received your vacancy submission", THEME_DOMAIN),
                         "fail" => __("Error creating paid job", THEME_DOMAIN),
-                        
+
                     ]
+                ],
+                "update" => [
+                    "free" => [
+                        "success" => __("update ", THEME_DOMAIN),
+                        "fail" => __("Error creating free job", THEME_DOMAIN),
+                    ],
+                    "paid" => [
+                        "success" => __("Update paid job successfully", THEME_DOMAIN),
+                        "fail" => __("Error creating paid job", THEME_DOMAIN),
+
+                    ]
+                ],
+                "trash" => [
+                    "success" => __("Success, job already deleted", THEME_DOMAIN),
+                    "fail" => __("There is an error, please contact administrator", THEME_DOMAIN),
+                    "not_authorized" => __("You dont have permission to delete this job", THEME_DOMAIN)
+                ]
+            ],
+            'candidate' => [
+                "apply_vacancy" => [
+                    "apply_success" => __("Success apply this job.", THEME_DOMAIN),
+                    "apply_failed" => __("Failed apply this job.", THEME_DOMAIN),
+                    "expired_job" => __("Cannot apply, the job was expired", THEME_DOMAIN),
+                ],
+                "favorite" => [
+                    "vacancy_not_found" => __("Vacancy not found.", THEME_DOMAIN),
+                    "add_success" => __("Success add favorite jobs", THEME_DOMAIN),
+                    "add_failed" => __("Failed add favorite jobs", THEME_DOMAIN),
+                    "already_exists" => __("Already in your favorites", THEME_DOMAIN),
+                    "empty" => __("Your have no favorites jobs", THEME_DOMAIN),
+                    "get_success" => __("Success get favorite jobs", THEME_DOMAIN),
+                    "delete_success" => __("Success delete favorite job", THEME_DOMAIN),
+                    "delete_failed" => __("Failed delete favorite job", THEME_DOMAIN),
+                    "apply_failed" => __("Failed apply this job.", THEME_DOMAIN),
+                    "expired_job" => __("Failed, the job already expired", THEME_DOMAIN),
+                ]
+            ],
+            'company' => [
+                "profile" => [
+                    "setup_success" => __("Success setting up your profile", THEME_DOMAIN),
+                    "setup_failed" => __("Failed setting up your profile", THEME_DOMAIN)
                 ]
             ]
         ];

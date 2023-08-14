@@ -22,7 +22,6 @@ class ContactController
             return [
                 "message"    => $this->_message->get('input.invalid_input'),
                 "errors"    => $validate['errors'],
-                "req"   => $request,
                 "status" => 400
             ];
         }
