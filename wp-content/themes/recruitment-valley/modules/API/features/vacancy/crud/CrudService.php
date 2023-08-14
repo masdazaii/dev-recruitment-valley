@@ -91,15 +91,7 @@ class VacancyCrudService
             return ResponseHelper::build($errors);
         }
 
-        echo '<pre>';
-        var_dump($createPaidJobRequest->getData());
-        echo '</pre>';
-
         $createPaidJobRequest->sanitize();
-
-        echo '<pre>';
-        var_dump($createPaidJobRequest->getData());
-        echo '</pre>';die;
 
         $params = $createPaidJobRequest->getData();
         $params["user_id"] = $request->user_id;
@@ -107,4 +99,19 @@ class VacancyCrudService
         return ResponseHelper::build($response);
     }
 
+    public function update(WP_REST_Request $request)
+    {
+        $params = $request->get_params();
+        $params["user_id"] = $request->user_id;
+        $response = $this->vacancyCrudController->update( $params );
+        return ResponseHelper::build($response);
+    }
+
+    public function trash( WP_REST_Request $request)
+    {
+        $params = $request->get_params();
+        $params["user_id"] = $request->user_id;
+        $response = $this->vacancyCrudController->trash($params);
+        return ResponseHelper::build( $response );
+    }
 }

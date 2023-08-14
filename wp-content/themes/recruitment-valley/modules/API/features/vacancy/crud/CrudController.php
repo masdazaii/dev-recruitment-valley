@@ -162,6 +162,10 @@ class VacancyCrudController
             'compare'  => 'IN'
         ]);
 
+        echo '<pre>';
+        var_dump($args);
+        echo '</pre>';die;
+
         // $vacancies = get_posts($args);
         $vacancies = new WP_Query($args);
 
@@ -363,6 +367,38 @@ class VacancyCrudController
                 $vacancyModel->setProp($acf_field, $value, is_array($value));
             }
         }
+
+        return [
+            "status" => 200,
+            "message" => $vacancyIsPaid ? $this->_message->get("vacancy.update.paid.success") : $this->_message->get("vacancy.update.paid.fail")
+        ];
+    }
+
+    public function trash( $request )
+    {
+        $vacancy = new Vacancy($request["vacancy_id"]);
+
+        if($request["user_id"] != $vacancy->getAuthor())
+        {
+            return [
+                "status" => 400,
+                "message" => $this->_message->get("vacancy.trash.not_authorized")
+            ];
+        }
+
+        $trashed = $vacancy->trash();
+
+        if(is_wp_error($trashed)){
+            return [
+                "status" => 400,
+                "message" => $this->_message->get("vacancy.trash.fail")
+            ];
+        }
+
+        return [
+            "status" => 200,
+            "message" => $this->_message->get("vacancy.trash.success")
+        ];
     }
 
     private function createVacancyPayload( $isPaid, $request )

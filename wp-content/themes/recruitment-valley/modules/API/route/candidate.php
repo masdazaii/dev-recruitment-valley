@@ -6,6 +6,7 @@ use Candidate\Profile\ProfileController;
 use Candidate\Profile\SetupProfileController;
 use Candidate\Vacancy\VacancyAppliedService;
 use Candidate\Profile\FavoriteVacancyService;
+use Candidate\Profile\ProfileService;
 use Global\LoginService;
 use Global\RegistrationService;
 use Middleware\AuthMiddleware;
@@ -27,6 +28,7 @@ class CandidateEndpoint
     {
         $loginService = new LoginService;
         $registrationService = new RegistrationService;
+        $profileService = new ProfileService;
         $vacancyAppliedService = new VacancyAppliedService;
         $favoriteVacancyService = new FavoriteVacancyService;
         $authMiddleware = new AuthMiddleware;
@@ -64,6 +66,12 @@ class CandidateEndpoint
                     'methods'               =>  'POST',
                     'permission_callback'   => [$authMiddleware, 'check_token_candidate'],
                     'callback'              =>  [new ProfileController(), 'setup'],
+                ],
+                'update_photo' => [
+                    'url'                   =>  'profile/photo',
+                    'methods'               =>  'POST',
+                    'permission_callback'   => [$authMiddleware, 'check_token_candidate'],
+                    'callback'              =>  [$profileService, 'updatePhoto'],
                 ],
                 'apply-job' => [
                     'url'                   => 'apply',

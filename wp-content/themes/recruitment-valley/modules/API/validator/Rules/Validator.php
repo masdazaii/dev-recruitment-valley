@@ -123,9 +123,9 @@ class Validator
                 }
             }
 
-            if(isset($sanitize[$key]))
+            if(is_array($value) || is_object($value) ||file_exists($value))
             {
-                $sanitizeName = $sanitize[$key];
+                // $sanitizeName = $sanitize[$key];
                 // switch ($sanitizeName) :
                 //     case "array" :
                         

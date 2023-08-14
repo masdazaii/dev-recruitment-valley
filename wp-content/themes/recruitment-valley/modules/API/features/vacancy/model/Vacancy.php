@@ -3,6 +3,7 @@
 namespace Vacancy;
 
 use Helper;
+use WP_Error;
 use WP_Post;
 use WP_Query;
 
@@ -200,7 +201,7 @@ class Vacancy
         return $this->getProp($this->term);
     }
 
-    public function getIsPaid()
+    public function getIsPaid() : bool
     {
         return $this->getProp($this->acf_is_paid);
     }
@@ -238,7 +239,12 @@ class Vacancy
 
     public function getVideoUrl()
     {
-        return Helper::yt_id($this->getProp($this->acf_video_url));
+        if($this->getProp($this->acf_video_url))
+        {
+            return Helper::yt_id($this->getProp($this->acf_video_url));
+        }
+
+        return "";
     }
 
     public function getFacebookUrl()
@@ -436,5 +442,15 @@ class Vacancy
         $vacancySitemap = get_posts($args);
 
         return $vacancySitemap;
+    }
+
+    public function trash() : int|WP_Error
+    {
+        $trashed = wp_update_post([
+            "ID" => $this->vacancy_id,
+            "post_status" => "trash"
+        ]);
+
+        return $trashed;
     }
 }

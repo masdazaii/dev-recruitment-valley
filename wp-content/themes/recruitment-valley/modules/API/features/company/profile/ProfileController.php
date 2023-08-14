@@ -241,4 +241,10 @@ class ProfileController
             'message' => $this->message->get("profile.update.success")
         ];
     }
+
+    public function updatePhoto( $request )
+    {
+        $userId = $request->user_id;
+
+    }
 }

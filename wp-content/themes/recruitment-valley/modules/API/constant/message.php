@@ -58,7 +58,13 @@ class Message
                 ],
                 'update' => [
                     'success' =>  __("success update profile", THEME_DOMAIN),
-                ]
+                    'photo' => [
+                        "success" => __("profile photo updated successfully", THEME_DOMAIN)
+                    ],
+                    'cv' => [
+                        "success" =>  __("profile photo updated successfully", THEME_DOMAIN)
+                    ],
+                ],
             ],
             'input' => [
                 'invalid_input'   => __("Input is invalid.", THEME_DOMAIN),
@@ -94,12 +100,29 @@ class Message
                         "fail" => __("Error creating paid job", THEME_DOMAIN),
 
                     ]
+                ],
+                "update" => [
+                    "free" => [
+                        "success" => __("update ", THEME_DOMAIN),
+                        "fail" => __("Error creating free job", THEME_DOMAIN),
+                    ],
+                    "paid" => [
+                        "success" => __("Update paid job successfully", THEME_DOMAIN),
+                        "fail" => __("Error creating paid job", THEME_DOMAIN),
+
+                    ]
+                ],
+                "trash" => [
+                    "success" => __("Success, job already deleted", THEME_DOMAIN),
+                    "fail" => __("There is an error, please contact administrator", THEME_DOMAIN),
+                    "not_authorized" => __("You dont have permission to delete this job", THEME_DOMAIN)
                 ]
             ],
             'candidate' => [
                 "apply_vacancy" => [
                     "apply_success" => __("Success apply this job.", THEME_DOMAIN),
-                    "apply_failed" => __("Failed apply this job.", THEME_DOMAIN)
+                    "apply_failed" => __("Failed apply this job.", THEME_DOMAIN),
+                    "expired_job" => __("Cannot apply, the job was expired", THEME_DOMAIN),
                 ],
                 "favorite" => [
                     "vacancy_not_found" => __("Vacancy not found.", THEME_DOMAIN),
