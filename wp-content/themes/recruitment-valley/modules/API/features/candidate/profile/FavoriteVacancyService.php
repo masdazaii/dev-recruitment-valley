@@ -6,6 +6,7 @@ use WP_REST_Request;
 use ResponseHelper;
 use Constant\Message;
 use Vacancy\VacancyResponse;
+use Helper\ValidationHelper;
 
 class FavoriteVacancyService
 {
@@ -22,14 +23,31 @@ class FavoriteVacancyService
 
     public function addFavoriteVacancy(WP_REST_Request $request)
     {
-        $validateVacancy = $this->_validate_vacancy($request->get_param('vacancyId'));
-        if (!$validateVacancy) {
+        $extraRules = [
+            "vacancyId" => ["not_exists:user/meta/favorite_vacancy," . $request['user_id']]
+        ];
+
+        $validator = new ValidationHelper('addFavorite', $request->get_params(), $extraRules);
+
+        if (!$validator->validate()) {
+            $errors = $validator->getErrors();
             return ResponseHelper::build([
-                "message" => $this->_message->get('candidate.favorite.vacancy_not_found'),
-                "data" => $request->get_param('vacancyId'),
-                "status" => 400,
+                'message' => $this->_message->get('candidate.favorite.vacancy_not_found'),
+                'errors' => $errors,
+                'status' => 400
             ]);
         }
+
+        // $validateVacancy = $this->_validate_vacancy($request->get_param('vacancyId'));
+        // if (!$validateVacancy) {
+        //     return ResponseHelper::build([
+        //         "message" => $this->_message->get('candidate.favorite.vacancy_not_found'),
+        //         "status" => 400,
+        //     ]);
+        // }
+
+        $validator->sanitize();
+        $body = $validator->getData();
 
         $body = $request->get_params();
         $response = $this->favoriteVacancyController->store($body);
@@ -48,6 +66,14 @@ class FavoriteVacancyService
 
     public function destroy(WP_REST_Request $request)
     {
+        $validateVacancy = $this->_validate_vacancy($request->get_param('vacancyId'));
+        if (!$validateVacancy) {
+            return ResponseHelper::build([
+                "message" => $this->_message->get('candidate.favorite.vacancy_not_found'),
+                "status" => 404,
+            ]);
+        }
+
         $body = $request->get_params();
         $response = $this->favoriteVacancyController->destroy($body);
         return ResponseHelper::build($response);

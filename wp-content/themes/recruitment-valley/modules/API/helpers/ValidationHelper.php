@@ -2,9 +2,14 @@
 
 namespace Helper;
 
+use Exception;
+use Constant\RequestRules;
+use V\Rules\Validator;
+
 class ValidationHelper
 {
-    public static function validate($request, $rules)
+    /** Old one */
+    public static function doValidate($request, $rules)
     {
         $response = [
             'is_valid'  => true,
@@ -43,5 +48,45 @@ class ValidationHelper
         return [
             'is_valid'  => true,
         ];
+    }
+
+    /** New validation props (using new validator thingy) continued here */
+    protected $_rules;
+    protected $_validator;
+
+    public function __construct(String $rule, array $data, array $extraRules = [])
+    {
+        if (empty($rule)) {
+            throw new Exception('please spesify rule');
+        }
+
+        $this->_rules = new RequestRules;
+        $rules = $this->_rules->get($rule);
+        if (!empty($extraRules)) {
+            foreach ($extraRules as $rule => $value) {
+                $rules[$rule] = array_merge($rules[$rule], $value);
+            }
+        }
+
+        $this->_validator = new Validator($data, $rules);
+    }
+    public function validate()
+    {
+        return $this->_validator->validate();
+    }
+
+    public function getErrors()
+    {
+        return $this->_validator->getErrors();
+    }
+
+    public function sanitize()
+    {
+        return $this->_validator->sanitize();
+    }
+
+    public function getData()
+    {
+        return $this->_validator->getData();
     }
 }

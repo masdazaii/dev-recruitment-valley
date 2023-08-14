@@ -8,6 +8,8 @@ use V\Rules\EmailRule;
 use V\Rules\MinRule;
 use V\Rules\MaxRule;
 use V\Rules\NumericRule;
+use V\Rules\ExistsRule;
+use V\Rules\NotExistsRule;
 use Exception;
 
 class Validator
@@ -82,6 +84,10 @@ class Validator
                 return new In();
             case 'url':
                 return new UrlRule();
+            case 'exists':
+                return new ExistsRule();
+            case 'not_exists':
+                return new NotExistsRule();
             default:
                 throw new Exception("Rule '{$ruleName}' not supported.");
         }

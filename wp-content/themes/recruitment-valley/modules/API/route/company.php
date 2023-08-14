@@ -100,6 +100,12 @@ class CompanyEndpoint
                     'permission_callback'   => [$authMiddleware, 'authorize_company'],
                     'callback'              => [$vacancyCrudService, 'trash']
                 ],
+                'setup-company-profile' => [
+                    'url'                   => '/profile/setup',
+                    'methods'               => 'POST',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company'],
+                    'callback'              => [$profile, 'setup'],
+                ],
             ]
         ];
 
