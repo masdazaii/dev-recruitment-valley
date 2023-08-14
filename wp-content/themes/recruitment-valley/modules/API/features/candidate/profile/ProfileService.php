@@ -25,4 +25,10 @@ class ProfileService
         $response = $this->setupProfileController->updatePhoto( $request );
         return ResponseHelper::build($response);
     }
+
+    public function updateCv(WP_REST_Request $request)
+    {
+        $response = $this->setupProfileController->updateCv( $request );
+        return ResponseHelper::build($response);
+    }
 }

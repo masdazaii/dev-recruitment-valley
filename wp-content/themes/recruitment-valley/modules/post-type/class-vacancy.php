@@ -17,7 +17,7 @@ class Vacancy extends RegisterCPT
             'menu_position' => 5
         ];
 
-        $this->customPostType( $title, $slug, $args);
+        $this->customPostType($title, $slug, $args);
 
         $sector_taxonomy = "sector";
         $args = [
@@ -67,6 +67,12 @@ class Vacancy extends RegisterCPT
                     'label' => __("Location", THEME_DOMAIN),
                 ]
             ],
+            [
+                "name" => "experiences",
+                "arguments" => [
+                    'label' => __("Experience", THEME_DOMAIN),
+                ]
+            ]
         ];
 
         foreach ($taxonomies as $key => $taxonomy) {

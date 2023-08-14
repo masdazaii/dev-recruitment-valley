@@ -121,14 +121,14 @@ class ProfileController
 
             if ($cv) {
                 $cv_id = wp_insert_attachment($cv['cv']['attachment'], $cv['cv']['file']);
-                update_field('ucaa_image', $cv_id, 'user_' . $user_id);
+                update_field('ucaa_cv', $cv_id, 'user_' . $user_id);
             }
 
             $wpdb->query('COMMIT');
 
             return [
                 "status" => 200,
-                "message" => $this->message->get("profile.update.photo.success")
+                "message" => $this->message->get("profile.update.cv.success")
             ];
 
         } catch (Error $e) {
