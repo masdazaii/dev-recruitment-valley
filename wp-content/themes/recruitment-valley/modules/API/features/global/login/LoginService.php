@@ -6,6 +6,7 @@ use Request\ForgotPasswordRequest;
 use Request\LoginRequest;
 use WP_REST_Request;
 use ResponseHelper;
+use WP_Error;
 
 class LoginService
 {
@@ -13,6 +14,7 @@ class LoginService
 
     public function __construct()
     {
+    
         $this->loginController = new LoginController;
     }
 

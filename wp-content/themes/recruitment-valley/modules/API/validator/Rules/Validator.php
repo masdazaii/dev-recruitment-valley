@@ -173,6 +173,7 @@ class Validator
         $sanitizedData = [
             "user_id" => $this->data['user_id']
         ];
+        
         foreach ($this->rules as $field => $rules) {
             /** Set rule real field */
             if (strpos($field, '.*') !== false) {
