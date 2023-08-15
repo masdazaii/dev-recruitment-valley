@@ -312,6 +312,7 @@ class ProfileController
             update_field('ucma_short_decription', $request['shortDescription'], 'user_' . $request['user_id']);
             update_field('ucma_benefit', $request['secondaryEmploymentConditions'], 'user_' . $request['user_id']);
             update_field('ucma_company_video_url', $request['companyVideo'], 'user_' . $request['user_id']);
+            update_field('ucma_is_full_registered', 1, 'user_' . $request['user_id']);
 
             $wpdb->query('COMMIT');
         } catch (Error $errors) {
