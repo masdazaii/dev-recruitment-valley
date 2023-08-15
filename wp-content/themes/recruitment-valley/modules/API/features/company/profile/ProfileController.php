@@ -360,7 +360,6 @@ class ProfileController
 
         return [
             "status" => 200,
-            'd' => $currentImage['ID'],
             "message" => $this->message->get("company.profile.update_image_success")
         ];
     }

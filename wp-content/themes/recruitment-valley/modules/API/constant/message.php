@@ -157,6 +157,13 @@ class Message
                     "update_image_success" => __("Success update company profile", THEME_DOMAIN),
                     "update_image_failed" => __("Failed update company profile", THEME_DOMAIN),
                 ]
+            ],
+            'payment' => [
+                "package" => [
+                    "get_success" => __("Success get all package.", THEME_DOMAIN),
+                    "show_success" => __("Success get package.", THEME_DOMAIN),
+                    "show_not_found" => __("Package with given slug not found.", THEME_DOMAIN),
+                ]
             ]
         ];
     }

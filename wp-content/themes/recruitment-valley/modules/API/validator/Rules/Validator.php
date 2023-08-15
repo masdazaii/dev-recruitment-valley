@@ -170,9 +170,12 @@ class Validator
     /** Temporary sanitize only for setup company */
     public function tempSanitize()
     {
-        $sanitizedData = [
-            "user_id" => $this->data['user_id']
-        ];
+        $sanitizedData = [];
+
+        if (array_key_exists('user_id', $this->data)) {
+            $sanitizedData['user_id'] = $this->data['user_id'];
+        }
+
         foreach ($this->rules as $field => $rules) {
             /** Set rule real field */
             if (strpos($field, '.*') !== false) {

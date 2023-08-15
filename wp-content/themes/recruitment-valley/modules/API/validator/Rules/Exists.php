@@ -50,8 +50,17 @@ class ExistsRule implements Rule
                     'orderby'        => 'ID',
                     'post_type'      => $type,
                     'post_status'    => 'publish',
-                    'post__in'       => [$value]
+                    // 'post__in'       => [$value]
                 ];
+
+                switch ($column) {
+                    case 'post_id':
+                        $args['post__in'] = [$value];
+                        break;
+                    case 'post_name':
+                        $args['name'] = $value;
+                        break;
+                }
 
                 $databaseValue = get_posts($args);
                 return count($databaseValue) < 1 ? false : true;
