@@ -70,9 +70,8 @@ class VacancyCrudService
         }
 
         $createFreeJobRequest->sanitize();
-
         $params = $createFreeJobRequest->getData();
-        $params["user_id"] = $request->user_id;
+        $params["user_id"] = $request["user_id"];
         $response = $this->vacancyCrudController->createFree($params);
         return ResponseHelper::build($response);
     }
@@ -97,7 +96,7 @@ class VacancyCrudService
     public function update(WP_REST_Request $request)
     {
         $params = $request->get_params();
-        $params["user_id"] = $request->user_id;
+        $params["user_id"] = $request["user_id"];
         $response = $this->vacancyCrudController->update( $params );
         return ResponseHelper::build($response);
     }
@@ -105,7 +104,7 @@ class VacancyCrudService
     public function trash( WP_REST_Request $request)
     {
         $params = $request->get_params();
-        $params["user_id"] = $request->user_id;
+        $params["user_id"] = $request["user_id"];
         $response = $this->vacancyCrudController->trash($params);
         return ResponseHelper::build( $response );
     }

@@ -46,4 +46,18 @@ class Email
 			$is_sent = wp_mail($user->user_email, $subject, $body);
 		}
 	}
+
+	public static function render_html_email($file, $args = [])
+	{
+		ob_start();
+		require THEME_DIR . '/templates/email/' . $file;
+		$content = ob_get_clean();
+
+		foreach ($args as $key => $value)
+		{
+			$content = str_replace("{{ $key }}", $value, $content);
+		}
+
+		return $content;
+	}
 }

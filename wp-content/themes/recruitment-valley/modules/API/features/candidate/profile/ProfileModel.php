@@ -91,6 +91,12 @@ class Candidate
         return $this->getProp($this->cv);
     }
 
+    public function getImage()
+    {
+        $image = $this->getProp($this->image);
+        return $image ? $image["url"] : null;
+    } 
+
     public function getProp($acf_field, $single = true)
     {
         return get_field($acf_field, 'user_'.$this->user_id, $single);

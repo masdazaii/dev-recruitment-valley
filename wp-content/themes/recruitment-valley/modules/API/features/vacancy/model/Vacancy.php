@@ -335,7 +335,7 @@ class Vacancy
     public function getAuthor()
     {
         $vacancy = get_post($this->vacancy_id);
-        return $vacancy->post_author;
+        return $vacancy;
     }
 
     public function getPublishDate( $format )

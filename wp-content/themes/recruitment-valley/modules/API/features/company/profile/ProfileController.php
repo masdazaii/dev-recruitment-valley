@@ -317,6 +317,9 @@ class ProfileController
             $wpdb->query('COMMIT');
         } catch (Error $errors) {
             $wpdb->query('ROLLBACK');
+            echo '<pre>';
+            var_dump($errors->getMessage());
+            echo '</pre>';
             return [
                 "message" => $this->message->get("company.profile.setup_failed"),
                 "errors" => $errors,
