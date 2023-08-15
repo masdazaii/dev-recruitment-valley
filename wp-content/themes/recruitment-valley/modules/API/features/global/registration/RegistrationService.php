@@ -64,7 +64,7 @@ class RegistrationService
                 );
 
                 $content = Email::render_html_email('create-account-candidate.php', $args);
-                wp_mail($body['email'], "Account succesvol aangemaakt", $content, $headers);
+                wp_mail($body['email'], "Bevestiging aanmaken account", $content, $headers);
             }
         }
 

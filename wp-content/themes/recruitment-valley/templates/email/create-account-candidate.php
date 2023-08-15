@@ -576,17 +576,11 @@
                                         color: #1f1f1f;
                                       "
                                     >
-                                      Hierbij bevestigen wij het aanmaken van
-                                      jouw gebruikersaccount op
-                                      Recruitmentvalley.com. <br /><br />
+                                      Hierbij bevestigen wij het aanmaken van jouw gebruikersaccount op Recruitmentvalley.com. <br /><br />
 
-                                      Met jouw account kun je o.a. bijhouden op
-                                      welke rollen je via Recruitment Valley
-                                      hebt gesolliciteerd <br /><br />
+                                      Met jouw account kun je o.a. bijhouden op welke rollen je via Recruitment Valley hebt gesolliciteerd <br /><br />
 
-                                      Tip: Maak een Job Alert aan, zo ontvang je
-                                      direct een melding als er een vacature
-                                      wordt geplaatst die bij je past.
+                                      Tip: Maak een Job Alert aan, zo ontvang je direct een melding als er een vacature wordt geplaatst die bij je past.
                                       <br /><br />
 
                                       Met vriendelijke groet,<br /><br />
