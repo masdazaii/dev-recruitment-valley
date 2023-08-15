@@ -2,6 +2,7 @@
 
 namespace Global;
 
+use BD\Emails\Email;
 use Constant\Message;
 use DateTimeImmutable;
 use WP_User;
@@ -95,7 +96,17 @@ class RegistrationController
         update_user_meta($addUser, "otp_is_verified", "0"); // Set OTP verified status, if 1 => true / validated, 0 => false / invalid
 
         /** Send OTP code */
-        wp_mail($request["email"], "One Time Password", "Your OTP : " . $otp);
+        $site_title = get_bloginfo('name');
+        $args = [
+            'token' => $otp,
+            'email' => $request['email'],
+        ];
+        $content = Email::render_html_email('email-otp.php', $args);
+        $headers = array(
+            'Content-Type: text/html; charset=UTF-8',
+        );
+
+        wp_mail($request["email"], "One Time Password - $site_title", $content, $headers);
 
         return [
             "message"   => $this->_message->get('registration.registration_success'),
