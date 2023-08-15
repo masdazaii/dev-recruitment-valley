@@ -53,6 +53,8 @@ class VacancyResponse
     public function formatSingle()
     {
         $vacancyModel = new Vacancy($this->vacancyCollection->ID);
+
+        $company = new Company($this->vacancyCollection->post_author);
         $vacancyTaxonomy = $vacancyModel->getTaxonomy(false);
         $formattedResponse = [
             "id" => $this->vacancyCollection->ID,
@@ -60,17 +62,22 @@ class VacancyResponse
             "shortDescription" => $vacancyTaxonomy,
             "title" => $this->vacancyCollection->post_title,
             "company" =>  [
-                "company_id" => $vacancyModel->getAuthor(),
-                "logo" => "https://picsum.photos/200/300",
-                "name" => "",
-                "about" => "",
+                "company_id" => $company->user_id,
+                "logo" => $company->getThumbnail(),
+                "name" => $company->getName(),
+                "about" => $company->getDescription(),
                 "maps" => "",
                 "sector" => "",
-                "totalEmployee" => "",
-                "tel" => "",
-                "email" => "",
-                "socialMedia" => [],
-                "website" => ""
+                "totalEmployee" => $company->getTotalEmployees(),
+                "tel" => $company->getPhoneCode() . $company->getPhone(),
+                "email" => $company->getEmail(),
+                "socialMedia" => [
+                    "facebook" => $company->getFacebook(),
+                    "twitter" => $company->getTwitter(),
+                    "linkedin" => $company->getLinkedin(),
+                    "instagram" => $company->getInstagram(),
+                ],
+                "website" => $company->getWebsite()
             ], // later get company here
             "contents" => [
                 "description" => $vacancyModel->getDescription(),
