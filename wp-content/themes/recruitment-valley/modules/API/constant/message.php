@@ -153,13 +153,22 @@ class Message
             'company' => [
                 "profile" => [
                     "setup_success" => __("Success setting up your profile", THEME_DOMAIN),
-                    "setup_failed" => __("Failed setting up your profile", THEME_DOMAIN)
+                    "setup_failed" => __("Failed setting up your profile", THEME_DOMAIN),
+                    "update_image_success" => __("Success update company profile", THEME_DOMAIN),
+                    "update_image_failed" => __("Failed update company profile", THEME_DOMAIN),
+                ]
+            ],
+            'payment' => [
+                "package" => [
+                    "get_success" => __("Success get all package.", THEME_DOMAIN),
+                    "show_success" => __("Success get package.", THEME_DOMAIN),
+                    "show_not_found" => __("Package with given slug not found.", THEME_DOMAIN),
                 ]
             ]
         ];
     }
 
-    public function get($message_location) : string|array
+    public function get($message_location): string|array
     {
         $keys = explode('.', $message_location);
         $message = $this->list;

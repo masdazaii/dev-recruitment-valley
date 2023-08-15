@@ -56,6 +56,9 @@ class RequestRules
                  * */
                 'vacancyId' => ["required", "exists:post/vacancy/post_id/single"]
             ],
+            'paymentPackage' => [
+                'slug' => ["required", "exists:post/payment/post_name/single"]
+            ],
             'test' => [
                 'test.*.name' => ["required"]
             ]
