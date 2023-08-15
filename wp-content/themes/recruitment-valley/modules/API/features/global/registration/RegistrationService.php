@@ -51,22 +51,7 @@ class RegistrationService
         $body = $request->get_params();
         $response = $this->registrationController->validateOTP($body);
 
-        $user = get_user_by("email", $body["email"]);
-        if($response['status'] === 200 && $user) {
-            if (in_array('candidate', $user->roles)) {
-                $args = [
-                    'applicant.firstName' => $user->user_email,
-                    'applicant.lastName' => '',
-                ];
-
-                $headers = array(
-                    'Content-Type: text/html; charset=UTF-8',
-                );
-
-                $content = Email::render_html_email('create-account-candidate.php', $args);
-                wp_mail($body['email'], "Bevestiging aanmaken account", $content, $headers);
-            }
-        }
+        $this->_send_email_to_verify_account($response, $body);
 
         return ResponseHelper::build($response);
     }
@@ -84,5 +69,37 @@ class RegistrationService
         $body = $resendOtpRequest->getData();
         $response = $this->registrationController->resendOTP($body);
         return ResponseHelper::build($response);
+    }
+
+    private function _send_email_to_verify_account($response, $body)
+    {
+        $site_title = get_bloginfo('name');
+        $user = get_user_by("email", $body["email"]);
+        if($response['status'] === 200 && $user) {
+            if (in_array('candidate', $user->roles)) {
+                $args = [
+                    'applicant.firstName' => $user->user_email,
+                    'applicant.lastName' => '',
+                ];
+
+                $headers = array(
+                    'Content-Type: text/html; charset=UTF-8',
+                );
+
+                $content = Email::render_html_email('create-account-candidate.php', $args);
+                wp_mail($body['email'], "Bevestiging aanmaken account - $site_title", $content, $headers);
+            } else {
+                $args = [
+                    'applicant.name' => $user->user_email,
+                ];
+
+                $headers = array(
+                    'Content-Type: text/html; charset=UTF-8',
+                );
+
+                $content = Email::render_html_email('create-account-company.php', $args);
+                wp_mail($body['email'], "Bevestiging aanmaken account - $site_title", $content, $headers);
+            }
+        }
     }
 }

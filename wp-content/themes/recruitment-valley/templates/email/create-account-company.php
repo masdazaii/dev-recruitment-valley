@@ -224,7 +224,7 @@
                                 <td style="width: 100px">
                                   <img
                                     height="auto"
-                                    src="../../assets/images/logo-header.webp"
+                                    src="<?= THEME_URL;?>/assets/images/logo-header.webp"
                                     style="
                                       border: 0;
                                       display: block;
@@ -317,7 +317,7 @@
                                 <td style="width: 600px">
                                   <img
                                     height="auto"
-                                    src="../../assets/images/hero-img.webp"
+                                    src="<?= THEME_URL;?>/assets/images/hero-img.webp"
                                     style="
                                       border: 0;
                                       display: block;
@@ -448,7 +448,7 @@
                                           font-family: Neue Montreal Medium;
                                         "
                                       >
-                                        (name),</span
+                                        {{ applicant.name }},</span
                                       >
                                     </p>
                                   </div>
@@ -576,17 +576,11 @@
                                         color: #1f1f1f;
                                       "
                                     >
-                                      Hierbij bevestigen wij het aanmaken van
-                                      jouw gebruikersaccount op
-                                      Recruitmentvalley.com. <br /><br />
+                                      Hierbij bevestigen wij het aanmaken van jouw bedrijfsaccount op Recruitmentvalley.com. <br /><br />
 
-                                      Met jouw account kun je o.a. bijhouden op
-                                      welke rollen je via Recruitment Valley
-                                      hebt gesolliciteerd <br /><br />
+                                      Met jouw account kun jij zelf je vacatures plaatsen en bijhouden. <br /><br />
 
-                                      Tip: Maak een Job Alert aan, zo ontvang je
-                                      direct een melding als er een vacature
-                                      wordt geplaatst die bij je past.
+                                      Tip: Vergeet je bedrijfsprofiel niet volledig in te vullen!
                                       <br /><br />
 
                                       Met vriendelijke groet,<br /><br />
@@ -695,7 +689,7 @@
                                         <td style="width: 100px">
                                           <img
                                             height="auto"
-                                            src="../../assets/images/logo-footer.webp"
+                                            src="<?= THEME_URL;?>/assets/images/logo-footer.webp"
                                             style="
                                               border: 0;
                                               display: block;
@@ -1067,7 +1061,7 @@
                                               >
                                                 <img
                                                   height="30"
-                                                  src="../../assets/images/circle-ig.webp"
+                                                  src="<?= THEME_URL;?>/assets/images/circle-ig.webp"
                                                   style="
                                                     border-radius: 20px;
                                                     display: block;
@@ -1123,7 +1117,7 @@
                                               >
                                                 <img
                                                   height="30"
-                                                  src="../../assets/images/circle-twitter.webp"
+                                                  src="<?= THEME_URL;?>/assets/images/circle-twitter.webp"
                                                   style="
                                                     border-radius: 20px;
                                                     display: block;
@@ -1179,7 +1173,7 @@
                                               >
                                                 <img
                                                   height="30"
-                                                  src="../../assets/images/circle-linked.webp"
+                                                  src="<?= THEME_URL;?>/assets/images/circle-linked.webp"
                                                   style="
                                                     border-radius: 20px;
                                                     display: block;
@@ -1235,7 +1229,7 @@
                                               >
                                                 <img
                                                   height="30"
-                                                  src="../../assets/images/circle-fb.webp"
+                                                  src="<?= THEME_URL;?>/assets/images/circle-fb.webp"
                                                   style="
                                                     border-radius: 20px;
                                                     display: block;
