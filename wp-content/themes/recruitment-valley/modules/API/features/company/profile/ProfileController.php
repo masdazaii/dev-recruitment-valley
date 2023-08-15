@@ -329,6 +329,42 @@ class ProfileController
         ];
     }
 
+    public function updatePhoto($request)
+    {
+        global $wpdb;
+
+        try {
+            $wpdb->query('START TRANSACTION');
+
+            $image = ModelHelper::handle_upload('image');
+            if ($image) {
+                // Get previous image
+                $currentImage = get_field('ucma_image', 'user_' . $request['user_id']) ?? [];
+
+                $imageID = wp_insert_attachment($image['image']['attachment'], $image['image']['file']);
+                update_field('ucma_image', $imageID, 'user_' . $request['user_id']);
+            }
+
+            $wpdb->query('COMMIT');
+        } catch (Error $errors) {
+            $wpdb->query('ROLLBACK');
+            return [
+                "message" => $this->message->get("company.profile.update_image_failed"),
+                "errors" => $errors,
+                "status" => 500
+            ];
+        }
+
+        // Delete old image
+        wp_delete_attachment($currentImage['ID']);
+
+        return [
+            "status" => 200,
+            'd' => $currentImage['ID'],
+            "message" => $this->message->get("company.profile.update_image_success")
+        ];
+    }
+
     // public function updatePhoto( WP_REST_Request $request )
     // {
     //     $params = $request->user_id;
