@@ -4,6 +4,7 @@ namespace Vacancy;
 
 use DateTime;
 use DateTimeImmutable;
+use Model\Company;
 use WP_Post;
 
 class VacancyResponse
@@ -24,6 +25,7 @@ class VacancyResponse
     {
         $formattedResponse = array_map(function (WP_Post $vacancy) {
             $vacancyModel = new Vacancy($vacancy->ID);
+            $company = new Company($vacancy->post_author);
             $vacancyTaxonomy = $vacancyModel->getTaxonomy(true);
             return [
                 "id" => $vacancy->ID,
@@ -39,7 +41,7 @@ class VacancyResponse
                 // "salaryRange"=> "2500-3000",
                 "salaryStart" => $vacancyModel->getSalaryStart(),
                 "salaryEnd" => $vacancyModel->getSalaryEnd(),
-                "thumbnail" => $vacancyModel->getThumbnail(),
+                "thumbnail" => $company->getThumbnail(),
                 "description" => $vacancyModel->getDescription(),
                 "postedDate" => date_format(new DateTime($vacancy->post_date_gmt), "Y-m-d H:i A")
             ];
@@ -58,6 +60,7 @@ class VacancyResponse
             "shortDescription" => $vacancyTaxonomy,
             "title" => $this->vacancyCollection->post_title,
             "company" =>  [
+                "company_id" => $vacancyModel->getAuthor(),
                 "logo" => "https://picsum.photos/200/300",
                 "name" => "",
                 "about" => "",

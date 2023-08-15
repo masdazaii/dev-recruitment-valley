@@ -14,15 +14,11 @@ class Vacancy extends RegisterCPT
         $title = __('Vacancies', THEME_DOMAIN);
         $slug = 'vacancy';
         $args = [
-            'menu_position' => 5
+            'menu_position' => 5,
+            'supports' => array('title', 'editor', 'author', 'thumbnail')
         ];
 
         $this->customPostType($title, $slug, $args);
-
-        $sector_taxonomy = "sector";
-        $args = [
-            'label' => __("Sector", THEME_DOMAIN),
-        ];
 
         $taxonomies = [
             [
