@@ -224,7 +224,7 @@
                                 <td style="width: 100px">
                                   <img
                                     height="auto"
-                                    src="../../assets/images/logo-header.webp"
+                                    src="<?= THEME_URL . '/assets/images/logo-header.webp';?>"
                                     style="
                                       border: 0;
                                       display: block;
@@ -317,7 +317,7 @@
                                 <td style="width: 600px">
                                   <img
                                     height="auto"
-                                    src="../../assets/images/hero-img.webp"
+                                    src="<?= THEME_URL . '/assets/images/hero-img.webp';?>"
                                     style="
                                       border: 0;
                                       display: block;
@@ -448,8 +448,7 @@
                                           font-family: Neue Montreal Medium;
                                         "
                                       >
-                                        {{ applicant.firstName }} {{
-                                        applicant.lastName }},</span
+                                        {{ applicant.firstName }} {{ applicant.lastName }},</span
                                       >
                                     </p>
                                   </div>
@@ -696,7 +695,7 @@
                                         <td style="width: 100px">
                                           <img
                                             height="auto"
-                                            src="../../assets/images/logo-footer.webp"
+                                            src="<?= THEME_URL . '/assets/images/logo-footer.webp';?>"
                                             style="
                                               border: 0;
                                               display: block;
@@ -1065,7 +1064,7 @@
                                               <a href="url" target="_blank">
                                                 <img
                                                   height="30"
-                                                  src="../../assets/images/circle-ig.webp"
+                                                  src="<?= THEME_URL . '/assets/images/circle-ig.webp';?>"
                                                   style="
                                                     border-radius: 20px;
                                                     display: block;
@@ -1118,7 +1117,7 @@
                                               <a href="url" target="_blank">
                                                 <img
                                                   height="30"
-                                                  src="../../assets/images/circle-twitter.webp"
+                                                  src="<?= THEME_URL . '/assets/images/circle-twitter.webp';?>"
                                                   style="
                                                     border-radius: 20px;
                                                     display: block;
@@ -1171,7 +1170,7 @@
                                               <a href="url" target="_blank">
                                                 <img
                                                   height="30"
-                                                  src="../../assets/images/circle-linked.webp"
+                                                  src="<?= THEME_URL . '/assets/images/circle-linked.webp';?>"
                                                   style="
                                                     border-radius: 20px;
                                                     display: block;
@@ -1224,7 +1223,7 @@
                                               <a href="url" target="_blank">
                                                 <img
                                                   height="30"
-                                                  src="../../assets/images/circle-fb.webp"
+                                                  src="<?= THEME_URL . '/assets/images/circle-fb.webp';?>"
                                                   style="
                                                     border-radius: 20px;
                                                     display: block;

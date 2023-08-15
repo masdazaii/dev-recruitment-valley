@@ -2,6 +2,7 @@
 
 namespace Global;
 
+use BD\Emails\Email;
 use Request\RegisterRequest;
 use Request\ResendOtpRequest;
 use Request\ValidateOtpRequest;
@@ -49,6 +50,24 @@ class RegistrationService
 
         $body = $request->get_params();
         $response = $this->registrationController->validateOTP($body);
+
+        $user = get_user_by("email", $body["email"]);
+        if($response['status'] === 200 && $user) {
+            if (in_array('candidate', $user->roles)) {
+                $args = [
+                    'applicant.firstName' => $user->user_email,
+                    'applicant.lastName' => '',
+                ];
+
+                $headers = array(
+                    'Content-Type: text/html; charset=UTF-8',
+                );
+
+                $content = Email::render_html_email('create-account-candidate.php', $args);
+                wp_mail($body['email'], "Account succesvol aangemaakt", $content, $headers);
+            }
+        }
+
         return ResponseHelper::build($response);
     }
 
