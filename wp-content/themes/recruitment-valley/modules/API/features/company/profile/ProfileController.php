@@ -312,6 +312,7 @@ class ProfileController
             update_field('ucma_short_decription', $request['shortDescription'], 'user_' . $request['user_id']);
             update_field('ucma_benefit', $request['secondaryEmploymentConditions'], 'user_' . $request['user_id']);
             update_field('ucma_company_video_url', $request['companyVideo'], 'user_' . $request['user_id']);
+            update_field('ucma_is_full_registered', 1, 'user_' . $request['user_id']);
 
             $wpdb->query('COMMIT');
         } catch (Error $errors) {
@@ -329,6 +330,41 @@ class ProfileController
         return [
             "message" => $this->message->get("company.profile.setup_success"),
             "status" => 200
+        ];
+    }
+
+    public function updatePhoto($request)
+    {
+        global $wpdb;
+
+        try {
+            $wpdb->query('START TRANSACTION');
+
+            $image = ModelHelper::handle_upload('image');
+            if ($image) {
+                // Get previous image
+                $currentImage = get_field('ucma_image', 'user_' . $request['user_id']) ?? [];
+
+                $imageID = wp_insert_attachment($image['image']['attachment'], $image['image']['file']);
+                update_field('ucma_image', $imageID, 'user_' . $request['user_id']);
+            }
+
+            $wpdb->query('COMMIT');
+        } catch (Error $errors) {
+            $wpdb->query('ROLLBACK');
+            return [
+                "message" => $this->message->get("company.profile.update_image_failed"),
+                "errors" => $errors,
+                "status" => 500
+            ];
+        }
+
+        // Delete old image
+        wp_delete_attachment($currentImage['ID']);
+
+        return [
+            "status" => 200,
+            "message" => $this->message->get("company.profile.update_image_success")
         ];
     }
 

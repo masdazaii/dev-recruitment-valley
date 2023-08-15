@@ -5,6 +5,7 @@ namespace Route;
 use Global\LoginService;
 use Global\RegistrationService;
 use Global\ContactService;
+use Global\PaymentService;
 use Middleware\AuthMiddleware;
 use RefreshToken\RefreshTokenService;
 use Vacancy\VacancyCrudService;
@@ -31,6 +32,7 @@ class GlobalEndpoint
         $termVacancyService = new VacancyTermService;
         $authMiddleware = new AuthMiddleware;
         $favoriteVacancyService = new FavoriteVacancyService;
+        $paymentService = new PaymentService;
 
         $endpoint = [
             'path' => '',
@@ -77,6 +79,18 @@ class GlobalEndpoint
                     'methods'               => 'GET',
                     'permission_callback'   => '__return_true',
                     'callback'              => [$crudVacancyService, 'get']
+                ],
+                'get_payment_package' => [
+                    'url'                   => '/packages',
+                    'methods'               => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$paymentService, 'get']
+                ],
+                'show_payment_package' => [
+                    'url'                   => '/packages/(?P<slug>[-\w]+)',
+                    'methods'               => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$paymentService, 'show']
                 ],
             ]
 
