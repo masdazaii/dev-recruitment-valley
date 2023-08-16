@@ -83,13 +83,12 @@ class VacancyResponse
                 "description" => $vacancyModel->getDescription(),
                 "term" => $vacancyModel->getTerm(),
             ],
-            "videoId" => $vacancyModel->getVideoUrl(),
-            "gallery" => $vacancyModel->getGallery(),
+            "videoId" => $company->getVideoUrl(),
+            "gallery" => $company->getGallery(),
             "reviews" => $vacancyModel->getReviews(),
             "steps" => $vacancyModel->getApplicationProcessStep(),
             "salaryStart" => $vacancyModel->getSalaryStart(),
             "salaryEnd" => $vacancyModel->getSalaryEnd(),
-            "thumbnail" => $vacancyModel->getThumbnail(),
             "postedDate" => $vacancyModel->getPublishDate("Y-m-d H:i A")
         ];
 
