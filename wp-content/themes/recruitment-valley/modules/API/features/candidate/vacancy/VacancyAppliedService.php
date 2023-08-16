@@ -32,12 +32,14 @@ class VacancyAppliedService
             $user = get_user_by('id', $params['user_id']);
             $vacancy = new Vacancy($params["vacancy"]);
             $company = get_user_by('id', $vacancy->getAuthor());
+            $company_name = get_field('ucma_company_name', 'user_' . $company->ID);
+            $company_name = (bool) $company_name ? $company_name : "";
 
             $args = [
                 'applicant.firstName' => $user->first_name,
                 'applicant.lastName' => $user->last_name,
                 'applicant.vacancy.title' => $vacancy->getTitle(),
-                'applicant.vacancy.company.name' => get_field('ucma_company_name', 'user_' . $company->ID)
+                'applicant.vacancy.company.name' => $company_name
             ];
 
             $headers = array(
