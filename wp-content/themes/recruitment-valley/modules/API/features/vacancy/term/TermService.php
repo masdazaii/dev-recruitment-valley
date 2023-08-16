@@ -25,4 +25,11 @@ class VacancyTermService
         $response['data'] = $formattedData;
         return ResponseHelper::build($response);
     }
+
+    public function getSectors(WP_REST_Request $request)
+    {
+        $params = $request->get_params();
+        $response = $this->vacancyTermController->getSectorsTerm($params);
+        return ResponseHelper::build($response);
+    }
 }

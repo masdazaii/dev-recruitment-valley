@@ -44,13 +44,13 @@ class GlobalEndpoint
                     'permission_callback'   => [$authMiddleware, 'check_token'],
                     'callback'              => [$loginService, 'login']
                 ],
-                'contact-employer' => [
+                'contact_employer' => [
                     'url'                   => '/contact/employer',
                     'methods'               => 'POST',
                     'permission_callback'   => '__return_true',
                     'callback'              => [$contactService, 'sendContactEmployer']
                 ],
-                'contact-job-seeker' => [
+                'contact_job_seeker' => [
                     'url'                   => '/contact/job-seeker',
                     'methods'               => 'POST',
                     'permission_callback'   => '__return_true',
@@ -62,13 +62,13 @@ class GlobalEndpoint
                     'permission_callback'   => '__return_true',
                     'callback'              => [$crudVacancyService, 'getAll']
                 ],
-                'vacancies-filter' => [
+                'vacancies_filter' => [
                     'url'                   => '/vacancies/filters',
                     'methods'               => 'GET',
                     'permission_callback'   => '__return_true',
                     'callback'              => [$termVacancyService, 'getAll']
                 ],
-                'add-favorite' => [
+                'add_favorite' => [
                     'url'                   => '/vacancies/favorite',
                     'methods'               => 'POST',
                     'permission_callback'   => [$authMiddleware, 'authorize_candidate'],
@@ -92,6 +92,12 @@ class GlobalEndpoint
                     'permission_callback'   => '__return_true',
                     'callback'              => [$paymentService, 'show']
                 ],
+                'get_sector_term' => [
+                    'url'                   => '/vacancies/filters/sector',
+                    'methods'               => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$termVacancyService, 'getSectors']
+                ]
             ]
 
         ];
