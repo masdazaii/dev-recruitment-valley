@@ -16,15 +16,16 @@ class OptionController
     public function getCompanyEmployeesOption($request)
     {
         $option = get_field('op_company_total_employees_option', 'option');
-        // foreach ($option as $key => $value) {
-        //     $optionData[] = [
-        //         'value' =>
-        //     ]
-        // }
+        foreach ($option as $key => $value) {
+            $optionData[] = [
+                'value' => $value['op_employees_total'],
+                'label' => $value['op_employees_total'],
+            ];
+        }
 
         return [
             "message" => $this->_message->get('option.company.employees_total.get_success'),
-            "data" => $option,
+            "data" => $optionData,
             "status" => 200
         ];
     }

@@ -64,11 +64,11 @@ class FavoriteVacancyController
         }
 
         $filters = [
-            'page' => $request['page'] ? sanitize_text_field($request['page']) : 1,
-            'postPerPage' => $request['perPage'] ? sanitize_text_field($request['perPage']) : 0,
+            'page' => isset($request['page']) ? sanitize_text_field($request['page']) : 1,
+            'postPerPage' => isset($request['perPage']) ? sanitize_text_field($request['perPage']) : 0,
         ];
 
-        if ($request['sort']) {
+        if (isset($request['sort'])) {
             switch (sanitize_text_field($request['sort'])) {
                 case 'recent':
                     $filters['order'] = 'post_date';
