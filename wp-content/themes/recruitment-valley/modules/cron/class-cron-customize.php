@@ -40,43 +40,28 @@ class CronCustomize
         error_log("[notify][expired +5 days] today is " . date('Y-m-d'));
         error_log("[notify][expired +5 days] will expired at " . $dateFiveAfter);
 
-        $expired_posts = get_option('cron_expired_notify_in_5_d', []);
-
-        $args = [
-            'post_type' => 'vacancy',
-            'posts_per_page' => -1,
-            'meta_query' => [
-                'relation' => 'AND',
-                [
-                    'key' => 'expired_at',
-                    'value' => $dateFiveAfter,
-                    'compare' => '=',
-                    'type'  => 'DATE'
-                ],
-                [
-                    'relation' => 'OR',
-                    [
-                        'key' => 'is_already_5_d',
-                        'compare' => 'NOT EXISTS'
-                    ],
-                    [
-                        'key'       => 'is_already_5_d',
-                        'compare'   => '=',
-                        'value'     => '0',
-                    ]
-                ]
+        $expired_posts = [
+            [
+                'post_id' => 308,
+                'expired_at' => '2023-08-21 04:11:00'
             ],
-            'post__not_in' => $expired_posts,
-            'fields'    => 'ids',
+            [
+                'post_id' => 291,
+                'expired_at' => '2023-09-15 02:50:05',
+            ]
         ];
 
-        $query = new WP_Query($args);
-        $expired_posts = $query->posts;
-        error_log('[notify][expired +5 days] posts_id: ' . json_encode($expired_posts));
+        $expired_posts = array_filter($expired_posts, function ($el) use ($dateFiveAfter) {
+            $time = strtotime($el['expired_at']);
+            $date = date('Y-m-d', $time);
+            return $date == $dateFiveAfter;
+        });
 
-        foreach($expired_posts as $in => $post_id)
+        error_log('[notify][expired +5 days] posts: ' . json_encode($expired_posts, JSON_PRETTY_PRINT));
+
+        foreach($expired_posts as $in => $the_post)
         {
-            $post = get_post($post_id);
+            $post = get_post($the_post['post_id']);
             $user = get_user_by('id', $post->post_author);
             
             $args = [
@@ -93,10 +78,12 @@ class CronCustomize
             
             error_log('[notify][expired +5 day] sending email to ' . $user->user_email);
             error_log('[notify][expired +5 day] sending email status (' . ($is_success ? 'success' : 'failed') . ')');
-            error_log('[notify][expired +5 day] unset post_id: ' . $post_id);
+            error_log('[notify][expired +5 day] unset post_id: ' . $the_post['post_id']);
             
-            update_post_meta($post_id, 'is_already_5_d', 1);
+            unset($expired_posts[$in]);
         }
+
+        // update_option('meta_key', $expired_posts);
     }
 }
 
