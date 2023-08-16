@@ -27,7 +27,7 @@ class CronCustomize
         add_action('rv_cron_expired_notification', [$this, 'handle_cron_expired_notify']);
 
         if(!wp_next_scheduled('rv_cron_expired_notification')) {
-            wp_schedule_event(time(), 'hourly', 'rv_cron_expired_notification');
+            wp_schedule_event(time(), 'daily', 'rv_cron_expired_notification');
         }
     }
 
