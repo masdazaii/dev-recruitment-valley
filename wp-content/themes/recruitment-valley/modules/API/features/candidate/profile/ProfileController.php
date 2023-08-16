@@ -36,6 +36,8 @@ class ProfileController
                 "city"=> $user->getCity(),
                 "email"=> $user->getEmail(),
                 "image" => $user->getImage(),
+                "dateOfBirth" => $user->getDateOfBirth(),
+                "linkedIn" => $user->getLinkedinPage(),
                 "cv"=> [
                     'url' => $user->getCv()["url"],
                     'fileName' => $user->getCv()["filename"],

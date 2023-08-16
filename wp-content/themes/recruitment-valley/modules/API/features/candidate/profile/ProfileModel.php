@@ -95,7 +95,17 @@ class Candidate
     {
         $image = $this->getProp($this->image);
         return $image ? $image["url"] : null;
-    } 
+    }
+    
+    public function getDateOfBirth()
+    {
+        return $this->getProp($this->dateOfBirth);
+    }
+
+    public function getLinkedinPage()
+    {
+        return $this->getProp($this->linkedin);
+    }
 
     public function getProp($acf_field, $single = true)
     {
