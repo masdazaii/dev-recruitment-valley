@@ -96,7 +96,7 @@ class CronCustomize
         // update_option('meta_key', $expired_posts);
     }
 
-    private function _expired_posts_handle($expired_posts)
+    private function _expired_posts_handle($expired_posts = [])
     {
         foreach($expired_posts as $in => $the_post)
         {
