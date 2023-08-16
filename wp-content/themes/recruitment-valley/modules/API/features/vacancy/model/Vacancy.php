@@ -41,6 +41,7 @@ class Vacancy
     // acf field
     public $acf_description = "description";
     public $acf_term = "term";
+    public $acf_placement_city = "placement_city";
     public $acf_is_paid = "is_paid";
     public $acf_apply_from_this_platform = "apply_from_this_platform";
     public $acf_application_process_title = "application_process_title";
@@ -53,12 +54,12 @@ class Vacancy
     public $acf_twitter_url = "twitter_url";
     public $acf_gallery = "gallery";
     public $acf_reviews = "reviews";
-    public $acf_city = "city";
     public $acf_country = "country";
     public $acf_salary_start = "salary_start";
     public $acf_salary_end = "salary_end";
     public $acf_external_url = "external_url";
     public $acf_expired_at = "expired_at";
+    public $acf_placement_address = "placement_address";
 
     public function __construct($vacancy_id = false)
     {
@@ -206,6 +207,11 @@ class Vacancy
         return $this->getProp($this->acf_is_paid);
     }
 
+    public function getPlacementAddress()
+    {
+        return $this->getProp($this->acf_placement_address);
+    }
+
     public function getApplyFromThisPlatform()
     {
         return $this->getProp($this->acf_apply_from_this_platform);
@@ -274,7 +280,7 @@ class Vacancy
 
     public function getCity()
     {
-        return $this->getProp($this->acf_city);
+        return $this->getProp($this->acf_placement_city);
     }
 
     public function getCountry()

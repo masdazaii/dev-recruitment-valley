@@ -30,7 +30,7 @@ class Company
     private $linkedin = "ucma_linkedin_url";
 
     private $videoUrl = "ucma_company_video_url";
-    private $gallery = "ucma_gallery";
+    private $gallery = "ucma_gallery_photo";
 
     public function __construct($userId = false)
     {
@@ -129,16 +129,23 @@ class Company
 
     public function getGallery()
     {
-        return $this->getProp($this->gallery);
+        $gallery = $this->getProp($this->gallery);
+        
+        if(!$gallery)
+        {
+            return [];
+        }
+        
+        $gallery = array_map(function($attachmentId){
+            return wp_get_attachment_url($attachmentId);
+        }, $gallery);
+
+        return $gallery;
     }
 
     public function getVideoUrl()
     {
-        $videoUrl = $this->getProp($this->videoUrl);
-        if($videoUrl)
-        {
-            return Helper::yt_id($videoUrl);
-        }
+        return $this->getProp($this->videoUrl);
     }
 
     public function getProp( $acf_field, $single = false)
