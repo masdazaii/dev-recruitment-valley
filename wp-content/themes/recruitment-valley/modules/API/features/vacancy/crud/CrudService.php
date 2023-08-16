@@ -92,7 +92,7 @@ class VacancyCrudService
         $createPaidJobRequest->sanitize();
 
         $params = $createPaidJobRequest->getData();
-        $params["user_id"] = $request->user_id;
+        $params["user_id"] = $request["user_id"];
         $response = $this->vacancyCrudController->createPaid($params);
         return ResponseHelper::build($response);
     }

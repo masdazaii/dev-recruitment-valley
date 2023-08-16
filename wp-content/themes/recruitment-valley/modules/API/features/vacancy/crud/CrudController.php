@@ -163,7 +163,6 @@ class VacancyCrudController
             $args['s'] = $filters['search'];
         }
 
-        // $vacancies = get_posts($args);
         $vacancies = new WP_Query($args);
 
         return [
