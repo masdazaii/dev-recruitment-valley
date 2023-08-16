@@ -145,6 +145,10 @@
         padding: 0px 0px !important;
       }
     }
+
+    .otp-margin {
+      margin: auto !important;
+    }
   </style>
 </head>
 
@@ -428,15 +432,17 @@
                                     padding: 0px 50px;
                                     word-break: break-word;
                                   ">
-                                <div style="
+                                <div class="otp-margin" style="
                                       font-family: Ubuntu, Helvetica, Arial,
                                         sans-serif;
                                       font-size: 13px;
                                       line-height: 1;
                                       text-align: left;
                                       color: #000000;
+                                      width:fit-content;
+                                      margin-inline: auto;
                                     ">
-                                  <p style="
+                                  <p class="otp-margin" style="
                                         background: #d9d9d9;
                                         width: auto;
                                         text-align: center;
