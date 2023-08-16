@@ -35,17 +35,20 @@ class ProfileController
                 "country"=> $user->getCountry(),
                 "city"=> $user->getCity(),
                 "email"=> $user->getEmail(),
+                "image" => $user->getImage(),
+                "dateOfBirth" => $user->getDateOfBirth(),
+                "linkedIn" => $user->getLinkedinPage(),
                 "cv"=> [
                     'url' => $user->getCv()["url"],
                     'fileName' => $user->getCv()["filename"],
-                    'createdAt' => $user->getCv()["date"],
+                    'createdAt' => date('M jS, Y', strtotime($user->getCv()["date"])),
                 ]
             ];
 
             return [
                 "status" => 200,
                 "data" => $response,
-                "message" => $this->message->get('candidate.get')
+                "message" => $this->message->get('candidate.get.success')
             ];
         } catch (Exception $e) {
             return [

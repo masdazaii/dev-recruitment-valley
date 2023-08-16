@@ -224,7 +224,7 @@
                                 <td style="width: 100px">
                                   <img
                                     height="auto"
-                                    src="../../assets/images/logo-header.webp"
+                                    src="<?= THEME_URL; ?>/assets/images/logo-header.webp"
                                     style="
                                       border: 0;
                                       display: block;
@@ -317,7 +317,7 @@
                                 <td style="width: 600px">
                                   <img
                                     height="auto"
-                                    src="../../assets/images/hero-img.webp"
+                                    src="<?= THEME_URL; ?>/assets/images/hero-img.webp"
                                     style="
                                       border: 0;
                                       display: block;
@@ -442,13 +442,12 @@
                                         color: #000;
                                       "
                                     >
-                                      Beste
+                                      Hallo,
                                       <span
                                         style="
                                           font-family: Neue Montreal Medium;
                                         "
-                                      >
-                                        (name),</span
+                                        >{{ email }}</span
                                       >
                                     </p>
                                   </div>
@@ -564,7 +563,74 @@
                                         line-height: 44px;
                                         color: #234943;
                                       "
-                                    ></p>
+                                    >
+                                      Gebruik de onderstaande verificatiecode op
+                                      de Recruitment Valley-website
+                                    </p>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td
+                                  align="left"
+                                  style="
+                                    font-size: 0px;
+                                    padding: 0px 0px;
+                                    word-break: break-word;
+                                  "
+                                >
+                                  <div
+                                    style="
+                                      font-family: Ubuntu, Helvetica, Arial,
+                                        sans-serif;
+                                      font-size: 13px;
+                                      line-height: 1;
+                                      text-align: left;
+                                      color: #000000;
+                                      width: fit-content;
+                                      margin-inline: auto;
+                                    "
+                                  >
+                                    <p
+                                      style="
+                                        background: #d9d9d9;
+                                        width: auto;
+                                        text-align: center;
+                                        padding: 20px 25px;
+                                        color: #1f1f1f;
+                                        font-family: Neue Montreal Regular;
+                                        font-size: 45px;
+                                        font-style: normal;
+                                        font-weight: 500;
+                                        line-height: 52px;
+                                        margin-inline: auto;
+                                      "
+                                    >
+                                      <!-- 321454 -->
+                                      {{ token }}
+                                    </p>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td
+                                  align="left"
+                                  style="
+                                    font-size: 0px;
+                                    padding: 0px;
+                                    word-break: break-word;
+                                  "
+                                >
+                                  <div
+                                    style="
+                                      font-family: Ubuntu, Helvetica, Arial,
+                                        sans-serif;
+                                      font-size: 13px;
+                                      line-height: 1;
+                                      text-align: left;
+                                      color: #000000;
+                                    "
+                                  >
                                     <p
                                       align="center"
                                       style="
@@ -576,22 +642,10 @@
                                         color: #1f1f1f;
                                       "
                                     >
-                                      Hierbij bevestigen wij het aanmaken van
-                                      jouw gebruikersaccount op
-                                      Recruitmentvalley.com. <br /><br />
-
-                                      Met jouw account kun je o.a. bijhouden op
-                                      welke rollen je via Recruitment Valley
-                                      hebt gesolliciteerd <br /><br />
-
-                                      Tip: Maak een Job Alert aan, zo ontvang je
-                                      direct een melding als er een vacature
-                                      wordt geplaatst die bij je past.
-                                      <br /><br />
-
-                                      Met vriendelijke groet,<br /><br />
-
-                                      Team Recruitment Valley
+                                      Als je hier niet om hebt gevraagd, kun je
+                                      deze e-mail negeren of ons dit laten
+                                      weten.<br /><br />
+                                      Bedankt!<br /><b>Recruitment Valley</b>
                                     </p>
                                   </div>
                                 </td>
@@ -695,7 +749,7 @@
                                         <td style="width: 100px">
                                           <img
                                             height="auto"
-                                            src="../../assets/images/logo-footer.webp"
+                                            src="<?= THEME_URL; ?>/assets/images/logo-footer.webp"
                                             style="
                                               border: 0;
                                               display: block;
@@ -1067,7 +1121,7 @@
                                               >
                                                 <img
                                                   height="30"
-                                                  src="../../assets/images/circle-ig.webp"
+                                                  src="<?= THEME_URL; ?>/assets/images/circle-ig.webp"
                                                   style="
                                                     border-radius: 20px;
                                                     display: block;
@@ -1123,7 +1177,7 @@
                                               >
                                                 <img
                                                   height="30"
-                                                  src="../../assets/images/circle-twitter.webp"
+                                                  src="<?= THEME_URL; ?>/assets/images/circle-twitter.webp"
                                                   style="
                                                     border-radius: 20px;
                                                     display: block;
@@ -1179,7 +1233,7 @@
                                               >
                                                 <img
                                                   height="30"
-                                                  src="../../assets/images/circle-linked.webp"
+                                                  src="<?= THEME_URL; ?>/assets/images/circle-linked.webp"
                                                   style="
                                                     border-radius: 20px;
                                                     display: block;
@@ -1235,7 +1289,7 @@
                                               >
                                                 <img
                                                   height="30"
-                                                  src="../../assets/images/circle-fb.webp"
+                                                  src="<?= THEME_URL; ?>/assets/images/circle-fb.webp"
                                                   style="
                                                     border-radius: 20px;
                                                     display: block;
