@@ -448,7 +448,7 @@
                                           font-family: Neue Montreal Medium;
                                         "
                                       >
-                                        {{ applicant.firstName }} {{ applicant.lastName }}</span
+                                        heer/mevrouw,</span
                                       >
                                     </p>
                                   </div>
@@ -576,13 +576,15 @@
                                         color: #1f1f1f;
                                       "
                                     >
-                                      Hierbij bevestigen wij jouw sollicitatie
-                                      op de vacature
-                                      <span>{{ applicant.vacancy.title }}</span>
-                                      bij
-                                      <span
-                                        >{{ applicant.vacancy.company.name }}</span
-                                      >.<br /><br />
+                                      Hierbij bevestigen wij de plaatsing van
+                                      jouw vacature
+                                      <span>{{ vacancy_title }}</span>. Als er
+                                      nog vragen zijn, neem gerust contact op
+                                      via info@recruitmentvalley.com.
+                                      <br /><br />
+
+                                      Wij wensen je veel succes met het vinden
+                                      van de juiste kandidaat! <br /><br />
 
                                       Met vriendelijke groet,<br /><br />
 

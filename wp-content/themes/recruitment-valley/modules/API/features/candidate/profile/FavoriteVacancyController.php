@@ -51,7 +51,7 @@ class FavoriteVacancyController
     public function list($request)
     {
         $favorites = get_user_meta($request['user_id'], 'favorite_vacancy', true) ?? [];
-        if (empty($favorites)) {
+        if (!empty($favorites)) {
             return [
                 "message"   => $this->_message->get('candidate.favorite.get_success'),
                 "data"      => [],

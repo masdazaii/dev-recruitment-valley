@@ -21,6 +21,8 @@ class CreatePaidJobRequest implements MiRequest
         return [
             "name" => [ 'required'],
             "description" => ["required"],
+            "city" => [ 'required'],
+            "placementAddress" => ["required"],
             "terms" => ["required"],
             "salaryStart" => ["numeric"],
             "salaryEnd" => ["numeric"],

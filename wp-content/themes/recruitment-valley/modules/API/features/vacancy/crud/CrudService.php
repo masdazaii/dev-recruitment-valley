@@ -2,6 +2,7 @@
 
 namespace Vacancy;
 
+use BD\Emails\Email;
 use Request\CandidateVacanciesRequest;
 use Request\CreateFreeJobRequest;
 use Request\CreatePaidJobRequest;
@@ -73,6 +74,9 @@ class VacancyCrudService
         $params = $createFreeJobRequest->getData();
         $params["user_id"] = $request["user_id"];
         $response = $this->vacancyCrudController->createFree($params);
+
+        $this->_send_mail_when_make_vacancy($response, $params);
+
         return ResponseHelper::build($response);
     }
 
@@ -88,7 +92,7 @@ class VacancyCrudService
         $createPaidJobRequest->sanitize();
 
         $params = $createPaidJobRequest->getData();
-        $params["user_id"] = $request->user_id;
+        $params["user_id"] = $request["user_id"];
         $response = $this->vacancyCrudController->createPaid($params);
         return ResponseHelper::build($response);
     }
@@ -107,5 +111,25 @@ class VacancyCrudService
         $params["user_id"] = $request["user_id"];
         $response = $this->vacancyCrudController->trash($params);
         return ResponseHelper::build( $response );
+    }
+
+    private function _send_mail_when_make_vacancy($response, $params)
+    {
+        if($response['status'] === 201) {
+            $vacancy_name = $params['name'];
+            $user = get_user_by('id', $params['user_id']);
+
+            $args = [
+                'vacancy_title' => $vacancy_name
+            ];
+
+            $headers = array(
+                'Content-Type: text/html; charset=UTF-8',
+            );
+
+            $site_title = get_bloginfo('name');
+            $content = Email::render_html_email('confirmation-jobpost-company.php', $args);
+            wp_mail($user->user_email, "Bevestiging plaatsing vacature - $site_title", $content, $headers);
+        }
     }
 }

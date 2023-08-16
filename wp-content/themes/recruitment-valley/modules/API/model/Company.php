@@ -2,6 +2,7 @@
 
 namespace Model;
 
+use Helper;
 use Vacancy\Vacancy;
 use WP_Query;
 
@@ -27,6 +28,9 @@ class Company
     private $twitter = "ucma_twitter_url";
     private $instagram = "ucma_instagram_url";
     private $linkedin = "ucma_linkedin_url";
+
+    private $videoUrl = "ucma_company_video_url";
+    private $gallery = "ucma_gallery_photo";
 
     public function __construct($userId = false)
     {
@@ -121,6 +125,27 @@ class Company
     public function getWebsite()
     {
         return $this->getProp($this->website);
+    }
+
+    public function getGallery()
+    {
+        $gallery = $this->getProp($this->gallery);
+        
+        if(!$gallery)
+        {
+            return [];
+        }
+        
+        $gallery = array_map(function($attachmentId){
+            return wp_get_attachment_url($attachmentId);
+        }, $gallery);
+
+        return $gallery;
+    }
+
+    public function getVideoUrl()
+    {
+        return $this->getProp($this->videoUrl);
     }
 
     public function getProp( $acf_field, $single = false)

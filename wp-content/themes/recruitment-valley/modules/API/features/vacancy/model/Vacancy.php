@@ -41,6 +41,7 @@ class Vacancy
     // acf field
     public $acf_description = "description";
     public $acf_term = "term";
+    public $acf_placement_city = "placement_city";
     public $acf_is_paid = "is_paid";
     public $acf_apply_from_this_platform = "apply_from_this_platform";
     public $acf_application_process_title = "application_process_title";
@@ -53,12 +54,12 @@ class Vacancy
     public $acf_twitter_url = "twitter_url";
     public $acf_gallery = "gallery";
     public $acf_reviews = "reviews";
-    public $acf_city = "city";
     public $acf_country = "country";
     public $acf_salary_start = "salary_start";
     public $acf_salary_end = "salary_end";
     public $acf_external_url = "external_url";
     public $acf_expired_at = "expired_at";
+    public $acf_placement_address = "placement_address";
 
     public function __construct($vacancy_id = false)
     {
@@ -198,12 +199,17 @@ class Vacancy
 
     public function getTerm()
     {
-        return $this->getProp($this->term);
+        return $this->getProp($this->acf_term);
     }
 
     public function getIsPaid() : bool
     {
         return $this->getProp($this->acf_is_paid);
+    }
+
+    public function getPlacementAddress()
+    {
+        return $this->getProp($this->acf_placement_address);
     }
 
     public function getApplyFromThisPlatform()
@@ -239,10 +245,10 @@ class Vacancy
 
     public function getVideoUrl()
     {
-        // if($this->getProp($this->acf_video_url))
-        // {
-        //     return Helper::yt_id($this->getProp($this->acf_video_url));
-        // }
+        if($this->getProp($this->acf_video_url))
+        {
+            return Helper::yt_id($this->getProp($this->acf_video_url));
+        }
 
         return "";
     }
@@ -274,7 +280,7 @@ class Vacancy
 
     public function getCity()
     {
-        return $this->getProp($this->acf_city);
+        return $this->getProp($this->acf_placement_city);
     }
 
     public function getCountry()
@@ -335,7 +341,7 @@ class Vacancy
     public function getAuthor()
     {
         $vacancy = get_post($this->vacancy_id);
-        return $vacancy;
+        return $vacancy->post_author;
     }
 
     public function getPublishDate( $format )

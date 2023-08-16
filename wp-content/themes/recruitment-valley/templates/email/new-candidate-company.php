@@ -224,7 +224,7 @@
                                 <td style="width: 100px">
                                   <img
                                     height="auto"
-                                    src="<?= THEME_URL; ?>/assets/images/logo-header.webp"
+                                    src="<?= THEME_URL ?>/assets/images/logo-header.webp"
                                     style="
                                       border: 0;
                                       display: block;
@@ -317,7 +317,7 @@
                                 <td style="width: 600px">
                                   <img
                                     height="auto"
-                                    src="<?= THEME_URL; ?>/assets/images/hero-img.webp"
+                                    src="<?= THEME_URL ?>/assets/images/hero-img.webp"
                                     style="
                                       border: 0;
                                       display: block;
@@ -442,14 +442,14 @@
                                         color: #000;
                                       "
                                     >
-                                      Beste
-                                      <span
+                                      Beste,
+                                      <!-- <span
                                         style="
                                           font-family: Neue Montreal Medium;
                                         "
                                       >
-                                        {{ applicant.firstName }} {{ applicant.lastName }}</span
-                                      >
+                                        heer/mevrouw,</span
+                                      > -->
                                     </p>
                                   </div>
                                 </td>
@@ -576,13 +576,12 @@
                                         color: #1f1f1f;
                                       "
                                     >
-                                      Hierbij bevestigen wij jouw sollicitatie
-                                      op de vacature
-                                      <span>{{ applicant.vacancy.title }}</span>
-                                      bij
-                                      <span
-                                        >{{ applicant.vacancy.company.name }}</span
-                                      >.<br /><br />
+                                      Hierbij ontvang je een sollicitatie voor
+                                      de vacature van
+                                      <span>{{ applicant.vacancy.title }}</span
+                                      >. In de bijlage vind je het CV en een
+                                      eventuele motivatie/toelichting.
+                                      <br /><br />
 
                                       Met vriendelijke groet,<br /><br />
 
@@ -690,7 +689,7 @@
                                         <td style="width: 100px">
                                           <img
                                             height="auto"
-                                            src="<?= THEME_URL; ?>/assets/images/logo-footer.webp"
+                                            src="<?= THEME_URL ?>/assets/images/logo-footer.webp"
                                             style="
                                               border: 0;
                                               display: block;
@@ -1062,7 +1061,7 @@
                                               >
                                                 <img
                                                   height="30"
-                                                  src="<?= THEME_URL; ?>/assets/images/circle-ig.webp"
+                                                  src="<?= THEME_URL ?>/assets/images/circle-ig.webp"
                                                   style="
                                                     border-radius: 20px;
                                                     display: block;
@@ -1118,7 +1117,7 @@
                                               >
                                                 <img
                                                   height="30"
-                                                  src="<?= THEME_URL; ?>/assets/images/circle-twitter.webp"
+                                                  src="<?= THEME_URL ?>/assets/images/circle-twitter.webp"
                                                   style="
                                                     border-radius: 20px;
                                                     display: block;
@@ -1174,7 +1173,7 @@
                                               >
                                                 <img
                                                   height="30"
-                                                  src="<?= THEME_URL; ?>/assets/images/circle-linked.webp"
+                                                  src="<?= THEME_URL ?>/assets/images/circle-linked.webp"
                                                   style="
                                                     border-radius: 20px;
                                                     display: block;
@@ -1230,7 +1229,7 @@
                                               >
                                                 <img
                                                   height="30"
-                                                  src="<?= THEME_URL; ?>/assets/images/circle-fb.webp"
+                                                  src="<?= THEME_URL ?>/assets/images/circle-fb.webp"
                                                   style="
                                                     border-radius: 20px;
                                                     display: block;

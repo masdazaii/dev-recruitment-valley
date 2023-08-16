@@ -11,11 +11,6 @@ class VacancyResponse
 {
     public $vacancyCollection;
 
-    // public function __construct()
-    // {
-    //     $this->vacancyCollection = $vacancyCollection;
-    // }
-
     public function setCollection($vacancyCollection)
     {
         $this->vacancyCollection = $vacancyCollection;
@@ -32,6 +27,7 @@ class VacancyResponse
                 "slug" => $vacancy->post_name,
                 "name" => $vacancy->post_title,
                 "city" => $vacancyModel->getCity(),
+                "placementAddress" => $vacancyModel->getPlacementAddress(),
                 "education" => $vacancyTaxonomy["education"]  ?? null,
                 "employmentType" => $vacancyTaxonomy["type"] ?? null,
                 "location" => $vacancyTaxonomy["location"] ?? null,
@@ -83,13 +79,14 @@ class VacancyResponse
                 "description" => $vacancyModel->getDescription(),
                 "term" => $vacancyModel->getTerm(),
             ],
-            "videoId" => $vacancyModel->getVideoUrl(),
-            "gallery" => $vacancyModel->getGallery(),
+            "city" => $vacancyModel->getCity(),
+            "placementAddress" => $vacancyModel->getPlacementAddress(),
+            "videoId" => $company->getVideoUrl(),
+            "gallery" => $company->getGallery(),
             "reviews" => $vacancyModel->getReviews(),
             "steps" => $vacancyModel->getApplicationProcessStep(),
             "salaryStart" => $vacancyModel->getSalaryStart(),
             "salaryEnd" => $vacancyModel->getSalaryEnd(),
-            "thumbnail" => $vacancyModel->getThumbnail(),
             "postedDate" => $vacancyModel->getPublishDate("Y-m-d H:i A")
         ];
 
@@ -107,9 +104,9 @@ class VacancyResponse
             return [
                 "id" => $vacancy->ID,
                 "name" => $vacancy->post_title,
-                "employmentType" => $vacancyTaxonomy["type"] ?? null,
-                "location" => $vacancyTaxonomy["location"] ?? null,
-                "sector" => $vacancyTaxonomy["sector"] ?? null,
+                "employmentType" => $vacancyTaxonomy["type"] ?? [],
+                "location" => $vacancyTaxonomy["location"] ?? [],
+                "sector" => $vacancyTaxonomy["sector"] ?? [],
                 "vacancyType" => $vacancyModel->getIsPaid() ? "Paid" : "Free",
                 "expiredAt" => strtotime($vacancyModel->getExpiredAt()),
                 "status" => $vacancyTaxonomy["status"][0]["name"] ?? null,
