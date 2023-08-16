@@ -54,7 +54,6 @@ class Vacancy
     public $acf_twitter_url = "twitter_url";
     public $acf_gallery = "gallery";
     public $acf_reviews = "reviews";
-    public $acf_city = "city";
     public $acf_country = "country";
     public $acf_salary_start = "salary_start";
     public $acf_salary_end = "salary_end";
@@ -275,7 +274,7 @@ class Vacancy
 
     public function getCity()
     {
-        return $this->getProp($this->acf_city);
+        return $this->getProp($this->acf_placement_city);
     }
 
     public function getCountry()
