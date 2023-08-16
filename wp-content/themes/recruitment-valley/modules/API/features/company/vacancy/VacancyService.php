@@ -36,7 +36,7 @@ class VacancyService
     public function getAll( WP_REST_Request $request )
     {
         $params = $request->get_params();
-        $params["user_id"] = $request->user_id;
+        $params["user_id"] = $request["user_id"];
         $response = $this->vacancyController->getAll( $params );
         $this->vacancyResponse->setCollection($response["data"]);
         $response["data"] = $this->vacancyResponse->formatCompany();
