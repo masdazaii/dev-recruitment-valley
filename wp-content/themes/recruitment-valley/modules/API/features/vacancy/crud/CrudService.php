@@ -108,4 +108,9 @@ class VacancyCrudService
         $response = $this->vacancyCrudController->trash($params);
         return ResponseHelper::build( $response );
     }
+
+    private function _send_mail_when_make_vacancy($response, $params)
+    {
+        
+    }
 }
