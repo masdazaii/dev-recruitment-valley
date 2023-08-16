@@ -104,9 +104,9 @@ class VacancyResponse
             return [
                 "id" => $vacancy->ID,
                 "name" => $vacancy->post_title,
-                "employmentType" => $vacancyTaxonomy["type"] ?? null,
-                "location" => $vacancyTaxonomy["location"] ?? null,
-                "sector" => $vacancyTaxonomy["sector"] ?? null,
+                "employmentType" => $vacancyTaxonomy["type"] ?? [],
+                "location" => $vacancyTaxonomy["location"] ?? [],
+                "sector" => $vacancyTaxonomy["sector"] ?? [],
                 "vacancyType" => $vacancyModel->getIsPaid() ? "Paid" : "Free",
                 "expiredAt" => strtotime($vacancyModel->getExpiredAt()),
                 "status" => $vacancyTaxonomy["status"][0]["name"] ?? null,

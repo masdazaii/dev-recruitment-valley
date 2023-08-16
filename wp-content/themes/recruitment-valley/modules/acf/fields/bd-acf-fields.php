@@ -1624,6 +1624,26 @@ acf_add_local_field_group(array(
 			'return_format' => 'Y-m-d H:i:s',
 			'first_day' => 1,
 		),
+		array(
+			'key' => 'field_64dc4f9285e75',
+			'label' => 'Placement Address',
+			'name' => 'placement_address',
+			'aria-label' => '',
+			'type' => 'text',
+			'instructions' => '',
+			'required' => 0,
+			'conditional_logic' => 0,
+			'wrapper' => array(
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'default_value' => '',
+			'maxlength' => '',
+			'placeholder' => '',
+			'prepend' => '',
+			'append' => '',
+		),
 	),
 	'location' => array(
 		array(
