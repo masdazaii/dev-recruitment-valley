@@ -34,7 +34,16 @@ class VacancyCrudService
         $params = $getAllRequest->getData();
         $response = $this->vacancyCrudController->getAll($params);
         $this->vacancyResponse->setCollection($response["data"]);
+
         $formattedResponse = $this->vacancyResponse->format();
+        
+        if(isset($params['placementAddress'])) {
+            if($params['placementAddress'] !== "") {
+                $formattedResponse = $this->vacancyCrudController->getAllByLocations($formattedResponse, $params);
+            }
+        }
+
+
         $response["data"] = $formattedResponse;
         return ResponseHelper::build($response);
     }

@@ -23,6 +23,37 @@ class VacancyCrudController
     }
 
     /** CHANGE STARTS HERE */
+        
+    /**
+     * getAllByLocations
+     *
+     * @param  mixed $data
+     * @param  mixed $params
+     * @return array
+     */
+    public function getAllByLocations($data, $params) : array 
+    {
+        // get locations city
+        $placementCity = $params['placementAddress'];
+        $apiKey = 'AIzaSyCSDEm4LesoBQq9i9W0tjwHWICln6Qsom8';
+
+        $apiUrl = "https://maps.googleapis.com/maps/api/geocode/json?address=" . urlencode($placementCity) . "&key=" . $apiKey;
+        $response = file_get_contents($apiUrl);
+        $data = json_decode($response, true);
+
+        echo '<pre>';
+        var_dump($data);
+        echo '<pre>';
+        die();
+
+        // standarization city name
+
+        // get data by city
+
+        // give by radius
+        return [];
+    }
+
     public function getAll($request)
     {
         $vacancy = new Vacancy;
