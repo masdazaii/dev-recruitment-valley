@@ -4,6 +4,7 @@ namespace Vacancy;
 
 use Constant\Message;
 use DateTimeImmutable;
+use JWTHelper;
 use WP_Post;
 use WP_Query;
 
