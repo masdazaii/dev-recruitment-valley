@@ -11,11 +11,6 @@ class VacancyResponse
 {
     public $vacancyCollection;
 
-    // public function __construct()
-    // {
-    //     $this->vacancyCollection = $vacancyCollection;
-    // }
-
     public function setCollection($vacancyCollection)
     {
         $this->vacancyCollection = $vacancyCollection;
@@ -32,6 +27,7 @@ class VacancyResponse
                 "slug" => $vacancy->post_name,
                 "name" => $vacancy->post_title,
                 "city" => $vacancyModel->getCity(),
+                "placementAddress" => $vacancyModel->getPlacementAddress(),
                 "education" => $vacancyTaxonomy["education"]  ?? null,
                 "employmentType" => $vacancyTaxonomy["type"] ?? null,
                 "location" => $vacancyTaxonomy["location"] ?? null,
@@ -84,6 +80,7 @@ class VacancyResponse
                 "term" => $vacancyModel->getTerm(),
             ],
             "city" => $vacancyModel->getCity(),
+            "placementAddress" => $vacancyModel->getPlacementAddress(),
             "videoId" => $company->getVideoUrl(),
             "gallery" => $company->getGallery(),
             "reviews" => $vacancyModel->getReviews(),
