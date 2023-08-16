@@ -22,7 +22,8 @@ class ProfileController
 
     public function get(WP_REST_Request $request)
     {
-        $user_id = $request->user_id;
+        // $user_id = $request->user_id;
+        $user_id = $request['user_id']; // Changed Line
         $user_data = ProfileModel::user_data($user_id);
         $user_data_acf = Helper::isset($user_data, 'acf');
         $galleries = Helper::isset($user_data_acf, 'ucma_gallery_photo') ?? [];
@@ -59,7 +60,10 @@ class ProfileController
                 'website' => Helper::isset($user_data_acf, 'ucma_website_url'),
                 'employees' => Helper::isset($user_data_acf, 'ucma_employees'),
                 'btw' => Helper::isset($user_data_acf, 'ucma_btw_number'),
+                /** Added Line start here */
+                'companyName' => Helper::isset($user_data_acf, 'ucma_company_name'), // Added Line
                 'image' => $image, // Added line
+                /** Added Line end here */
             ],
             'socialMedia' => [
                 'facebook' => Helper::isset($user_data_acf, 'ucma_facebook_url'),
@@ -287,7 +291,9 @@ class ProfileController
                 update_field('ucma_image', $image_id, 'user_' . $request['user_id']);
             }
 
-            /** Store ACF */
+            /** Store Meta && ACF */
+            // update_field('ucma_company_email', $request['email'], 'user_' . $request['user_id']);
+            update_field('ucma_company_name', $request['companyName'], 'user_' . $request['user_id']);
             update_field('ucma_phone_code', $request['phoneNumberCode'], 'user_' . $request['user_id']);
             update_field('ucma_phone', $request['phoneNumber'], 'user_' . $request['user_id']);
             update_field('ucma_country', $request['country'], 'user_' . $request['user_id']);
@@ -306,10 +312,14 @@ class ProfileController
             update_field('ucma_short_decription', $request['shortDescription'], 'user_' . $request['user_id']);
             update_field('ucma_benefit', $request['secondaryEmploymentConditions'], 'user_' . $request['user_id']);
             update_field('ucma_company_video_url', $request['companyVideo'], 'user_' . $request['user_id']);
+            update_field('ucma_is_full_registered', 1, 'user_' . $request['user_id']);
 
             $wpdb->query('COMMIT');
         } catch (Error $errors) {
             $wpdb->query('ROLLBACK');
+            echo '<pre>';
+            var_dump($errors->getMessage());
+            echo '</pre>';
             return [
                 "message" => $this->message->get("company.profile.setup_failed"),
                 "errors" => $errors,
@@ -320,6 +330,41 @@ class ProfileController
         return [
             "message" => $this->message->get("company.profile.setup_success"),
             "status" => 200
+        ];
+    }
+
+    public function updatePhoto($request)
+    {
+        global $wpdb;
+
+        try {
+            $wpdb->query('START TRANSACTION');
+
+            $image = ModelHelper::handle_upload('image');
+            if ($image) {
+                // Get previous image
+                $currentImage = get_field('ucma_image', 'user_' . $request['user_id']) ?? [];
+
+                $imageID = wp_insert_attachment($image['image']['attachment'], $image['image']['file']);
+                update_field('ucma_image', $imageID, 'user_' . $request['user_id']);
+            }
+
+            $wpdb->query('COMMIT');
+        } catch (Error $errors) {
+            $wpdb->query('ROLLBACK');
+            return [
+                "message" => $this->message->get("company.profile.update_image_failed"),
+                "errors" => $errors,
+                "status" => 500
+            ];
+        }
+
+        // Delete old image
+        wp_delete_attachment($currentImage['ID']);
+
+        return [
+            "status" => 200,
+            "message" => $this->message->get("company.profile.update_image_success")
         ];
     }
 

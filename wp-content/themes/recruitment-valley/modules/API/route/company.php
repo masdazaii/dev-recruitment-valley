@@ -44,7 +44,8 @@ class CompanyEndpoint
                 'profile_get' => [
                     'url'                   =>  'profile',
                     'methods'               =>  'Get',
-                    'permission_callback'   => [$authMiddleware, 'check_token_company'],
+                    // 'permission_callback'   => [$authMiddleware, 'check_token_company'],
+                    'permission_callback'   => [$authMiddleware, 'authorize_company'], // Changed line
                     'callback'              =>  [$profile, 'get']
                 ],
                 'profile_post_detail' => [
@@ -116,6 +117,12 @@ class CompanyEndpoint
                     'methods'               => 'POST',
                     'permission_callback'   => [$authMiddleware, 'authorize_company'],
                     'callback'              => [$profile, 'setup'],
+                ],
+                'profile_update_photo' => [
+                    'url'                   => 'profile/image',
+                    'methods'               => 'POST',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company'],
+                    'callback'              => [$profile, 'updatePhoto']
                 ],
             ]
         ];

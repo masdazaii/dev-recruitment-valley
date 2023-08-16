@@ -4,6 +4,7 @@ namespace Vacancy;
 
 use DateTime;
 use DateTimeImmutable;
+use Model\Company;
 use WP_Post;
 
 class VacancyResponse
@@ -24,6 +25,7 @@ class VacancyResponse
     {
         $formattedResponse = array_map(function (WP_Post $vacancy) {
             $vacancyModel = new Vacancy($vacancy->ID);
+            $company = new Company($vacancy->post_author);
             $vacancyTaxonomy = $vacancyModel->getTaxonomy(true);
             return [
                 "id" => $vacancy->ID,
@@ -39,7 +41,7 @@ class VacancyResponse
                 // "salaryRange"=> "2500-3000",
                 "salaryStart" => $vacancyModel->getSalaryStart(),
                 "salaryEnd" => $vacancyModel->getSalaryEnd(),
-                "thumbnail" => $vacancyModel->getThumbnail(),
+                "thumbnail" => $company->getThumbnail(),
                 "description" => $vacancyModel->getDescription(),
                 "postedDate" => date_format(new DateTime($vacancy->post_date_gmt), "Y-m-d H:i A")
             ];
@@ -51,6 +53,8 @@ class VacancyResponse
     public function formatSingle()
     {
         $vacancyModel = new Vacancy($this->vacancyCollection->ID);
+
+        $company = new Company($this->vacancyCollection->post_author);
         $vacancyTaxonomy = $vacancyModel->getTaxonomy(false);
         $formattedResponse = [
             "id" => $this->vacancyCollection->ID,
@@ -58,16 +62,22 @@ class VacancyResponse
             "shortDescription" => $vacancyTaxonomy,
             "title" => $this->vacancyCollection->post_title,
             "company" =>  [
-                "logo" => "https://picsum.photos/200/300",
-                "name" => "",
-                "about" => "",
+                "company_id" => $company->user_id,
+                "logo" => $company->getThumbnail(),
+                "name" => $company->getName(),
+                "about" => $company->getDescription(),
                 "maps" => "",
                 "sector" => "",
-                "totalEmployee" => "",
-                "tel" => "",
-                "email" => "",
-                "socialMedia" => [],
-                "website" => ""
+                "totalEmployee" => $company->getTotalEmployees(),
+                "tel" => $company->getPhoneCode() . $company->getPhone(),
+                "email" => $company->getEmail(),
+                "socialMedia" => [
+                    "facebook" => $company->getFacebook(),
+                    "twitter" => $company->getTwitter(),
+                    "linkedin" => $company->getLinkedin(),
+                    "instagram" => $company->getInstagram(),
+                ],
+                "website" => $company->getWebsite()
             ], // later get company here
             "contents" => [
                 "description" => $vacancyModel->getDescription(),

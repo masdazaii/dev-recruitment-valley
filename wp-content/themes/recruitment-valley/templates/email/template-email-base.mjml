@@ -1,0 +1,250 @@
+<mjml>
+  <mj-head>
+    <mj-style>
+      @font-face { font-family: "Neue Montreal Light"; src:
+      url("https://db.onlinewebfonts.com/t/b2bf6541bf9ab3fc3138440f2bc8b592.woff2")format("woff2");
+      } @font-face { font-family: "Neue Montreal Regular"; src:
+      url("https://db.onlinewebfonts.com/t/7980cc1889b6b0b264dc47cca659f7c2.woff2")format("woff2");
+      } @font-face { font-family: "Neue Montreal Medium"; src:
+      url("https://db.onlinewebfonts.com/t/c5c9157a20810aac79a10bf84a37bdb4.woff2")format("woff2");
+      } @font-face { font-family: "Neue Montreal Bold"; src:
+      url("https://db.onlinewebfonts.com/t/1a991b240e707c46ca904d731893f108.woff2")format("woff2");
+      } @media(max-width:414px) { .text-title { font-size:24px !important;
+      line-height:30px !important; } }
+    </mj-style>
+  </mj-head>
+  <mj-body>
+    /* Template Header */
+    <mj-section padding="20px" background-color="#DAF67D">
+      <mj-column>
+        <mj-image
+          padding="0px"
+          width="100px"
+          src="/assets/img/logo-small.png"
+        ></mj-image>
+      </mj-column>
+    </mj-section>
+    <mj-section padding="0px">
+      <mj-column background-color="#DAF67D">
+        <mj-image
+          padding="0px"
+          width="600px"
+          src="https://picsum.photos/600/256"
+        ></mj-image>
+      </mj-column>
+    </mj-section>
+
+    /* Template Body */
+    <mj-section padding="50px 40px 20px 40px" background-color="#fff">
+      <mj-column padding="0px" background-color="#fff">
+        <mj-text padding="0px">
+          <p
+            align="center"
+            style="
+              font-family: Neue Montreal Regular;
+              font-size: 24px;
+              font-style: normal;
+              font-weight: 500;
+              line-height: 32px;
+              color: #000;
+            "
+          >
+            Hallo,
+            <span style="font-family: Neue Montreal Medium"
+              >Gebruikersnaam</span
+            >
+          </p>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section padding="0px 40px 80px 40px" background-color="#ffffff">
+      <mj-column padding="32px" background-color="#F5F5F5" border-radius="8px">
+        <mj-text padding="0px">
+          <p
+            class="text-title"
+            align="center"
+            style="
+              font-family: Neue Montreal Medium;
+              font-size: 36px;
+              font-style: normal;
+              font-weight: 500;
+              line-height: 44px;
+              color: #234943;
+            "
+          >
+            Welkom bij <br />
+            Recruitment Valley
+          </p>
+          <p
+            align="center"
+            style="
+              font-family: Neue Montreal Regular;
+              font-size: 16px;
+              font-style: normal;
+              font-weight: 400;
+              line-height: 24px;
+              color: #1f1f1f;
+            "
+          >
+            Je hebt zojuist een account aangemaakt in Recruitment Valley en bent
+            klaar om een baan te zoeken die je leuk vindt.
+          </p>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    /* Template footer */
+    <mj-section padding="32px 40px 12px 40px" background-color="#1f1f1f">
+      <mj-column padding="0px">
+        <mj-image
+          padding="0px"
+          width="100px"
+          src="/assets/img/logo-small.png"
+          align="left"
+        ></mj-image>
+      </mj-column>
+    </mj-section>
+    <mj-section padding="0px 40px 50px 40px" background-color="#1f1f1f">
+      <mj-column padding="0px">
+        <mj-text padding="0px">
+          <p
+            class="text-title"
+            style="
+              font-family: Neue Montreal Medium;
+              font-size: 45px;
+              font-style: normal;
+              font-weight: 500;
+              line-height: 52px;
+              color: #ffffff;
+            "
+          >
+            Het nr. 1 jobboard <br /><span style="color: #daf67d"
+              >voor recruiters</span
+            >
+          </p>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section padding="0px 40px 50px 40px" background-color="#1f1f1f">
+      <mj-column padding="0px">
+        <mj-text
+          padding="0px"
+          font-family="Neue Montreal Light"
+          color="#F45E43"
+        >
+          <p
+            style="
+              font-family: Neue Montreal Medium;
+              \font-size: 14px;
+              font-style: normal;
+              font-weight: 500;
+              line-height: 20px;
+              letter-spacing: 0.1px;
+              color: #fff;
+            "
+          >
+            Contact
+          </p>
+          <p
+            style="
+              font-family: Neue Montreal Regular;
+              font-size: 14px;
+              font-style: normal;
+              font-weight: 400;
+              line-height: 20px;
+              letter-spacing: 0.25px;
+              color: #e9e9e9;
+            "
+          >
+            Einsteinlaan 8 <br />2289 CC, Rijswijk
+          </p>
+        </mj-text>
+      </mj-column>
+      <mj-column padding="0px">
+        <mj-text
+          padding="0px"
+          font-family="Neue Montreal Light"
+          color="#F45E43"
+        >
+          <a
+            href="mailto:info@recruitmentvalley.com"
+            style="
+              font-family: Neue Montreal Medium;
+              font-size: 14px;
+              font-style: normal;
+              font-weight: 500;
+              line-height: 20px;
+              letter-spacing: 0.1px;
+              color: #fff;
+              text-decoration: none;
+            "
+            >info@recruitmentvalley.com</a
+          >
+        </mj-text>
+        <mj-social
+          padding="20px 0px"
+          align="left"
+          font-size="15px"
+          icon-size="30px"
+          mode="horizontal"
+        >
+          <mj-social-element
+            href="url"
+            target="_blank"
+            background-color="transparent"
+            border-radius="20px"
+            padding="0px 8px 0px 0px"
+            src="https://picsum.photos/15/15"
+          >
+          </mj-social-element>
+          <mj-social-element
+            href="url"
+            target="_blank"
+            background-color="transparent"
+            border-radius="20px"
+            padding="0px 8px 0px 0px"
+            src="https://picsum.photos/15/15"
+          >
+          </mj-social-element>
+          <mj-social-element
+            href="url"
+            target="_blank"
+            background-color="transparent"
+            border-radius="20px"
+            padding="0px 8px 0px 0px"
+            src="https://picsum.photos/15/15"
+          >
+          </mj-social-element>
+          <mj-social-element
+            href="url"
+            target="_blank"
+            background-color="transparent"
+            border-radius="20px"
+            padding="0px 8px 0px 0px"
+            src="https://picsum.photos/15/15"
+          >
+          </mj-social-element>
+        </mj-social>
+      </mj-column>
+    </mj-section>
+    <mj-section padding="0px 40px 05px 40px" background-color="#1f1f1f">
+      <mj-column padding="0px">
+        <mj-text padding="0px">
+          <p
+            align="center"
+            style="
+              font-family: Neue Montreal Regular;
+              font-size: 12px;
+              font-style: normal;
+              font-weight: 400;
+              line-height: 18px;
+              color: #e9e9e9;
+            "
+          >
+            © Recruitment Valley 2023
+          </p>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
