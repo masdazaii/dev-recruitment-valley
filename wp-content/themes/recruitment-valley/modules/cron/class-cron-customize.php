@@ -11,6 +11,7 @@
 */
 
 use BD\Emails\Email;
+use Vacancy\Vacancy;
 
 defined( 'ABSPATH' ) || die( "Can't access directly" );
 
@@ -37,6 +38,7 @@ class CronCustomize
         $fiveDaysAfter = strtotime('+5 days', $today);
         // 2023-08-11
         $dateFiveAfter = date('Y-m-d', $fiveDaysAfter);
+        $dateToday     = date('Y-m-d', $today);
         error_log("[notify][expired +5 days] today is " . date('Y-m-d'));
         error_log("[notify][expired +5 days] will expired at " . $dateFiveAfter);
 
@@ -50,6 +52,12 @@ class CronCustomize
                 'expired_at' => '2023-09-15 02:50:05',
             ]
         ];
+
+        $expired_posts_already = array_filter($expired_posts, function ($el) use($dateToday) {
+            $time = strtotime($el['expired_at']);
+            $date = date('Y-m-d', $time);
+            return $date == $dateToday;
+        });
 
         $expired_posts = array_filter($expired_posts, function ($el) use ($dateFiveAfter) {
             $time = strtotime($el['expired_at']);
@@ -83,7 +91,31 @@ class CronCustomize
             unset($expired_posts[$in]);
         }
 
+        
+        $this->_expired_posts_handle($expired_posts_already);
         // update_option('meta_key', $expired_posts);
+    }
+
+    private function _expired_posts_handle($expired_posts)
+    {
+        foreach($expired_posts as $in => $the_post)
+        {
+            $post = get_post($the_post['post_id']);
+            $user = get_user_by('id', $post->post_author);
+
+            $args = [
+                'vacancy_title' => $post->post_title,
+            ];
+
+            $headers = array(
+                'Content-Type: text/html; charset=UTF-8',
+            );
+            $content = Email::render_html_email('job-expired-company.php', $args);
+            wp_mail($user->user_email, "Melding verlopen vacature", $content, $headers);
+            unset($expired_posts[$in]);
+        }
+
+        return $expired_posts;
     }
 }
 
