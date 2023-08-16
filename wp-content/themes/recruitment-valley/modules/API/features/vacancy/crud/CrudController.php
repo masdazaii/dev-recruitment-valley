@@ -384,7 +384,7 @@ class VacancyCrudController
 
         return [
             "status" => 200,
-            "message" => $vacancyIsPaid ? $this->_message->get("vacancy.update.paid.success") : $this->_message->get("vacancy.update.paid.fail")
+            "message" => $vacancyIsPaid ? $this->_message->get("vacancy.update.paid.success") : $this->_message->get("vacancy.update.free.success")
         ];
     }
 

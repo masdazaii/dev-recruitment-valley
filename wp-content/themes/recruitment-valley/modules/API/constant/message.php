@@ -104,7 +104,7 @@ class Message
                 ],
                 "update" => [
                     "free" => [
-                        "success" => __("update ", THEME_DOMAIN),
+                        "success" => __("Update free job successfully", THEME_DOMAIN),
                         "fail" => __("Error creating free job", THEME_DOMAIN),
                     ],
                     "paid" => [
