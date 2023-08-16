@@ -59,6 +59,7 @@ class Vacancy
     public $acf_salary_end = "salary_end";
     public $acf_external_url = "external_url";
     public $acf_expired_at = "expired_at";
+    public $acf_placement_address = "placement_address";
 
     public function __construct($vacancy_id = false)
     {
@@ -204,6 +205,11 @@ class Vacancy
     public function getIsPaid() : bool
     {
         return $this->getProp($this->acf_is_paid);
+    }
+
+    public function getPlacementAddress()
+    {
+        return $this->getProp($this->acf_placement_address);
     }
 
     public function getApplyFromThisPlatform()
