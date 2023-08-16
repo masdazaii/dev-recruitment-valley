@@ -155,8 +155,9 @@ class Message
                 "profile" => [
                     "setup_success" => __("Success setting up your profile", THEME_DOMAIN),
                     "setup_failed" => __("Failed setting up your profile", THEME_DOMAIN),
-                    "update_image_success" => __("Success update company profile", THEME_DOMAIN),
-                    "update_image_failed" => __("Failed update company profile", THEME_DOMAIN),
+                    "update_success" => __("Success update company profile", THEME_DOMAIN),
+                    "update_failed" => __("Failed update company profile", THEME_DOMAIN),
+                    "update_detail_success" => __("Success update company profile", THEME_DOMAIN),
                 ]
             ],
             'payment' => [
@@ -164,6 +165,16 @@ class Message
                     "get_success" => __("Success get all package.", THEME_DOMAIN),
                     "show_success" => __("Success get package.", THEME_DOMAIN),
                     "show_not_found" => __("Package with given slug not found.", THEME_DOMAIN),
+                ]
+            ],
+            'system' => [
+                'overall_failed' => __('System Error.', THEME_DOMAIN),
+            ],
+            'option' => [
+                "company" => [
+                    "employees_total" => [
+                        "get_success" => __('Success get employees total option.', THEME_DOMAIN),
+                    ]
                 ]
             ]
         ];

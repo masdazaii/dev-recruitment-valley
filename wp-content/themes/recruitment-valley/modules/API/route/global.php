@@ -6,6 +6,7 @@ use Global\LoginService;
 use Global\RegistrationService;
 use Global\ContactService;
 use Global\PaymentService;
+use Global\OptionService;
 use Middleware\AuthMiddleware;
 use RefreshToken\RefreshTokenService;
 use Vacancy\VacancyCrudService;
@@ -30,9 +31,10 @@ class GlobalEndpoint
         $contactService = new ContactService;
         $crudVacancyService = new VacancyCrudService;
         $termVacancyService = new VacancyTermService;
-        $authMiddleware = new AuthMiddleware;
         $favoriteVacancyService = new FavoriteVacancyService;
         $paymentService = new PaymentService;
+        $optionService = new OptionService;
+        $authMiddleware = new AuthMiddleware;
 
         $endpoint = [
             'path' => '',
@@ -97,6 +99,12 @@ class GlobalEndpoint
                     'methods'               => 'GET',
                     'permission_callback'   => '__return_true',
                     'callback'              => [$termVacancyService, 'getSectors']
+                ],
+                'get_employees_option' => [
+                    'url'                   => '/options/employees-total',
+                    'methods'               => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$optionService, 'getCompanyEmployeesTotal']
                 ]
             ]
 

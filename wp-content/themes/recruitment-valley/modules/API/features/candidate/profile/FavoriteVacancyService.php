@@ -58,9 +58,11 @@ class FavoriteVacancyService
     {
         $body = $request->get_params();
         $response = $this->favoriteVacancyController->list($body);
-        $this->vacancyResponse->setCollection($response["data"]);
-        $formattedResponse = $this->vacancyResponse->formatFavorite();
-        $response["data"] = $formattedResponse;
+        if (!empty($response["data"])) {
+            $this->vacancyResponse->setCollection($response["data"]);
+            $formattedResponse = $this->vacancyResponse->formatFavorite();
+            $response["data"] = $formattedResponse;
+        }
         return ResponseHelper::build($response);
     }
 
