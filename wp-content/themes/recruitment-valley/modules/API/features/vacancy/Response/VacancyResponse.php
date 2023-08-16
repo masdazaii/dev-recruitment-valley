@@ -83,6 +83,7 @@ class VacancyResponse
                 "description" => $vacancyModel->getDescription(),
                 "term" => $vacancyModel->getTerm(),
             ],
+            "city" => $vacancyModel->getCity(),
             "videoId" => $company->getVideoUrl(),
             "gallery" => $company->getGallery(),
             "reviews" => $vacancyModel->getReviews(),
