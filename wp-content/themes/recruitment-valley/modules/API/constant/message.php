@@ -160,7 +160,7 @@ class Message
                     "update_detail_success" => __("Success update company profile", THEME_DOMAIN),
                 ]
             ],
-            'payment' => [
+            'package' => [
                 "package" => [
                     "get_success" => __("Success get all package.", THEME_DOMAIN),
                     "show_success" => __("Success get package.", THEME_DOMAIN),

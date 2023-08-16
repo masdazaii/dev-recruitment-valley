@@ -12,4 +12,4 @@ require_once __DIR__ . '/__class-register.php';
 require_once __DIR__ . '/class-contact.php';
 require_once __DIR__ . '/class-vacancy.php';
 require_once __DIR__ . '/class-applicant.php';
-require_once __DIR__ . '/class-payment.php';
+require_once __DIR__ . '/class-package.php';
