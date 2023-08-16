@@ -89,6 +89,7 @@ class Message
                 "not_found" => __("there is no vancancy found base on your criteria", THEME_DOMAIN),
                 "term" => [
                     'get_term_success' => __("Success get vacancies' filters.", THEME_DOMAIN),
+                    'show_term_success' => __("Success get vacancies terms.", THEME_DOMAIN),
                 ],
                 "create" => [
                     "free" => [
