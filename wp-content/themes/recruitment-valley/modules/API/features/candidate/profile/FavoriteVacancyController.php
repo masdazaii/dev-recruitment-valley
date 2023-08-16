@@ -51,12 +51,12 @@ class FavoriteVacancyController
     public function list($request)
     {
         $favorites = get_user_meta($request['user_id'], 'favorite_vacancy', true) ?? [];
-        if (!empty($favorites)) {
+        if (empty($favorites)) {
             return [
                 "message"   => $this->_message->get('candidate.favorite.get_success'),
-                "data"      => $favorites,
+                "data"      => [],
                 "meta"      => [
-                    "currentPage" => intval(sanitize_text_field($request['page'])),
+                    "currentPage" => isset($request['page']) ? intval(sanitize_text_field($request['page'])) : 0,
                     "totalPage" => 0
                 ],
                 "status"    => 200,
@@ -64,18 +64,20 @@ class FavoriteVacancyController
         }
 
         $filters = [
-            'page' => sanitize_text_field($request['page']) ?? 1,
-            'postPerPage' => sanitize_text_field($request['perPage']) ?? 0,
+            'page' => $request['page'] ? sanitize_text_field($request['page']) : 1,
+            'postPerPage' => $request['perPage'] ? sanitize_text_field($request['perPage']) : 0,
         ];
 
-        switch (sanitize_text_field($request['sort'])) {
-            case 'recent':
-                $filters['order'] = 'post_date';
-                $filters['orderBy'] = 'DESC';
-                break;
-            default:
-                $filters['order'] = 'ID';
-                $filters['orderBy'] = 'ASC';
+        if ($request['sort']) {
+            switch (sanitize_text_field($request['sort'])) {
+                case 'recent':
+                    $filters['order'] = 'post_date';
+                    $filters['orderBy'] = 'DESC';
+                    break;
+                default:
+                    $filters['order'] = 'ID';
+                    $filters['orderBy'] = 'ASC';
+            }
         }
 
         $offset = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['postPerPage']) + 1);
@@ -91,15 +93,22 @@ class FavoriteVacancyController
 
         $vacancies = new WP_Query($args);
 
-        return [
-            "message"   => $this->_message->get('candidate.favorite.get_success'),
-            "data"    => $vacancies->posts,
-            "meta"    => [
-                "currentPage" => intval($filters['page']),
-                "totalPage" => $vacancies->max_num_pages
-            ],
-            "status"  => 200
-        ];
+        if (!is_wp_error($vacancies)) {
+            return [
+                "message"   => $this->_message->get('candidate.favorite.get_success'),
+                "data"    => $vacancies->posts ?? [],
+                "meta"    => [
+                    "currentPage" => intval($filters['page']),
+                    "totalPage" => $vacancies->max_num_pages
+                ],
+                "status"  => 200
+            ];
+        } else {
+            return [
+                "message"   => $this->_message->get('system.overall_failed'),
+                "status"  => 500
+            ];
+        }
     }
 
     public function destroy($request)
