@@ -41,6 +41,7 @@ class Vacancy
     // acf field
     public $acf_description = "description";
     public $acf_term = "term";
+    public $acf_placement_city = "placement_city";
     public $acf_is_paid = "is_paid";
     public $acf_apply_from_this_platform = "apply_from_this_platform";
     public $acf_application_process_title = "application_process_title";

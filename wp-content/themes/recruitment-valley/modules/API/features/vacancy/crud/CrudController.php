@@ -204,6 +204,7 @@ class VacancyCrudController
     {
         $payload = [
             "title" => $request["name"],
+            "city" => $request["city"],
             "description" => $request["description"],
             "salary_start" => $request["salaryStart"],
             "salary_end" => $request["salaryEnd"],
@@ -227,6 +228,7 @@ class VacancyCrudController
 
             $vacancyModel->storePost($payload);
             $vacancyModel->setTaxonomy($payload["taxonomy"]);
+            $vacancyModel->setProp($vacancyModel->acf_placement_city, $payload["city"]);
             $vacancyModel->setProp($vacancyModel->acf_description, $payload["description"]);
             $vacancyModel->setProp($vacancyModel->acf_is_paid, $payload["is_paid"]);
             $vacancyModel->setProp($vacancyModel->acf_salary_start, $payload["salary_start"]);
@@ -265,6 +267,7 @@ class VacancyCrudController
     {
         $payload = [
             "title" => $request["name"],
+            "city" => $request["city"],
             "description" => $request["description"],
             "term" => $request["terms"],
             "salary_start" => $request["salaryStart"],
