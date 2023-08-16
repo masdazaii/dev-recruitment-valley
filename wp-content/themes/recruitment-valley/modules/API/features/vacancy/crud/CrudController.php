@@ -163,7 +163,6 @@ class VacancyCrudController
             $args['s'] = $filters['search'];
         }
 
-        // $vacancies = get_posts($args);
         $vacancies = new WP_Query($args);
 
         return [
@@ -205,6 +204,7 @@ class VacancyCrudController
         $payload = [
             "title" => $request["name"],
             "city" => $request["city"],
+            "placementAddress" => $request["placementAddress"],
             "description" => $request["description"],
             "salary_start" => $request["salaryStart"],
             "salary_end" => $request["salaryEnd"],
@@ -235,6 +235,7 @@ class VacancyCrudController
             $vacancyModel->setProp($vacancyModel->acf_salary_end, $payload["salary_end"]);
             $vacancyModel->setProp($vacancyModel->acf_apply_from_this_platform, $payload["apply_from_this_platform"]);
             $vacancyModel->setProp($vacancyModel->acf_expired_at, date("Y-m-d H:i:s"));
+            $vacancyModel->setProp($vacancyModel->acf_placement_address, $payload["placementAddress"]);
 
             if ($payload["apply_from_this_platform"]) {
                 $vacancyModel->setProp($vacancyModel->acf_external_url, $payload["external_url"]);
@@ -268,6 +269,7 @@ class VacancyCrudController
         $payload = [
             "title" => $request["name"],
             "city" => $request["city"],
+            "placementAddress" => $request["placementAddress"],
             "description" => $request["description"],
             "term" => $request["terms"],
             "salary_start" => $request["salaryStart"],
@@ -306,6 +308,9 @@ class VacancyCrudController
                     $vacancyModel->setProp($acf_field, $value, is_array($value));
                 }
             }
+
+            $vacancyModel->setProp($vacancyModel->acf_placement_city, $payload["city"]);
+            $vacancyModel->setProp($vacancyModel->acf_placement_address, $payload["placementAddress"]);
 
             $expiredAt = new DateTimeImmutable();
             $expiredAt = $expiredAt->modify("+30 days")->format("Y-m-d H:i:s");

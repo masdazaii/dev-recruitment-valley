@@ -131,6 +131,11 @@ class Company
     {
         $gallery = $this->getProp($this->gallery);
         
+        if(!$gallery)
+        {
+            return [];
+        }
+        
         $gallery = array_map(function($attachmentId){
             return wp_get_attachment_url($attachmentId);
         }, $gallery);

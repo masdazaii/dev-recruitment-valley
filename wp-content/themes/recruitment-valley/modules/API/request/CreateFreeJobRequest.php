@@ -22,6 +22,7 @@ class CreateFreeJobRequest implements MiRequest
             "name" => [ 'required'],
             "description" => ["required"],
             "city" => ["required"],
+            "placementAddress" => ["required"],
             "salaryStart" => ["required", "numeric"],
             "salaryEnd" => ["required", "numeric"],
             "sector.*" => ["required", "numeric"],
