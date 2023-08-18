@@ -120,7 +120,8 @@
                 ],
                 "return_format": "id",
                 "multiple": 0,
-                "allow_null": 0
+                "allow_null": 0,
+                "bidirectional_target": []
             },
             {
                 "key": "field_64d30cf8c0932",
@@ -141,7 +142,8 @@
                 ],
                 "return_format": "id",
                 "multiple": 0,
-                "allow_null": 0
+                "allow_null": 0,
+                "bidirectional_target": []
             },
             {
                 "key": "field_64d30d2ac0933",
@@ -165,7 +167,8 @@
                 "return_format": "id",
                 "multiple": 0,
                 "allow_null": 0,
-                "ui": 1
+                "ui": 1,
+                "bidirectional_target": []
             }
         ],
         "location": [
@@ -485,8 +488,8 @@
         "fields": [
             {
                 "key": "field_64db313b255b4",
-                "label": "Payment Price",
-                "name": "rv_payment_price",
+                "label": "Package Price",
+                "name": "rv_package_price",
                 "aria-label": "",
                 "type": "number",
                 "instructions": "",
@@ -508,7 +511,7 @@
             {
                 "key": "field_64db3185255b5",
                 "label": "Credit Quantity",
-                "name": "rv_payment_credit_quantity",
+                "name": "rv_package_credit_quantity",
                 "aria-label": "",
                 "type": "number",
                 "instructions": "",
@@ -553,7 +556,222 @@
                 {
                     "param": "post_type",
                     "operator": "==",
-                    "value": "payment"
+                    "value": "package"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": "",
+        "show_in_rest": 0
+    },
+    {
+        "key": "group_64dc99a3d5433",
+        "title": "Stripe settings",
+        "fields": [
+            {
+                "key": "field_64dc99a41cb8d",
+                "label": "Publish Key",
+                "name": "stripe_publish_key",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_64dc9a5b1cb8e",
+                "label": "Secret key",
+                "name": "stripe_secret_key",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "options_page",
+                    "operator": "==",
+                    "value": "stripe-settings"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": "",
+        "show_in_rest": 0
+    },
+    {
+        "key": "group_64def1de61291",
+        "title": "Transaction Field Group",
+        "fields": [
+            {
+                "key": "field_64def71c70a4e",
+                "label": "Transaction Stripe ID",
+                "name": "transaction_stripe_id",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_64def224d0166",
+                "label": "Transaction User Name",
+                "name": "transaction_user_name",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_64def270d0167",
+                "label": "Transaction Package Name",
+                "name": "transaction_package_name",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_64def27fd0168",
+                "label": "Transaction Amount",
+                "name": "transaction_amount",
+                "aria-label": "",
+                "type": "number",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "min": "",
+                "max": "",
+                "placeholder": "",
+                "step": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_64def2c3d0169",
+                "label": "Transaction user id",
+                "name": "transaction_user_id",
+                "aria-label": "",
+                "type": "user",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "role": "",
+                "return_format": "array",
+                "multiple": 0,
+                "allow_null": 0,
+                "bidirectional_target": []
+            },
+            {
+                "key": "field_64def2d7d016a",
+                "label": "Transaction pacakge id",
+                "name": "transaction_pacakge_id",
+                "aria-label": "",
+                "type": "post_object",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "post_type": [
+                    "package"
+                ],
+                "post_status": "",
+                "taxonomy": "",
+                "return_format": "object",
+                "multiple": 0,
+                "allow_null": 0,
+                "ui": 1,
+                "bidirectional_target": []
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "transaction"
                 }
             ]
         ],
