@@ -49,7 +49,7 @@ class CronCustomize
             ],
             [
                 'post_id' => 291,
-                'expired_at' => '2023-09-15 02:50:05',
+                'expired_at' => get_field('expired_at', 291),
             ]
         ];
 
@@ -57,6 +57,13 @@ class CronCustomize
             $time = strtotime($el['expired_at']);
             $date = date('Y-m-d', $time);
             return $date == $dateToday;
+        });
+
+        $not_expired_posts = array_filter($expired_posts, function ($el) use ($dateToday) {
+            $date = date('Y-m-d', strtotime($el['expired_at']));
+            $time_date = strtotime($date);
+            $time_today = strtotime($dateToday);
+            return $time_date > $time_today;
         });
 
         $expired_posts = array_filter($expired_posts, function ($el) use ($dateFiveAfter) {
@@ -93,7 +100,7 @@ class CronCustomize
 
         
         $this->_expired_posts_handle($expired_posts_already);
-        // update_option('meta_key', $expired_posts);
+        // update_option('meta_key', $not_expired_posts);
     }
 
     private function _expired_posts_handle($expired_posts = [])
