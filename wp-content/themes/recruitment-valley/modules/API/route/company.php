@@ -29,6 +29,12 @@ class CompanyEndpoint
         $endpoint = [
             'path'  => 'company',
             'endpoints' => [
+                'repost_job' => [
+                    'url'                   =>  'vacancy/repost/(?P<vacancy_id>[-\w]+)',
+                    'methods'               =>  'POST',
+                    'permission_callback'   =>  [$authMiddleware, 'authorize_company'],
+                    'callback'              =>  [$vacancyCrudService, 'repostJob']
+                ],
                 'create_free_job' => [
                     'url'                   =>  'vacancy/free',
                     'methods'               =>  'POST',
@@ -48,17 +54,17 @@ class CompanyEndpoint
                     'permission_callback'   => [$authMiddleware, 'authorize_company'], // Changed line
                     'callback'              =>  [$profile, 'get']
                 ],
-                'profile_post_detail' => [
-                    'url'                   => '/profile/detail',
-                    'methods'               => 'POST',
-                    'permission_callback'   => [$authMiddleware, 'check_token_company'],
-                    'args' => [
-                        'id' => [
-                            'type'        => 'string',
-                        ]
-                    ],
-                    'callback'              =>  [$profile, 'post_detail']
-                ],
+                // 'profile_post_detail' => [
+                //     'url'                   => '/profile/detail',
+                //     'methods'               => 'POST',
+                //     'permission_callback'   => [$authMiddleware, 'check_token_company'],
+                //     'args' => [
+                //         'id' => [
+                //             'type'        => 'string',
+                //         ]
+                //     ],
+                //     'callback'              =>  [$profile, 'post_detail']
+                // ],
                 'profile_post_address' => [
                     'url'                   => 'profile/address',
                     'methods'               => 'Post',
@@ -123,6 +129,12 @@ class CompanyEndpoint
                     'methods'               => 'POST',
                     'permission_callback'   => [$authMiddleware, 'authorize_company'],
                     'callback'              => [$profile, 'updatePhoto']
+                ],
+                'profile_update_detail' => [
+                    'url'                   => 'profile/detail',
+                    'methods'               => 'POST',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company'],
+                    'callback'              => [$profile, 'updateDetail']
                 ],
             ]
         ];

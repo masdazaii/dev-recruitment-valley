@@ -60,6 +60,13 @@ class ProfileService
         return ResponseHelper::build($response);
     }
 
+    public function updateDetail(WP_REST_Request $request)
+    {
+        $body = $request->get_params();
+        $response = $this->setupProfileController->updateDetail($request);
+        return ResponseHelper::build($response);
+    }
+
     public function setup(WP_REST_Request $request)
     {
         $validator = new ValidationHelper('setupCompanyProfile', $request->get_params());

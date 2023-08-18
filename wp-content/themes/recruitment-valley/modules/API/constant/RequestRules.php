@@ -5,6 +5,7 @@ namespace Constant;
 class RequestRules
 {
     public $rules;
+    public $sanitizeRules;
 
     public function __construct()
     {
@@ -42,6 +43,16 @@ class RequestRules
                 "companyVideo" => [], //                  https://youtube.com/watch?v=asdfasdf
                 "gallery" => []
             ],
+            'updateCompanyDetail' => [
+                "companyName" => ["required"],
+                "sector.*" => ["required"],
+                "phoneNumberCode" => ["required"],
+                "phoneNumber" => ["required"],
+                "website" => ["required", "url"],
+                "employees" => ["requred"],
+                "kvkNumber" => [],
+                "btwNumber" => [],
+            ],
             'addFavorite' => [
                 /**
                  * exists parameter : {{ 1 }}/{{ 2 }}/{{ 3 }}/{{ 4 }},{{5}}
@@ -61,6 +72,19 @@ class RequestRules
             ],
             'test' => [
                 'test.*.name' => ["required"]
+            ]
+        ];
+
+        $this->sanitizeRules = [
+            'register' => [
+                "email" => "email",
+                "password" => null,
+                "accountType" => "default"
+            ],
+            /** When using rule other than these 2. Please add following sanitize rule in Validator.php. */
+            "example" => [
+                "email" => "email",
+                "string" => "default", // Will use sanitize_text_field
             ]
         ];
     }

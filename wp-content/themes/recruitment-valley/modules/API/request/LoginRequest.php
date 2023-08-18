@@ -25,7 +25,7 @@ class LoginRequest implements MiRequest
         ];
     }
 
-    public function validate() : bool
+    public function validate(): bool
     {
         return $this->_validator->validate();
     }
@@ -35,16 +35,16 @@ class LoginRequest implements MiRequest
         return $this->_validator->sanitize();
     }
 
-    public function getData() : array
+    public function getData(): array
     {
         return $this->_validator->getData();
     }
 
-    public function getErrors() : array
+    public function getErrors(): array
     {
         return [
             "status" => 400,
-            "message" => $this->_validator->getErrors(), 
+            "message" => $this->_validator->getErrors(),
         ];
     }
 }

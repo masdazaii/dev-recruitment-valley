@@ -35,19 +35,6 @@ class VacancyTermController
 
     public function getSectorsTerm($parameters)
     {
-        /** Get Taxonomy */
-        // $taxonomies = get_object_taxonomies('vacancy', 'names');
-        // foreach ($taxonomies as $value) {
-        //     /** Get Terms each taxonomy */
-        //     $termData[$value] = $this->_setResponse($this->termModel->selectTerm($value, []));
-        // }
-
-        // return [
-        //     "status" => 200,
-        //     "message" => $this->_message->get('vacancy.term.get_term_success'),
-        //     "data" => $termData
-        // ];
-
         /** Get Term */
         $terms = get_terms([
             'taxonomy' => 'sector'

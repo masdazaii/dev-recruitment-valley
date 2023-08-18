@@ -121,6 +121,8 @@ class AuthMiddleware
         /** Change start here */
         $request->set_param('user_id', $handleToken->user_id);
         $user = get_user_by('ID', $handleToken->user_id);
+        
+        if($user === false)  return new WP_Error("rest_forbidden", $this->_message->get('auth.unauthenticate'), array("status" => 403));
 
         if (!in_array(strtolower($user->roles[0]), $allowed)) {
             return new WP_Error("rest_forbidden", $this->_message->get('auth.unauthenticate'), array("status" => 403));
