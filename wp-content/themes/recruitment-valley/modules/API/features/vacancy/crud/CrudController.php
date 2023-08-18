@@ -4,6 +4,7 @@ namespace Vacancy;
 
 use Constant\Message;
 use DateTimeImmutable;
+use JWTHelper;
 use WP_Post;
 use WP_Query;
 
@@ -329,7 +330,9 @@ class VacancyCrudController
             "application_process_step" => $request["applicationProcedureSteps"],
         ];
 
+        global $wpdb;
         try {
+            $wpdb->query('START TRANSACTION');
             $vacancyModel = new Vacancy;
             $vacancyModel->storePost($payload);
             $vacancyModel->setTaxonomy($payload["taxonomy"]);
@@ -349,11 +352,19 @@ class VacancyCrudController
             $vacancyModel->setStatus('open');
             $vacancyModel->setProp("expired_at", $expiredAt);
 
+            $this->add_expired_date_to_option([
+                'post_id' => $vacancyModel->vacancy_id,
+                'expired_at' => $expiredAt
+            ]);
+
+            $wpdb->query('COMMIT');
+
             return [
                 "status" => 201,
                 "message" => $this->_message->get("vacancy.create.paid.success"),
             ];
         } catch (\Throwable $th) {
+            $wpdb->query('ROLLBACK');
             return [
                 "status" => 500,
                 // "message" => $this->_message->get("vacancy.create.paid.fail"),
@@ -361,6 +372,7 @@ class VacancyCrudController
 
             ];
         } catch (\WP_Error $e) {
+            $wpdb->query('ROLLBACK');
             return [
                 "status" => 500,
                 "message" => $e->get_error_message(),
@@ -414,7 +426,7 @@ class VacancyCrudController
 
         return [
             "status" => 200,
-            "message" => $vacancyIsPaid ? $this->_message->get("vacancy.update.paid.success") : $this->_message->get("vacancy.update.paid.fail")
+            "message" => $vacancyIsPaid ? $this->_message->get("vacancy.update.paid.success") : $this->_message->get("vacancy.update.free.success")
         ];
     }
 
@@ -443,7 +455,15 @@ class VacancyCrudController
             "message" => $this->_message->get("vacancy.trash.success")
         ];
     }
-
+    
+    /**
+     * createVacancyPayload
+     * map payload base on free job or paid job
+     * 
+     * @param  mixed $isPaid
+     * @param  mixed $request
+     * @return array
+     */
     private function createVacancyPayload($isPaid, $request)
     {
         $payload = [];
@@ -567,5 +587,14 @@ class VacancyCrudController
             "status" => 402, 
             "message" => "post with id {$vacancy_id} successfully reposted" 
         ];
+    }
+
+    public function add_expired_date_to_option($jobExpiredAt)
+    {
+        $jobExpireDate = get_option("job_expires") ? maybe_unserialize(get_option("job_expires")) : [];
+
+        array_push( $jobExpireDate, $jobExpiredAt );
+
+        update_option("job_expires" ,maybe_serialize($jobExpireDate));
     }
 }

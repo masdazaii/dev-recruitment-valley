@@ -21,6 +21,7 @@ class Candidate
     private $isFullRegistered = "ucaa_is_full_registered";
     private $cv = "ucaa_cv";
     private $image = "ucaa_image";
+    private $favoriteJob = "favorite_vacancy";
 
     public function __construct( $user_id = false)
     {
@@ -105,6 +106,12 @@ class Candidate
     public function getLinkedinPage()
     {
         return $this->getProp($this->linkedin);
+    }
+
+    public function isFavorite( $vacancyId )
+    {
+        $favoriteJobs = get_user_meta($this->user_id, $this->favoriteJob);
+        return in_array($vacancyId, $favoriteJobs);
     }
 
     public function getProp($acf_field, $single = true)

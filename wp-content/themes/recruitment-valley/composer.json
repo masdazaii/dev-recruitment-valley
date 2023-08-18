@@ -1,6 +1,7 @@
 {
     "require": {
         "tgmpa/tgm-plugin-activation": "^2.6",
-        "firebase/php-jwt": "^6.8"
+        "firebase/php-jwt": "^6.8",
+        "stripe/stripe-php": "^10.21"
     }
 }

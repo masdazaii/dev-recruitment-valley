@@ -104,7 +104,7 @@ class Message
                 ],
                 "update" => [
                     "free" => [
-                        "success" => __("update ", THEME_DOMAIN),
+                        "success" => __("Update free job successfully", THEME_DOMAIN),
                         "fail" => __("Error creating free job", THEME_DOMAIN),
                     ],
                     "paid" => [
@@ -162,7 +162,7 @@ class Message
                     "get_image_success" => __("Success get company image.", THEME_DOMAIN),
                 ]
             ],
-            'payment' => [
+            'package' => [
                 "package" => [
                     "get_success" => __("Success get all package.", THEME_DOMAIN),
                     "show_success" => __("Success get package.", THEME_DOMAIN),
@@ -178,6 +178,11 @@ class Message
                         "get_success" => __('Success get employees total option.', THEME_DOMAIN),
                     ]
                 ]
+            ], 
+            "package" => [
+                "purchase" => [
+                    'success' => __("Success creating payment url", THEME_DOMAIN), 
+                ], 
             ]
         ];
     }

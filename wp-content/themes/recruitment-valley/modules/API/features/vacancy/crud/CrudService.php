@@ -3,6 +3,7 @@
 namespace Vacancy;
 
 use BD\Emails\Email;
+use JWTHelper;
 use Request\CandidateVacanciesRequest;
 use Request\CreateFreeJobRequest;
 use Request\CreatePaidJobRequest;
@@ -51,6 +52,7 @@ class VacancyCrudService
 
     public function get(WP_REST_Request $request)
     {
+        $tokenPayload = JWTHelper::has($request);
         $singleVacancyRequest = new SingleVacancyRequest($request);
         if(!$singleVacancyRequest->validate())
         {

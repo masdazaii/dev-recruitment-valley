@@ -2,6 +2,7 @@
 
 namespace Vacancy;
 
+use Candidate\Profile\Candidate;
 use DateTime;
 use DateTimeImmutable;
 use Model\Company;
@@ -12,9 +13,16 @@ class VacancyResponse
 {
     public $vacancyCollection;
 
+    private $userPayload;
+
     public function setCollection($vacancyCollection)
     {
         $this->vacancyCollection = $vacancyCollection;
+    }
+
+    public function setUserPayload( $payload )
+    {
+        $this->userPayload = $payload;
     }
 
     public function format()
@@ -50,6 +58,8 @@ class VacancyResponse
     public function formatSingle()
     {
         $vacancyModel = new Vacancy($this->vacancyCollection->ID);
+        
+        $candidate = $this->userPayload ? new Candidate($this->userPayload->user_id) : null;
 
         $company = new Company($this->vacancyCollection->post_author);
         $vacancyTaxonomy = $vacancyModel->getTaxonomy(false);
@@ -69,6 +79,7 @@ class VacancyResponse
         $formattedResponse = [
             "id" => $this->vacancyCollection->ID,
             "isPaid" => $vacancyModel->getIsPaid(),
+            "isFavorite" => $candidate ? $candidate->isFavorite( $this->vacancyCollection->post_author ) : false,
             "shortDescription" => $vacancyTaxonomy,
             "title" => $this->vacancyCollection->post_title,
             "company" =>  [
