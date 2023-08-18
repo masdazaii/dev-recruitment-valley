@@ -128,4 +128,25 @@ class AuthMiddleware
 
         return true;
     }
+
+    public function logout_handle(WP_REST_Request $request)
+    {
+        $token = $request->get_header('Authorization');
+
+        if ($token == "") {
+            return new WP_Error("rest_forbidden", $this->_message->get('auth.invalid_token'), array("status" => 403));
+        }
+        try {
+            $decodedToken = JWT::decode($token, new Key(JWT_SECRET, "HS256"));
+            $request->set_param('user_id', $decodedToken->user_id);
+
+            return $decodedToken;
+        } catch (ExpiredException $e) {
+            $request->set_param('user_id', $decodedToken->user_id);
+
+            return true;
+        } catch (UnexpectedValueException $e) {
+            return new WP_Error("rest_forbidden", $this->_message->get('auth.invalid_token'), array("status" => 403));
+        }
+    }
 }

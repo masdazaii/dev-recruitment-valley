@@ -14,15 +14,14 @@ class LoginService
 
     public function __construct()
     {
-    
+
         $this->loginController = new LoginController;
     }
 
     public function login(WP_REST_Request $request)
     {
         $loginRequest = new LoginRequest($request);
-        if(!$loginRequest->validate())
-        {
+        if (!$loginRequest->validate()) {
             $errors = $loginRequest->getErrors();
             return ResponseHelper::build($errors);
         }
@@ -35,23 +34,22 @@ class LoginService
 
     public function logout(WP_REST_Request $request)
     {
-        $body = $request->get_header('Authorization');
+        $body = $request->get_params();
         $response = $this->loginController->logout($body);
         return ResponseHelper::build($response);
     }
 
-    public function forgotPassword( WP_REST_Request $request )
+    public function forgotPassword(WP_REST_Request $request)
     {
         $forgotPasswordRequest = new ForgotPasswordRequest($request);
-        if(!$forgotPasswordRequest->validate())
-        {
+        if (!$forgotPasswordRequest->validate()) {
             $errors = $forgotPasswordRequest->getErrors();
             return ResponseHelper::build($errors);
         }
 
         $forgotPasswordRequest->sanitize();
         $body = $forgotPasswordRequest->getData();
-        
+
         $response = $this->loginController->forgot_password($body);
         return ResponseHelper::build($response);
     }
@@ -62,5 +60,4 @@ class LoginService
         $response = $this->loginController->reset_password($body);
         return ResponseHelper::build($response);
     }
-
 }

@@ -68,9 +68,9 @@ class ContactController
             update_field('email', $request['email'], $contactID);
         }
 
-        // /** Send email to admin */
+        /** Send email to admin */
         $adminEmail = get_option('admin_email');
-        // // $adminHeaders[] = 'From: ' . $request['email'] . '<' . $request['email']  . '>';
+        // $adminHeaders[] = 'From: ' . $request['email'] . '<' . $request['email']  . '>';
         $subject = 'NEW MESSAGE - ';
         $body = $request['message'];
         $body .= '<hr>';

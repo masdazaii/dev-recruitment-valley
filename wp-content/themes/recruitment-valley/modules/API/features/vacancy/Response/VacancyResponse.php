@@ -6,6 +6,7 @@ use DateTime;
 use DateTimeImmutable;
 use Model\Company;
 use WP_Post;
+use Helper\StringHelper;
 
 class VacancyResponse
 {
@@ -52,6 +53,19 @@ class VacancyResponse
 
         $company = new Company($this->vacancyCollection->post_author);
         $vacancyTaxonomy = $vacancyModel->getTaxonomy(false);
+
+        /** Set social media response */
+        $socialMedia = ["facebook", "linkedin", "instagram", "twitter"];
+
+        $socialMediaResponse = [];
+        foreach ($socialMedia as $key => $socmed) {
+            $socialMediaResponse[$key] = [
+                "id" => $key + 1,
+                "type" => $socmed,
+                "url" => $company->getSocialMedia($socmed)
+            ];
+        }
+
         $formattedResponse = [
             "id" => $this->vacancyCollection->ID,
             "isPaid" => $vacancyModel->getIsPaid(),
@@ -67,12 +81,13 @@ class VacancyResponse
                 "totalEmployee" => $company->getTotalEmployees(),
                 "tel" => $company->getPhoneCode() . $company->getPhone(),
                 "email" => $company->getEmail(),
-                "socialMedia" => [
-                    "facebook" => $company->getFacebook(),
-                    "twitter" => $company->getTwitter(),
-                    "linkedin" => $company->getLinkedin(),
-                    "instagram" => $company->getInstagram(),
-                ],
+                // "socialMedia" => [
+                //     "facebook" => $company->getFacebook(),
+                //     "twitter" => $company->getTwitter(),
+                //     "linkedin" => $company->getLinkedin(),
+                //     "instagram" => $company->getInstagram(),
+                // ],
+                "socialMedia" => $socialMediaResponse,
                 "website" => $company->getWebsite()
             ], // later get company here
             "contents" => [
@@ -126,7 +141,7 @@ class VacancyResponse
                 "slug" => $vacancy->post_name,
                 "name" => $vacancy->post_title,
                 "thumbnail" => $vacancyModel->getThumbnail(),
-                "description" => $vacancyModel->getDescription(),
+                "description" => $vacancyModel->getDescription() !== "" ? StringHelper::shortenString($vacancyModel->getDescription(), 0, 500, '...') : "",
                 "status" => $vacancyTaxonomy['status'][0]['name'] ?? null,
                 "jobPostedDate" => $vacancy->post_date,
             ];

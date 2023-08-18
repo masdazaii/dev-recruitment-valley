@@ -63,62 +63,62 @@ class ProfileController
         }
         /** Added line End here */
 
-        $socialMedia = [
-            [
-                "type" => "facebook",
-                "url" => "ucma_facebook_url"
-            ],
-            [
-                "type" => "linkedin",
-                "url" => "ucma_linkedin_url"
-            ],
-            [
-                "type" => "instagram",
-                "url" => "ucma_instagram_url"
-            ],
-            [
-                "type" => "twitter",
-                "url" => "ucma_twitter_url"
-            ],
-        ];
+        // $socialMedia = [
+        //     [
+        //         "type" => "facebook",
+        //         "url" => "ucma_facebook_url"
+        //     ],
+        //     [
+        //         "type" => "linkedin",
+        //         "url" => "ucma_linkedin_url"
+        //     ],
+        //     [
+        //         "type" => "instagram",
+        //         "url" => "ucma_instagram_url"
+        //     ],
+        //     [
+        //         "type" => "twitter",
+        //         "url" => "ucma_twitter_url"
+        //     ],
+        // ];
 
-        $socialMediaResponse = [];
-        foreach ($socialMedia as $key => $socmed) {
-            $socialMediaResponse[$key] = [
-                "id" => $key+1,
-                "type" => $socmed["type"],
-                "url" => Helper::isset($user_data_acf, $socmed["url"])
-            ];
-        }
+        // $socialMediaResponse = [];
+        // foreach ($socialMedia as $key => $socmed) {
+        //     $socialMediaResponse[$key] = [
+        //         "id" => $key + 1,
+        //         "type" => $socmed["type"],
+        //         "url" => Helper::isset($user_data_acf, $socmed["url"])
+        //     ];
+        // }
 
         return [
             'detail' => [
                 'email' => Helper::isset($user_data, 'user_email'),
-                'phoneNumber' => Helper::isset($user_data_acf, 'ucma_phone_code') . " " . Helper::isset($user_data_acf, 'ucma_phone'),
                 'address' => Helper::isset($user_data_acf, 'ucma_city') . ", " . Helper::isset($user_data_acf, 'ucma_country'),
                 'kvk' => Helper::isset($user_data_acf, 'ucma_kvk_number'),
+                // 'phoneNumber' => Helper::isset($user_data_acf, 'ucma_phone_code') . " " . Helper::isset($usxer_data_acf, 'ucma_phone'), // Changed, look below
                 // 'sector' => Helper::isset($user_data_acf, 'ucma_sector'), // Changed, look below
                 'website' => Helper::isset($user_data_acf, 'ucma_website_url'),
                 'employees' => Helper::isset($user_data_acf, 'ucma_employees'),
                 'btw' => Helper::isset($user_data_acf, 'ucma_btw_number'),
 
                 /** Added/Changed Line start here */
+                'phoneNumberCode' => Helper::isset($user_data_acf, 'ucma_phone_code'), // Changed, look below
+                'phoneNumber' => Helper::isset($user_data_acf, 'ucma_phone'), // Changed, look below
                 'sector' => $termsResponse,
-                'companyName' => Helper::isset($user_data_acf, 'ucma_company_name'), // Added Line
-                'image' => $image, // Added line
+                'companyName' => Helper::isset($user_data_acf, 'ucma_company_name'),
+                'image' => $image,
                 /** Added Line end here */
             ],
-            'socialMedia' => $socialMediaResponse, 
-            // [
-
-            //     'facebook' => Helper::isset($user_data_acf, 'ucma_facebook_url'),
-            //     'linkedin' => Helper::isset($user_data_acf, 'ucma_linkedin_url'),
-            //     'instagram' => Helper::isset($user_data_acf, 'ucma_instagram_url'),
-            //     'twitter' => Helper::isset($user_data_acf, 'ucma_twitter_url')
-            // ],
+            'socialMedia' => [
+                'facebook' => Helper::isset($user_data_acf, 'ucma_facebook_url'),
+                'linkedin' => Helper::isset($user_data_acf, 'ucma_linkedin_url'),
+                'instagram' => Helper::isset($user_data_acf, 'ucma_instagram_url'),
+                'twitter' => Helper::isset($user_data_acf, 'ucma_twitter_url')
+            ],
             'address' => [
                 'country' => Helper::isset($user_data_acf, 'ucma_country'),
-                'streetname' => Helper::isset($user_data_acf, 'ucma_street'),
+                'street' => Helper::isset($user_data_acf, 'ucma_street'),
                 'city' => Helper::isset($user_data_acf, 'ucma_city'),
                 'postcode' => Helper::isset($user_data_acf, 'ucma_postcode'),
             ],

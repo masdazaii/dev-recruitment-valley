@@ -35,19 +35,18 @@ class Company
     public function __construct($userId = false)
     {
         $this->vacancyModel = new Vacancy;
-        if($userId)
-        {
+        if ($userId) {
             $this->user_id = $userId;
             $this->user = get_user_by('id', $this->user_id);
         }
     }
 
-    public function setUserId( $userId )
+    public function setUserId($userId)
     {
         $this->user_id = $userId;
     }
 
-    public function getVacancyByStatus( $status )
+    public function getVacancyByStatus($status)
     {
         $args = [
             "post_type" => $this->vacancyModel->vacancy,
@@ -57,13 +56,13 @@ class Company
                 [
                     'taxonomy' => 'status',
                     'field' => 'slug',
-                    'terms' => array( $status ),
+                    'terms' => array($status),
                     'operator' => 'IN'
                 ],
             ],
         ];
 
-        $vacancies = new WP_Query( $args );
+        $vacancies = new WP_Query($args);
 
         return $vacancies->found_posts;
     }
@@ -130,13 +129,12 @@ class Company
     public function getGallery()
     {
         $gallery = $this->getProp($this->gallery);
-        
-        if(!$gallery)
-        {
+
+        if (!$gallery) {
             return [];
         }
-        
-        $gallery = array_map(function($attachmentId){
+
+        $gallery = array_map(function ($attachmentId) {
             return wp_get_attachment_url($attachmentId);
         }, $gallery);
 
@@ -148,9 +146,24 @@ class Company
         return $this->getProp($this->videoUrl);
     }
 
-    public function getProp( $acf_field, $single = false)
+    public function getProp($acf_field, $single = false)
     {
-        return get_field($acf_field, "user_".$this->user_id, $single);
+        return get_field($acf_field, "user_" . $this->user_id, $single);
     }
 
+    public function getSocialMedia(String $platform)
+    {
+        switch ($platform) {
+            case "facebook":
+                return $this->getFacebook() ?? '';
+            case "twitter":
+                return $this->getTwitter() ?? '';
+            case "linkedin":
+                return $this->getLinkedin() ?? '';
+            case "instagram":
+                return $this->getInstagram() ?? '';
+            default:
+                return '';
+        }
+    }
 }
