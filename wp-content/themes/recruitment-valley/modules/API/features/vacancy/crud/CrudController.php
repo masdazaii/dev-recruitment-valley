@@ -5,6 +5,7 @@ namespace Vacancy;
 use Constant\Message;
 use DateTimeImmutable;
 use JWTHelper;
+use Model\Company;
 use WP_Post;
 use WP_Query;
 
@@ -257,7 +258,6 @@ class VacancyCrudController
 
         try {
             $vacancyModel = new Vacancy;
-
             $vacancyModel->storePost($payload);
             $vacancyModel->setTaxonomy($payload["taxonomy"]);
             $vacancyModel->setProp($vacancyModel->acf_placement_city, $payload["city"]);
@@ -334,6 +334,14 @@ class VacancyCrudController
         try {
             $wpdb->query('START TRANSACTION');
             $vacancyModel = new Vacancy;
+
+            // paid job validation
+            $company = new Company( $payload["user_id"] );
+            $companyCredit = $company->getCredit();
+            $paidJobPrice = 1;
+            if($companyCredit < $paidJobPrice) return [ "status" => 402, "message" => "Your credit is insufficient." ];
+            //end job validation 
+
             $vacancyModel->storePost($payload);
             $vacancyModel->setTaxonomy($payload["taxonomy"]);
 
@@ -356,6 +364,10 @@ class VacancyCrudController
                 'post_id' => $vacancyModel->vacancy_id,
                 'expired_at' => $expiredAt
             ]);
+
+            // charge credit
+            $companyCredit -= $paidJobPrice;
+            $company->setCredit($companyCredit);
 
             $wpdb->query('COMMIT');
 
@@ -551,12 +563,14 @@ class VacancyCrudController
 
         // total credit
         // TODO : get total current credit
-        $job_credit = 3;
+        $company = new Company($user_id);
+        $job_credit = $company->getCredit();
+
         // TODO : get credit per 1 time repost
         $credit_per_post = 1;
         
         // return 402 if credit is insufficient
-        if($job_credit <= 0) return [ "status" => 402, "message" => "Your credit is insufficient." ];
+        if($job_credit < $credit_per_post) return [ "status" => 402, "message" => "Your credit is insufficient." ];
 
         // get status vacancies
         $status = $vacancy->getStatus();
@@ -578,9 +592,14 @@ class VacancyCrudController
         $date_expired = $date_expired->modify("+30 days")->format("Y-m-d H:i:s");
         update_field('expired_at', $date_expired,$vacancy_id);
 
+        // add expired at date and post into option to make it works in cron
+        $this->add_expired_date_to_option(["post_id" => $vacancy_id, "expired_at" => $date_expired]);
+
         // reduce credit
         $job_credit -= $credit_per_post;
+        
         // TODO : update total credit
+        $company->setCredit($job_credit);
 
         // return status 200
         return [ 
