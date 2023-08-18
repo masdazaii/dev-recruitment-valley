@@ -502,4 +502,26 @@ class VacancyCrudController
 
         return $payload;
     }
+    
+    /**
+     * repost
+     *
+     * @param  mixed $request
+     * @return array
+     */
+    public function repost($request) : array
+    {
+        $vacancy_id = $request['vacancy_id'];
+
+        // return 400 if post id not found
+        if(get_post_status( $vacancy_id ) === false)   return [ "status" => 400, "message" => "invalid post" ];
+
+        // total credit
+        $job_credit = 10;
+        
+        // return 402 if credit is insufficient
+        if($job_credit <= 0) return [ "status" => 402, "message" => "Your credit is insufficient." ];
+
+        
+    }
 }
