@@ -10,6 +10,7 @@ use Request\CreatePaidJobRequest;
 use Request\SingleVacancyRequest;
 use ResponseHelper;
 use WP_REST_Request;
+use WP_REST_Response;
 
 class VacancyCrudService
 {
@@ -35,7 +36,16 @@ class VacancyCrudService
         $params = $getAllRequest->getData();
         $response = $this->vacancyCrudController->getAll($params);
         $this->vacancyResponse->setCollection($response["data"]);
+
         $formattedResponse = $this->vacancyResponse->format();
+        
+        if(isset($params['placementAddress'])) {
+            if($params['placementAddress'] !== "") {
+                $formattedResponse = $this->vacancyCrudController->getAllByLocations($formattedResponse, $params);
+            }
+        }
+
+
         $response["data"] = $formattedResponse;
         return ResponseHelper::build($response);
     }
@@ -103,6 +113,9 @@ class VacancyCrudService
     {
         $params = $request->get_params();
         $params["user_id"] = $request["user_id"];
+
+        if(get_post_status( $params['vacancy_id']) === false) return ResponseHelper::build(['status' => 400, 'message' => 'invalid post']);
+
         $response = $this->vacancyCrudController->update( $params );
         return ResponseHelper::build($response);
     }
@@ -133,5 +146,19 @@ class VacancyCrudService
             $content = Email::render_html_email('confirmation-jobpost-company.php', $args);
             wp_mail($user->user_email, "Bevestiging plaatsing vacature - $site_title", $content, $headers);
         }
+    }
+    
+    
+    
+    /**
+     * repostJob
+     *
+     * @param  mixed $request
+     * @return WP_REST_Response
+     */
+    public function repostJob(WP_REST_Request $request) : WP_REST_Response {
+        $params = $request->get_params();
+        $response = $this->vacancyCrudController->repost($params);
+        return ResponseHelper::build( $response );
     }
 }

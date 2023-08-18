@@ -291,7 +291,13 @@ class Vacancy
     public function getStatus()
     {
         $status = get_the_terms($this->vacancy_id, 'status');
-        return $status;
+
+        if(isset($status[0])) {
+
+            return ['term_id' =>  $status[0]->term_id, 'name' =>  $status[0]->name];
+        }
+
+        return ['term_id' => 0, 'name' =>  ""];
     }
 
     public function getReviews()
