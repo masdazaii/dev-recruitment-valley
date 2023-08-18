@@ -176,6 +176,11 @@ class Message
                         "get_success" => __('Success get employees total option.', THEME_DOMAIN),
                     ]
                 ]
+            ], 
+            "package" => [
+                "purchase" => [
+                    'success' => __("Success creating payment url", THEME_DOMAIN), 
+                ], 
             ]
         ];
     }

@@ -45,8 +45,15 @@ class PackageService
         return ResponseHelper::build($response);
     }
 
-    public function purchase( WP_REST_Request $request )
+    public function createPaymentUrl( WP_REST_Request $request )
     {
-        return $this->_packageController->purchase($request);
+        $response = $this->_packageController->createPaymentUrl($request);
+        return ResponseHelper::build($response);
+    }
+
+    public function purchase(WP_REST_Request $request)
+    {
+        $response = $this->_packageController->purchase($request);
+        return ResponseHelper::build($response);
     }
 }

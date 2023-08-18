@@ -86,8 +86,14 @@ class GlobalEndpoint
                     'permission_callback'   => [$authMiddleware, 'authorize_company'],
                     'callback'              => [$paymentService, 'get']
                 ],
-                'purchase_package' => [
-                    'url'                   => '/package',
+                'create_payment_package' => [
+                    'url'                   => 'package/create-payment-link',
+                    'methods'               => 'POST',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company'],
+                    'callback'              => [$paymentService, 'createPaymentUrl']
+                ],
+                "purchase_package" => [
+                    'url'                   => 'package/purchase',
                     'methods'               => 'POST',
                     'permission_callback'   => [$authMiddleware, 'authorize_company'],
                     'callback'              => [$paymentService, 'purchase']

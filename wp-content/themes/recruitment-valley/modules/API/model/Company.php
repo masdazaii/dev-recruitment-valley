@@ -32,6 +32,8 @@ class Company
     private $videoUrl = "ucma_company_video_url";
     private $gallery = "ucma_gallery_photo";
 
+    private $credit = "company_credit";
+
     public function __construct($userId = false)
     {
         $this->vacancyModel = new Vacancy;
@@ -72,6 +74,11 @@ class Company
     {
         $attachment_id = $this->getProp($this->image);
         return wp_get_attachment_url($attachment_id) ? wp_get_attachment_url($attachment_id) : null;
+    }
+
+    public function getId()
+    {
+        return $this->user_id;
     }
 
     public function getName()
@@ -152,5 +159,28 @@ class Company
     {
         return get_field($acf_field, "user_".$this->user_id, $single);
     }
+    
+    /**
+     * grant
+     * granting spesific credit to company base on package that already bought
+     * 
+     * @param  mixed $totalCredit
+     * @return void
+     */
+    public function grant( $totalCredit )
+    {
+        $currentCredit = $this->getCredit() != "" || $this->getCredit() != false ? $this->getCredit() : 0;
+        $currentCredit += (int) $totalCredit;
+        return $this->setCredit($currentCredit);
+    }
 
+    public function getCredit()
+    {
+        return get_user_meta($this->user_id, $this->credit, true);
+    }
+
+    public function setCredit( $total )
+    {
+        return update_user_meta($this->user_id, $this->credit, $total);
+    }
 }
