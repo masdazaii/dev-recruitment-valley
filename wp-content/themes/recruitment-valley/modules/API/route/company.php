@@ -29,6 +29,12 @@ class CompanyEndpoint
         $endpoint = [
             'path'  => 'company',
             'endpoints' => [
+                'repost_job' => [
+                    'url'                   =>  'vacancy/repost/(?P<vacancy_id>[-\w]+)',
+                    'methods'               =>  'POST',
+                    'permission_callback'   =>  [$authMiddleware, 'authorize_company'],
+                    'callback'              =>  [$vacancyCrudService, 'repostJob']
+                ],
                 'create_free_job' => [
                     'url'                   =>  'vacancy/free',
                     'methods'               =>  'POST',

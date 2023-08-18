@@ -288,11 +288,17 @@ class Vacancy
         return $this->getProp($this->acf_country);
     }
 
-    // public function getStatus()
-    // {
-    //     $status = get_the_terms($this->vacancy_id, 'status');
-    //     return $status;
-    // }
+    public function getStatus()
+    {
+        $status = get_the_terms($this->vacancy_id, 'status');
+
+        if(isset($status[0])) {
+
+            return ['term_id' =>  $status[0]->term_id, 'name' =>  $status[0]->name];
+        }
+
+        return ['term_id' => 0, 'name' =>  ""];
+    }
 
     public function getReviews()
     {
