@@ -8,21 +8,21 @@ use ResponseHelper;
 use Constant\Message;
 use Helper\ValidationHelper;
 
-class PaymentService
+class PackageService
 {
     protected $_message;
-    private $_paymentController;
+    private $_packageController;
 
     public function __construct()
     {
         $this->_message = new Message();
-        $this->_paymentController = new PaymentController;
+        $this->_packageController = new PackageController;
     }
 
     public function get(WP_REST_Request $request)
     {
         $params = $request->get_params();
-        $response = $this->_paymentController->get($params);
+        $response = $this->_packageController->get($params);
         return ResponseHelper::build($response);
     }
 
@@ -41,7 +41,19 @@ class PaymentService
         $validator->tempSanitize();
         $params = $validator->getData();
 
-        $response = $this->_paymentController->show($params);
+        $response = $this->_packageController->show($params);
+        return ResponseHelper::build($response);
+    }
+
+    public function createPaymentUrl( WP_REST_Request $request )
+    {
+        $response = $this->_packageController->createPaymentUrl($request);
+        return ResponseHelper::build($response);
+    }
+
+    public function purchase(WP_REST_Request $request)
+    {
+        $response = $this->_packageController->purchase($request);
         return ResponseHelper::build($response);
     }
 }

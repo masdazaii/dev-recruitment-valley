@@ -62,6 +62,26 @@ class JWTHelper
             ];
         }
     }
+
+    public static function has(WP_REST_Request $request)
+    {
+        $token = $request->get_header("Authorization");
+        
+        if(!$token)
+        {
+            return false;
+        }
+
+        try {
+            $decodedToken = JWT::decode($token, new Key(JWT_SECRET, "HS256"));
+
+            return $decodedToken;
+        } catch (ExpiredException $e) {
+            return false;
+        } catch (UnexpectedValueException $e) {
+            return false;
+        }
+    }
 }
 
 new JWTHelper();

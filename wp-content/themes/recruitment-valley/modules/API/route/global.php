@@ -3,15 +3,13 @@
 namespace Route;
 
 use Global\LoginService;
-use Global\RegistrationService;
 use Global\ContactService;
-use Global\PaymentService;
 use Global\OptionService;
 use Middleware\AuthMiddleware;
-use RefreshToken\RefreshTokenService;
 use Vacancy\VacancyCrudService;
 use Vacancy\Term\VacancyTermService;
 use Candidate\Profile\FavoriteVacancyService;
+use Global\PackageService;
 
 class GlobalEndpoint
 {
@@ -32,7 +30,7 @@ class GlobalEndpoint
         $crudVacancyService = new VacancyCrudService;
         $termVacancyService = new VacancyTermService;
         $favoriteVacancyService = new FavoriteVacancyService;
-        $paymentService = new PaymentService;
+        $paymentService = new PackageService;
         $optionService = new OptionService;
         $authMiddleware = new AuthMiddleware;
 
@@ -85,13 +83,25 @@ class GlobalEndpoint
                 'get_payment_package' => [
                     'url'                   => '/packages',
                     'methods'               => 'GET',
-                    'permission_callback'   => '__return_true',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company'],
                     'callback'              => [$paymentService, 'get']
+                ],
+                'create_payment_package' => [
+                    'url'                   => 'package/create-payment-link',
+                    'methods'               => 'POST',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company'],
+                    'callback'              => [$paymentService, 'createPaymentUrl']
+                ],
+                "purchase_package" => [
+                    'url'                   => 'package/purchase',
+                    'methods'               => 'POST',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company'],
+                    'callback'              => [$paymentService, 'purchase']
                 ],
                 'show_payment_package' => [
                     'url'                   => '/packages/(?P<slug>[-\w]+)',
                     'methods'               => 'GET',
-                    'permission_callback'   => '__return_true',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company'],
                     'callback'              => [$paymentService, 'show']
                 ],
                 'get_sector_term' => [

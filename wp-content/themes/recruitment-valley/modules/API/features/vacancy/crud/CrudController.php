@@ -4,6 +4,7 @@ namespace Vacancy;
 
 use Constant\Message;
 use DateTimeImmutable;
+use JWTHelper;
 use WP_Post;
 use WP_Query;
 
@@ -414,7 +415,7 @@ class VacancyCrudController
 
         return [
             "status" => 200,
-            "message" => $vacancyIsPaid ? $this->_message->get("vacancy.update.paid.success") : $this->_message->get("vacancy.update.paid.fail")
+            "message" => $vacancyIsPaid ? $this->_message->get("vacancy.update.paid.success") : $this->_message->get("vacancy.update.free.success")
         ];
     }
 
