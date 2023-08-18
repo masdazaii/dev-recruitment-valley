@@ -42,21 +42,23 @@ class CronCustomize
         error_log("[notify][expired +5 days] today is " . date('Y-m-d'));
         error_log("[notify][expired +5 days] will expired at " . $dateFiveAfter);
 
-        $expired_posts = [
-            [
-                'post_id' => 308,
-                'expired_at' => '2023-08-21 04:11:00'
-            ],
-            [
-                'post_id' => 291,
-                'expired_at' => get_field('expired_at', 291),
-            ]
-        ];
+        // $expired_posts = [
+        //     [
+        //         'post_id' => 308,
+        //         'expired_at' => '2023-08-21 04:11:00'
+        //     ],
+        //     [
+        //         'post_id' => 291,
+        //         'expired_at' => get_field('expired_at', 291),
+        //     ]
+        // ];
+
+        $expired_posts = maybe_unserialize(get_option('job_expires'));
 
         $expired_posts_already = array_filter($expired_posts, function ($el) use($dateToday) {
             $time = strtotime($el['expired_at']);
             $date = date('Y-m-d', $time);
-            return $date == $dateToday;
+            return $time <= time();
         });
 
         $not_expired_posts = array_filter($expired_posts, function ($el) use ($dateToday) {
@@ -76,6 +78,8 @@ class CronCustomize
 
         foreach($expired_posts as $in => $the_post)
         {
+            error_log("already expired ". $the_post['post_id'] ." ".$the_post['expired_at']);
+
             $post = get_post($the_post['post_id']);
             $user = get_user_by('id', $post->post_author);
             
@@ -100,13 +104,16 @@ class CronCustomize
 
         
         $this->_expired_posts_handle($expired_posts_already);
-        // update_option('meta_key', $not_expired_posts);
+
+        update_option('job_expires', $not_expired_posts);
     }
 
     private function _expired_posts_handle($expired_posts = [])
     {
         foreach($expired_posts as $in => $the_post)
         {
+            error_log( "expired post ". $the_post["post_id"] ." ". $the_post["expired_at"] );
+
             $post = get_post($the_post['post_id']);
             $user = get_user_by('id', $post->post_author);
 
