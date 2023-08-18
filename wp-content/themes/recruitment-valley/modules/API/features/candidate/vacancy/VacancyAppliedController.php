@@ -26,6 +26,39 @@ class VacancyAppliedController
         $expiredAt = new DateTime($vacancy->getExpiredAt());
         $now = new DateTime();
 
+        $applicantArgs = [
+            "post_type" => "applicants",
+            "post_status" => "publish",
+            "numberposts" => -1,
+            "meta_query" => [
+                "relation" => "AND",
+                [
+                    "key" => "applicant_candidate",
+                    "value" => $request['user_id'],
+                    "compare" => "="
+                ],
+                [
+                    "key" => "applicant_vacancy",
+                    "value" => $request['vacancy'],
+                    "compare" => "="
+                ]
+            ]
+        ];
+
+        $applicants = get_posts($applicantArgs);
+
+        echo '<pre>';
+        var_dump($applicants);
+        echo '</pre>';die;
+        
+        if($applicants > 0)
+        {
+            return [
+                "status" => 400,
+                "message" => "You already apply to this job "
+            ];
+        }
+
         if ($now > $expiredAt) {
             return [
                 "status" => 400,
