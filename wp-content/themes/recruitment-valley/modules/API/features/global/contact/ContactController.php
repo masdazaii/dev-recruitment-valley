@@ -17,56 +17,56 @@ class ContactController
 
     public function sendContact(array $request, String $from)
     {
-        // $validate = $this->_validate_request($request, $from);
+        $validate = $this->_validate_request($request, $from);
 
-        // if (!$validate['is_valid']) {
-        //     return [
-        //         "message"    => $this->_message->get('input.invalid_input'),
-        //         "errors"    => $validate['errors'],
-        //         "status" => 400
-        //     ];
-        // }
+        if (!$validate['is_valid']) {
+            return [
+                "message"    => $this->_message->get('input.invalid_input'),
+                "errors"    => $validate['errors'],
+                "status" => 400
+            ];
+        }
 
-        // $arguments = [
-        //     'post_name'     => $permalink ?? '',
-        //     'post_title'    => ($from === 'company' ? $request['companyName'] . ' - ' . $request['name'] : $request['firstName'] . ' ' . $request['lastName']),
-        //     'post_content'  => $request['message'],
-        //     'post_date'     => date('Y-m-d H:i:s', time()),
-        //     'post_date_gmt' => gmdate('Y-m-d H:i:s', time()),
-        //     'post_status'   => 'publish',
-        //     'ping_status'   => 'closed',
-        //     'post_parent'   => 0,
-        //     'post_author'   => get_current_user_id(),
-        //     'post_type'     => 'contacts',
-        //     'comment_status' => 'closed',
-        //     'page_template'  => 'default'
-        // ];
+        $arguments = [
+            'post_name'     => $permalink ?? '',
+            'post_title'    => ($from === 'company' ? $request['companyName'] . ' - ' . $request['name'] : $request['firstName'] . ' ' . $request['lastName']),
+            'post_content'  => $request['message'],
+            'post_date'     => date('Y-m-d H:i:s', time()),
+            'post_date_gmt' => gmdate('Y-m-d H:i:s', time()),
+            'post_status'   => 'publish',
+            'ping_status'   => 'closed',
+            'post_parent'   => 0,
+            'post_author'   => get_current_user_id(),
+            'post_type'     => 'contacts',
+            'comment_status' => 'closed',
+            'page_template'  => 'default'
+        ];
 
-        // $contactID = wp_insert_post($arguments, false, true);
+        $contactID = wp_insert_post($arguments, false, true);
 
-        // if (!$contactID) {
-        //     return [
-        //         "message"    => $this->_message->get('input.failed_to_store'),
-        //         "status" => 400
-        //     ];
-        // }
+        if (!$contactID) {
+            return [
+                "message"    => $this->_message->get('input.failed_to_store'),
+                "status" => 400
+            ];
+        }
 
-        // /** Set contact meta */
-        // update_field('contact_sender_role', $from, $contactID);
+        /** Set contact meta */
+        update_field('contact_sender_role', $from, $contactID);
 
-        // if ($from === 'company') {
-        //     update_field('company_name', $request['companyName'], $contactID);
-        //     update_field('company_sender_name', $request['name'], $contactID);
-        // } else {
-        //     update_field('job_seeker_first_name', $request['firstName'], $contactID);
-        //     update_field('job_seeker_last_name', $request['lastName'], $contactID);
-        // }
-        // update_field('phone_number', $request['phoneNumber'], $contactID);
-        // update_field('phone_number_code_area', $request['phoneNumberCode'], $contactID);
+        if ($from === 'company') {
+            update_field('company_name', $request['companyName'], $contactID);
+            update_field('company_sender_name', $request['name'], $contactID);
+        } else {
+            update_field('job_seeker_first_name', $request['firstName'], $contactID);
+            update_field('job_seeker_last_name', $request['lastName'], $contactID);
+        }
+        update_field('phone_number', $request['phoneNumber'], $contactID);
+        update_field('phone_number_code_area', $request['phoneNumberCode'], $contactID);
 
-        // if ($request['email']) {
-        //     update_field('email', $request['email'], $contactID);
-        // }
+        if ($request['email']) {
+            update_field('email', $request['email'], $contactID);
+        }
 
         // /** Send email to admin */
         $adminEmail = get_option('admin_email');

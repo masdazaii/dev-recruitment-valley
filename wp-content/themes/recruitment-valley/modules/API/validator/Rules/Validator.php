@@ -16,12 +16,14 @@ class Validator
 {
     private $data;
     private $rules;
+    private $_sanitizeRules;
     private $errors;
 
-    public function __construct(array $data, array $rules)
+    public function __construct(array $data, array $rules, array $sanitizeRules = [])
     {
         $this->data = $data;
         $this->rules = $rules;
+        $this->_sanitizeRules = $sanitizeRules;
         $this->errors = [];
     }
 
@@ -170,40 +172,84 @@ class Validator
     /** Temporary sanitize only for setup company */
     public function tempSanitize()
     {
-        $sanitizedData = [];
+        /** Old Sanitize start here */
+        // $sanitizedData = [];
 
-        if (array_key_exists('user_id', $this->data)) {
-            $sanitizedData['user_id'] = $this->data['user_id'];
-        }
+        // if (array_key_exists('user_id', $this->data)) {
+        //     $sanitizedData['user_id'] = $this->data['user_id'];
+        // }
 
-        foreach ($this->rules as $field => $rules) {
-            /** Set rule real field */
-            if (strpos($field, '.*') !== false) {
-                $theField = substr($field, 0, -2);
-            } else {
-                $theField = $field;
-            }
+        // foreach ($this->rules as $field => $rules) {
+        //     /** Set rule real field */
+        //     if (strpos($field, '.*') !== false) {
+        //         $theField = substr($field, 0, -2);
+        //     } else {
+        //         $theField = $field;
+        //     }
 
-            /** Check if request key exist */
-            if (strpos($field, '.*') !== false) {
-                $theField = substr($field, 0, -2);
-                if (array_key_exists($theField, $this->data)) {
-                    if (!is_array($this->data[$theField]) && $this->data[$theField] !== null) {
-                        $arrayValue = explode(',', $this->data[$theField]);
+        //     /** Check if request key exist */
+        //     if (strpos($field, '.*') !== false) {
+        //         $theField = substr($field, 0, -2);
+        //         if (array_key_exists($theField, $this->data)) {
+        //             if (!is_array($this->data[$theField]) && $this->data[$theField] !== null) {
+        //                 $arrayValue = explode(',', $this->data[$theField]);
+        //             } else {
+        //                 $arrayValue = isset($this->data[$theField]) ? $this->data[$theField] : null;
+        //             }
+
+        //             foreach ($arrayValue as $value) {
+        //                 if ($value) {
+        //                     $sanitizedData[$theField][] = sanitize_text_field($value);
+        //                 }
+        //             }
+        //         }
+        //     } else {
+        //         $sanitizedData[$field] = isset($this->data[$field]) ? sanitize_text_field($this->data[$field]) : null;
+        //     }
+        // }
+        // $this->data = $sanitizedData;
+        /** Old Sanitize End here */
+
+        /** Changed Sanitize start here */
+        if (!empty($this->_sanitizeRules)) {
+            foreach ($this->_sanitizeRules as $field => $rule) {
+                if (is_string($rule) && $rule !== null && !empty($rule)) {
+                    if (strpos($field, '.*') !== false) {
+                        $theField = explode('.*.', $field)[0];
+
+                        $this->data[$theField] = $this->_sanitizeArray($rule, $this->data[$theField]);
+                        // $this->data[$theField][] = $this->_doSanitize($rule, $this->data[$theField]);
                     } else {
-                        $arrayValue = isset($this->data[$theField]) ? $this->data[$theField] : null;
-                    }
-
-                    foreach ($arrayValue as $value) {
-                        if ($value) {
-                            $sanitizedData[$theField][] = sanitize_text_field($value);
-                        }
+                        $this->data[$field] = $this->_doSanitize($rule, $this->data[$field]);
                     }
                 }
-            } else {
-                $sanitizedData[$field] = isset($this->data[$field]) ? sanitize_text_field($this->data[$field]) : null;
             }
         }
-        $this->data = $sanitizedData;
+    }
+
+    private function _sanitizeArray(String $rule, mixed $data)
+    {
+        if (is_array($data)) {
+            foreach ($data as $key => $value) {
+                if (is_array($value)) {
+                    $data = $this->_sanitizeArray($rule, $value);
+                } else {
+                    $data = $this->_doSanitize($rule, $value);
+                }
+            }
+        }
+        return $data;
+    }
+
+    private function _doSanitize(String $rule, Mixed $data)
+    {
+        switch ($rule):
+            case 'email':
+                return sanitize_text_field($data);
+                break;
+            default:
+                return sanitize_text_field($data);
+                break;
+        endswitch;
     }
 }

@@ -8,11 +8,10 @@ class UrlRule implements Rule
 {
     public function validate($field, $value, $parameters): bool
     {
-        if($value === null || $value === "")
-        {
+        if ($value === null || $value === "") {
             return true;
         }
-        
+
         return filter_var($value, FILTER_VALIDATE_URL) !== false;
     }
 

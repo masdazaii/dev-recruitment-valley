@@ -48,7 +48,48 @@ class ProfileController
                 'url' => $image['url']
             ];
         }
+
+        // $sectors = Helper::isset($user_data_acf, 'ucma_sector');
+        $terms = get_terms([
+            'taxonomy' => 'sector',
+            'include' => Helper::isset($user_data_acf, 'ucma_sector') ?? []
+        ]);
+        $termsResponse = [];
+        foreach ($terms as $term) {
+            $termsResponse[] = [
+                'label' => $term->name,
+                'value' => $term->term_id,
+            ];
+        }
         /** Added line End here */
+
+        $socialMedia = [
+            [
+                "type" => "facebook",
+                "url" => "ucma_facebook_url"
+            ],
+            [
+                "type" => "linkedin",
+                "url" => "ucma_linkedin_url"
+            ],
+            [
+                "type" => "instagram",
+                "url" => "ucma_instagram_url"
+            ],
+            [
+                "type" => "twitter",
+                "url" => "ucma_twitter_url"
+            ],
+        ];
+
+        $socialMediaResponse = [];
+        foreach ($socialMedia as $key => $socmed) {
+            $socialMediaResponse[$key] = [
+                "id" => $key+1,
+                "type" => $socmed["type"],
+                "url" => Helper::isset($user_data_acf, $socmed["url"])
+            ];
+        }
 
         return [
             'detail' => [
@@ -56,21 +97,25 @@ class ProfileController
                 'phoneNumber' => Helper::isset($user_data_acf, 'ucma_phone_code') . " " . Helper::isset($user_data_acf, 'ucma_phone'),
                 'address' => Helper::isset($user_data_acf, 'ucma_city') . ", " . Helper::isset($user_data_acf, 'ucma_country'),
                 'kvk' => Helper::isset($user_data_acf, 'ucma_kvk_number'),
-                'sector' => Helper::isset($user_data_acf, 'ucma_sector'),
+                // 'sector' => Helper::isset($user_data_acf, 'ucma_sector'), // Changed, look below
                 'website' => Helper::isset($user_data_acf, 'ucma_website_url'),
                 'employees' => Helper::isset($user_data_acf, 'ucma_employees'),
                 'btw' => Helper::isset($user_data_acf, 'ucma_btw_number'),
-                /** Added Line start here */
+
+                /** Added/Changed Line start here */
+                'sector' => $termsResponse,
                 'companyName' => Helper::isset($user_data_acf, 'ucma_company_name'), // Added Line
                 'image' => $image, // Added line
                 /** Added Line end here */
             ],
-            'socialMedia' => [
-                'facebook' => Helper::isset($user_data_acf, 'ucma_facebook_url'),
-                'linkedin' => Helper::isset($user_data_acf, 'ucma_linkedin_url'),
-                'instagram' => Helper::isset($user_data_acf, 'ucma_instagram_url'),
-                'twitter' => Helper::isset($user_data_acf, 'ucma_twitter_url')
-            ],
+            'socialMedia' => $socialMediaResponse, 
+            // [
+
+            //     'facebook' => Helper::isset($user_data_acf, 'ucma_facebook_url'),
+            //     'linkedin' => Helper::isset($user_data_acf, 'ucma_linkedin_url'),
+            //     'instagram' => Helper::isset($user_data_acf, 'ucma_instagram_url'),
+            //     'twitter' => Helper::isset($user_data_acf, 'ucma_twitter_url')
+            // ],
             'address' => [
                 'country' => Helper::isset($user_data_acf, 'ucma_country'),
                 'streetname' => Helper::isset($user_data_acf, 'ucma_street'),
@@ -187,6 +232,40 @@ class ProfileController
         ];
     }
 
+    public function updateDetail($request)
+    {
+        global $wpdb;
+        try {
+            $wpdb->query('START TRANSACTION');
+
+            /** Update ACF */
+            update_field('ucma_company_name', $request['companyName'], 'user_' . $request['user_id']);
+            update_field('ucma_sector', $request['sector'], 'user_' . $request['user_id']);
+            update_field('ucma_phone_code', $request['phoneNumberCode'], 'user_' . $request['user_id']);
+            update_field('ucma_phone', $request['phoneNumber'], 'user_' . $request['user_id']);
+            update_field('ucma_website_url', $request['website'], 'user_' . $request['user_id']);
+            update_field('ucma_employees', $request['employees']['value'], 'user_' . $request['user_id']);
+            update_field('ucma_kvk_number', $request['kvkNumber'], 'user_' . $request['user_id']);
+            update_field('ucma_btw_number', $request['btwNumber'], 'user_' . $request['user_id']);
+
+            $wpdb->query('COMMIT');
+        } catch (Error $errors) {
+            $wpdb->query('ROLLBACK');
+
+            return [
+                "message" => $this->message->get("company.profile.setup_failed"),
+                "errors" => $errors,
+                "status" => 500
+            ];
+        }
+
+        return [
+            "status" => 200,
+            "message" => $this->message->get("company.profile.update_success"),
+            // "data" => $request
+        ];
+    }
+
     public function post_information(WP_REST_Request $request)
     {
         $user_id = $request->user_id;
@@ -266,11 +345,11 @@ class ProfileController
         try {
             $wpdb->query('START TRANSACTION');
 
-            $updateData = [
-                'ID' => $request['user_id'],
-                'firstName' => $request['companyName']
-            ];
-            wp_update_user($updateData);
+            // $updateData = [
+            //     'ID' => $request['user_id'],
+            //     'firstName' => $request['companyName']
+            // ];
+            // wp_update_user($updateData);
 
             /** Upload Gallery */
             $galleries = ModelHelper::handle_uploads('gallery', $request['user_id']);
@@ -317,9 +396,7 @@ class ProfileController
             $wpdb->query('COMMIT');
         } catch (Error $errors) {
             $wpdb->query('ROLLBACK');
-            echo '<pre>';
-            var_dump($errors->getMessage());
-            echo '</pre>';
+
             return [
                 "message" => $this->message->get("company.profile.setup_failed"),
                 "errors" => $errors,
@@ -329,7 +406,7 @@ class ProfileController
 
         return [
             "message" => $this->message->get("company.profile.setup_success"),
-            "status" => 200
+            "status" => 201
         ];
     }
 
@@ -364,7 +441,7 @@ class ProfileController
 
         return [
             "status" => 200,
-            "message" => $this->message->get("company.profile.update_image_success")
+            "message" => $this->message->get("company.profile.update_success")
         ];
     }
 
