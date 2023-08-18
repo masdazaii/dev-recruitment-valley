@@ -25,14 +25,24 @@ class JWTHelper
         ];
     }
 
-    public static function generate(array $claims, string $timeToLive, $algorithm = 'HS256')
+    /**
+     * Generate HWT function
+     *
+     * @param array $claims
+     * @param string $timeToLive -> set empty string for unlimited token life-time
+     * @param string $algorithm
+     * @return void
+     */
+    public static function generate(array $claims, string $timeToLive = '', $algorithm = 'HS256')
     {
         $key    = JWT_SECRET ?? "+3;@54)g|X?V%lWf+^4@3Xuu55*])bPX ftl1b>Nrd|w/]v[>bVgQm(m.#fAyAOV";
 
         $payload = array_merge($claims, self::$registeredClaims);
 
-        $issuedAt = self::$issuedAt;
-        $payload['exp'] = $issuedAt->modify($timeToLive)->getTimestamp();
+        if ($timeToLive !== '') {
+            $issuedAt = self::$issuedAt;
+            $payload['exp'] = $issuedAt->modify($timeToLive)->getTimestamp();
+        }
 
         return JWT::encode($payload, $key, $algorithm);
     }
@@ -40,7 +50,7 @@ class JWTHelper
     public static function check($token)
     {
         if ($token == "") {
-            return [ 
+            return [
                 "status" => 400,
                 "message" => "Token Invalid"
             ];
@@ -51,12 +61,12 @@ class JWTHelper
 
             return $decodedToken;
         } catch (ExpiredException $e) {
-            return [ 
+            return [
                 "status" => 400,
                 "message" => self::$_message->get('auth.expired')
             ];
         } catch (UnexpectedValueException $e) {
-            return [ 
+            return [
                 "status" => 400,
                 "message" => "Token Invalid"
             ];

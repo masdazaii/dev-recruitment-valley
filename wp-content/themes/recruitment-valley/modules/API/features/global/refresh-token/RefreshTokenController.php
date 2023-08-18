@@ -53,17 +53,17 @@ class RefreshTokenController
             $payloadNewAccessToken = [
                 "user_id" => $user->ID,
                 "role" => $user->roles[0],
-                "setup_status" => get_field("ucaa_is_full_registered", "user_".$user->ID) ?? false,
+                "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
             ];
 
             $payloadNewrefreshToken = [
                 "user_id" => $user->ID,
                 "role" => $user->roles[0],
-                "setup_status" => get_field("ucaa_is_full_registered", "user_".$user->ID) ?? false,
+                "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
             ];
 
             $newToken = JWTHelper::generate($payloadNewAccessToken, "+60  minutes");
-            $newRefreshToken = JWTHelper::generate($payloadNewrefreshToken, "+120 minutes");
+            $newRefreshToken = JWTHelper::generate($payloadNewrefreshToken, ""); // Make time-to-live unimited base on mas esa feedback on 18 August 2023
 
             update_user_meta($user->ID, "refresh_token", $newRefreshToken);
 
