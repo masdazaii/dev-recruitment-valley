@@ -65,15 +65,17 @@ class LoginController
         $payloadAccessToken = [
             "exp" => $expireAccessToken,
             "user_id" => $user->ID,
+            "user_email" => $user->user_email,
             "role" => $user->roles[0],
             "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
         ];
 
         /** For Refresh Token */
-        $expireRefreshToken  = $issuedAt->modify("+120 minutes")->getTimestamp(); // valid until 60 minutes after toket issued
+        // $expireRefreshToken  = $issuedAt->modify("+120 minutes")->getTimestamp(); // valid until 60 minutes after toket issued
         $payloadRefreshToken = [
-            "exp" => $expireRefreshToken,
+            // "exp" => $expireRefreshToken, // make time-to-live unimited base on mas esa feedback on 18 August 2023
             "user_id" => $user->ID,
+            "user_email" => $user->user_email,
             "role" => $user->roles[0],
             "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
         ];
@@ -91,23 +93,13 @@ class LoginController
         ];
     }
 
-    public function logout($jwtoken)
+    public function logout($request)
     {
-        if (!isset($jwtoken) || $jwtoken === '') {
-            return [
-                "message"   => $this->_message->get("auth.token_not_provided"),
-                "status"    => 403
-            ];
-        }
-
-        $key     = JWT_SECRET ?? "+3;@54)g|X?V%lWf+^4@3Xuu55*])bPX ftl1b>Nrd|w/]v[>bVgQm(m.#fAyAOV";
-        $payload = JWT::decode($jwtoken, new Key($key, 'HS256'));
-
         // Set jwt to blacklist
         // $_SESSION['JWT_BLACKLIST'][] = $jwtoken;
 
         // Remove refresh token from meta
-        update_user_meta($payload->user_id, 'refresh_token', '');
+        update_user_meta($request['user_id'], 'refresh_token', '');
 
         return [
             "message"   => $this->_message->get("auth.logout_success"),
@@ -183,7 +175,8 @@ class LoginController
             array_push($errors, ["key" => "repeatNewPassword", "message" => $this->_message->get("auth.reset_password.repeat_password_required")]);
         }
 
-        if ($repeatPassword !== $repeatPassword) {
+        // if ($repeatPassword !== $repeatPassword) { // Changed Below
+        if ($newPassword !== $repeatPassword) {
             array_push($errors, ["key" => "passwordMissmatch", "message" => $this->_message->get("auth.reset_password.password_missmatch")]);
         }
 
@@ -216,6 +209,7 @@ class LoginController
         }
 
         reset_password($user, $newPassword);
+        update_user_meta($user->ID, "reset_password_key", ''); // Added Line
 
         return [
             "status" => 200,

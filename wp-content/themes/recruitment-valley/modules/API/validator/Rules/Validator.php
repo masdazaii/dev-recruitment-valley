@@ -241,11 +241,14 @@ class Validator
         return $data;
     }
 
-    private function _doSanitize(String $rule, Mixed $data)
+    private function _doSanitize(String $rule, Mixed $data, String $parameter = '')
     {
         switch ($rule):
             case 'email':
                 return sanitize_text_field($data);
+                break;
+            case 'textarea':
+                return sanitize_textarea_field($data);
                 break;
             default:
                 return sanitize_text_field($data);

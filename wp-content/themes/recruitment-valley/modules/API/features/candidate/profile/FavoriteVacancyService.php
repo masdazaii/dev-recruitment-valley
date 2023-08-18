@@ -45,11 +45,10 @@ class FavoriteVacancyService
         //         "status" => 400,
         //     ]);
         // }
+        // $body = $request->get_params();
 
         $validator->tempSanitize();
         $body = $validator->getData();
-
-        $body = $request->get_params();
         $response = $this->favoriteVacancyController->store($body);
         return ResponseHelper::build($response);
     }

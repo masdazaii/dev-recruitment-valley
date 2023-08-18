@@ -56,7 +56,8 @@ class AuthEndpoint
                 'logout' => [
                     'url'                   => 'logout',
                     'methods'               => 'POST',
-                    'permission_callback'   => [$authMiddleware, "check_token"],
+                    // 'permission_callback'   => [$authMiddleware, "check_token"],
+                    'permission_callback'   => [$authMiddleware, "logout_handle"],
                     'callback'              => [$loginService, 'logout']
                 ],
                 'forgot-password' => [
