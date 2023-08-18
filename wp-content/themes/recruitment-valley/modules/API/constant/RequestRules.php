@@ -19,7 +19,7 @@ class RequestRules
                 "email" => ["required", "email"],
                 "password" => ["required"]
             ],
-            'setupCompanyProfile' => [
+            'companySetupProfile' => [
                 "companyName" => ["required"], // Recruiter
                 "sector.*" => ["exists:term/sector/term_id/single"], // 1
                 // "sector.*" => [], // 1
@@ -43,7 +43,7 @@ class RequestRules
                 "companyVideo" => [], //                  https://youtube.com/watch?v=asdfasdf
                 "gallery" => []
             ],
-            'updateCompanyDetail' => [
+            'companyUpdateDetail' => [
                 "companyName" => ["required"],
                 "sector.*" => ["required"],
                 "phoneNumberCode" => ["required"],
@@ -52,6 +52,23 @@ class RequestRules
                 "employees" => ["requred"],
                 "kvkNumber" => [],
                 "btwNumber" => [],
+            ],
+            'candidateUpdateProfile' => [
+                "firstName" => ["required"],
+                "dateOfBirth" => ["required"],
+                "phoneNumber" => ["required"],
+                "phoneNumberCode" => ["required"],
+                "country" => ["required"],
+                "city" => ["required"],
+                "linkedinPage" => ["required"],
+            ],
+            'candidateChangeEmail' => [
+                'newEmail' => ["required", "email"] // Must add rules exists to check if email already used!
+            ],
+            'candidateChangepassword' => [
+                'newPassword' => ["required"],
+                'repeatNewPassword' => ["required"],
+                'key' => ["required"]
             ],
             'addFavorite' => [
                 /**
@@ -70,6 +87,12 @@ class RequestRules
             'paymentPackage' => [
                 'slug' => ["required", "exists:post/payment/post_name/single"]
             ],
+            'applyVacancy' => [
+                'phoneNumberCode' => ["required"],
+                'phoneNumber' => ["required"],
+                'coverLetter' => [],
+                'vacancy' => ["required", "exists:post/vacancy/post_id/single"],
+            ],
             'test' => [
                 'test.*.name' => ["required"]
             ]
@@ -85,6 +108,15 @@ class RequestRules
             "example" => [
                 "email" => "email",
                 "string" => "default", // Will use sanitize_text_field
+            ],
+            "applyVacancy" => [
+                'phoneNumberCode' => "default",
+                'phoneNumber' => "default",
+                'coverLetter' => "textarea",
+                'vacancy' => "default",
+            ],
+            "candidateChangeEmail" => [
+                'newEmail' => "email"
             ]
         ];
     }

@@ -122,8 +122,12 @@ class ProfileController
                 'city' => Helper::isset($user_data_acf, 'ucma_city'),
                 'postcode' => Helper::isset($user_data_acf, 'ucma_postcode'),
             ],
-            'information' => Helper::isset($user_data_acf, 'ucma_short_decription'),
-            'gallery' => $galleries
+            'information' => [
+                'shortDescription' => Helper::isset($user_data_acf, 'ucma_short_decription'),
+                'secondaryEmploymentConditions' => Helper::isset($user_data_acf, 'ucma_benefit'),
+                'videoUrl' => Helper::isset($user_data_acf, 'ucma_company_video_url'),
+                'gallery' => $galleries
+            ],
         ];
     }
 
@@ -273,7 +277,7 @@ class ProfileController
         $fields = $request->get_body_params();
 
         $validate = ValidationHelper::doValidate($fields, [
-            "sortDescription" => "required",
+            "shortDescription" => "required",
         ]);
         if (!$validate['is_valid']) wp_send_json_error(['validation' => $validate['fields'], 'status' => 400], 400);
 
@@ -284,8 +288,9 @@ class ProfileController
 
             $galleries = ModelHelper::handle_uploads('gallery', 'test');
 
-            update_field('ucma_short_decription', Helper::isset($fields, 'sortDescription'), 'user_' . $user_id);
+            update_field('ucma_short_decription', Helper::isset($fields, 'shortDescription'), 'user_' . $user_id);
             update_field('ucma_company_video_url', Helper::isset($fields, 'videoUrl'), 'user_' . $user_id);
+            update_field('ucma_benefit', Helper::isset($fields, 'secondaryEmploymentConditions'), 'user_' . $request['user_id']); // Added Line
 
             $current_gallery = maybe_unserialize(get_user_meta($user_id, 'ucma_gallery_photo'));
             $current_gallery = isset($current_gallery[0]) ? $current_gallery[0] : [];
@@ -304,7 +309,8 @@ class ProfileController
         }
 
         return [
-            'message' => $this->message->get("profile.update.success")
+            'message' => $this->message->get("profile.update.success"),
+            'status' => 200,
         ];
     }
 
@@ -442,6 +448,24 @@ class ProfileController
         return [
             "status" => 200,
             "message" => $this->message->get("company.profile.update_success")
+        ];
+    }
+
+    public function getPhoto($request)
+    {
+        $image = get_field('ucma_image', 'user_' . $request['user_id']) ?? [];
+        if (!empty($image)) {
+            $image = [
+                'id' => $image['ID'],
+                'title' => $image['title'],
+                'url' => $image['url']
+            ];
+        }
+
+        return [
+            'message' => $this->message->get('company.profile.get_image_success'),
+            'image' => $image,
+            'status' => 200
         ];
     }
 

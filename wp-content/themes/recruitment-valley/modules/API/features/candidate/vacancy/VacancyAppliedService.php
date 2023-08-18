@@ -2,26 +2,50 @@
 
 namespace Candidate\Vacancy;
 
-use BD\Emails\Email;
 use ResponseHelper;
-use Vacancy\Vacancy;
 use WP_REST_Request;
+use BD\Emails\Email;
+use Vacancy\Vacancy;
+use Constant\Message;
+use Helper\ValidationHelper;
 
 class VacancyAppliedService
 {
+    protected $_message;
     public $vacancyAppliedController;
 
     public function __construct()
     {
+        $this->_message = new Message();
         $this->vacancyAppliedController = new VacancyAppliedController;
     }
 
     public function applyVacancy(WP_REST_Request $request)
     {
-        $params = $request->get_params();
+        $validator = new ValidationHelper('applyVacancy', $request->get_params());
+
+        if (!$validator->tempValidate()) {
+            $errors = $validator->getErrors();
+            return ResponseHelper::build([
+                'message' => $this->_message->get('candidate.favorite.vacancy_not_found'),
+                'errors' => $errors,
+                'status' => 400
+            ]);
+        }
+
+        // $params = $request->get_params();
+
+        $validator->tempSanitize();
+        $params = $validator->getData();
         $response = $this->vacancyAppliedController->applyVacancy($params);
 
-        $this->_send_when_success_apply($response, $params);
+        if ($response['status'] === 201 && $params['user_id']) {
+            $this->_send_into_candidate($response, $params);
+
+            $this->_send_into_company($response, $params);
+        }
+
+        // $this->_send_when_success_apply($response, $params);
 
         return ResponseHelper::build($response);
     }

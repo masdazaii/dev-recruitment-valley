@@ -92,12 +92,19 @@ class AuthMiddleware
 
         $user = get_user_by('ID', $handleToken->user_id);
 
+        /** Check if user already verify the OTP */
+        $isVerified = get_user_meta($user->ID, 'otp_is_verified', true);
+        if ($isVerified <= 0 || $isVerified == '0') {
+            return new WP_Error("rest_forbidden", $this->_message->get('auth.unauthenticate'), array("status" => 403));
+        }
+
         if (!in_array(strtolower($user->roles[0]), $allowed)) {
             return new WP_Error("rest_forbidden", $this->_message->get('auth.unauthenticate'), array("status" => 403));
         }
 
         // $request->set_param('user_id', $request->user_id); // this will take the user_id of the currently logged in user
         $request->set_param('user_id', $handleToken->user_id);
+        $request->set_param('email', $handleToken->user_email);
         return true;
     }
 
@@ -121,8 +128,14 @@ class AuthMiddleware
         /** Change start here */
         $request->set_param('user_id', $handleToken->user_id);
         $user = get_user_by('ID', $handleToken->user_id);
-        
-        if($user === false)  return new WP_Error("rest_forbidden", $this->_message->get('auth.unauthenticate'), array("status" => 403));
+
+        /** Check if user already verify the OTP */
+        $isVerified = get_user_meta($user->ID, 'otp_is_verified', true);
+        if ($isVerified <= 0 || $isVerified == '0') {
+            return new WP_Error("rest_forbidden", $this->_message->get('auth.unauthenticate'), array("status" => 403));
+        }
+
+        if ($user === false)  return new WP_Error("rest_forbidden", $this->_message->get('auth.unauthenticate'), array("status" => 403));
 
         if (!in_array(strtolower($user->roles[0]), $allowed)) {
             return new WP_Error("rest_forbidden", $this->_message->get('auth.unauthenticate'), array("status" => 403));

@@ -175,7 +175,8 @@ class LoginController
             array_push($errors, ["key" => "repeatNewPassword", "message" => $this->_message->get("auth.reset_password.repeat_password_required")]);
         }
 
-        if ($repeatPassword !== $repeatPassword) {
+        // if ($repeatPassword !== $repeatPassword) { // Changed Below
+        if ($newPassword !== $repeatPassword) {
             array_push($errors, ["key" => "passwordMissmatch", "message" => $this->_message->get("auth.reset_password.password_missmatch")]);
         }
 
@@ -208,6 +209,7 @@ class LoginController
         }
 
         reset_password($user, $newPassword);
+        update_user_meta($user->ID, "reset_password_key", ''); // Added Line
 
         return [
             "status" => 200,

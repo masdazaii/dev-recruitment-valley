@@ -19,22 +19,22 @@ class VacancyAppliedController
     public function applyVacancy($request)
     {
         $user = get_user_by('ID', $request['user_id']);
-        
+
         $vacancy = new Vacancy($request["vacancy"]);
         $company = $vacancy->getAuthor();
         $vacancyTitle = $vacancy->getTitle();
-        $expiredAt = new DateTime( $vacancy->getExpiredAt());
+        $expiredAt = new DateTime($vacancy->getExpiredAt());
         $now = new DateTime();
 
-        if($now > $expiredAt) {
+        if ($now > $expiredAt) {
             return [
                 "status" => 400,
                 "message" => $this->_message->get('candidate.apply_vacancy.expired_job')
             ];
         }
 
-        $title = 'Application - ' . $user->user_nicename . ' - '. $vacancyTitle;
-        
+        $title = 'Application - ' . $user->user_nicename . ' - ' . $vacancyTitle;
+
         $arguments = [
             'post_title' => $title,
             // 'post_author' => $request['user_id'],
@@ -58,11 +58,9 @@ class VacancyAppliedController
             ];
         }
 
-        if(isset($_FILES['cv']) && $_FILES['cv']['error'] === UPLOAD_ERR_OK)
-        {
-            $fileExtension = pathinfo( $_FILES['cv']['name'], PATHINFO_EXTENSION );
-            if($fileExtension != "pdf" && $fileExtension != "jpg" && $fileExtension != "png" )
-            {
+        if (isset($_FILES['cv']) && $_FILES['cv']['error'] === UPLOAD_ERR_OK) {
+            $fileExtension = pathinfo($_FILES['cv']['name'], PATHINFO_EXTENSION);
+            if ($fileExtension != "pdf" && $fileExtension != "jpg" && $fileExtension != "png") {
                 return [
                     "status" => 400,
                     "message" => "filetype not supported",
@@ -72,21 +70,19 @@ class VacancyAppliedController
             $filename = wp_unique_filename(wp_upload_dir()['path'], $_FILES['cv']['name']);
             $upload_path = wp_upload_dir()['path'] . '/' . $filename;
 
-            if(move_uploaded_file($_FILES['cv']['tmp_name'], $upload_path))
-            {
+            if (move_uploaded_file($_FILES['cv']['tmp_name'], $upload_path)) {
                 $attachmentId = wp_insert_attachment([
                     'post_title' => $filename,
                 ]);
 
-                if(!$attachmentId)
-                {
+                if (!$attachmentId) {
                     return [
                         "status" => 500,
                         "message" => "cannot save cv, error occured"
                     ];
                 }
                 update_field("apply_cv", $attachmentId, $doApply);
-            }else{
+            } else {
                 return [
                     "status" => 500,
                     "message" => "cannot save cv, error occured"
@@ -98,18 +94,17 @@ class VacancyAppliedController
         update_field('phone_code_area', $request['phoneNumberCode'], $doApply);
         update_field('phone_number', $request['phoneNumber'], $doApply);
         update_field('cover_letter', $request['coverLetter'], $doApply);
-        update_field('applicant_candidate',$request["user_id"], $doApply);
-        update_field('applicant_company',$company, $doApply);
-        update_field('applicant_vacancy',$request["vacancy"], $doApply);
+        update_field('applicant_candidate', $request["user_id"], $doApply);
+        update_field('applicant_company', $company, $doApply);
+        update_field('applicant_vacancy', $request["vacancy"], $doApply);
 
         // add one time data that not affected by update
-        update_post_meta($doApply, 'applicant_data', get_fields('user_'.$request["user_id"]) );
-        update_post_meta($doApply, 'vacancy_data', get_fields($request["vacancy"]) );
-        update_post_meta($doApply, 'company_data', get_fields("user_".$company) );
+        update_post_meta($doApply, 'applicant_data', get_fields('user_' . $request["user_id"]));
+        update_post_meta($doApply, 'vacancy_data', get_fields($request["vacancy"]));
+        update_post_meta($doApply, 'company_data', get_fields("user_" . $company));
 
         return [
             "message"   => $this->_message->get('candidate.apply_vacancy.apply_success'),
-            "data"      => $user->ID,
             "status"    => 201
         ];
     }
