@@ -80,7 +80,7 @@ class FavoriteVacancyController
             }
         }
 
-        $offset = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['postPerPage']) + 1);
+        $offset = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['postPerPage']));
 
         $args = [
             "post_type" => $this->_posttype,

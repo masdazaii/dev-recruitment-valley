@@ -20,7 +20,7 @@ class ProfileController
         $this->message = new Message;
     }
 
-    public function get( WP_REST_Request $request )
+    public function get(WP_REST_Request $request)
     {
         $user_id = $request->user_id;
 
@@ -28,20 +28,20 @@ class ProfileController
             $user = new Candidate($user_id);
 
             $response = [
-                "firstName"=> $user->getFirstName(),
-                "lastName"=> $user->getLastName(),
-                "phoneNumberCode"=> $user->getPhoneNumberCode(),
-                "phoneNumber"=> $user->getPhoneNumber(),
-                "country"=> $user->getCountry(),
-                "city"=> $user->getCity(),
-                "email"=> $user->getEmail(),
+                "firstName" => $user->getFirstName(),
+                "lastName" => $user->getLastName(),
+                "phoneNumberCode" => $user->getPhoneNumberCode(),
+                "phoneNumber" => $user->getPhoneNumber(),
+                "country" => $user->getCountry(),
+                "city" => $user->getCity(),
+                "email" => $user->getEmail(),
                 "image" => $user->getImage(),
                 "dateOfBirth" => $user->getDateOfBirth(),
                 "linkedIn" => $user->getLinkedinPage(),
-                "cv"=> [
-                    'url' => $user->getCv()["url"],
-                    'fileName' => $user->getCv()["filename"],
-                    'createdAt' => date('M jS, Y', strtotime($user->getCv()["date"])),
+                "cv" => [
+                    'url' => $user->getCv() ? $user->getCv()["url"] : null,
+                    'fileName' => $user->getCv() ? $user->getCv()["filename"] : null,
+                    'createdAt' => $user->getCv() ? date('M jS, Y', strtotime($user->getCv()["date"])) : null,
                 ]
             ];
 
@@ -140,7 +140,6 @@ class ProfileController
                 "status" => 200,
                 "message" => $this->message->get("profile.update.photo.success")
             ];
-
         } catch (Error $e) {
             $wpdb->query('ROLLBACK');
             return [
@@ -171,7 +170,6 @@ class ProfileController
                 "status" => 200,
                 "message" => $this->message->get("profile.update.cv.success")
             ];
-
         } catch (Error $e) {
             $wpdb->query('ROLLBACK');
             return [
@@ -181,10 +179,10 @@ class ProfileController
         }
     }
 
-    public function updateProfile( WP_REST_Request $request )
+    public function updateProfile(WP_REST_Request $request)
     {
         $user_id = $request->user_id;
-        $fields = $request->get_body_params();
+        $fields = $request->get_params();
 
         $validate = ValidationHelper::doValidate($fields, [
             "firstName" => "required",
@@ -241,14 +239,15 @@ class ProfileController
         }
     }
 
-    public function changeEmailRequest( WP_REST_Request $request )
+    // public function changeEmailRequest(WP_REST_Request $request) // Changed below
+    public function changeEmailRequest($request)
     {
         $oldEmail = $request["email"];
         $newEmail = $request["newEmail"];
 
         $newEmailExists = email_exists($newEmail);
 
-        if($newEmailExists){
+        if ($newEmailExists) {
             return [
                 "status" => 400,
                 "message" => $this->message->get('candidate.change_email_request.email_exist')
@@ -256,8 +255,7 @@ class ProfileController
         }
 
         $user = get_user_by('email', $oldEmail);
-        if(!$user)
-        {
+        if (!$user) {
             return [
                 "status" => 400,
                 "message" => $this->message->get('candidate.change_email_request.not_found')
@@ -269,18 +267,19 @@ class ProfileController
                 "user_id" => $user->ID,
                 "old_email" => $user->user_email,
                 "new_email" => $newEmail,
-            ], "+2 hours"
+            ],
+            "+2 hours"
         );
 
         /** Send email to admin */
         $admin = get_option('admin_email');
         $subject = __("NEW CHANGE EMAIL REQUEST");
 
-        $chang_email_url = get_site_url()."/changeEmail?token=".$token;
+        $chang_email_url = get_site_url() . "/changeEmail?token=" . $token;
 
         $message = "new change email request, if this is not by you just skip it <br>";
         $message .= "<br>";
-        $message .= "visit this url ". $chang_email_url;
+        $message .= "visit this url " . $chang_email_url;
 
         wp_mail($user->user_email, $subject, $message);
 
@@ -294,14 +293,12 @@ class ProfileController
     {
         $body = $request->get_params();
         $payload = JWTHelper::check($body["token"]);
-        if(is_array($payload))
-        {
+        if (is_array($payload)) {
             return $payload;
         }
 
         $user = get_user_by('id', $payload->user_id);
-        if(!$user)
-        {
+        if (!$user) {
             return [
                 "status" => 400,
                 "message" => $this->message->get('candidate.change_email_request.not_found')
@@ -309,8 +306,7 @@ class ProfileController
         }
 
         $userNewEmail = get_user_by("email", $payload->new_email);
-        if($userNewEmail)
-        {
+        if ($userNewEmail) {
             return [
                 "status" => 400,
                 "message" => $this->message->get('candidate.change_email_request.email_exist')
@@ -322,22 +318,20 @@ class ProfileController
             "user_email" => $payload->new_email,
         ]);
 
-        if(is_wp_error($updatedEmail))
-        {
+        if (is_wp_error($updatedEmail)) {
             return [
                 "status" => 500,
                 "message" => $this->message->get('candidate.change_email.fail')
             ];
-        }else{
+        } else {
             return [
                 "status" => 200,
                 "message" => $this->message->get('candidate.change_email.success')
             ];
         }
-
     }
 
-    public function changePassword( WP_REST_Request $request)
+    public function changePassword(WP_REST_Request $request)
     {
         $user_id = $request->user_id;
         $user = get_user_by('id', $user_id);
@@ -350,8 +344,7 @@ class ProfileController
             ];
         }
 
-        if($body["newPassword"] !== $body["repeatNewPassword"])
-        {
+        if ($body["newPassword"] !== $body["repeatNewPassword"]) {
             return [
                 "status" => 400,
                 "message" => "new password missmatch",
@@ -365,5 +358,4 @@ class ProfileController
             "message" => "Success, password changed"
         ];
     }
-
 }

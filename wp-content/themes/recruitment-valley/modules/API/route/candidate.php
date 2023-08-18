@@ -118,7 +118,8 @@ class CandidateEndpoint
                 'change_email_request' => [
                     'url'                   =>  'profile/change-email-request',
                     'methods'               =>  'POST',
-                    'permission_callback'   => [$authMiddleware, 'check_token'],
+                    // 'permission_callback'   => [$authMiddleware, 'check_token'],
+                    'permission_callback'   => [$authMiddleware, 'authorize_candidate'],
                     'callback'              =>  [$profileService, 'changeEmailRequest'],
                 ],
                 'change_email' => [

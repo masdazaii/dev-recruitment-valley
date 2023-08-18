@@ -69,7 +69,7 @@ class ProfileService
 
     public function setup(WP_REST_Request $request)
     {
-        $validator = new ValidationHelper('setupCompanyProfile', $request->get_params());
+        $validator = new ValidationHelper('companySetupProfile', $request->get_params());
 
         if (!$validator->tempValidate()) {
             $errors = $validator->getErrors();
@@ -84,6 +84,12 @@ class ProfileService
         $body = $validator->getData();
         // $body = $request->get_params();
         $response = $this->setupProfileController->setup($body);
+        return ResponseHelper::build($response);
+    }
+
+    public function getPhoto(WP_REST_Request $request)
+    {
+        $response = $this->setupProfileController->getPhoto($request->get_params());
         return ResponseHelper::build($response);
     }
 }

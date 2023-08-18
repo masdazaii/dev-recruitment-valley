@@ -145,6 +145,7 @@ class Message
                     "success" => __("Success, change email request already sent to your email", THEME_DOMAIN),
                     "not_found" => __("candidate not found", THEME_DOMAIN),
                     "email_exist" => __("Email already exist", THEME_DOMAIN),
+                    "invalid" => __("Invalid user input.", THEME_DOMAIN),
                 ],
                 "change_email" => [
                     "success" => __("Success, email changed successfully", THEME_DOMAIN),
@@ -158,6 +159,7 @@ class Message
                     "update_success" => __("Success update company profile", THEME_DOMAIN),
                     "update_failed" => __("Failed update company profile", THEME_DOMAIN),
                     "update_detail_success" => __("Success update company profile", THEME_DOMAIN),
+                    "get_image_success" => __("Success get company image.", THEME_DOMAIN),
                 ]
             ],
             'package' => [
