@@ -511,17 +511,61 @@ class VacancyCrudController
      */
     public function repost($request) : array
     {
+        // get vacancy id by request 
         $vacancy_id = $request['vacancy_id'];
 
+        // get user id by request
+        $user_id = $request['user_id'];
+
+        // setup vacancy class
+        $vacancy = new Vacancy($request["vacancy_id"]);
+
+        // check id author
+        $author = (int) $vacancy->getAuthor();
+
+        // return 400 if author and user id not match
+        if($author !== $user_id) return [ "status" => 400, "message" => "user not have permission to repost this job with id {$vacancy_id}" ];
+        
         // return 400 if post id not found
         if(get_post_status( $vacancy_id ) === false)   return [ "status" => 400, "message" => "invalid post" ];
 
         // total credit
-        $job_credit = 10;
+        // TODO : get total current credit
+        $job_credit = 3;
+        // TODO : get credit per 1 time repost
+        $credit_per_post = 1;
         
         // return 402 if credit is insufficient
         if($job_credit <= 0) return [ "status" => 402, "message" => "Your credit is insufficient." ];
 
-        
+        // get status vacancies
+        $status = $vacancy->getStatus();
+        $status_lower = strtolower($status['name']);
+
+        // return 400 if status post is not Close
+        if($status_lower !== 'close') return [ "status" => 402, "message" => "You cannot repost a job with id {$vacancy_id}, because the job is still in the {$status['name']} state." ];
+
+        // remove old term status
+        $taxonomy = 'status';
+        wp_remove_object_terms($vacancy_id,  $status['term_id'], $taxonomy);
+
+        // add new term status
+        $term_name = "Open";
+        wp_set_object_terms($vacancy_id, $term_name, $taxonomy, true);
+
+        // set expired date +1 month
+        $date_expired = new DateTimeImmutable();
+        $date_expired = $date_expired->modify("+30 days")->format("Y-m-d H:i:s");
+        update_field('expired_at', $date_expired,$vacancy_id);
+
+        // reduce credit
+        $job_credit -= $credit_per_post;
+        // TODO : update total credit
+
+        // return status 200
+        return [ 
+            "status" => 402, 
+            "message" => "post with id {$vacancy_id} successfully reposted" 
+        ];
     }
 }
