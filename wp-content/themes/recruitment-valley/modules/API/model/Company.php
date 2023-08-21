@@ -2,6 +2,7 @@
 
 namespace Model;
 
+use Exception;
 use Helper;
 use Vacancy\Vacancy;
 use WP_Query;
@@ -39,7 +40,13 @@ class Company
         $this->vacancyModel = new Vacancy;
         if ($userId) {
             $this->user_id = $userId;
-            $this->user = get_user_by('id', $this->user_id);
+            $user = get_user_by('id', $this->user_id);
+            if(!$user)
+            {
+                throw new Exception("company not found", 400);
+            }
+
+            $this->user = $user;
         }
     }
 
@@ -190,7 +197,11 @@ class Company
 
     public function getCredit()
     {
-        return get_user_meta($this->user_id, $this->credit, true);
+        $credit = get_user_meta($this->user_id, $this->credit, true);
+
+        $credit = is_numeric($credit) ? (int) $credit : 0;
+
+        return $credit;
     }
 
     public function setCredit($total)

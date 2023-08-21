@@ -96,7 +96,7 @@ wp-content/*
 #!wp-content/mu-plugins/
 !wp-content/plugins/
 !wp-content/themes/
-wp-content/themes/*/vendor
+# wp-content/themes/*/vendor
 
 # ignore these plugins from the core
 #wp-content/plugins/hello.php

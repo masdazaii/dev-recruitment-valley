@@ -204,7 +204,7 @@ class PackageController
 
             return [
                 "status" => 200,
-                "message" => $package->getCredit() . " already added into your balance",
+                "message" => $package->getCredit() . "credit already added into your balance",
             ];
         }
     }

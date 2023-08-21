@@ -23,6 +23,8 @@ class Candidate
     private $image = "ucaa_image";
     private $favoriteJob = "favorite_vacancy";
 
+    private $changeEmailToken = "change_email_token";
+
     public function __construct( $user_id = false)
     {
         if($user_id) {
