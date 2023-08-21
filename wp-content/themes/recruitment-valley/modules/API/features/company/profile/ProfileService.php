@@ -92,4 +92,10 @@ class ProfileService
         $response = $this->setupProfileController->getPhoto($request->get_params());
         return ResponseHelper::build($response);
     }
+
+    public function getCredit(WP_REST_Request $request)
+    {
+        $response = $this->setupProfileController->getCredit( $request );
+        return ResponseHelper::build($response);
+    }
 }

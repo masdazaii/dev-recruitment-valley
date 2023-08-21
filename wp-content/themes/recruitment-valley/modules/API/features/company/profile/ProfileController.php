@@ -4,8 +4,10 @@ namespace Company\Profile;
 
 use Constant\Message;
 use Error;
+use Exception;
 use Helper;
 use Helper\ValidationHelper;
+use Model\Company;
 use Model\ModelHelper;
 use ResponseHelper;
 use WP_REST_Request;
@@ -473,4 +475,23 @@ class ProfileController
     // {
     //     $params = $request->user_id;
     // }
+
+    public function getCredit( WP_REST_Request $request )
+    {
+        try {
+            $company = new Company($request["user_id"]);
+
+            return [
+                "status" => 200,
+                "message" => "success get company credit",
+                "data" => [
+                    "credit" => $company->getCredit() 
+                ]
+                ];
+        } catch (\Exception $e) {
+            return ["status" => $e->getCode(), "message" => $e->getMessage() ];
+        }
+
+
+    }
 }
