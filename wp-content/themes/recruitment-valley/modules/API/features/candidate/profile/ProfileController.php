@@ -283,6 +283,8 @@ class ProfileController
 
         wp_mail($user->user_email, $subject, $message);
 
+        update_user_meta($user->ID, "change_email_token", $token);
+
         return [
             "status" => 200,
             "message" => $this->message->get('candidate.change_email_request.success')
@@ -298,10 +300,21 @@ class ProfileController
         }
 
         $user = get_user_by('id', $payload->user_id);
+
         if (!$user) {
             return [
                 "status" => 400,
                 "message" => $this->message->get('candidate.change_email_request.not_found')
+            ];
+        }
+
+        $savedToken = get_user_meta($user->ID, "change_email_token", true);
+
+        if($body["token"] != $savedToken)
+        {
+            return [
+                "status" => 400,
+                "message" => $this->message->get('candidate.change_email.already_used')
             ];
         }
 
@@ -317,6 +330,8 @@ class ProfileController
             "ID" => $user->ID,
             "user_email" => $payload->new_email,
         ]);
+
+        update_user_meta($user->ID, "change_email_token", "");
 
         if (is_wp_error($updatedEmail)) {
             return [

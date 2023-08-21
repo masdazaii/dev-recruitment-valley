@@ -149,7 +149,8 @@ class Message
                 ],
                 "change_email" => [
                     "success" => __("Success, email changed successfully", THEME_DOMAIN),
-                    "fail" => __("Error, something went wrong please contact administrartor", THEME_DOMAIN)
+                    "fail" => __("Error, something went wrong please contact administrartor", THEME_DOMAIN),
+                    "already_used" => __("Token already used", THEME_DOMAIN),
                 ]
             ],
             'company' => [
