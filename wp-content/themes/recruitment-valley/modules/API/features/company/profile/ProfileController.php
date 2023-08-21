@@ -369,11 +369,11 @@ class ProfileController
         try {
             $wpdb->query('START TRANSACTION');
 
-            $updateData = [
-                'ID' => $request['user_id'],
-                'firstName' => $request['companyName']
-            ];
-            wp_update_user($updateData);
+            // $updateData = [
+            //     'ID' => $request['user_id'],
+            //     'firstName' => $request['companyName']
+            // ];
+            // wp_update_user($updateData);
 
             /** Upload Gallery */
             $galleries = ModelHelper::handle_uploads('gallery', $request['user_id']);
@@ -497,7 +497,7 @@ class ProfileController
     //     $params = $request->user_id;
     // }
 
-    public function getCredit( WP_REST_Request $request )
+    public function getCredit(WP_REST_Request $request)
     {
         try {
             $company = new Company($request["user_id"]);
@@ -506,13 +506,31 @@ class ProfileController
                 "status" => 200,
                 "message" => "success get company credit",
                 "data" => [
-                    "credit" => $company->getCredit() 
+                    "credit" => $company->getCredit()
                 ]
-                ];
+            ];
         } catch (\Exception $e) {
-            return ["status" => $e->getCode(), "message" => $e->getMessage() ];
+            return ["status" => $e->getCode(), "message" => $e->getMessage()];
         }
+    }
 
+    private function _validateGallery($request)
+    {
+        $currentGallery = maybe_unserialize(get_user_meta($request['user_id'], 'ucma_gallery_photo'));
+        $countRequestFile = count($_FILES['gallery']['name']);
 
+        if ((count($currentGallery[0]) + $countRequestFile) > 10) {
+            return [
+                'is_valid' => false,
+                'errors' => [
+                    'You\'ve reached limit for uploaded gallery. Maximum stored gallery is 10 files.'
+                ]
+            ];
+        } else {
+            return [
+                'is_valid' => true,
+                'errors' => []
+            ];
+        }
     }
 }

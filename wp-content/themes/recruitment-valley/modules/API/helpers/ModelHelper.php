@@ -6,7 +6,6 @@ class ModelHelper
 {
     public static function handle_upload($name, $custom_dir = null)
     {
-        // print('<pre>' . print_r($_FILES, true) . '</pre>');
         if (!isset($_FILES[$name])) return false;
 
         require_once(ABSPATH . 'wp-admin/includes/file.php');

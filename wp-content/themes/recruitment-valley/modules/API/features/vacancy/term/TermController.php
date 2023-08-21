@@ -33,11 +33,12 @@ class VacancyTermController
         ];
     }
 
-    public function getSectorsTerm($parameters)
+    /** The 2 above is merged to 1 function */
+    public function getSpesificTaxonomyTerm($parameters)
     {
         /** Get Term */
         $terms = get_terms([
-            'taxonomy' => 'sector'
+            'taxonomy' => $parameters['taxonomy']
         ]);
 
         return [
