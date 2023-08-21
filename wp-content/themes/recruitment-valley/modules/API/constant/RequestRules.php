@@ -53,6 +53,12 @@ class RequestRules
                 "kvkNumber" => [],
                 "btwNumber" => [],
             ],
+            'companyUpdateInformation' => [
+                "shortDescription" => ["required"],
+                "videoUrl" => [],
+                "secondaryEmploymentConditions" => [],
+                // "gallery" => []
+            ],
             'candidateUpdateProfile' => [
                 "firstName" => ["required"],
                 "dateOfBirth" => ["required"],
@@ -85,7 +91,7 @@ class RequestRules
                 'vacancyId' => ["required", "exists:post/vacancy/post_id/single"]
             ],
             'paymentPackage' => [
-                'slug' => ["required", "exists:post/payment/post_name/single"]
+                'slug' => ["required", "exists:post/package/post_name/single"]
             ],
             'applyVacancy' => [
                 'phoneNumberCode' => ["required"],
@@ -102,22 +108,51 @@ class RequestRules
             'register' => [
                 "email" => "email",
                 "password" => null,
-                "accountType" => "default"
+                "accountType" => "text"
             ],
             /** When using rule other than these 2. Please add following sanitize rule in Validator.php. */
             "example" => [
                 "email" => "email",
-                "string" => "default", // Will use sanitize_text_field
+                "string" => "text", // Will use sanitize_text_field
             ],
             "applyVacancy" => [
-                'phoneNumberCode' => "default",
-                'phoneNumber' => "default",
+                'phoneNumberCode' => "text",
+                'phoneNumber' => "text",
                 'coverLetter' => "textarea",
-                'vacancy' => "default",
+                'vacancy' => "text",
             ],
             "candidateChangeEmail" => [
                 'newEmail' => "email"
-            ]
+            ],
+            'companySetupProfile' => [
+                "companyName" => "text",
+                "sector.*" => "text",
+                "employeesTotal" => "text",
+                "phoneNumber" => "text",
+                "phoneNumberCode" => "text",
+                "email" => "email",
+                "website" => "text",
+                "kvkNumber" => "text",
+                "btwNumber" => "text",
+                "facebook" => "text",
+                "instagram" => "text",
+                "linkedin" => "text",
+                "twitter" => "text",
+                "country" => "text",
+                "street" => "text",
+                "city" => "text",
+                "postCode" => "text",
+                "shortDescription" => "textarea",
+                "secondaryEmploymentConditions" => "textarea",
+                "companyVideo" => "text",
+                "gallery" => ""
+            ],
+            'companyUpdateInformation' => [
+                "shortDescription" => "textarea",
+                "videoUrl" => "",
+                "secondaryEmploymentConditions" => "textarea",
+                "gallery" => ""
+            ],
         ];
     }
 
@@ -127,6 +162,15 @@ class RequestRules
             return $this->rules[$rule];
         } else {
             return false;
+        }
+    }
+
+    public function getSanitizeRule(String $rule)
+    {
+        if ($rule && $rule !== "" && array_key_exists($rule, $this->sanitizeRules)) {
+            return $this->sanitizeRules[$rule];
+        } else {
+            return [];
         }
     }
 }

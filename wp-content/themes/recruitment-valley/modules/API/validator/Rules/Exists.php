@@ -34,12 +34,15 @@ class ExistsRule implements Rule
     {
         switch ($table) {
             case 'user':
-                switch ($column) {
+                switch ($type) {
                     case 'meta':
+                        return true;
                         break;
                     case 'acf':
+                        return true;
                         break;
                     default:
+                        return true;
                         // $dbValue = get_user()
                 }
                 break;

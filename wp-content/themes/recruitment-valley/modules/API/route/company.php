@@ -125,12 +125,12 @@ class CompanyEndpoint
                     'callback'              => [$profile, 'setup'],
                 ],
                 'profile_update_photo' => [
-                    'url'                   => 'profile/image',
+                    'url'                   => '/profile/image',
                     'methods'               => 'POST',
                     'permission_callback'   => [$authMiddleware, 'authorize_company'],
                     'callback'              => [$profile, 'updatePhoto']
                 ],
-                'profile_update_photo' => [
+                'profile_get_photo' => [
                     'url'                   => 'profile/image',
                     'methods'               => 'GET',
                     'permission_callback'   => [$authMiddleware, 'authorize_company'],

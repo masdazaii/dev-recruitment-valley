@@ -35,7 +35,7 @@ class NotExistsRule implements Rule
     {
         switch ($table) {
             case 'user':
-                switch ($column) {
+                switch ($type) {
                     case 'meta':
                         $databaseValue = get_user_meta($selector, $column, true);
                         if (is_array($databaseValue)) {

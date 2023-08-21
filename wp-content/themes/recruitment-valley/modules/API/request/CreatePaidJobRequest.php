@@ -19,9 +19,9 @@ class CreatePaidJobRequest implements MiRequest
     public function rules(): array
     {
         return [
-            "name" => [ 'required'],
+            "name" => ['required'],
             "description" => ["required"],
-            "city" => [ 'required'],
+            "city" => ['required'],
             "placementAddress" => ["required"],
             "terms" => ["required"],
             "salaryStart" => ["numeric"],
@@ -42,6 +42,7 @@ class CreatePaidJobRequest implements MiRequest
             "instagram" => ["url"],
             "twitter" => ["url"],
             "review" => [],
+            "experience.*" => ["required", "numeric"] // Added Line
         ];
     }
 
@@ -58,26 +59,26 @@ class CreatePaidJobRequest implements MiRequest
         ];
     }
 
-    public function validate() : bool
+    public function validate(): bool
     {
         return $this->_validator->validate();
     }
 
     public function sanitize()
     {
-        return $this->_validator->sanitize( $this->sanitizes() );
+        return $this->_validator->sanitize($this->sanitizes());
     }
 
-    public function getData() : array
+    public function getData(): array
     {
         return $this->_validator->getData();
     }
 
-    public function getErrors() : array
+    public function getErrors(): array
     {
         return [
             "status" => 400,
-            "message" => $this->_validator->getErrors(), 
+            "message" => $this->_validator->getErrors(),
         ];
     }
 }

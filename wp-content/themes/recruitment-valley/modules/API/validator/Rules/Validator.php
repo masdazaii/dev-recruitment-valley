@@ -10,6 +10,7 @@ use V\Rules\MaxRule;
 use V\Rules\NumericRule;
 use V\Rules\ExistsRule;
 use V\Rules\NotExistsRule;
+use V\Rules\MaxStoredRule;
 use Exception;
 
 class Validator
@@ -89,6 +90,8 @@ class Validator
                 return new ExistsRule();
             case 'not_exists':
                 return new NotExistsRule();
+            case 'max_stored':
+                return new MaxStoredRule();
             default:
                 throw new Exception("Rule '{$ruleName}' not supported.");
         }
@@ -217,10 +220,18 @@ class Validator
                     if (strpos($field, '.*') !== false) {
                         $theField = explode('.*.', $field)[0];
 
-                        $this->data[$theField] = $this->_sanitizeArray($rule, $this->data[$theField]);
-                        // $this->data[$theField][] = $this->_doSanitize($rule, $this->data[$theField]);
+                        if (array_key_exists($theField, $this->data)) {
+                            $this->data[$theField] = $this->_sanitizeArray($rule, $this->data[$theField]);
+                            // $this->data[$theField][] = $this->_doSanitize($rule, $this->data[$theField]);
+                        } else {
+                            $this->data[$theField] = null;
+                        }
                     } else {
-                        $this->data[$field] = $this->_doSanitize($rule, $this->data[$field]);
+                        if (array_key_exists($field, $this->data)) {
+                            $this->data[$field] = $this->_doSanitize($rule, $this->data[$field]);
+                        } else {
+                            $this->data[$field] = null;
+                        }
                     }
                 }
             }
@@ -250,8 +261,11 @@ class Validator
             case 'textarea':
                 return sanitize_textarea_field($data);
                 break;
-            default:
+            case 'text':
                 return sanitize_text_field($data);
+                break;
+            default:
+                return $data;
                 break;
         endswitch;
     }

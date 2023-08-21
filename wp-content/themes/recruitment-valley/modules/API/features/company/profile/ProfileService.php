@@ -38,6 +38,21 @@ class ProfileService
 
     public function post_information(WP_REST_Request $request)
     {
+        $extraRules = [
+            'gallery' => ["max_stored:10,file/user/meta/ucma_gallery_photo," . $request->user_id]
+        ];
+
+        $validator = new ValidationHelper('companyUpdateInformation', $request->get_params(), $extraRules);
+
+        if (!$validator->tempValidate()) {
+            $errors = $validator->getErrors();
+            return ResponseHelper::build([
+                'message' => $this->_message->get('company.profile.update_failed'),
+                'errors' => $errors,
+                'status' => 400
+            ]);
+        }
+
         $response = $this->setupProfileController->post_information($request);
         return ResponseHelper::build($response);
     }
@@ -63,18 +78,22 @@ class ProfileService
     public function updateDetail(WP_REST_Request $request)
     {
         $body = $request->get_params();
-        $response = $this->setupProfileController->updateDetail($request);
+        $response = $this->setupProfileController->updateDetail($body);
         return ResponseHelper::build($response);
     }
 
     public function setup(WP_REST_Request $request)
     {
-        $validator = new ValidationHelper('companySetupProfile', $request->get_params());
+        $extraRules = [
+            'gallery' => ["max_stored:10,file/user/meta/ucma_gallery_photo," . $request['user_id']]
+        ];
+
+        $validator = new ValidationHelper('companySetupProfile', $request->get_params(), $extraRules);
 
         if (!$validator->tempValidate()) {
             $errors = $validator->getErrors();
             return ResponseHelper::build([
-                'message' => $this->_message->get('candidate.favorite.vacancy_not_found'),
+                'message' => $this->_message->get('company.profile.setup_invalid'),
                 'errors' => $errors,
                 'status' => 400
             ]);
@@ -82,7 +101,7 @@ class ProfileService
 
         $body = $validator->tempSanitize();
         $body = $validator->getData();
-        // $body = $request->get_params();
+
         $response = $this->setupProfileController->setup($body);
         return ResponseHelper::build($response);
     }
@@ -95,7 +114,7 @@ class ProfileService
 
     public function getCredit(WP_REST_Request $request)
     {
-        $response = $this->setupProfileController->getCredit( $request );
+        $response = $this->setupProfileController->getCredit($request);
         return ResponseHelper::build($response);
     }
 }

@@ -93,10 +93,16 @@ class ProfileController
         //     ];
         // }
 
+        $addressResponse = '';
+        if (Helper::isset($user_data_acf, 'ucma_city') !== null || Helper::isset($user_data_acf, 'ucma_country') !== null) {
+            $addressResponse .= Helper::isset($user_data_acf, 'ucma_city') . ', ' ?? '';
+            $addressResponse .= Helper::isset($user_data_acf, 'ucma_country') ?? '';
+        }
+
         return [
             'detail' => [
                 'email' => Helper::isset($user_data, 'user_email'),
-                'address' => Helper::isset($user_data_acf, 'ucma_city') . ", " . Helper::isset($user_data_acf, 'ucma_country'),
+                'address' => $addressResponse,
                 'kvk' => Helper::isset($user_data_acf, 'ucma_kvk_number'),
                 // 'phoneNumber' => Helper::isset($user_data_acf, 'ucma_phone_code') . " " . Helper::isset($usxer_data_acf, 'ucma_phone'), // Changed, look below
                 // 'sector' => Helper::isset($user_data_acf, 'ucma_sector'), // Changed, look below
@@ -267,8 +273,7 @@ class ProfileController
 
         return [
             "status" => 200,
-            "message" => $this->message->get("company.profile.update_success"),
-            // "data" => $request
+            "message" => $this->message->get("company.profile.update_success")
         ];
     }
 
@@ -288,11 +293,12 @@ class ProfileController
         try {
             $wpdb->query('START TRANSACTION');
 
-            $galleries = ModelHelper::handle_uploads('gallery', 'test');
+            // $galleries = ModelHelper::handle_uploads('gallery', 'test'); // Change below this
+            $galleries = ModelHelper::handle_uploads('gallery', $user_id); // Changes!
 
             update_field('ucma_short_decription', Helper::isset($fields, 'shortDescription'), 'user_' . $user_id);
             update_field('ucma_company_video_url', Helper::isset($fields, 'videoUrl'), 'user_' . $user_id);
-            update_field('ucma_benefit', Helper::isset($fields, 'secondaryEmploymentConditions'), 'user_' . $request['user_id']); // Added Line
+            update_field('ucma_benefit', Helper::isset($fields, 'secondaryEmploymentConditions'), 'user_' . $user_id); // Added Line
 
             $current_gallery = maybe_unserialize(get_user_meta($user_id, 'ucma_gallery_photo'));
             $current_gallery = isset($current_gallery[0]) ? $current_gallery[0] : [];
@@ -328,10 +334,18 @@ class ProfileController
             $current_gallery = maybe_unserialize(get_user_meta($user_id, 'ucma_gallery_photo'));
             $current_gallery = isset($current_gallery[0]) ? $current_gallery[0] : [];
 
-            $gallery_index = explode("-", $gallery_id_index)[1];
             $gallery_id = explode("-", $gallery_id_index)[0];
-            if (isset($current_gallery[$gallery_index]) && $current_gallery[$gallery_index] == $gallery_id) {
-                unset($current_gallery[$gallery_index]);
+
+            /** Old syntax start here */
+            // $gallery_index = explode("-", $gallery_id_index)[1];
+            // if (isset($current_gallery[$gallery_index]) && $current_gallery[$gallery_index] == $gallery_id) {
+            //     unset($current_gallery[$gallery_index]);
+            // }
+
+            /** Changes start here */
+            $galleryIndex = array_search($gallery_id, $current_gallery);
+            if ($galleryIndex) {
+                unset($current_gallery[$galleryIndex]);
             }
             update_field('ucma_gallery_photo', $current_gallery, 'user_' . $user_id);
 
@@ -342,10 +356,12 @@ class ProfileController
         }
 
         return [
+            'status' => 200,
             'message' => $this->message->get("profile.update.success")
         ];
     }
 
+    // public function setup(WP_REST_Request $request)
     public function setup($request)
     {
         global $wpdb;
@@ -361,6 +377,8 @@ class ProfileController
 
             /** Upload Gallery */
             $galleries = ModelHelper::handle_uploads('gallery', $request['user_id']);
+            // $galleries = ModelHelper::handle_uploads('gallery', 'test');
+
             $current_gallery = maybe_unserialize(get_user_meta($request['user_id'], 'ucma_gallery_photo'));
             $current_gallery = isset($current_gallery[0]) ? $current_gallery[0] : [];
             if ($galleries) {
@@ -418,7 +436,7 @@ class ProfileController
         ];
     }
 
-    public function updatePhoto($request)
+    public function updatePhoto(WP_REST_Request $request)
     {
         global $wpdb;
 
@@ -431,8 +449,9 @@ class ProfileController
                 $currentImage = get_field('ucma_image', 'user_' . $request['user_id']) ?? [];
 
                 $imageID = wp_insert_attachment($image['image']['attachment'], $image['image']['file']);
-                update_field('ucma_image', $imageID, 'user_' . $request['user_id']);
             }
+
+            update_field('ucma_image', $imageID, 'user_' . $request['user_id']);
 
             $wpdb->query('COMMIT');
         } catch (Error $errors) {
@@ -445,7 +464,9 @@ class ProfileController
         }
 
         // Delete old image
-        wp_delete_attachment($currentImage['ID']);
+        if (isset($currentImage) && !empty($currentImage)) {
+            wp_delete_attachment($currentImage['ID']);
+        }
 
         return [
             "status" => 200,
@@ -466,7 +487,7 @@ class ProfileController
 
         return [
             'message' => $this->message->get('company.profile.get_image_success'),
-            'image' => $image,
+            'data' => $image,
             'status' => 200
         ];
     }
@@ -476,7 +497,7 @@ class ProfileController
     //     $params = $request->user_id;
     // }
 
-    public function getCredit( WP_REST_Request $request )
+    public function getCredit(WP_REST_Request $request)
     {
         try {
             $company = new Company($request["user_id"]);
@@ -485,13 +506,31 @@ class ProfileController
                 "status" => 200,
                 "message" => "success get company credit",
                 "data" => [
-                    "credit" => $company->getCredit() 
+                    "credit" => $company->getCredit()
                 ]
-                ];
+            ];
         } catch (\Exception $e) {
-            return ["status" => $e->getCode(), "message" => $e->getMessage() ];
+            return ["status" => $e->getCode(), "message" => $e->getMessage()];
         }
+    }
 
+    private function _validateGallery($request)
+    {
+        $currentGallery = maybe_unserialize(get_user_meta($request['user_id'], 'ucma_gallery_photo'));
+        $countRequestFile = count($_FILES['gallery']['name']);
 
+        if ((count($currentGallery[0]) + $countRequestFile) > 10) {
+            return [
+                'is_valid' => false,
+                'errors' => [
+                    'You\'ve reached limit for uploaded gallery. Maximum stored gallery is 10 files.'
+                ]
+            ];
+        } else {
+            return [
+                'is_valid' => true,
+                'errors' => []
+            ];
+        }
     }
 }
