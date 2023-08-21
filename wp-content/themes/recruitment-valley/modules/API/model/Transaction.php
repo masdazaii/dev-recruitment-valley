@@ -131,7 +131,7 @@ class Transaction
      */
     public function isGranted()
     {
-        return get_post_meta($this->transaction_id, $this->granted, true); 
+        return get_post_meta($this->transaction_id, $this->granted, true) != true ? true : false; 
     }
 
     /**
