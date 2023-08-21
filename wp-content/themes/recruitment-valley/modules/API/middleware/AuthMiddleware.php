@@ -94,6 +94,7 @@ class AuthMiddleware
 
         /** Check if user already verify the OTP */
         $isVerified = get_user_meta($user->ID, 'otp_is_verified', true);
+
         if ($isVerified <= 0 || $isVerified == '0') {
             return new WP_Error("rest_forbidden", $this->_message->get('auth.unauthenticate'), array("status" => 403));
         }

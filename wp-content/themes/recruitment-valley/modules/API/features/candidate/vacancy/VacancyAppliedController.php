@@ -46,12 +46,8 @@ class VacancyAppliedController
         ];
 
         $applicants = get_posts($applicantArgs);
-
-        echo '<pre>';
-        var_dump($applicants);
-        echo '</pre>';die;
         
-        if($applicants > 0)
+        if(count($applicants) > 0)
         {
             return [
                 "status" => 400,
