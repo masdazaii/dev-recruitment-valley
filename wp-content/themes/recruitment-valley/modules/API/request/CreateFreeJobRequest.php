@@ -19,7 +19,7 @@ class CreateFreeJobRequest implements MiRequest
     public function rules(): array
     {
         return [
-            "name" => [ 'required'],
+            "name" => ['required'],
             "description" => ["required"],
             "city" => ["required"],
             "placementAddress" => ["required"],
@@ -31,11 +31,12 @@ class CreateFreeJobRequest implements MiRequest
             "location.*" => ["required", "numeric"],
             "education.*" => ["required", "numeric"],
             "employmentType.*" => ["required", "numeric"],
-            "externalUrl" => ["url"]
+            "externalUrl" => ["url"],
+            "experience.*" => ["required", "numeric"] // Added Line
         ];
     }
 
-    public function validate() : bool
+    public function validate(): bool
     {
         return $this->_validator->validate();
     }
@@ -45,16 +46,16 @@ class CreateFreeJobRequest implements MiRequest
         return $this->_validator->sanitize();
     }
 
-    public function getData() : array
+    public function getData(): array
     {
         return $this->_validator->getData();
     }
 
-    public function getErrors() : array
+    public function getErrors(): array
     {
         return [
             "status" => 400,
-            "message" => $this->_validator->getErrors(), 
+            "message" => $this->_validator->getErrors(),
         ];
     }
 }

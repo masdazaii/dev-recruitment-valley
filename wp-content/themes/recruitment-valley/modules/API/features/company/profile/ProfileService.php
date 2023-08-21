@@ -63,7 +63,7 @@ class ProfileService
     public function updateDetail(WP_REST_Request $request)
     {
         $body = $request->get_params();
-        $response = $this->setupProfileController->updateDetail($request);
+        $response = $this->setupProfileController->updateDetail($body);
         return ResponseHelper::build($response);
     }
 

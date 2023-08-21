@@ -24,7 +24,7 @@ class VacancyCrudController
     }
 
     /** CHANGE STARTS HERE */
-        
+
     /**
      * getAllByLocations
      *
@@ -32,7 +32,7 @@ class VacancyCrudController
      * @param  mixed $params
      * @return array
      */
-    public function getAllByLocations($data, $params) : array 
+    public function getAllByLocations($data, $params): array
     {
         // get locations city
         $placementCity = $params['placementAddress'];
@@ -251,6 +251,7 @@ class VacancyCrudController
                 "location" => $request["location"],
                 "education" => $request["education"],
                 "type" => $request["employmentType"],
+                "experiences" => $request["experience"] ?? [], // Added Line
                 "status" => [31] // set free job become pending category
             ],
         ];
@@ -325,6 +326,7 @@ class VacancyCrudController
                 "location" => $request["location"],
                 "education" => $request["education"],
                 "type" => $request["employmentType"],
+                "experiences" => $request["experience"] ?? [], // Added Line
                 "status" => [32] // set free job become pending category
             ],
             "application_process_step" => $request["applicationProcedureSteps"],
@@ -455,11 +457,11 @@ class VacancyCrudController
             "message" => $this->_message->get("vacancy.trash.success")
         ];
     }
-    
+
     /**
      * createVacancyPayload
      * map payload base on free job or paid job
-     * 
+     *
      * @param  mixed $isPaid
      * @param  mixed $request
      * @return array
@@ -493,6 +495,7 @@ class VacancyCrudController
                     "location" => $request["location"],
                     "education" => $request["education"],
                     "type" => $request["employmentType"],
+                    "experiences" => $request["experience"] ?? [], // Added Line
                     "status" => [32] // set free job become pending category
                 ],
                 "application_process_step" => $request["applicationProcedureSteps"],
@@ -515,6 +518,7 @@ class VacancyCrudController
                     "location" => $request["location"],
                     "education" => $request["education"],
                     "type" => $request["employmentType"],
+                    "experiences" => $request["experiences"] ?? [], // Added Line
                     "status" => [31] // set free job become pending category
                 ],
             ];
@@ -522,16 +526,16 @@ class VacancyCrudController
 
         return $payload;
     }
-    
+
     /**
      * repost
      *
      * @param  mixed $request
      * @return array
      */
-    public function repost($request) : array
+    public function repost($request): array
     {
-        // get vacancy id by request 
+        // get vacancy id by request
         $vacancy_id = $request['vacancy_id'];
 
         // get user id by request
@@ -544,26 +548,26 @@ class VacancyCrudController
         $author = (int) $vacancy->getAuthor();
 
         // return 400 if author and user id not match
-        if($author !== $user_id) return [ "status" => 400, "message" => "user not have permission to repost this job with id {$vacancy_id}" ];
-        
+        if ($author !== $user_id) return ["status" => 400, "message" => "user not have permission to repost this job with id {$vacancy_id}"];
+
         // return 400 if post id not found
-        if(get_post_status( $vacancy_id ) === false)   return [ "status" => 400, "message" => "invalid post" ];
+        if (get_post_status($vacancy_id) === false)   return ["status" => 400, "message" => "invalid post"];
 
         // total credit
         // TODO : get total current credit
         $job_credit = 3;
         // TODO : get credit per 1 time repost
         $credit_per_post = 1;
-        
+
         // return 402 if credit is insufficient
-        if($job_credit <= 0) return [ "status" => 402, "message" => "Your credit is insufficient." ];
+        if ($job_credit <= 0) return ["status" => 402, "message" => "Your credit is insufficient."];
 
         // get status vacancies
         $status = $vacancy->getStatus();
         $status_lower = strtolower($status['name']);
 
         // return 400 if status post is not Close
-        if($status_lower !== 'close') return [ "status" => 402, "message" => "You cannot repost a job with id {$vacancy_id}, because the job is still in the {$status['name']} state." ];
+        if ($status_lower !== 'close') return ["status" => 402, "message" => "You cannot repost a job with id {$vacancy_id}, because the job is still in the {$status['name']} state."];
 
         // remove old term status
         $taxonomy = 'status';
@@ -576,16 +580,16 @@ class VacancyCrudController
         // set expired date +1 month
         $date_expired = new DateTimeImmutable();
         $date_expired = $date_expired->modify("+30 days")->format("Y-m-d H:i:s");
-        update_field('expired_at', $date_expired,$vacancy_id);
+        update_field('expired_at', $date_expired, $vacancy_id);
 
         // reduce credit
         $job_credit -= $credit_per_post;
         // TODO : update total credit
 
         // return status 200
-        return [ 
-            "status" => 402, 
-            "message" => "post with id {$vacancy_id} successfully reposted" 
+        return [
+            "status" => 402,
+            "message" => "post with id {$vacancy_id} successfully reposted"
         ];
     }
 
@@ -593,8 +597,8 @@ class VacancyCrudController
     {
         $jobExpireDate = get_option("job_expires") ? maybe_unserialize(get_option("job_expires")) : [];
 
-        array_push( $jobExpireDate, $jobExpiredAt );
+        array_push($jobExpireDate, $jobExpiredAt);
 
-        update_option("job_expires" ,maybe_serialize($jobExpireDate));
+        update_option("job_expires", maybe_serialize($jobExpireDate));
     }
 }
