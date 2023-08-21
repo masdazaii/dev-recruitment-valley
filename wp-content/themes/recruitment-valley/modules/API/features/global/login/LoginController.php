@@ -31,12 +31,12 @@ class LoginController
             ];
         }
 
-        // if (!get_user_meta($user->ID, 'otp_is_verified', true)) {
-        //     return [
-        //         "message" => $this->_message->get('auth.unfinish_registration'),
-        //         "status" => 400
-        //     ];
-        // }
+        if (!get_user_meta($user->ID, 'otp_is_verified', true)) {
+            return [
+                "message" => $this->_message->get('auth.unfinish_registration'),
+                "status" => 400
+            ];
+        }
 
         $credentials = [
             "user_login"    => $user->user_login,
