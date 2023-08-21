@@ -56,4 +56,10 @@ class PackageService
         $response = $this->_packageController->purchase($request);
         return ResponseHelper::build($response);
     }
+
+    public function onWebhookTrigger(WP_REST_Request $request)
+    {
+        $response = $this->_packageController->onWebhookTrigger($request);
+        return ResponseHelper::build($response);
+    }
 }

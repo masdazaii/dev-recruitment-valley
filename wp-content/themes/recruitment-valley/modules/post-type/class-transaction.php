@@ -19,6 +19,19 @@ class Transaction extends RegisterCPT
         ];
 
         $this->customPostType($title, $slug, $args);
+
+        $taxonomies = [
+            [
+                "name" => "payment_status",
+                "arguments" => [
+                    'label' => __("Payment Status", THEME_DOMAIN),
+                ]
+            ],
+        ];
+
+        foreach ($taxonomies as $key => $taxonomy) {
+            $this->taxonomy($slug, $taxonomy["name"], $taxonomy["arguments"]);
+        }
     }
 }
 
