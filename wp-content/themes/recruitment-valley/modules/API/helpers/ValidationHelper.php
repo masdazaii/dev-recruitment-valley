@@ -62,10 +62,14 @@ class ValidationHelper
 
         $this->_rules = new RequestRules;
         $rules = $this->_rules->get($rule);
-        $sanitizeRules = $this->_rules->getSanitizeRule($rule);
+        $sanitizeRules = $this->_rules->getSanitizeRule($rule) ?? [];
         if (!empty($extraRules)) {
             foreach ($extraRules as $rule => $value) {
-                $rules[$rule] = array_merge($rules[$rule], $value);
+                if (array_key_exists($rule, $rules)) {
+                    $rules[$rule] = array_merge($rules[$rule], $value);
+                } else {
+                    $rules[$rule] = $value;
+                }
             }
         }
 

@@ -104,11 +104,26 @@ class GlobalEndpoint
                     'permission_callback'   => [$authMiddleware, 'authorize_company'],
                     'callback'              => [$paymentService, 'show']
                 ],
-                'get_sector_term' => [
-                    'url'                   => '/vacancies/filters/sector',
+
+                // 'get_sector_term' => [
+                //     'url'                   => '/vacancies/filters/sector',
+                //     'methods'               => 'GET',
+                //     'permission_callback'   => '__return_true',
+                //     'callback'              => [$termVacancyService, 'getSectors']
+                // ],
+                // 'get_employment_type_term' => [
+                //     'url'                   => '/vacancies/filters/employment-type',
+                //     'methods'               => 'GET',
+                //     'permission_callback'   => '__return_true',
+                //     'callback'              => [$termVacancyService, 'getEmploymentType']
+                // ],
+
+                /** The 2 above is merged to 1 endpoint */
+                'get_term_test' => [
+                    'url'                   => '/vacancies/filters/(?P<taxonomy>[-\w]+)',
                     'methods'               => 'GET',
                     'permission_callback'   => '__return_true',
-                    'callback'              => [$termVacancyService, 'getSectors']
+                    'callback'              => [$termVacancyService, 'getSpesificTaxonomyTerm']
                 ],
                 'get_employees_option' => [
                     'url'                   => '/options/employees-total',

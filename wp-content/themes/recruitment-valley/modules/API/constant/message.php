@@ -157,6 +157,7 @@ class Message
                 "profile" => [
                     "setup_success" => __("Success setting up your profile", THEME_DOMAIN),
                     "setup_failed" => __("Failed setting up your profile", THEME_DOMAIN),
+                    "setup_invalid" => __("Invalid user input.", THEME_DOMAIN),
                     "update_success" => __("Success update company profile", THEME_DOMAIN),
                     "update_failed" => __("Failed update company profile", THEME_DOMAIN),
                     "update_detail_success" => __("Success update company profile", THEME_DOMAIN),
@@ -179,11 +180,11 @@ class Message
                         "get_success" => __('Success get employees total option.', THEME_DOMAIN),
                     ]
                 ]
-            ], 
+            ],
             "package" => [
                 "purchase" => [
-                    'success' => __("Success creating payment url", THEME_DOMAIN), 
-                ], 
+                    'success' => __("Success creating payment url", THEME_DOMAIN),
+                ],
             ]
         ];
     }

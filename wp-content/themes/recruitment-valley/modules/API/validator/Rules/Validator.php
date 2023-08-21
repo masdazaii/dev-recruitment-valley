@@ -10,6 +10,7 @@ use V\Rules\MaxRule;
 use V\Rules\NumericRule;
 use V\Rules\ExistsRule;
 use V\Rules\NotExistsRule;
+use V\Rules\MaxStoredRule;
 use Exception;
 
 class Validator
@@ -89,6 +90,8 @@ class Validator
                 return new ExistsRule();
             case 'not_exists':
                 return new NotExistsRule();
+            case 'max_stored':
+                return new MaxStoredRule();
             default:
                 throw new Exception("Rule '{$ruleName}' not supported.");
         }

@@ -53,6 +53,12 @@ class RequestRules
                 "kvkNumber" => [],
                 "btwNumber" => [],
             ],
+            'companyUpdateInformation' => [
+                "shortDescription" => ["required"],
+                "videoUrl" => [],
+                "secondaryEmploymentConditions" => [],
+                // "gallery" => []
+            ],
             'candidateUpdateProfile' => [
                 "firstName" => ["required"],
                 "dateOfBirth" => ["required"],
@@ -141,6 +147,12 @@ class RequestRules
                 "companyVideo" => "text",
                 "gallery" => ""
             ],
+            'companyUpdateInformation' => [
+                "shortDescription" => "textarea",
+                "videoUrl" => "",
+                "secondaryEmploymentConditions" => "textarea",
+                "gallery" => ""
+            ],
         ];
     }
 
@@ -158,7 +170,7 @@ class RequestRules
         if ($rule && $rule !== "" && array_key_exists($rule, $this->sanitizeRules)) {
             return $this->sanitizeRules[$rule];
         } else {
-            return false;
+            return [];
         }
     }
 }

@@ -26,10 +26,39 @@ class VacancyTermService
         return ResponseHelper::build($response);
     }
 
-    public function getSectors(WP_REST_Request $request)
+    /** The 2 above is merged to 1 endpoint */
+    public function getSpesificTaxonomyTerm(WP_REST_Request $request)
     {
         $params = $request->get_params();
-        $response = $this->vacancyTermController->getSectorsTerm($params);
+        switch (sanitize_text_field($params['taxonomy'])):
+            case 'sector':
+                $params['taxonomy'] = 'sector';
+                break;
+            case 'employment-type':
+                $params['taxonomy'] = 'type';
+                break;
+            case 'role':
+                $params['taxonomy'] = 'type';
+                break;
+            case 'education':
+                $params['taxonomy'] = 'education';
+                break;
+            case 'working-hours':
+                $params['taxonomy'] = 'working-hours';
+                break;
+            case 'location':
+                $params['taxonomy'] = 'location';
+                break;
+            case 'experiences':
+                $params['taxonomy'] = 'experiences';
+                break;
+            default:
+                return ResponseHelper::build([
+                    'message' => 'Taxonomy didn\'t exists!',
+                    'status' => 400
+                ]);
+        endswitch;
+        $response = $this->vacancyTermController->getSpesificTaxonomyTerm($params);
         return ResponseHelper::build($response);
     }
 }
