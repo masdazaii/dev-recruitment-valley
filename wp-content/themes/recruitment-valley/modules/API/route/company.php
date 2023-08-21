@@ -142,6 +142,12 @@ class CompanyEndpoint
                     'permission_callback'   => [$authMiddleware, 'authorize_company'],
                     'callback'              => [$profile, 'updateDetail']
                 ],
+                "get_credit" => [
+                    'url'                   => 'credit',
+                    'methods'               => 'GET',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company'],
+                    'callback'              => [$profile, 'getCredit']
+                ]
             ]
         ];
 
