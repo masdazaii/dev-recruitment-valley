@@ -20,7 +20,7 @@ class VacancyResponse
         $this->vacancyCollection = $vacancyCollection;
     }
 
-    public function setUserPayload( $payload )
+    public function setUserPayload($payload)
     {
         $this->userPayload = $payload;
     }
@@ -58,7 +58,7 @@ class VacancyResponse
     public function formatSingle()
     {
         $vacancyModel = new Vacancy($this->vacancyCollection->ID);
-        
+
         $candidate = $this->userPayload ? new Candidate($this->userPayload->user_id) : null;
 
         $company = new Company($this->vacancyCollection->post_author);
@@ -79,7 +79,7 @@ class VacancyResponse
         $formattedResponse = [
             "id" => $this->vacancyCollection->ID,
             "isPaid" => $vacancyModel->getIsPaid(),
-            "isFavorite" => $candidate ? $candidate->isFavorite( $this->vacancyCollection->post_author ) : false,
+            "isFavorite" => $candidate ? $candidate->isFavorite($this->vacancyCollection->post_author) : false,
             "shortDescription" => $vacancyTaxonomy,
             "title" => $this->vacancyCollection->post_title,
             "company" =>  [
@@ -134,7 +134,7 @@ class VacancyResponse
                 "location" => $vacancyTaxonomy["location"] ?? [],
                 "sector" => $vacancyTaxonomy["sector"] ?? [],
                 "vacancyType" => $vacancyModel->getIsPaid() ? "Paid" : "Free",
-                "expiredAt" => strtotime($vacancyModel->getExpiredAt()),
+                "expiredAt" => $vacancyModel->getExpiredAt("d/m/Y"),
                 "status" => $vacancyTaxonomy["status"][0]["name"] ?? null,
             ];
         }, $this->vacancyCollection);
