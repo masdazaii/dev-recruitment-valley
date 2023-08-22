@@ -199,8 +199,8 @@ class PackageController
             "status" => 200,
             "data" => [
                 "package" => [
-                    "price" => $package->getPrice(),
-                    "credit" => $package->getCredit(),
+                    "price" => intval($package->getPrice()),
+                    "credit" => intval($package->getCredit()),
                     "pricePerCredit" => $package->getPrice() / $package->getCredit(),
                 ],
                 "status" => $transaction->getStatus(),
