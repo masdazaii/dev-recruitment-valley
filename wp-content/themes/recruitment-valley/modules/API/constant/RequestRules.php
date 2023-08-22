@@ -20,28 +20,29 @@ class RequestRules
                 "password" => ["required"]
             ],
             'companySetupProfile' => [
-                "companyName" => ["required"], // Recruiter
-                "sector.*" => ["exists:term/sector/term_id/single"], // 1
-                // "sector.*" => [], // 1
-                "employeesTotal" => [], // 1
-                "phoneNumber" => ["required"], // 8967321123
-                "phoneNumberCode" => ["required"], // 62
-                // "email" => ["required", "email"], // company@email.com
-                "website" => [], //                  https://website.com
-                "kvkNumber" => [], //                129380
-                "btwNumber" => [], //                129380
-                "facebook" => [], //                 https://facebook.com
-                "instagram" => [], //                https://instagram.com
-                "linkedin" => [], //                 https://linkedin.com
-                "twitter" => [], //                  https://twitter.com
-                "country" => ["required"], //                  Netherland
-                "street" => ["required"], //               jl.kemerdekaan
-                "city" => ["required"], //                 Amsterdam
-                "postCode" => ["required"], //                 91823E
-                "shortDescription" => ["required"], //                 This is my company
-                "secondaryEmploymentConditions" => [], //                <div>WYSIWYG</div>
-                "companyVideo" => [], //                  https://youtube.com/watch?v=asdfasdf
-                "gallery" => []
+                "companyName" => ["required"],
+                "sector.*" => ["exists:term/sector/term_id/single"],
+                // "sector.*" => [],
+                "employeesTotal" => [],
+                "phoneNumber" => ["required"],
+                "phoneNumberCode" => ["required"],
+                // "email" => ["required", "email"],
+                "website" => [],
+                "kvkNumber" => [],
+                "btwNumber" => [],
+                "facebook" => [],
+                "instagram" => [],
+                "linkedin" => [],
+                "twitter" => [],
+                "country" => ["required"],
+                "street" => ["required"],
+                "city" => ["required"],
+                "postCode" => ["required"],
+                "shortDescription" => ["required"],
+                "secondaryEmploymentConditions" => [],
+                "companyVideo" => [],
+                "gallery" => [],
+                "image" => []
             ],
             'companyUpdateDetail' => [
                 "companyName" => ["required"],
@@ -100,7 +101,7 @@ class RequestRules
                 'vacancy' => ["required", "exists:post/vacancy/post_id/single"],
             ],
             'test' => [
-                'test.*.name' => ["required"]
+                'test.*.name' => ["required", "mime:jpg,jpeg,png,bmp,gif,svg,webp"]
             ]
         ];
 
@@ -145,7 +146,8 @@ class RequestRules
                 "shortDescription" => "textarea",
                 "secondaryEmploymentConditions" => "textarea",
                 "companyVideo" => "text",
-                "gallery" => ""
+                "gallery" => "",
+                "image" => ""
             ],
             'companyUpdateInformation' => [
                 "shortDescription" => "textarea",

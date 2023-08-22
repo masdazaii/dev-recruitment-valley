@@ -11,7 +11,7 @@ class MaxStoredRule implements Rule
         $params = explode('/', $parameters[1]);
 
         if ($params[0] === 'file') {
-            $theField = strpos($field, '.*') !== false ? explode('.*.', $field)[0] : $field;
+            $theField = strpos($field, '.*') !== false ? explode('.*', $field)[0] : $field;
 
             if (!array_key_exists($theField, $_FILES) || count($_FILES[$theField]['name']) <= 0) {
                 return true;
