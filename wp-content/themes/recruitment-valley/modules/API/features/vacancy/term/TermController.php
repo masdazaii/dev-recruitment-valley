@@ -21,9 +21,11 @@ class VacancyTermController
     {
         /** Get Taxonomy */
         $taxonomies = get_object_taxonomies('vacancy', 'names');
+        $termStatusOpen = get_term_by('slug', 'open', 'status', 'OBJECT');
+
         foreach ($taxonomies as $value) {
             /** Get Terms each taxonomy */
-            $termData[$value] = $this->_setResponse($this->termModel->selectTerm($value, []));
+            $termData[$value] = $this->_setResponse($this->termModel->selectTerm($value, ['post_status' => $termStatusOpen->term_id]));
         }
 
         return [
@@ -55,8 +57,8 @@ class VacancyTermController
         foreach ($terms as $key => $value) {
             $term = [
                 'label' => $value->name,
-                'value' => $value->term_id,
-                'total' => $value->count
+                'value' => intval($value->term_id),
+                'total' => intval($value->count)
             ];
 
             array_push($response, $term);

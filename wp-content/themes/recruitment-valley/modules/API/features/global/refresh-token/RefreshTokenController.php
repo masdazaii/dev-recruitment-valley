@@ -50,16 +50,25 @@ class RefreshTokenController
                 ];
             }
 
+            /** Changes Star here */
+            if ($decodedToken->role == 'candidate') {
+                $setupStatus = get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false;
+            } else if ($decodedToken->role == 'company') {
+                $setupStatus = get_field("ucma_is_full_registered", "user_" . $user->ID) ?? false;
+            }
+
             $payloadNewAccessToken = [
                 "user_id" => $user->ID,
                 "role" => $user->roles[0],
-                "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
+                // "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
+                "setup_status" => $setupStatus,
             ];
 
             $payloadNewrefreshToken = [
                 "user_id" => $user->ID,
                 "role" => $user->roles[0],
-                "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
+                // "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
+                "setup_status" => $setupStatus,
             ];
 
             $newToken = JWTHelper::generate($payloadNewAccessToken, "+60  minutes");

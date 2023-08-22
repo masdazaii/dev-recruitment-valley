@@ -161,9 +161,8 @@ class Vacancy
      */
     public function setStatus($status)
     {
-        $termExist = term_exists($status,'status');
-        if($termExist)
-        {
+        $termExist = term_exists($status, 'status');
+        if ($termExist) {
             return wp_set_post_terms($this->vacancy_id, $termExist["term_id"], 'status');
         }
     }
@@ -202,7 +201,7 @@ class Vacancy
         return $this->getProp($this->acf_term);
     }
 
-    public function getIsPaid() : bool
+    public function getIsPaid(): bool
     {
         return $this->getProp($this->acf_is_paid);
     }
@@ -245,8 +244,7 @@ class Vacancy
 
     public function getVideoUrl()
     {
-        if($this->getProp($this->acf_video_url))
-        {
+        if ($this->getProp($this->acf_video_url)) {
             return Helper::yt_id($this->getProp($this->acf_video_url));
         }
 
@@ -292,7 +290,7 @@ class Vacancy
     {
         $status = get_the_terms($this->vacancy_id, 'status');
 
-        if(isset($status[0])) {
+        if (isset($status[0])) {
 
             return ['term_id' =>  $status[0]->term_id, 'name' =>  $status[0]->name];
         }
@@ -327,6 +325,7 @@ class Vacancy
 
     public function getExpiredAt($format = "Y-m-d H:i:s")
     {
+        // return $this->getProp($this->acf_expired_at);
         $date = $this->getProp($this->acf_expired_at);
         $date = $date ? date_create($date) : "";
         return $date != "" ? date_format($date, $format) : "";
@@ -352,7 +351,7 @@ class Vacancy
         return $vacancy->post_author;
     }
 
-    public function getPublishDate( $format )
+    public function getPublishDate($format)
     {
         return get_post_time($format, true, $this->vacancy_id);
     }
@@ -452,13 +451,13 @@ class Vacancy
             'fields' => 'post_name', // Retrieve only post IDs to improve performance
             'post_status' => "publish"
         );
-        
+
         $vacancySitemap = get_posts($args);
 
         return $vacancySitemap;
     }
 
-    public function trash() : int|WP_Error
+    public function trash(): int|WP_Error
     {
         $trashed = wp_update_post([
             "ID" => $this->vacancy_id,

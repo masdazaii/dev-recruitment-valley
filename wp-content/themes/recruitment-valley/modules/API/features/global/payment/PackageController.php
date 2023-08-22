@@ -74,7 +74,7 @@ class PackageController
         ];
     }
 
-    public function createPaymentUrl( WP_REST_Request $request )
+    public function createPaymentUrl(WP_REST_Request $request)
     {
 
         $packageId = $request["packageId"];
@@ -83,39 +83,40 @@ class PackageController
         $package = new Package($packageId);
         $packagePrice = $package->getPrice();
         $pacakgeDescription = $package->getDescription();
-        
-        $secretKey = get_field( "stripe_secret_key", "option");
+
+        $secretKey = get_field("stripe_secret_key", "option");
         $stripe = new \Stripe\StripeClient($secretKey);
         $amount = $packagePrice * 100;
 
         $company = new Company($userId);
-        $package = new Package($packageId); 
+        $package = new Package($packageId);
 
         $transaction = new Transaction;
-        $transactionTitle = "Transaction from ". $company->getName() . " Buy " . $package->getTitle();  
+        $transactionTitle = "Transaction from " . $company->getName() . " Buy " . $package->getTitle();
 
         $transactionId = $transaction->storePost(["title" => $transactionTitle]);
 
-        if(is_wp_error($transactionId) || !$transactionId)
-        {
+        if (is_wp_error($transactionId) || !$transactionId) {
             return [
                 "status" => 500,
                 "message" => "something error when creating payment"
             ];
         }
 
-        $transaction->setUserName( $company->getName() );
-        $transaction->setPackageName( $package->getTitle() );
-        $transaction->setTransactionAmount( $amount/100 );
-        $transaction->setUserId( $company->getId() );
-        $transaction->setPackageId( $package->getPackageId() );
+        $transaction->setUserName($company->getName());
+        $transaction->setPackageName($package->getTitle());
+        $transaction->setTransactionAmount($amount / 100);
+        $transaction->setUserId($company->getId());
+        $transaction->setPackageId($package->getPackageId());
         $transaction->setStatus("pending");
 
         $encodedTransactionID = JWTHelper::generate(
             [
-                    "transaction_id" => $transaction->getTransactionId(),
-                    "user_id" => $company->getId(),
-                ], "+1 day");
+                "transaction_id" => $transaction->getTransactionId(),
+                "user_id" => $company->getId(),
+            ],
+            "+1 day"
+        );
 
         $stripeMetadata = [
             "transaction_id" => $transaction->getTransactionId(),
@@ -124,30 +125,30 @@ class PackageController
         ];
 
         $session = $stripe->checkout->sessions->create([
-			'line_items' => [
-				[
-					'price_data' => [
-						'currency' => 'EUR', //current currency used by birdles
-						'product_data' => [
-							'name' => 'Pacakge Credit for user ' . $userId, // Product name, after the data provided it will be change by user filter name
-						],
-						'unit_amount' => $amount, // divide by 2 zero example ; 2000 it will converted to 20
-					],
-					'quantity' => 1, // for current situation it will always by one because its only one time product
-				]
-			],
-			'mode' => 'payment',
-			'success_url' => "https://dev-recruitment-valley.vercel.app/werkgever/tegoed/succes" . "?token=" .$encodedTransactionID , // success url after payment
-			'cancel_url' => "https://dev-recruitment-valley.vercel.app/werkgever/tegoed" . "?token=" .$encodedTransactionID, // fail redit=rect payment
+            'line_items' => [
+                [
+                    'price_data' => [
+                        'currency' => 'EUR', //current currency used by birdles
+                        'product_data' => [
+                            'name' => 'Pacakge Credit for user ' . $userId, // Product name, after the data provided it will be change by user filter name
+                        ],
+                        'unit_amount' => $amount, // divide by 2 zero example ; 2000 it will converted to 20
+                    ],
+                    'quantity' => 1, // for current situation it will always by one because its only one time product
+                ]
+            ],
+            'mode' => 'payment',
+            'success_url' => "https://dev-recruitment-valley.vercel.app/werkgever/tegoed/succes" . "?token=" . $encodedTransactionID, // success url after payment
+            'cancel_url' => "https://dev-recruitment-valley.vercel.app/werkgever/tegoed" . "?token=" . $encodedTransactionID, // fail redit=rect payment
             'payment_intent_data' => [
                 "metadata" => $stripeMetadata
             ],
             "payment_method_types" => [
                 "card", "ideal"
             ],
-		]);
+        ]);
 
-        $transaction->setTransactionStripeId( $session->id );
+        $transaction->setTransactionStripeId($session->id);
 
         return [
             "status" => 200,
@@ -159,27 +160,24 @@ class PackageController
     }
 
 
-    public function purchase( WP_REST_Request $request)
+    public function purchase(WP_REST_Request $request)
     {
         $token = $request->get_param('token');
         $decodedToken = JWTHelper::check($token);
 
-        if(!isset($decodedToken->transaction_id) && !isset($decodedToken->user_id))
-        {
+        if (!isset($decodedToken->transaction_id) && !isset($decodedToken->user_id)) {
             return $decodedToken;
         }
 
-        if($request["user_id"] != $decodedToken->user_id)
-        {
+        if ($request["user_id"] != $decodedToken->user_id) {
             return [
                 "status" => 400,
                 "message" => "user not match"
             ];
         }
 
-        $transaction = new Transaction( $decodedToken->transaction_id);
-        if($transaction instanceof Exception)
-        {
+        $transaction = new Transaction($decodedToken->transaction_id);
+        if ($transaction instanceof Exception) {
             return [
                 "status" => 400,
                 "message" => "Transaction not found"
@@ -189,27 +187,29 @@ class PackageController
         $package = new Package($transaction->getPackageId());
         $user = get_user_by('ID', $transaction->getUserId());
 
-        $secretKey = get_field( "stripe_secret_key", "option");
+        $secretKey = get_field("stripe_secret_key", "option");
         $stripe = new StripeClient($secretKey);
 
         $checkoutSession = $stripe
-                            ->checkout
-                            ->sessions
-                            ->retrieve($transaction->getTransactionStripeId());
+            ->checkout
+            ->sessions
+            ->retrieve($transaction->getTransactionStripeId());
 
         return [
             "status" => 200,
             "data" => [
-                "pacakge" => [
-                    "price" => $package->getPrice(),
-                    "credit" => $package->getCredit(),
+                "package" => [
+                    "price" => intval($package->getPrice()),
+                    "credit" => intval($package->getCredit()),
                     "pricePerCredit" => $package->getPrice() / $package->getCredit(),
                 ],
                 "status" => $transaction->getStatus(),
-                "date" => $transaction->getDate( "d F Y" )
+                "date" => $transaction->getDate("d F Y"),
+                "transactionId" => $transaction->getTransactionId(),
+                "transactionStripeId" => $transaction->getTransactionStripeId()
             ]
         ];
-                            
+
         // if($checkoutSession->payment_status === "paid")
         // {
         //     $user_id = $decodedToken->user_id;
@@ -223,7 +223,7 @@ class PackageController
         //             "message"=> "This transaction already granting credit"
         //         ];
         //     }
-            
+
         //     $transaction->granted();
         //     $company->grant($package->getCredit());
 
@@ -235,9 +235,9 @@ class PackageController
     }
 
 
-    public function onWebhookTrigger( WP_REST_Request $request)
+    public function onWebhookTrigger(WP_REST_Request $request)
     {
-        $secretKey = get_field( "stripe_secret_key", "option");
+        $secretKey = get_field("stripe_secret_key", "option");
         $stripe = new \Stripe\StripeClient($secretKey);
 
         $payload = @file_get_contents('php://input');
@@ -249,9 +249,11 @@ class PackageController
 
         try {
             $event = \Stripe\Webhook::constructEvent(
-                $payload, $sig_header, $endpoint_secret
+                $payload,
+                $sig_header,
+                $endpoint_secret
             );
-        } catch(\UnexpectedValueException $e) {
+        } catch (\UnexpectedValueException $e) {
             // Invalid payload
             $response = [
                 "status" => 400,
@@ -261,7 +263,7 @@ class PackageController
             error_log(json_encode($response));
 
             return $response;
-        } catch(\Stripe\Exception\SignatureVerificationException $e) {
+        } catch (\Stripe\Exception\SignatureVerificationException $e) {
             // Invalid signature
             $response = [
                 "status" => 400,
@@ -278,19 +280,17 @@ class PackageController
         switch ($event->type) {
             case "charge.succeeded":
                 return $this->onPaymentSuccess($event);
-            case "payment_intent.payment_failed" : 
-                return $this->onPaymentFail( $event );
-            default :
+            case "payment_intent.payment_failed":
+                return $this->onPaymentFail($event);
+            default:
                 return [
                     "status" => 400,
                     "message" => "event not registered"
                 ];
-
         }
-
     }
 
-    public function onPaymentSuccess( $data )
+    public function onPaymentSuccess($data)
     {
         error_log("payment success webhook triggerred");
 
@@ -298,21 +298,19 @@ class PackageController
 
         $transaction_data = $data->data->object;
 
-        if($transaction_data->status === "succeeded" && $transaction_data->paid )
-        {
+        if ($transaction_data->status === "succeeded" && $transaction_data->paid) {
             $user_id = $transaction_data->metadata->user_id;
             $company = new Company($user_id);
-            $transaction = new Transaction( $transaction_data->metadata->transaction_id );
+            $transaction = new Transaction($transaction_data->metadata->transaction_id);
             $package = new Package($transaction->getPackageId());
 
-            if(!$transaction->isGranted())
-            {
+            if (!$transaction->isGranted()) {
                 return [
                     "status" => 400,
-                    "message"=> "This transaction already granting credit"
+                    "message" => "This transaction already granting credit"
                 ];
             }
-            
+
             $transaction->setStatus("success");
             $transaction->granted();
             $company->grant($package->getCredit());
@@ -320,7 +318,7 @@ class PackageController
             return [
                 "status" => 200,
                 "message" => "Success granting credit"
-            ];    
+            ];
         }
 
         return [
@@ -329,7 +327,7 @@ class PackageController
         ];
     }
 
-    public function onPaymentFail( $data )
+    public function onPaymentFail($data)
     {
         error_log("payment fail webhook triggerred");
 

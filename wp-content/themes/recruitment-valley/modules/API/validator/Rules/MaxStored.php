@@ -11,7 +11,7 @@ class MaxStoredRule implements Rule
         $params = explode('/', $parameters[1]);
 
         if ($params[0] === 'file') {
-            $theField = strpos($field, '.*') !== false ? explode('.*.', $field)[0] : $field;
+            $theField = strpos($field, '.*') !== false ? explode('.*', $field)[0] : $field;
 
             if (!array_key_exists($theField, $_FILES) || count($_FILES[$theField]['name']) <= 0) {
                 return true;
@@ -25,8 +25,6 @@ class MaxStoredRule implements Rule
                 $check = $this->check(count($_FILES[$theField]['name']), $table, $type, $column, $selector, $limit);
 
                 return $check;
-
-                return false;
             }
         } else {
             if ($value == "" || $value == null || empty($value)) {
@@ -50,9 +48,16 @@ class MaxStoredRule implements Rule
                     case 'meta':
                         $databaseValue = maybe_unserialize(get_user_meta($selector, $column, true));
 
-                        if (is_array($databaseValue) && (count($databaseValue) + intval($value)) < $limit) {
-                            return true;
+                        if (is_array($databaseValue)) {
+                            if (count($databaseValue) + intval($value) <= $limit) {
+                                return true;
+                            } else {
+                                return false;
+                            }
                         } else {
+                            if (intval($value) <= $limit) {
+                                return true;
+                            }
                             return false;
                         }
                         break;

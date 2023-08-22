@@ -30,16 +30,18 @@ class ProfileController
         $user_data_acf = Helper::isset($user_data, 'acf');
         $galleries = Helper::isset($user_data_acf, 'ucma_gallery_photo') ?? [];
 
-        $galleries = array_map(function ($gallery) {
-            static $i = 0;
-            $result = [
-                'id' => $gallery['ID'] . "-" . $i,
-                'title' => $gallery['title'],
-                'url' => $gallery['url'],
-            ];
-            $i++;
-            return $result;
-        }, $galleries);
+        if ($galleries) {
+            $galleries = array_map(function ($gallery) {
+                static $i = 0;
+                $result = [
+                    'id' => $gallery['ID'] . "-" . $i,
+                    'title' => $gallery['title'],
+                    'url' => $gallery['url'],
+                ];
+                $i++;
+                return $result;
+            }, $galleries);
+        }
 
         /** Added line Start here */
         $image = Helper::isset($user_data_acf, 'ucma_image') ?? [];
@@ -344,7 +346,7 @@ class ProfileController
 
             /** Changes start here */
             $galleryIndex = array_search($gallery_id, $current_gallery);
-            if ($galleryIndex) {
+            if (isset($galleryIndex) && $galleryIndex >= 0) {
                 unset($current_gallery[$galleryIndex]);
             }
             update_field('ucma_gallery_photo', $current_gallery, 'user_' . $user_id);

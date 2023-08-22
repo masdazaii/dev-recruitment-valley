@@ -62,12 +62,20 @@ class LoginController
         /** For Access Token */
         $expireAccessToken  = $issuedAt->modify($timeToLive)->getTimestamp(); // valid until 60 minutes after toket issued
 
+        /** Changes Start here */
+        if ($user->roles[0] == 'candidate') {
+            $setupStatus = get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false;
+        } else if ($user->roles[0] == 'company') {
+            $setupStatus = get_field("ucma_is_full_registered", "user_" . $user->ID) ?? false;
+        }
+
         $payloadAccessToken = [
             "exp" => $expireAccessToken,
             "user_id" => $user->ID,
             "user_email" => $user->user_email,
             "role" => $user->roles[0],
-            "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
+            // "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
+            "setup_status" => $setupStatus,
         ];
 
         /** For Refresh Token */
@@ -77,8 +85,10 @@ class LoginController
             "user_id" => $user->ID,
             "user_email" => $user->user_email,
             "role" => $user->roles[0],
-            "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
+            // "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
+            "setup_status" => $setupStatus,
         ];
+
 
         // store refresh token to db
         update_user_meta($user->ID, 'refresh_token', JWT::encode($payloadRefreshToken, $key, 'HS256'));

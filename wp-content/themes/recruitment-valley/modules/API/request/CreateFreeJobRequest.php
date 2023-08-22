@@ -32,7 +32,7 @@ class CreateFreeJobRequest implements MiRequest
             "education.*" => ["required", "numeric"],
             "employmentType.*" => ["required", "numeric"],
             "externalUrl" => ["url"],
-            "experience.*" => ["required", "numeric"] // Added Line
+            "experience.*" => ["numeric"] // Added Line
         ];
     }
 
