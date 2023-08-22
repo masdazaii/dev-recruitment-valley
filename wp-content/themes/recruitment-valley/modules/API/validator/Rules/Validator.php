@@ -63,7 +63,7 @@ class Validator
         $parameters = [];
         if (strpos($rule, ':') !== false) {
             list($rule, $parameterString) = explode(':', $rule, 2);
-            $parameters = explode(',', $parameterString);
+            $parameters = explode(',', strtolower($parameterString));
         }
 
         return [$rule, $parameters];
@@ -218,7 +218,7 @@ class Validator
             foreach ($this->_sanitizeRules as $field => $rule) {
                 if (is_string($rule) && $rule !== null && !empty($rule)) {
                     if (strpos($field, '.*') !== false) {
-                        $theField = explode('.*.', $field)[0];
+                        $theField = explode('.*', $field)[0];
 
                         if (array_key_exists($theField, $this->data)) {
                             $this->data[$theField] = $this->_sanitizeArray($rule, $this->data[$theField]);
