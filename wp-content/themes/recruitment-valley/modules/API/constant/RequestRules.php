@@ -26,7 +26,7 @@ class RequestRules
                 "employeesTotal" => ["numeric"], // 1
                 "phoneNumber" => ["required"], // 8967321123
                 "phoneNumberCode" => ["required"], // 62
-                "email" => ["required", "email"], // company@email.com
+                // "email" => ["required", "email"], // company@email.com
                 "website" => [], //                  https://website.com
                 "kvkNumber" => [], //                129380
                 "btwNumber" => [], //                129380

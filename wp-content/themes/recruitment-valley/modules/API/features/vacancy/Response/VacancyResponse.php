@@ -134,7 +134,7 @@ class VacancyResponse
                 "location" => $vacancyTaxonomy["location"] ?? [],
                 "sector" => $vacancyTaxonomy["sector"] ?? [],
                 "vacancyType" => $vacancyModel->getIsPaid() ? "Paid" : "Free",
-                "expiredAt" => strtotime($vacancyModel->getExpiredAt()),
+                "expiredAt" => $vacancyModel->getExpiredAt("d/m/Y"),
                 "status" => $vacancyTaxonomy["status"][0]["name"] ?? null,
             ];
         }, $this->vacancyCollection);

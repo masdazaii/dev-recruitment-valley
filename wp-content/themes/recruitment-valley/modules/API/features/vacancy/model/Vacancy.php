@@ -325,9 +325,11 @@ class Vacancy
         return $this->getProp($this->acf_salary_end);
     }
 
-    public function getExpiredAt()
+    public function getExpiredAt($format = "Y-m-d H:i:s")
     {
-        return $this->getProp($this->acf_expired_at);
+        $date = $this->getProp($this->acf_expired_at);
+        $date = $date ? date_create($date) : "";
+        return $date != "" ? date_format($date, $format) : "";
     }
 
     public function setProp($acf_field, $value, $repeater = false)
