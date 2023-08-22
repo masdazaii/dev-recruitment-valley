@@ -113,6 +113,13 @@ class Transaction
         return $this->setProp($this->transaction_package_id, $packageId);
     }
 
+    public function getDate( $format )
+    {
+        $date = $this->post->post_date;
+        $date = date_create($date); 
+        return date_format($date, $format);
+    }
+
     public function getProp( $field )
     {
         return get_field($field, $this->transaction_id);
@@ -121,6 +128,28 @@ class Transaction
     public function setProp( $field, $value )
     {
         return update_field($field, $value, $this->transaction_id);
+    }
+
+    public function setStatus( $status )
+    {
+        $valid_statuses = array( 'pending', 'success', 'failed' ); // Add more as needed
+        
+        if ( in_array( $status, $valid_statuses ) ) {
+            // Remove any existing payment status terms
+            wp_set_post_terms( $this->transaction_id, null, 'payment_status', false );
+            $termExist = term_exists($status,'payment_status');
+
+            // Set the new payment status term
+            wp_set_post_terms( $this->transaction_id, $termExist["term_id"], 'payment_status', false );
+        }
+    }
+
+    public function getStatus( )
+    {
+        $status_terms = wp_get_post_terms( $this->transaction_id, 'payment_status' );
+        if ( ! empty( $status_terms ) ) {
+            return $status_terms[0]->name;
+        }
     }
     
     /**
