@@ -22,11 +22,11 @@ class MaxStoredRule implements Rule
                 $type = $params[2];
                 $column = $params[3];
 
+                // print('<pre>' . print_r($params, true) . '</pre>');
+
                 $check = $this->check(count($_FILES[$theField]['name']), $table, $type, $column, $selector, $limit);
 
                 return $check;
-
-                return false;
             }
         } else {
             if ($value == "" || $value == null || empty($value)) {
@@ -49,6 +49,7 @@ class MaxStoredRule implements Rule
                 switch ($type) {
                     case 'meta':
                         $databaseValue = maybe_unserialize(get_user_meta($selector, $column, true));
+                        print('<pre>' . print_r(count($databaseValue) + intval($value), true) . '</pre>');
 
                         if (is_array($databaseValue) && (count($databaseValue) + intval($value)) < $limit) {
                             return true;

@@ -119,7 +119,7 @@ class GlobalEndpoint
                 // ],
 
                 /** The 2 above is merged to 1 endpoint */
-                'get_term_test' => [
+                'get_terms' => [
                     'url'                   => '/vacancies/filters/(?P<taxonomy>[-\w]+)',
                     'methods'               => 'GET',
                     'permission_callback'   => '__return_true',
@@ -130,7 +130,19 @@ class GlobalEndpoint
                     'methods'               => 'GET',
                     'permission_callback'   => '__return_true',
                     'callback'              => [$optionService, 'getCompanyEmployeesTotal']
-                ]
+                ],
+                'get_employees_option_nd' => [
+                    'url'                   => '/filters/employees-total',
+                    'methods'               => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$optionService, 'getCompanyEmployeesTotal']
+                ],
+                'get_terms_nd' => [
+                    'url'                   => '/filters/(?P<taxonomy>[-\w]+)',
+                    'methods'               => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$termVacancyService, 'getSpesificTaxonomyTerm']
+                ],
             ]
 
         ];
