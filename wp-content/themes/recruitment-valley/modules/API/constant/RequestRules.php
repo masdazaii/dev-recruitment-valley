@@ -23,7 +23,7 @@ class RequestRules
                 "companyName" => ["required"], // Recruiter
                 "sector.*" => ["exists:term/sector/term_id/single"], // 1
                 // "sector.*" => [], // 1
-                "employeesTotal" => ["numeric"], // 1
+                "employeesTotal" => [], // 1
                 "phoneNumber" => ["required"], // 8967321123
                 "phoneNumberCode" => ["required"], // 62
                 // "email" => ["required", "email"], // company@email.com
