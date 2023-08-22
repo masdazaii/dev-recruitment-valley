@@ -19,6 +19,9 @@ class RequestRules
                 "email" => ["required", "email"],
                 "password" => ["required"]
             ],
+            'forgotPassword' => [
+                "email" => ["required", "email"],
+            ],
             'companySetupProfile' => [
                 "companyName" => ["required"],
                 "sector.*" => ["exists:term/sector/term_id/single"],
@@ -76,6 +79,48 @@ class RequestRules
                 'newPassword' => ["required"],
                 'repeatNewPassword' => ["required"],
                 'key' => ["required"]
+            ],
+            'vacancyCreateFree' => [
+                "name" => ['required'],
+                "description" => ["required"],
+                "city" => ["required"],
+                "placementAddress" => ["required"],
+                "salaryStart" => ["numeric"],
+                "salaryEnd" => ["numeric"],
+                "sector.*" => ["required", "numeric"],
+                "role.*" => ["required", "numeric"],
+                "workingHours.*" => ["required", "numeric"],
+                "location.*" => ["required", "numeric"],
+                "education.*" => ["required", "numeric"],
+                "employmentType.*" => ["required", "numeric"],
+                "externalUrl" => ["url"],
+                "experience.*" => ["numeric"]
+            ],
+            'vacancyCreatePaid' => [
+                "name" => ['required'],
+                "description" => ["required"],
+                "city" => ['required'],
+                "placementAddress" => ["required"],
+                "terms" => ["required"],
+                "salaryStart" => ["numeric"],
+                "salaryEnd" => ["numeric"],
+                "sector.*" => ["required", "numeric"],
+                "role.*" => ["required", "numeric"],
+                "workingHours.*" => ["required", "numeric"],
+                "location.*" => ["required", "numeric"],
+                "education.*" => ["required", "numeric"],
+                "employmentType.*" => ["required", "numeric"],
+                "externalUrl" => ["url"],
+                "applicationProcedureTitle" => ["required"],
+                "applicationProcedureText" => ["required"],
+                "applicationProcedureSteps.*" => ["required"],
+                "video" => ["url"],
+                "facebook" => ["url"],
+                "linkedin" => ["url"],
+                "instagram" => ["url"],
+                "twitter" => ["url"],
+                "review" => [],
+                "experience.*" => ["numeric"] // Added Line
             ],
             'addFavorite' => [
                 /**
