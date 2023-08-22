@@ -38,7 +38,7 @@ class VacancyTermService
                 $params['taxonomy'] = 'type';
                 break;
             case 'role':
-                $params['taxonomy'] = 'type';
+                $params['taxonomy'] = 'role';
                 break;
             case 'education':
                 $params['taxonomy'] = 'education';
