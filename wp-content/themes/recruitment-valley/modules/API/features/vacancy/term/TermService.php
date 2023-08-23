@@ -21,8 +21,8 @@ class VacancyTermService
     {
         $params = $request->get_params();
         $response = $this->vacancyTermController->getAllTerm($params);
-        // $formattedData = $this->vacancyTermResponse->format($response['data']);
-        // $response['data'] = $formattedData;
+        $formattedData = $this->vacancyTermResponse->format($response['data']);
+        $response['data'] = $formattedData;
         return ResponseHelper::build($response);
     }
 

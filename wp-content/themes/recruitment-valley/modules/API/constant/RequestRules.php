@@ -189,7 +189,7 @@ class RequestRules
                 "city" => "text",
                 "postCode" => "text",
                 "shortDescription" => "textarea",
-                "secondaryEmploymentConditions" => "textarea",
+                "secondaryEmploymentConditions" => "",
                 "companyVideo" => "text",
                 "gallery" => "",
                 "image" => ""
@@ -197,7 +197,7 @@ class RequestRules
             'companyUpdateInformation' => [
                 "shortDescription" => "textarea",
                 "videoUrl" => "",
-                "secondaryEmploymentConditions" => "textarea",
+                "secondaryEmploymentConditions" => "",
                 "gallery" => ""
             ],
         ];

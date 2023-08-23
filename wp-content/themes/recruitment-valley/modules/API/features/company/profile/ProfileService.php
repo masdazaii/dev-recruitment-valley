@@ -117,4 +117,10 @@ class ProfileService
         $response = $this->setupProfileController->getCredit($request);
         return ResponseHelper::build($response);
     }
+
+    public function getSecondaryEmploymentCondition(WP_REST_Request $request)
+    {
+        $response = $this->setupProfileController->getSecondaryEmploymentCondition($request->get_params());
+        return ResponseHelper::build($response);
+    }
 }

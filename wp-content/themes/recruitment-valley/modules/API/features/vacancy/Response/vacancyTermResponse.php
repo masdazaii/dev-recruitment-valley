@@ -11,9 +11,9 @@ class vacancyTermResponse
             "location" => $data['location'],
             "role" => $data['role'],
             "sector" => $data['sector'],
-            "status" => $data['status'],
             "employmentType" => $data['type'],
-            "hoursPerWeek" => $data['working-hours']
+            "hoursPerWeek" => $data['working-hours'],
+            "experiences" => $data['experiences']
         ];
 
         return $response;

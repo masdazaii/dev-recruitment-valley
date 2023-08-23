@@ -372,4 +372,23 @@ class ProfileController
             "message" => "Success, password changed"
         ];
     }
+
+    public function getCV($request)
+    {
+        $theCV = get_field('ucaa_cv', 'user_' . $request["user_id"]);
+        $response = [];
+        if ($theCV) {
+            $response = [
+                'fileName' => $theCV['filename'],
+                'url' => $theCV['url'] ?? NULL,
+                'createdAt' => $theCV['date'] ? date('M jS, Y', strtotime($theCV['date'])) : NULL,
+            ];
+        }
+
+        return [
+            'status' => 200,
+            'message' => $this->message->get('candidate.profile.get_success'),
+            'data' => $response
+        ];
+    }
 }

@@ -32,7 +32,6 @@ class VacancyTermController
         return [
             "status" => 200,
             "message" => $this->_message->get('vacancy.term.get_term_success'),
-            // "filters" => $filters,
             "data" => $termData
         ];
     }
@@ -62,30 +61,31 @@ class VacancyTermController
                 'value' => (int)$value->term_id,
                 'total' => (int)$value->count
             ];
+            $response[$value->taxonomy][] = $term;
 
-            switch ($value->taxonomy) {
-                case 'sector':
-                    $response['sector'][] = $term;
-                    break;
-                case 'type':
-                    $response['employmentType'][] = $term;
-                    break;
-                case 'role':
-                    $response['role'][] = $term;
-                    break;
-                case 'education':
-                    $response['education'][] = $term;
-                    break;
-                case 'working-hours':
-                    $response['workingHours'][] = $term;
-                    break;
-                case 'location':
-                    $response['location'][] = $term;
-                    break;
-                case 'experiences':
-                    $response['experiences'][] = $term;
-                    break;
-            }
+            // switch ($value->taxonomy) {
+            //     case 'sector':
+            //         $response['sector'][] = $term;
+            //         break;
+            //     case 'type':
+            //         $response['employmentType'][] = $term;
+            //         break;
+            //     case 'role':
+            //         $response['role'][] = $term;
+            //         break;
+            //     case 'education':
+            //         $response['education'][] = $term;
+            //         break;
+            //     case 'working-hours':
+            //         $response['workingHours'][] = $term;
+            //         break;
+            //     case 'location':
+            //         $response['location'][] = $term;
+            //         break;
+            //     case 'experiences':
+            //         $response['experiences'][] = $term;
+            //         break;
+            // }
         }
 
         return $response;
