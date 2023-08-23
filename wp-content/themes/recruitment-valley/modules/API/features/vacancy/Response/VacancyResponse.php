@@ -107,13 +107,15 @@ class VacancyResponse
             ],
             "city" => $vacancyModel->getCity(),
             "placementAddress" => $vacancyModel->getPlacementAddress(),
-            "videoId" => $company->getVideoUrl(),
+            // "videoId" => $company->getVideoUrl(), // Changed below
+            "videoId" => $company->getVideoUrl() ? StringHelper::getYoutubeID($company->getVideoUrl()) : null, // Added Line
             "gallery" => $company->getGallery(),
             "reviews" => $vacancyModel->getReviews(),
             "steps" => $vacancyModel->getApplicationProcessStep(),
             "salaryStart" => $vacancyModel->getSalaryStart(),
             "salaryEnd" => $vacancyModel->getSalaryEnd(),
-            "postedDate" => $vacancyModel->getPublishDate("Y-m-d H:i A")
+            "postedDate" => $vacancyModel->getPublishDate("Y-m-d H:i A"),
+            "expiredDate" => $vacancyModel->getExpiredAt()
         ];
 
         // $formattedResponse = get_field($vacancyModel->acf_application_process_step,$this->vacancyCollection->ID);
@@ -136,6 +138,7 @@ class VacancyResponse
                 "vacancyType" => $vacancyModel->getIsPaid() ? "Paid" : "Free",
                 "expiredAt" => $vacancyModel->getExpiredAt("d/m/Y"),
                 "status" => $vacancyTaxonomy["status"][0]["name"] ?? null,
+                "slug" => $vacancy->post_name
             ];
         }, $this->vacancyCollection);
 

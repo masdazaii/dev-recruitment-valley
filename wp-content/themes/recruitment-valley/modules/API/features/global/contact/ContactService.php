@@ -19,6 +19,8 @@ class ContactService
     {
         $body = $request->get_params();
         $response = $this->contactController->sendContact($body, 'company');
+
+        $this->_send_email_contact_to_admin($response, $body, 'company');
         $this->_send_email_to_sender($response, $body, 'company');
 
         return ResponseHelper::build($response);
@@ -28,21 +30,21 @@ class ContactService
     {
         $body = $request->get_params();
         $response = $this->contactController->sendContact($body, 'candidate');
-        
+
         $this->_send_email_contact_to_admin($response, $body, 'candidate');
         $this->_send_email_to_sender($response, $body, 'candidate');
-        
+
         return ResponseHelper::build($response);
     }
 
     private function _send_email_contact_to_admin($response, $body, $type = 'candidate')
     {
-        if($response['status'] !== 200) return;
+        if ($response['status'] !== 200) return;
 
         $args = [
             'contact.firstName' => $type === 'candidate' ? $body['firstName'] : $body['companyName'],
             'contact.lastName'  => $type === 'candidate' ? $body['lastName'] : $body['name'],
-            'contact.phone'  => "(+" . $body['phoneNumberCode'] . ") ". $body['phoneNumber'],
+            'contact.phone'  => "(+" . $body['phoneNumberCode'] . ") " . $body['phoneNumber'],
             'contact.email'  => $body['email'],
             'contact.remark'  => $body['message'] ?? "",
         ];
@@ -54,14 +56,15 @@ class ContactService
 
         $site_title = get_bloginfo('name');
         $site_email = get_option('admin_email');
+
         wp_mail($site_email, "Contact Bevestiging - $site_title", $content, $headers);
     }
 
     private function _send_email_to_sender($response, $body, $type = 'candidate')
     {
         $email = $body['email'];
-        if($response['status'] !== 200 || !isset($email)) return;
-        
+        if ($response['status'] !== 200 || !isset($email)) return;
+
         $args = [
             'contact.firstName' => $type === 'candidate' ? $body['firstName'] : $body['companyName'],
             'contact.lastName'  => $type === 'candidate' ? $body['lastName'] : $body['name'],

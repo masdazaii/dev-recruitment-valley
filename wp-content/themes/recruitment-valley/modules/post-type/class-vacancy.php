@@ -2,11 +2,15 @@
 
 namespace PostType;
 
+use DateTimeImmutable;
+use Vacancy\Vacancy as VacancyModel;
+
 class Vacancy extends RegisterCPT
 {
     public function __construct()
     {
         add_action('init', [$this, 'RegisterVacancyCPT']);
+        add_action('save_post', [$this, 'setExpiredDate'], 10, 3);
     }
 
     public function RegisterVacancyCPT()
@@ -73,6 +77,21 @@ class Vacancy extends RegisterCPT
 
         foreach ($taxonomies as $key => $taxonomy) {
             $this->taxonomy($slug, $taxonomy["name"], $taxonomy["arguments"]);
+        }
+    }
+
+    public function setExpiredDate($post_id, $post, $postBefore)
+    {
+        if ($post->post_type == 'vacancy') {
+            /** 'open' is term slug, 'status' is taxonomy name */
+            if (has_term('open', 'status', $post)) {
+                if (!get_field('is_paid', $post_id, true)) {
+                    error_log('free');
+                    $vacancyModel = new VacancyModel($post_id);
+                    $today = new DateTimeImmutable("now");
+                    $vacancyModel->setProp($vacancyModel->acf_expired_at, $today->modify("+30 days")->format("Y-m-d H:i:s"));
+                }
+            }
         }
     }
 }

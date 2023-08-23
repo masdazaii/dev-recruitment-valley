@@ -196,7 +196,7 @@
                           <tbody>
                             <tr>
                               <td style="width: 100px">
-                                <img height="auto" src="<?= THEME_URL; ?>/assets/images/logo-header.webp" style="
+                                <img height="auto" src="<?= THEME_URL; ?>/assets/images/logo-header.png" style="
                                       border: 0;
                                       display: block;
                                       outline: none;
@@ -551,7 +551,7 @@
                                   <tbody>
                                     <tr>
                                       <td style="width: 100px">
-                                        <img height="auto" src="<?= THEME_URL; ?>/assets/images/logo-footer.webp" style="
+                                        <img height="auto" src="<?= THEME_URL; ?>/assets/images/logo-footer.png" style="
                                               border: 0;
                                               display: block;
                                               outline: none;
