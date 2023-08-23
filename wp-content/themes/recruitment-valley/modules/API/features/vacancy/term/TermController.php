@@ -20,17 +20,19 @@ class VacancyTermController
     public function getAllTerm($parameters)
     {
         /** Get Taxonomy */
-        $taxonomies = get_object_taxonomies('vacancy', 'names');
         $termStatusOpen = get_term_by('slug', 'open', 'status', 'OBJECT');
 
-        foreach ($taxonomies as $value) {
-            /** Get Terms each taxonomy */
-            $termData[$value] = $this->_setResponse($this->termModel->selectTerm($value, ['post_status' => $termStatusOpen->term_id]));
-        }
+        /** Changes Start Here */
+        $filters = [
+            'post_status' => $termStatusOpen->term_id,
+            'hideEmpty' => $parameters['hideEmpty'] ?? false
+        ];
+        $termData = $this->_setResponse($this->termModel->selectAllTerm($filters));
 
         return [
             "status" => 200,
             "message" => $this->_message->get('vacancy.term.get_term_success'),
+            // "filters" => $filters,
             "data" => $termData
         ];
     }
@@ -57,11 +59,33 @@ class VacancyTermController
         foreach ($terms as $key => $value) {
             $term = [
                 'label' => $value->name,
-                'value' => intval($value->term_id),
-                'total' => intval($value->count)
+                'value' => (int)$value->term_id,
+                'total' => (int)$value->count
             ];
 
-            array_push($response, $term);
+            switch ($value->taxonomy) {
+                case 'sector':
+                    $response['sector'][] = $term;
+                    break;
+                case 'type':
+                    $response['employmentType'][] = $term;
+                    break;
+                case 'role':
+                    $response['role'][] = $term;
+                    break;
+                case 'education':
+                    $response['education'][] = $term;
+                    break;
+                case 'working-hours':
+                    $response['workingHours'][] = $term;
+                    break;
+                case 'location':
+                    $response['location'][] = $term;
+                    break;
+                case 'experiences':
+                    $response['experiences'][] = $term;
+                    break;
+            }
         }
 
         return $response;
