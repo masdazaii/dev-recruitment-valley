@@ -107,7 +107,8 @@ class VacancyResponse
             ],
             "city" => $vacancyModel->getCity(),
             "placementAddress" => $vacancyModel->getPlacementAddress(),
-            "videoId" => $company->getVideoUrl(),
+            // "videoId" => $company->getVideoUrl(), // Changed below
+            "videoId" => StringHelper::getYoutubeID($company->getVideoUrl()), // Added Line
             "gallery" => $company->getGallery(),
             "reviews" => $vacancyModel->getReviews(),
             "steps" => $vacancyModel->getApplicationProcessStep(),
