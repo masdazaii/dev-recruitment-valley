@@ -13,7 +13,7 @@ class LoginController
 {
     private $_message;
 
-    private $reset_password_url = "dev-recruitment-valley.test";
+    private $reset_password_url = "https://dev-recruitment-valley.vercel.app/autorisatie/nieuw-wachtwoord";
 
     public function __construct()
     {
