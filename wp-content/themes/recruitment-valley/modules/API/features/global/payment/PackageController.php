@@ -134,6 +134,8 @@ class PackageController
                             'name' => 'Pacakge Credit for user ' . $userId, // Product name, after the data provided it will be change by user filter name
                         ],
                         'unit_amount' => $amount, // divide by 2 zero example ; 2000 it will converted to 20
+                        'tax_behavior' => "exclusive",
+                        
                     ],
                     'quantity' => 1, // for current situation it will always by one because its only one time product
                 ]
@@ -144,6 +146,16 @@ class PackageController
             'payment_intent_data' => [
                 "metadata" => $stripeMetadata
             ],
+            'metadata' => $stripeMetadata,
+            'invoice_creation' => [
+				'enabled' => true,
+				'invoice_data' => [
+					'rendering_options' => ['amount_tax_display' => 'exclude_tax'],
+				],
+			],
+            'automatic_tax' => [
+				'enabled' => true,
+			],
             "payment_method_types" => [
                 "card", "ideal"
             ],
@@ -212,29 +224,6 @@ class PackageController
                 "transactionStripeId" => $transaction->getTransactionStripeId()
             ]
         ];
-
-        // if($checkoutSession->payment_status === "paid")
-        // {
-        //     $user_id = $decodedToken->user_id;
-        //     $company = new Company($user_id);
-        //     $package = new Package($transaction->getPackageId());
-
-        //     if(!$transaction->isGranted())
-        //     {
-        //         return [
-        //             "status" => 400,
-        //             "message"=> "This transaction already granting credit"
-        //         ];
-        //     }
-
-        //     $transaction->granted();
-        //     $company->grant($package->getCredit());
-
-        //     return [
-        //         "status" => 200,
-        //         "message" => $package->getCredit() . "credit already added into your balance",
-        //     ];
-        // }
     }
 
 
@@ -244,7 +233,9 @@ class PackageController
         $stripe = new \Stripe\StripeClient($secretKey);
 
         $payload = @file_get_contents('php://input');
-        $endpoint_secret = 'whsec_3Z07iu7314TUwmpuohrnAEuV6BwcgcoT';
+        // $endpoint_secret = 'whsec_3Z07iu7314TUwmpuohrnAEuV6BwcgcoT';
+        
+        $endpoint_secret = 'whsec_02c7938964b4c50fc49380728f70538105c68b52df5a50da93130db4e6023ebf';
 
         $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
 
@@ -282,6 +273,8 @@ class PackageController
 
         switch ($event->type) {
             case "charge.succeeded":
+                return $this->onChargeSucceeded($event);
+            case "checkout.session.completed":
                 return $this->onPaymentSuccess($event);
             case "payment_intent.payment_failed":
                 return $this->onPaymentFail($event);
@@ -301,7 +294,7 @@ class PackageController
 
         $transaction_data = $data->data->object;
 
-        if ($transaction_data->status === "succeeded" && $transaction_data->paid) {
+        if ($transaction_data->status === "complete" && $transaction_data->payment_status == "paid") {
             $user_id = $transaction_data->metadata->user_id;
             $company = new Company($user_id);
             $transaction = new Transaction($transaction_data->metadata->transaction_id);
@@ -314,6 +307,9 @@ class PackageController
                 ];
             }
 
+            $this->sendInvoice($transaction_data->invoice, $company->getEmail() );
+
+            error_log("granting user");
             $transaction->setStatus("success");
             $transaction->granted();
             $company->grant($package->getCredit());
@@ -345,4 +341,61 @@ class PackageController
             "message" => "payment fail triggerred"
         ];
     }
+
+    public function sendInvoice( $invoiceId , $email = false )
+    {
+        error_log("start sending invoice");
+
+        $secretKey = get_field("stripe_secret_key", "option");
+        \Stripe\Stripe::setApiKey($secretKey);
+
+        try {
+            // Retrieve the invoice
+            $invoice = \Stripe\Invoice::retrieve($invoiceId);
+        
+            // Update customer email
+            if($email)
+            {
+                $customer = \Stripe\Customer::retrieve($invoice->customer);
+                $customer->email = $email;
+                $customer->save();
+            }
+        
+            // Send the invoice
+            $invoice->sendInvoice();
+            error_log("invoice {$invoice->id} already sent to customer");
+            
+        } catch (\Stripe\Exception\ApiErrorException $e) {
+            error_log("Sent invoice error : ". $e->getMessage());
+        }
+        
+    }
+
+    public function onChargeSucceeded( $data )
+    {
+        error_log("send receipt start");
+
+        error_log(json_encode($data));
+
+        return [
+            "status" => 200,
+            "message" => "Success get receipt"
+        ];
+    }
+
+    // public function sendReceipt($paymentIntentId, $email = false)
+    // {
+    //     $secretKey = get_field("stripe_secret_key", "option");
+    //     \Stripe\Stripe::setApiKey($secretKey);
+
+    //     try {
+    //         $paymentIntent = \Stripe\PaymentIntent::retrieve($paymentIntentId);
+
+    //         $paymentIntent->sendInvoice();
+    //         error_log("invoice {$invoice->id} already sent to customer");
+            
+    //     } catch (\Stripe\Exception\ApiErrorException $e) {
+    //         error_log("Sent invoice error : ". $e->getMessage());
+    //     }
+    // }
 }
