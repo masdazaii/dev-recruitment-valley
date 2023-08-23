@@ -516,6 +516,19 @@ class ProfileController
         }
     }
 
+    public function getSecondaryEmploymentCondition($request)
+    {
+        $theBenefit = get_field('ucma_benefit', 'user_' . $request['user_id']);
+
+        return [
+            'status' => 200,
+            'message' => $this->message->get('company.profile.get_success'),
+            'data' => [
+                'secondaryEmploymentCondition' => $theBenefit ?? NULL
+            ]
+        ];
+    }
+
     private function _validateGallery($request)
     {
         $currentGallery = maybe_unserialize(get_user_meta($request['user_id'], 'ucma_gallery_photo'));

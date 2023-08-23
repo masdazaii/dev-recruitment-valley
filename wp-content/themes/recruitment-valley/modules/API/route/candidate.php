@@ -79,11 +79,17 @@ class CandidateEndpoint
                     'permission_callback'   => [$authMiddleware, 'check_token_candidate'],
                     'callback'              =>  [$profileService, 'updatePhoto'],
                 ],
+                'get_cv' => [
+                    'url'                   =>  '/profile/cv',
+                    'methods'               =>  'GET',
+                    'permission_callback'   => [$authMiddleware, 'authorize_candidate'],
+                    'callback'              => [$profileService, 'getCV'],
+                ],
                 'update_cv' => [
-                    'url'                   =>  'profile/cv',
-                    'methods'               =>  'POST',
+                    'url'                   => 'profile/cv',
+                    'methods'               => 'POST',
                     'permission_callback'   => [$authMiddleware, 'check_token_candidate'],
-                    'callback'              =>  [$profileService, 'updateCv'],
+                    'callback'              => [$profileService, 'updateCv'],
                 ],
                 'apply-job' => [
                     'url'                   => 'apply',

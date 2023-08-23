@@ -83,4 +83,11 @@ class ProfileService
         $response = $this->setupProfileController->changePassword($request);
         return ResponseHelper::build($response);
     }
+
+    public function getCV(WP_REST_Request $request)
+    {
+        $params = $request->get_params();
+        $response = $this->setupProfileController->getCV($params);
+        return ResponseHelper::build($response);
+    }
 }

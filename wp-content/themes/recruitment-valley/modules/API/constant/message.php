@@ -120,6 +120,9 @@ class Message
                 ]
             ],
             'candidate' => [
+                "profile" => [
+                    "get_success" => __("Success get candidate profile.", THEME_DOMAIN),
+                ],
                 "apply_vacancy" => [
                     "apply_success" => __("Success apply this job.", THEME_DOMAIN),
                     "apply_failed" => __("Failed apply this job.", THEME_DOMAIN),
@@ -162,6 +165,7 @@ class Message
                     "update_failed" => __("Failed update company profile", THEME_DOMAIN),
                     "update_detail_success" => __("Success update company profile", THEME_DOMAIN),
                     "get_image_success" => __("Success get company image.", THEME_DOMAIN),
+                    "get_success" => __("Success get company profile.", THEME_DOMAIN),
                 ]
             ],
             'package' => [
