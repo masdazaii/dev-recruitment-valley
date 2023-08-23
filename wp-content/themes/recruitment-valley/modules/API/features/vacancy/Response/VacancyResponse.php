@@ -136,6 +136,7 @@ class VacancyResponse
                 "vacancyType" => $vacancyModel->getIsPaid() ? "Paid" : "Free",
                 "expiredAt" => $vacancyModel->getExpiredAt("d/m/Y"),
                 "status" => $vacancyTaxonomy["status"][0]["name"] ?? null,
+                "slug" => $vacancy->post_name
             ];
         }, $this->vacancyCollection);
 
