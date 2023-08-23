@@ -69,34 +69,34 @@ class ContactController
         }
 
         /** Send email to admin */
-        $adminEmail = get_option('admin_email');
+        // $adminEmail = get_option('admin_email');
         // $adminHeaders[] = 'From: ' . $request['email'] . '<' . $request['email']  . '>';
-        $subject = 'NEW MESSAGE - ';
-        $body = $request['message'];
-        $body .= '<hr>';
-        $body .= 'Sender data : ' . PHP_EOL;
+        // $subject = 'NEW MESSAGE - ';
+        // $body = $request['message'];
+        // $body .= '<hr>';
+        // $body .= 'Sender data : ' . PHP_EOL;
 
-        if ($from === 'company') {
-            $subject .= $request['companyName'] . ' [' . $request['name'] . ']';
-            $body .= 'Company Name : ' . $request['companyName'] . ' [' . $request['name'] . ']' . PHP_EOL;
-        } else {
-            $subject .= $request['firstName'] . ' - ' . $request['lastName'];
-            $body .= 'Candidate Name : ' . $request['firstName'] . ' - ' . $request['lastName'] . PHP_EOL;
-        }
-        $body .= 'Email : ' . $request['email'] . PHP_EOL;
-        $body .= 'Phone : ' . '(' . $request['phoneNumber'] . ') ' . $request['phoneNumber'] . PHP_EOL;
+        // if ($from === 'company') {
+        //     $subject .= $request['companyName'] . ' [' . $request['name'] . ']';
+        //     $body .= 'Company Name : ' . $request['companyName'] . ' [' . $request['name'] . ']' . PHP_EOL;
+        // } else {
+        //     $subject .= $request['firstName'] . ' - ' . $request['lastName'];
+        //     $body .= 'Candidate Name : ' . $request['firstName'] . ' - ' . $request['lastName'] . PHP_EOL;
+        // }
+        // $body .= 'Email : ' . $request['email'] . PHP_EOL;
+        // $body .= 'Phone : ' . '(' . $request['phoneNumber'] . ') ' . $request['phoneNumber'] . PHP_EOL;
 
         // wp_mail($adminEmail, $subject, $body);
-        EmailHelper::send(
-            'contact-' . $from,
-            [
-                'email' => $request['email'],
-                'name'  => ($from === 'company' ? $request['name'] : $request['firstName'] . ' ' . $request['lastName'])
-            ],
-            $request['email'],
-            $subject,
-            $request
-        );
+        // EmailHelper::send(
+        //     'contact-' . $from,
+        //     [
+        //         'email' => $request['email'],
+        //         'name'  => ($from === 'company' ? $request['name'] : $request['firstName'] . ' ' . $request['lastName'])
+        //     ],
+        //     $request['email'],
+        //     $subject,
+        //     $request
+        // );
 
         return [
             "message"    => $this->_message->get('contact.success'),
