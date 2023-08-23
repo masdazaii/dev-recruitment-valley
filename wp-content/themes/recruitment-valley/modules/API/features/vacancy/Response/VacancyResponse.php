@@ -108,13 +108,14 @@ class VacancyResponse
             "city" => $vacancyModel->getCity(),
             "placementAddress" => $vacancyModel->getPlacementAddress(),
             // "videoId" => $company->getVideoUrl(), // Changed below
-            "videoId" => StringHelper::getYoutubeID($company->getVideoUrl()), // Added Line
+            "videoId" => $company->getVideoUrl() ? StringHelper::getYoutubeID($company->getVideoUrl()) : null, // Added Line
             "gallery" => $company->getGallery(),
             "reviews" => $vacancyModel->getReviews(),
             "steps" => $vacancyModel->getApplicationProcessStep(),
             "salaryStart" => $vacancyModel->getSalaryStart(),
             "salaryEnd" => $vacancyModel->getSalaryEnd(),
-            "postedDate" => $vacancyModel->getPublishDate("Y-m-d H:i A")
+            "postedDate" => $vacancyModel->getPublishDate("Y-m-d H:i A"),
+            "expiredDate" => $vacancyModel->getExpiredAt()
         ];
 
         // $formattedResponse = get_field($vacancyModel->acf_application_process_step,$this->vacancyCollection->ID);
