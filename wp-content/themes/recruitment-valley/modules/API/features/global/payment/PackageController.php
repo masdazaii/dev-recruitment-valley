@@ -5,6 +5,7 @@ namespace Global;
 use Constant\Message;
 use Error;
 use Exception;
+use Helper\EmailHelper;
 use JWTHelper;
 use Model\Company;
 use Package;
@@ -149,6 +150,8 @@ class PackageController
         ]);
 
         $transaction->setTransactionStripeId($session->id);
+
+        EmailHelper::sendPaymentConfirmation( $transactionId );
 
         return [
             "status" => 200,

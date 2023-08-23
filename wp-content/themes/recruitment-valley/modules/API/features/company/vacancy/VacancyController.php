@@ -55,8 +55,8 @@ class VacancyController
     {
         $vacancy = new Vacancy;
         $filters = [
-            'page' => $request['page'] ?? null,
-            'postPerPage' => $request['perPage'] ?? null,
+            'page' => $request['page'] ?? 1,
+            'postPerPage' => $request['perPage'] ?? 10,
             'search' => $request['search'] ?? null,
         ];
 
@@ -68,7 +68,7 @@ class VacancyController
 
         $args = [
             "post_type" => $vacancy->vacancy,
-            "post_author" => $request["user_id"],
+            "author__in" => [$request["user_id"]],
             "posts_per_page" => $filters['postPerPage'],
             "offset" => $offset,
             "order" => "ASC",
@@ -102,7 +102,7 @@ class VacancyController
             'message' => $this->_message->get('vacancy.get_all'),
             'data'    => $vacancies->posts,
             'meta'    => [
-                'currentPage' => $filters['page'],
+                'currentPage' => (int) $filters['page'],
                 'totalPage' => $vacancies->max_num_pages
             ],
             'status'  => 200
