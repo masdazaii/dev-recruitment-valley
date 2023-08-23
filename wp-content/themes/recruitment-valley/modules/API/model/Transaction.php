@@ -75,7 +75,8 @@ class Transaction
 
     public function getUserId()
     {
-        return $this->getProp($this->transaction_user_id);
+        $user = $this->getProp($this->transaction_user_id);
+        return $user["ID"];
     }
 
     public function getPackageId()
