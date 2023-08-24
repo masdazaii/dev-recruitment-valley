@@ -90,4 +90,11 @@ class ProfileService
         $response = $this->setupProfileController->getCV($params);
         return ResponseHelper::build($response);
     }
+
+    public function getUserNav(WP_REST_Request $request)
+    {
+        $params = $request->get_params();
+        $response = $this->setupProfileController->getUserNav($params);
+        return ResponseHelper::build($response);
+    }
 }
