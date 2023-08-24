@@ -140,7 +140,7 @@ class Company
         return $this->getProp($this->website);
     }
 
-    public function getGallery()
+    public function getGallery( $object = false )
     {
         $gallery = $this->getProp($this->gallery);
 
@@ -148,7 +148,16 @@ class Company
             return [];
         }
 
-        $gallery = array_map(function ($attachmentId) {
+        $gallery = array_map(function ($attachmentId) use ($object) {
+            if($object)
+            {
+                return [
+                    "id" => $attachmentId,
+                    "url" => wp_get_attachment_url($attachmentId),
+                    "title" => wp_get_attachment_caption($attachmentId)
+                ];    
+            }
+
             return wp_get_attachment_url($attachmentId);
         }, $gallery);
 

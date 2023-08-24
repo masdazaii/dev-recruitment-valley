@@ -275,10 +275,10 @@ class VacancyCrudController
             }
 
             $expiredAt = new DateTimeImmutable();
-            $expiredAt = $expiredAt->modify("+30 days")->format("Y-m-d H:i:s");
+            // $expiredAt = $expiredAt->modify("+30 days")->format("Y-m-d H:i:s");
 
             $vacancyModel->setStatus('processing');
-            $vacancyModel->setProp("expired_at", $expiredAt);
+            // $vacancyModel->setProp("expired_at", $expiredAt);
 
             return [
                 "status" => 201,

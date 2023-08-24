@@ -42,4 +42,14 @@ class VacancyService
         $response["data"] = $this->vacancyResponse->formatCompany();
         return ResponseHelper::build($response);
     }
+
+    public function get(WP_REST_Request $request)
+    {
+        $params = $request->get_params();
+        $params["user_id"] = $request["user_id"];
+        $response = $this->vacancyController->get($request);
+        $this->vacancyResponse->setCollection($response["data"]);
+        $response["data"] = $this->vacancyResponse->formatResponseUpdate();
+        return ResponseHelper::build($response);
+    }
 }
