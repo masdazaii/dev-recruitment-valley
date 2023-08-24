@@ -49,7 +49,7 @@ class PackageController
                 'packageDescription' => $post->post_content,
                 'packagePrice' => $package->getPrice(),
                 'packageCreditQuantity' => $package->getCredit(),
-                'pricePerPackage' => $package->getPricePerVacany(),
+                'pricePerCredit' => $package->getPricePerVacany(),
                 'isFavorite' => $isFavorite
             ];
         }
