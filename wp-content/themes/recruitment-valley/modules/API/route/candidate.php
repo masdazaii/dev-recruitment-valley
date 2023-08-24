@@ -91,6 +91,12 @@ class CandidateEndpoint
                     'permission_callback'   => [$authMiddleware, 'check_token_candidate'],
                     'callback'              => [$profileService, 'updateCv'],
                 ],
+                'candidate_nav' => [
+                    'url'                   => '/profile/user-nav',
+                    'methods'               => 'GET',
+                    'permission_callback'   => [$authMiddleware, 'authorize_candidate'],
+                    'callback'              => [$profileService, 'getUserNav'],
+                ],
                 'apply-job' => [
                     'url'                   => 'apply',
                     'methods'               => 'POST',
@@ -138,7 +144,7 @@ class CandidateEndpoint
                     'methods'               =>  'POST',
                     'permission_callback'   => [$authMiddleware, 'check_token'],
                     'callback'              =>  [$profileService, 'changePassword'],
-                ]
+                ],
             ]
         ];
 
