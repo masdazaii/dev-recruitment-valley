@@ -167,7 +167,7 @@ class Company
 
     public function getVideoUrl()
     {
-        return $this->getProp($this->videoUrl);
+        return $this->getProp($this->videoUrl) ?? "";
     }
 
     public function getProp($acf_field, $single = false)
