@@ -66,6 +66,7 @@ class ExistsRule implements Rule
                 }
 
                 $databaseValue = get_posts($args);
+
                 return count($databaseValue) < 1 ? false : true;
             case 'term':
                 $checkTerm = get_term_by($column, $value, $type);

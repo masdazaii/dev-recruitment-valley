@@ -39,7 +39,7 @@ class NotExistsRule implements Rule
                     case 'meta':
                         $databaseValue = get_user_meta($selector, $column, true);
                         if (is_array($databaseValue)) {
-                            return in_array($value, $databaseValue) ?? false;
+                            return in_array($value, $databaseValue) ? false : true;
                         } else {
                             return $databaseValue == $value ?? false;
                         }

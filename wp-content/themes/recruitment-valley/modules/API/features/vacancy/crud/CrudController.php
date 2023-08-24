@@ -6,6 +6,7 @@ use Constant\Message;
 use DateTimeImmutable;
 use JWTHelper;
 use Model\Company;
+use Model\ModelHelper;
 use WP_Post;
 use WP_Query;
 
@@ -353,7 +354,7 @@ class VacancyCrudController
                 }
             }
 
-            $vacancyModel->setProp($vacancyModel->acf_placement_city, $payload["city"]);
+            $vacancyID = $vacancyModel->setProp($vacancyModel->acf_placement_city, $payload["city"]);
             $vacancyModel->setProp($vacancyModel->acf_placement_address, $payload["placementAddress"]);
 
             $expiredAt = new DateTimeImmutable();
@@ -361,6 +362,24 @@ class VacancyCrudController
 
             $vacancyModel->setStatus('open');
             $vacancyModel->setProp("expired_at", $expiredAt);
+
+            /** Added syntax for gallery */
+            $galleries = ModelHelper::handle_uploads('galleryJob', 'vacancy/' . $vacancyID);
+            if (isset($request['galleryCompany'])) {
+                $galleryIds = array_map(function ($gallery) {
+                    return explode('-', $gallery)[0];
+                }, $request['galleryCompany']);
+            }
+
+            if ($galleries) {
+                $vacancyGallery = $galleryIds ?? [];
+                foreach ($galleries as $key => $gallery) {
+                    $vacancyGallery[] = wp_insert_attachment($gallery['attachment'], $gallery['file']);
+                }
+
+                $vacancyModel->setProp($vacancyModel->acf_gallery, $vacancyGallery, false);
+            }
+
 
             $this->add_expired_date_to_option([
                 'post_id' => $vacancyModel->vacancy_id,

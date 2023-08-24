@@ -42,7 +42,9 @@ class CreatePaidJobRequest implements MiRequest
             "instagram" => ["url"],
             "twitter" => ["url"],
             "review" => [],
-            "experience.*" => ["numeric"] // Added Line
+            "experience.*" => ["numeric"], // Added Line
+            "galleryJob.*" => [], // Added Line
+            "galleryCompany.*" => [] // Added Line
         ];
     }
 
