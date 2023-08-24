@@ -55,6 +55,7 @@ class Message
             'profile' => [
                 'setup' => [
                     'success' =>  __("success setup profile", THEME_DOMAIN),
+                    'failed' =>  __("failed setup profile", THEME_DOMAIN),
                 ],
                 'update' => [
                     'success' =>  __("success update profile", THEME_DOMAIN),

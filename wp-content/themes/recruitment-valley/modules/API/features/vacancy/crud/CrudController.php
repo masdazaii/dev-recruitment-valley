@@ -395,6 +395,14 @@ class VacancyCrudController
         }
     }
 
+    /**
+     * Filter wp_query search function
+     * change the sql query when search when posts_search hook is run
+     *
+     * @param [mixed] $search
+     * @param [object] $query
+     * @return void
+     */
     public function filterVacancySearch($search,  $query)
     {
         global $wpdb;
