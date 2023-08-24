@@ -80,10 +80,10 @@ class CandidateEndpoint
                     'callback'              =>  [$profileService, 'updatePhoto'],
                 ],
                 'get_cv' => [
-                    'url'                   =>  '/profile/cv',
+                    'url'                   =>  '/profile/apply-data',
                     'methods'               =>  'GET',
                     'permission_callback'   => [$authMiddleware, 'authorize_candidate'],
-                    'callback'              => [$profileService, 'getCV'],
+                    'callback'              => [$profileService, 'getApplyData'],
                 ],
                 'update_cv' => [
                     'url'                   => 'profile/cv',

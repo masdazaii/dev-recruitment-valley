@@ -23,11 +23,7 @@ class FavoriteVacancyService
 
     public function addFavoriteVacancy(WP_REST_Request $request)
     {
-        $extraRules = [
-            "vacancyId" => ["not_exists:user/meta/favorite_vacancy," . $request['user_id']]
-        ];
-
-        $validator = new ValidationHelper('addFavorite', $request->get_params(), $extraRules);
+        $validator = new ValidationHelper('addFavorite', $request->get_params());
 
         if (!$validator->tempValidate()) {
             $errors = $validator->getErrors();

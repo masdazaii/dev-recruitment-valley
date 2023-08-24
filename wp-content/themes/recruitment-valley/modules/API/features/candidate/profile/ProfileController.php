@@ -393,12 +393,13 @@ class ProfileController
         ];
     }
 
-    public function getCV($request)
+    public function getApplyData($request)
     {
-        $theCV = get_field('ucaa_cv', 'user_' . $request["user_id"]);
-        $response = [];
+        $user = new Candidate($request["user_id"]);
+
+        $theCV = $user->getCv() ?? NULL;
         if ($theCV) {
-            $response = [
+            $responseCV = [
                 'fileName' => $theCV['filename'],
                 'url' => $theCV['url'] ?? NULL,
                 'createdAt' => $theCV['date'] ? date('M jS, Y', strtotime($theCV['date'])) : NULL,
@@ -408,7 +409,11 @@ class ProfileController
         return [
             'status' => 200,
             'message' => $this->message->get('candidate.profile.get_success'),
-            'data' => $response
+            'data' => [
+                'cv' => $responseCV ?? null,
+                'phoneNumber' => $user->getPhoneNumber(),
+                'phoneNumberCode' => $user->getPhoneNumberCode(),
+            ]
         ];
     }
 
