@@ -25,7 +25,7 @@ class VacancyTermController
         /** Changes Start Here */
         $filters = [
             'post_status' => $termStatusOpen->term_id,
-            'hideEmpty' => $parameters['hideEmpty'] ?? false
+            'hideEmpty' => isset($parameters['hideEmpty']) && $parameters['hideEmpty'] === 'true' ? true : false
         ];
         $termData = $this->_setResponse($this->termModel->selectAllTerm($filters));
 
@@ -40,14 +40,24 @@ class VacancyTermController
     public function getSpesificTaxonomyTerm($parameters)
     {
         /** Get Term */
-        $terms = get_terms([
-            'taxonomy' => $parameters['taxonomy']
-        ]);
+        // $terms = get_terms([
+        //     'taxonomy' => $parameters['taxonomy'],
+        //     'hide_empty' => $parameters['hideEmpty'] ?? false
+        // ]);
+
+        /** Changes Start Here */
+        $termStatusOpen = get_term_by('slug', 'open', 'status', 'OBJECT');
+        $filters = [
+            'post_status' => $termStatusOpen->term_id,
+            'hideEmpty' => isset($parameters['hideEmpty']) && $parameters['hideEmpty'] === 'true' ? true : false
+        ];
+
+        $terms = $this->_setResponse($this->termModel->selectTerm($parameters['taxonomy'], $filters), 'single');
 
         return [
             "status" => 200,
             "message" => $this->_message->get('vacancy.term.show_term_success'),
-            "data" => $this->_setResponse($terms, 'single')
+            "data" => $terms
         ];
     }
 
