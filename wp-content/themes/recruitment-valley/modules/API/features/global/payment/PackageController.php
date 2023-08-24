@@ -31,19 +31,25 @@ class PackageController
     {
         $data = get_posts([
             'post_type' => 'package',
-            'post_status' => 'publish'
+            'post_status' => 'publish',
+            'orderby'   => 'meta_value_num',
+            'meta_key' => 'rv_package_price',
+            'order' => "ASC"
         ]);
 
         $responseData = [];
         foreach ($data as $post) {
             $isFavorite = get_field('is_favorite', $post->ID) ?? false;
+
+            $package = new Package( $post->ID );
             $responseData[] = [
                 'id' => $post->ID,
                 'slug' => $post->post_name,
                 'packageName' => $post->post_title,
                 'packageDescription' => $post->post_content,
-                'packagePrice' => get_field('rv_package_price', $post->ID),
-                'packageCreditQuantity' => get_field('rv_package_credit_quantity', $post->ID),
+                'packagePrice' => $package->getPrice(),
+                'packageCreditQuantity' => $package->getCredit(),
+                'pricePerPackage' => $package->getPricePerVacany(),
                 'isFavorite' => $isFavorite
             ];
         }
@@ -235,7 +241,7 @@ class PackageController
         $payload = @file_get_contents('php://input');
         // $endpoint_secret = 'whsec_3Z07iu7314TUwmpuohrnAEuV6BwcgcoT';
         
-        $endpoint_secret = 'whsec_02c7938964b4c50fc49380728f70538105c68b52df5a50da93130db4e6023ebf';
+        $endpoint_secret = 'whsec_3Z07iu7314TUwmpuohrnAEuV6BwcgcoT';
 
         $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
 

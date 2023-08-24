@@ -59,7 +59,7 @@ class Company
     {
         $args = [
             "post_type" => $this->vacancyModel->vacancy,
-            "post_author" => $this->user_id,
+            "author__in" => [ $this->user_id ],
             "posts_per_page" => -1,
             "tax_query" => [
                 [

@@ -37,12 +37,14 @@ class Package
 
     public function getPrice()
     {
-        return $this->getProp($this->price);
+        $price = $this->getProp($this->price);
+        return $price;
     }
 
     public function getCredit()
     {
-        return $this->getProp($this->credit);
+        $credit = $this->getProp($this->credit);
+        return (int) $credit < 0 ? "unlimited" : $credit;
     }
 
     public function getFavorite()
@@ -58,6 +60,21 @@ class Package
     public function getTitle()
     {
         return $this->package->post_title ?? "";
+    }
+
+    public function getPricePerVacany()
+    {
+        $price = $this->getPrice();
+        $credit = $this->getCredit();
+
+        if(!is_numeric($credit))
+        {
+            return "unlimited";
+        }
+
+        $priceperVacany = $price / $credit;
+
+        return number_format((float) $priceperVacany, 2, '.', '');
     }
 
     public function getProp( $field )
