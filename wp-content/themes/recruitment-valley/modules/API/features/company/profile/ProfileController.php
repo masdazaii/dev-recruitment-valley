@@ -539,19 +539,6 @@ class ProfileController
         }
     }
 
-    public function getSecondaryEmploymentCondition($request)
-    {
-        $theBenefit = get_field('ucma_benefit', 'user_' . $request['user_id']);
-
-        return [
-            'status' => 200,
-            'message' => $this->message->get('company.profile.get_success'),
-            'data' => [
-                'secondaryEmploymentCondition' => $theBenefit ?? NULL
-            ]
-        ];
-    }
-
     public function getCreatePaidJobDefaultValue($request)
     {
         try {
