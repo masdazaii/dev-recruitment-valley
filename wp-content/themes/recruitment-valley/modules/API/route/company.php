@@ -94,11 +94,17 @@ class CompanyEndpoint
                     ],
                     'callback'              =>  [$profile, 'delete_gallery']
                 ],
-                'profile_get_secondary_employment_condition' => [
-                    'url'                   => '/secondary-employment-condition',
+                // 'profile_get_secondary_employment_condition' => [
+                //     'url'                   => '/secondary-employment-condition',
+                //     'methods'               => 'GET',
+                //     'permission_callback'   => [$authMiddleware, 'authorize_company'],
+                //     'callback'              => [$profile, 'getSecondaryEmploymentCondition']
+                // ],
+                'create-paid-job-default-value' => [
+                    'url'                   => '/create-paid-job-default-value',
                     'methods'               => 'GET',
                     'permission_callback'   => [$authMiddleware, 'authorize_company'],
-                    'callback'              => [$profile, 'getSecondaryEmploymentCondition']
+                    'callback'              => [$profile, 'getCreatePaidJobDefaultValue']
                 ],
                 'status_vacancy_count' => [
                     'url'                   => 'dashboard/vacancy/status',

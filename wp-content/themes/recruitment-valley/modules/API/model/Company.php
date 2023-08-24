@@ -35,14 +35,15 @@ class Company
 
     private $credit = "company_credit";
 
+    private $secondaryEmploymentCondition = "ucma_benefit";
+
     public function __construct($userId = false)
     {
         $this->vacancyModel = new Vacancy;
         if ($userId) {
             $this->user_id = $userId;
             $user = get_user_by('id', $this->user_id);
-            if(!$user)
-            {
+            if (!$user) {
                 throw new Exception("company not found", 400);
             }
 
@@ -59,7 +60,7 @@ class Company
     {
         $args = [
             "post_type" => $this->vacancyModel->vacancy,
-            "author__in" => [ $this->user_id ],
+            "author__in" => [$this->user_id],
             "posts_per_page" => -1,
             "tax_query" => [
                 [
@@ -207,5 +208,10 @@ class Company
     public function setCredit($total)
     {
         return update_user_meta($this->user_id, $this->credit, $total);
+    }
+
+    public function getSecondaryEmploymentCondition()
+    {
+        return $this->getProp($this->secondaryEmploymentCondition);
     }
 }

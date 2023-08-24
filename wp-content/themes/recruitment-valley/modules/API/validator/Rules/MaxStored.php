@@ -48,6 +48,10 @@ class MaxStoredRule implements Rule
                     case 'meta':
                         $databaseValue = maybe_unserialize(get_user_meta($selector, $column, true));
 
+                        print('<pre>' . print_r($databaseValue, true) . '</pre>');
+                        print('<pre>' . print_r(count($databaseValue), true) . '</pre>');
+                        print('<pre>' . print_r($value, true) . '</pre>');
+
                         if (is_array($databaseValue)) {
                             if (count($databaseValue) + intval($value) <= $limit) {
                                 return true;

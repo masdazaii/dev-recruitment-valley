@@ -125,4 +125,10 @@ class ProfileService
         $response = $this->setupProfileController->getSecondaryEmploymentCondition($request->get_params());
         return ResponseHelper::build($response);
     }
+
+    public function getCreatePaidJobDefaultValue(WP_REST_Request $request)
+    {
+        $response = $this->setupProfileController->getCreatePaidJobDefaultValue($request->get_params());
+        return ResponseHelper::build($response);
+    }
 }

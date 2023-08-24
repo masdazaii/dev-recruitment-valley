@@ -552,6 +552,33 @@ class ProfileController
         ];
     }
 
+    public function getCreatePaidJobDefaultValue($request)
+    {
+        try {
+            $company = new Company($request["user_id"]);
+
+            return [
+                'status' => 200,
+                'message' => $this->message->get('company.profile.get_success'),
+                'data' => [
+                    'videoUrl' => $company->getVideoUrl() ?? null,
+                    'socialMedia' => [
+                        'facebook' => $company->getFacebook(),
+                        'linkedin' => $company->getLinkedin(),
+                        'instagram' => $company->getInstagram(),
+                        'twitter' => $company->getTwitter(),
+                    ],
+                    'secondaryEmploymentCondition' => $company->getSecondaryEmploymentCondition() ?? NULL
+                ]
+            ];
+        } catch (\Exception $e) {
+            return [
+                "status" => $e->getCode(),
+                "message" => $e->getMessage()
+            ];
+        }
+    }
+
     private function _validateGallery($request)
     {
         $currentGallery = maybe_unserialize(get_user_meta($request['user_id'], 'ucma_gallery_photo'));

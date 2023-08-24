@@ -60,6 +60,7 @@ class RefreshTokenController
             $payloadNewAccessToken = [
                 "user_id" => $user->ID,
                 "role" => $user->roles[0],
+                "user_email" => $user->user_email,
                 // "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
                 "setup_status" => $setupStatus,
             ];
@@ -67,6 +68,7 @@ class RefreshTokenController
             $payloadNewrefreshToken = [
                 "user_id" => $user->ID,
                 "role" => $user->roles[0],
+                "user_email" => $user->user_email,
                 // "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
                 "setup_status" => $setupStatus,
             ];
