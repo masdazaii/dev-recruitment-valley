@@ -411,4 +411,26 @@ class ProfileController
             'data' => $response
         ];
     }
+
+    public function getUserNav($request)
+    {
+        try {
+            $user = new Candidate($request['user_id']);
+
+            return [
+                'status' => 200,
+                'message' => $this->message->get('candidate.profile.get_success'),
+                'data' => [
+                    "image" => $user->getImage(),
+                    "firstName" => $user->getFirstName(),
+                    "lastName" => $user->getLastName(),
+                ]
+            ];
+        } catch (\Exception $e) {
+            return [
+                "status" => $e->getCode(),
+                "message" => $e->getMessage()
+            ];
+        }
+    }
 }

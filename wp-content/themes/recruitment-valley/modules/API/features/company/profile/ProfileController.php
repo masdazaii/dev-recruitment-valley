@@ -539,17 +539,31 @@ class ProfileController
         }
     }
 
-    public function getSecondaryEmploymentCondition($request)
+    public function getCreatePaidJobDefaultValue($request)
     {
-        $theBenefit = get_field('ucma_benefit', 'user_' . $request['user_id']);
+        try {
+            $company = new Company($request["user_id"]);
 
-        return [
-            'status' => 200,
-            'message' => $this->message->get('company.profile.get_success'),
-            'data' => [
-                'secondaryEmploymentCondition' => $theBenefit ?? NULL
-            ]
-        ];
+            return [
+                'status' => 200,
+                'message' => $this->message->get('company.profile.get_success'),
+                'data' => [
+                    'videoUrl' => $company->getVideoUrl() ?? null,
+                    'socialMedia' => [
+                        'facebook' => $company->getFacebook(),
+                        'linkedin' => $company->getLinkedin(),
+                        'instagram' => $company->getInstagram(),
+                        'twitter' => $company->getTwitter(),
+                    ],
+                    'secondaryEmploymentCondition' => $company->getSecondaryEmploymentCondition() ?? NULL
+                ]
+            ];
+        } catch (\Exception $e) {
+            return [
+                "status" => $e->getCode(),
+                "message" => $e->getMessage()
+            ];
+        }
     }
 
     private function _validateGallery($request)
