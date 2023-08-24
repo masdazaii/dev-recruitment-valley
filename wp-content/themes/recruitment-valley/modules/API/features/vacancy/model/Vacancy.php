@@ -229,7 +229,7 @@ class Vacancy
     public function getApplicationProcessStep()
     {
         $steps = $this->getProp($this->acf_application_process_step);
-        if (!is_array($steps)) return null;
+        if (!is_array($steps)) return [];
 
         return array_map(function ($step) {
             static $i = 0;
@@ -240,6 +240,12 @@ class Vacancy
             $i++;
             return $result;
         }, $steps);
+    }
+
+    public function getIsNew()
+    {
+        $post_date = $this->getPublishDate();
+        return strtotime($post_date) < time();
     }
 
     public function getVideoUrl()
@@ -302,7 +308,7 @@ class Vacancy
     {
         $reviews = $this->getProp($this->acf_reviews);
 
-        if (!is_array($reviews)) return null;
+        if (!is_array($reviews)) return [];
 
         return array_map(function ($review) {
             return [
@@ -316,6 +322,52 @@ class Vacancy
     public function getSalaryStart()
     {
         return $this->getProp($this->acf_salary_start);
+    }
+
+    public function getTax()
+    {
+        $taxonomies = [
+            [
+                "name" => "sector",
+            ],
+            [
+                "name" => "role",
+            ],
+            [
+                "name" => "type",
+            ],
+            [
+                "name" => "education",
+            ],
+            [
+                "name" => "working-hours",
+            ],
+            [
+                "name" => "status",
+            ],
+            [
+                "name" => "location",
+            ],
+            [
+                "name" => "experiences",
+            ]
+        ];
+
+        $result = [];
+
+        foreach ($taxonomies as $key => $taxonomy) {
+             $terms = get_terms([
+                "taxonomy" => $taxonomy,
+                "object_ids" => $this->vacancy_id
+            ]);
+
+            foreach ($terms as $key => $term) {
+                $result[$taxonomy["name"]][$key]["label"] = $term->name;
+                $result[$taxonomy["name"]][$key]["value"] = $term->term_id;
+            }
+        }
+
+        return $result;
     }
 
     public function getSalaryEnd()
@@ -351,7 +403,9 @@ class Vacancy
         return $vacancy->post_author;
     }
 
-    public function getPublishDate($format)
+    
+
+    public function getPublishDate($format = "Y-m-d H:i:s")
     {
         return get_post_time($format, true, $this->vacancy_id);
     }

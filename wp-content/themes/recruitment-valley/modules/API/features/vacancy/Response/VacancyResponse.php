@@ -61,8 +61,6 @@ class VacancyResponse
     {
         $vacancyModel = new Vacancy($this->vacancyCollection->ID);
 
-        $candidate = $this->userPayload ? new Candidate($this->userPayload->user_id) : null;
-
         $company = new Company($this->vacancyCollection->post_author);
         $vacancyTaxonomy = $vacancyModel->getTaxonomy(false);
 
@@ -81,9 +79,8 @@ class VacancyResponse
         $formattedResponse = [
             "id" => $this->vacancyCollection->ID,
             "isPaid" => $vacancyModel->getIsPaid(),
-            "isFavorite" => $candidate ? $candidate->isFavorite($this->vacancyCollection->post_author) : false,
             "shortDescription" => $vacancyTaxonomy,
-            "title" => $this->vacancyCollection->post_title,
+            "title" => $this->vacancyCollection->post_title, // later get company here
             "company" =>  [
                 "company_id" => $company->user_id,
                 "logo" => $company->getThumbnail(),
@@ -163,6 +160,58 @@ class VacancyResponse
                 "jobPostedDate" => $vacancy->post_date,
             ];
         }, $this->vacancyCollection);
+
+        return $formattedResponse;
+    }
+
+    public function formatResponseUpdate()
+    {
+        $vacancyModel = new Vacancy($this->vacancyCollection->ID);
+
+        $candidate = $this->userPayload ? new Candidate($this->userPayload->user_id) : null;
+
+        $company = new Company($this->vacancyCollection->post_author);
+        $vacancyTaxonomy = $vacancyModel->getTaxonomy(false);
+
+        /** Set social media response */
+        $socialMedia = ["facebook", "linkedin", "instagram", "twitter"];
+
+        $socialMediaResponse = [];
+        foreach ($socialMedia as $key => $socmed) {
+            $socialMediaResponse[$key] = [
+                "id" => $key + 1,
+                "type" => $socmed,
+                "url" => $company->getSocialMedia($socmed)
+            ];
+        }
+
+        $formattedResponse = [
+            "id" => $this->vacancyCollection->ID,
+            "isPaid" => $vacancyModel->getIsPaid(),
+            "isFavorite" => $candidate ? $candidate->isFavorite($this->vacancyCollection->post_author) : false,
+            // "shortDescription" => $vacancyTaxonomy,
+            "title" => $this->vacancyCollection->post_title,
+            "contents" => [
+                "description" => $vacancyModel->getDescription(),
+                "term" => $vacancyModel->getTerm(),
+            ],
+            "city" => $vacancyModel->getCity(),
+            "placementAddress" => $vacancyModel->getPlacementAddress(),
+            "videoId" => $company->getVideoUrl() , // Added Line
+            "gallery" => $company->getGallery( true ),
+            "reviews" => $vacancyModel->getReviews(),
+            "steps" => $vacancyModel->getApplicationProcessStep(),
+            "salaryStart" => $vacancyModel->getSalaryStart(),
+            "salaryEnd" => $vacancyModel->getSalaryEnd(),
+            "postedDate" => $vacancyModel->getPublishDate("Y-m-d H:i A"),
+            "expiredDate" => $vacancyModel->getExpiredAt()
+        ];
+
+        $vacancyTax = $vacancyModel->getTax();
+
+        $formattedResponse = array_merge($formattedResponse, $vacancyTax);
+
+        // $formattedResponse = get_field($vacancyModel->acf_application_process_step,$this->vacancyCollection->ID);
 
         return $formattedResponse;
     }

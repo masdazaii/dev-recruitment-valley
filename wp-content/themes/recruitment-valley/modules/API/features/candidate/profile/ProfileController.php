@@ -221,7 +221,6 @@ class ProfileController
         ]);
 
         if (!$validate['is_valid']) return wp_send_json_error(['validation' => $validate['fields'], 'status' => 400], 400);
-        if (count($_FILES) === 0) return wp_send_json_error(['validation' => ['cv' => ["Field cv is requied."]], 'status' => 400], 400);
 
         global $wpdb;
         try {
@@ -233,9 +232,6 @@ class ProfileController
                 'last_name'       => $fields['lastName'],
             ];
 
-            $cv = ModelHelper::handle_upload('cv');
-            $image = ModelHelper::handle_upload('image');
-
             wp_update_user($userdata);
             update_field('ucaa_date_of_birth', $fields['dateOfBirth'], 'user_' . $user_id);
             update_field('ucaa_phone', $fields['phoneNumber'], 'user_' . $user_id);
@@ -244,14 +240,6 @@ class ProfileController
             update_field('ucaa_city', $fields['city'], 'user_' . $user_id);
             update_field('ucaa_linkedin_url_page', $fields['linkedinPage'], 'user_' . $user_id);
             update_field('ucaa_is_full_registered', 1, 'user_' . $user_id);
-            if ($cv) {
-                $cv_id = wp_insert_attachment($cv['cv']['attachment'], $cv['cv']['file']);
-                update_field('ucaa_cv', $cv_id, 'user_' . $user_id);
-            }
-            if ($image) {
-                $image_id = wp_insert_attachment($image['image']['attachment'], $image['image']['file']);
-                update_field('ucaa_image', $image_id, 'user_' . $user_id);
-            }
 
             $wpdb->query('COMMIT');
 

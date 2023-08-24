@@ -153,6 +153,12 @@ class CompanyEndpoint
                     'methods'               => 'GET',
                     'permission_callback'   => [$authMiddleware, 'authorize_company'],
                     'callback'              => [$profile, 'getCredit']
+                ],
+                "get_vacancy_detail" => [
+                    'url'                   => 'vacancy/(?P<vacancy_id>[-\w]+)',
+                    'methods'               => 'GET',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company'],
+                    'callback'              => [$vacancyService, 'get']
                 ]
             ]
         ];
