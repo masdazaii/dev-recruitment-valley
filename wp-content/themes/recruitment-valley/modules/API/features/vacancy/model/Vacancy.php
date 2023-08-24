@@ -229,7 +229,7 @@ class Vacancy
     public function getApplicationProcessStep()
     {
         $steps = $this->getProp($this->acf_application_process_step);
-        if (!is_array($steps)) return null;
+        if (!is_array($steps)) return [];
 
         return array_map(function ($step) {
             static $i = 0;
@@ -308,7 +308,7 @@ class Vacancy
     {
         $reviews = $this->getProp($this->acf_reviews);
 
-        if (!is_array($reviews)) return null;
+        if (!is_array($reviews)) return [];
 
         return array_map(function ($review) {
             return [
