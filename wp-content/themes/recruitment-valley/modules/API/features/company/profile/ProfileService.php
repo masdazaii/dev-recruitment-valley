@@ -42,7 +42,8 @@ class ProfileService
             'gallery' => ["max_stored:10,file/user/meta/ucma_gallery_photo," . $request->user_id]
         ];
 
-        $validator = new ValidationHelper('companyUpdateInformation', $request->get_params(), $extraRules);
+        // $validator = new ValidationHelper('companyUpdateInformation', $request->get_params(), $extraRules);
+        $validator = new ValidationHelper('companyUpdateInformation', $request->get_params());
 
         if (!$validator->tempValidate()) {
             $errors = $validator->getErrors();
@@ -88,7 +89,8 @@ class ProfileService
             'gallery' => ["max_stored:10,file/user/meta/ucma_gallery_photo," . $request['user_id']]
         ];
 
-        $validator = new ValidationHelper('companySetupProfile', $request->get_params(), $extraRules);
+        // $validator = new ValidationHelper('companySetupProfile', $request->get_params(), $extraRules);
+        $validator = new ValidationHelper('companySetupProfile', $request->get_params());
 
         if (!$validator->tempValidate()) {
             $errors = $validator->getErrors();
