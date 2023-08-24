@@ -102,42 +102,49 @@ class ProfileController
         }
 
         return [
-            'detail' => [
-                'email' => Helper::isset($user_data, 'user_email'),
-                'address' => $addressResponse,
-                'kvk' => Helper::isset($user_data_acf, 'ucma_kvk_number'),
-                // 'phoneNumber' => Helper::isset($user_data_acf, 'ucma_phone_code') . " " . Helper::isset($usxer_data_acf, 'ucma_phone'), // Changed, look below
-                // 'sector' => Helper::isset($user_data_acf, 'ucma_sector'), // Changed, look below
-                'website' => Helper::isset($user_data_acf, 'ucma_website_url'),
-                'employees' => Helper::isset($user_data_acf, 'ucma_employees'),
-                'btw' => Helper::isset($user_data_acf, 'ucma_btw_number'),
+            "message" => $this->message->get('company.profile.get_success'),
+            "data" => [
+                'detail' => [
+                    'email' => Helper::isset($user_data, 'user_email'),
+                    'address' => $addressResponse,
+                    'kvk' => Helper::isset($user_data_acf, 'ucma_kvk_number'),
+                    // 'phoneNumber' => Helper::isset($user_data_acf, 'ucma_phone_code') . " " . Helper::isset($usxer_data_acf, 'ucma_phone'), // Changed, look below
+                    // 'sector' => Helper::isset($user_data_acf, 'ucma_sector'), // Changed, look below
+                    'website' => Helper::isset($user_data_acf, 'ucma_website_url'),
+                    'employees' => [
+                        'label' => Helper::isset($user_data_acf, 'ucma_employees'),
+                        'value' => Helper::isset($user_data_acf, 'ucma_employees')
+                    ],
+                    'btw' => Helper::isset($user_data_acf, 'ucma_btw_number'),
 
-                /** Added/Changed Line start here */
-                'phoneNumberCode' => Helper::isset($user_data_acf, 'ucma_phone_code'), // Changed, look below
-                'phoneNumber' => Helper::isset($user_data_acf, 'ucma_phone'), // Changed, look below
-                'sector' => $termsResponse,
-                'companyName' => Helper::isset($user_data_acf, 'ucma_company_name'),
-                'image' => $image,
-                /** Added Line end here */
+                    /** Added/Changed Line start here */
+                    'phoneNumberCode' => Helper::isset($user_data_acf, 'ucma_phone_code'), // Changed, look below
+                    'phoneNumber' => Helper::isset($user_data_acf, 'ucma_phone'), // Changed, look below
+                    'sector' => $termsResponse,
+                    'companyName' => Helper::isset($user_data_acf, 'ucma_company_name'),
+                    'image' => $image,
+                    /** Added Line end here */
+                ],
+                'socialMedia' => [
+                    'facebook' => Helper::isset($user_data_acf, 'ucma_facebook_url'),
+                    'linkedin' => Helper::isset($user_data_acf, 'ucma_linkedin_url'),
+                    'instagram' => Helper::isset($user_data_acf, 'ucma_instagram_url'),
+                    'twitter' => Helper::isset($user_data_acf, 'ucma_twitter_url')
+                ],
+                'address' => [
+                    'country' => Helper::isset($user_data_acf, 'ucma_country'),
+                    'street' => Helper::isset($user_data_acf, 'ucma_street'),
+                    'city' => Helper::isset($user_data_acf, 'ucma_city'),
+                    'postcode' => Helper::isset($user_data_acf, 'ucma_postcode'),
+                ],
+                'information' => [
+                    'shortDescription' => Helper::isset($user_data_acf, 'ucma_short_decription'),
+                    'secondaryEmploymentConditions' => Helper::isset($user_data_acf, 'ucma_benefit'),
+                    'videoUrl' => Helper::isset($user_data_acf, 'ucma_company_video_url'),
+                    'gallery' => $galleries
+                ],
             ],
-            'socialMedia' => [
-                'facebook' => Helper::isset($user_data_acf, 'ucma_facebook_url'),
-                'linkedin' => Helper::isset($user_data_acf, 'ucma_linkedin_url'),
-                'instagram' => Helper::isset($user_data_acf, 'ucma_instagram_url'),
-                'twitter' => Helper::isset($user_data_acf, 'ucma_twitter_url')
-            ],
-            'address' => [
-                'country' => Helper::isset($user_data_acf, 'ucma_country'),
-                'street' => Helper::isset($user_data_acf, 'ucma_street'),
-                'city' => Helper::isset($user_data_acf, 'ucma_city'),
-                'postcode' => Helper::isset($user_data_acf, 'ucma_postcode'),
-            ],
-            'information' => [
-                'shortDescription' => Helper::isset($user_data_acf, 'ucma_short_decription'),
-                'secondaryEmploymentConditions' => Helper::isset($user_data_acf, 'ucma_benefit'),
-                'videoUrl' => Helper::isset($user_data_acf, 'ucma_company_video_url'),
-                'gallery' => $galleries
-            ],
+            "status" => 200
         ];
     }
 
@@ -167,7 +174,13 @@ class ProfileController
             $wpdb->query('COMMIT');
         } catch (Error $e) {
             $wpdb->query('ROLLBACK');
-            return wp_send_json_error(['error' => $e, 'status' => 500], 500);
+            // return wp_send_json_error(['error' => $e, 'status' => 500], 500);
+
+            return [
+                'message' => $this->message->get("profile.update.failed"),
+                'errors' => $e,
+                'status' => 500
+            ];
         }
 
         return [
@@ -315,7 +328,12 @@ class ProfileController
             $wpdb->query('COMMIT');
         } catch (Error $e) {
             $wpdb->query('ROLLBACK');
-            return wp_send_json_error(['error' => $e, 'status' => 500], 500);
+            // return wp_send_json_error(['error' => $e, 'status' => 500], 500);
+            return [
+                "message" => $this->message->get("company.profile.setup_failed"),
+                "errors" => $e,
+                "status" => 500
+            ];
         }
 
         return [
@@ -354,7 +372,12 @@ class ProfileController
             $wpdb->query('COMMIT');
         } catch (Error $e) {
             $wpdb->query('ROLLBACK');
-            return wp_send_json_error(['error' => $e, 'status' => 500], 500);
+            // return wp_send_json_error(['error' => $e, 'status' => 500], 500);
+            return [
+                "message" => $this->message->get("company.profile.setup_failed"),
+                "errors" => $e,
+                "status" => 500
+            ];
         }
 
         return [

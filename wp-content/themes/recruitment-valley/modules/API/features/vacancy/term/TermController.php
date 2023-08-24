@@ -47,11 +47,11 @@ class VacancyTermController
         return [
             "status" => 200,
             "message" => $this->_message->get('vacancy.term.show_term_success'),
-            "data" => $this->_setResponse($terms)
+            "data" => $this->_setResponse($terms, 'single')
         ];
     }
 
-    private function _setResponse($terms)
+    private function _setResponse($terms, $format = 'all')
     {
         $response = [];
 
@@ -61,31 +61,11 @@ class VacancyTermController
                 'value' => (int)$value->term_id,
                 'total' => (int)$value->count
             ];
-            $response[$value->taxonomy][] = $term;
-
-            // switch ($value->taxonomy) {
-            //     case 'sector':
-            //         $response['sector'][] = $term;
-            //         break;
-            //     case 'type':
-            //         $response['employmentType'][] = $term;
-            //         break;
-            //     case 'role':
-            //         $response['role'][] = $term;
-            //         break;
-            //     case 'education':
-            //         $response['education'][] = $term;
-            //         break;
-            //     case 'working-hours':
-            //         $response['workingHours'][] = $term;
-            //         break;
-            //     case 'location':
-            //         $response['location'][] = $term;
-            //         break;
-            //     case 'experiences':
-            //         $response['experiences'][] = $term;
-            //         break;
-            // }
+            if ($format == 'all') {
+                $response[$value->taxonomy][] = $term;
+            } else if ($format == 'single') {
+                $response[] = $term;
+            }
         }
 
         return $response;
