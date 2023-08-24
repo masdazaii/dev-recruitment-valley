@@ -81,6 +81,25 @@ class VacancyResponse
             "isPaid" => $vacancyModel->getIsPaid(),
             "shortDescription" => $vacancyTaxonomy,
             "title" => $this->vacancyCollection->post_title, // later get company here
+            "company" =>  [
+                "company_id" => $company->user_id,
+                "logo" => $company->getThumbnail(),
+                "name" => $company->getName(),
+                "about" => $company->getDescription(),
+                "maps" => "",
+                "sector" => "",
+                "totalEmployee" => $company->getTotalEmployees(),
+                "tel" => $company->getPhoneCode() . $company->getPhone(),
+                "email" => $company->getEmail(),
+                // "socialMedia" => [
+                //     "facebook" => $company->getFacebook(),
+                //     "twitter" => $company->getTwitter(),
+                //     "linkedin" => $company->getLinkedin(),
+                //     "instagram" => $company->getInstagram(),
+                // ],
+                "socialMedia" => $socialMediaResponse,
+                "website" => $company->getWebsite()
+            ], // later get company here
             "contents" => [
                 "description" => $vacancyModel->getDescription(),
                 "term" => $vacancyModel->getTerm(),
