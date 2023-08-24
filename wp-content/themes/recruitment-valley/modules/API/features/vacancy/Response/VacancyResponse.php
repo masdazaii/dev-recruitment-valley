@@ -31,6 +31,7 @@ class VacancyResponse
             $vacancyModel = new Vacancy($vacancy->ID);
             $company = new Company($vacancy->post_author);
             $vacancyTaxonomy = $vacancyModel->getTaxonomy(true);
+
             return [
                 "id" => $vacancy->ID,
                 "slug" => $vacancy->post_name,
@@ -48,7 +49,8 @@ class VacancyResponse
                 "salaryEnd" => $vacancyModel->getSalaryEnd(),
                 "thumbnail" => $company->getThumbnail(),
                 "description" => $vacancyModel->getDescription(),
-                "postedDate" => date_format(new DateTime($vacancy->post_date_gmt), "Y-m-d H:i A")
+                // "postedDate" => date_format(new DateTime($vacancy->post_date_gmt), "Y-m-d H:i A")
+                "postedDate" => date_format(new DateTime($vacancy->post_date_gmt), "d-m-Y H:i")
             ];
         }, $this->vacancyCollection);
 
@@ -114,8 +116,9 @@ class VacancyResponse
             "steps" => $vacancyModel->getApplicationProcessStep(),
             "salaryStart" => $vacancyModel->getSalaryStart(),
             "salaryEnd" => $vacancyModel->getSalaryEnd(),
-            "postedDate" => $vacancyModel->getPublishDate("Y-m-d H:i A"),
-            "expiredDate" => $vacancyModel->getExpiredAt()
+            // "postedDate" => $vacancyModel->getPublishDate("Y-m-d H:i A"),
+            "postedDate" => $vacancyModel->getPublishDate("d-m-Y H:i"),
+            "expiredDate" => $vacancyModel->getExpiredAt("d-m-Y H:i")
         ];
 
         // $formattedResponse = get_field($vacancyModel->acf_application_process_step,$this->vacancyCollection->ID);
