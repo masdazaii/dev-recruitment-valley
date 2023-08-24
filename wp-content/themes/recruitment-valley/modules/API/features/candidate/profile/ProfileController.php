@@ -74,8 +74,28 @@ class ProfileController
             // "linkedinPage" => "required",
         ]);
 
-        if (!$validate['is_valid']) return wp_send_json_error(['validation' => $validate['fields'], 'status' => 400], 400);
-        if (count($_FILES) === 0) return wp_send_json_error(['validation' => ['cv' => ["Field cv is requied."]], 'status' => 400], 400);
+        // if (!$validate['is_valid']) return wp_send_json_error(['validation' => $validate['fields'], 'status' => 400], 400);
+        // if (count($_FILES) === 0) return wp_send_json_error(['validation' => ['cv' => ["Field cv is requied."]], 'status' => 400], 400);
+
+        if (!$validate['is_valid']) {
+            return [
+                "message" => $this->message->get("profile.setup.failed"),
+                "errors" => $validate['fields'],
+                "status" => 400
+            ];
+        }
+
+        if (count($_FILES) === 0) {
+            return [
+                "message" => $this->message->get("profile.setup.failed"),
+                "errors" => [
+                    'cv' => [
+                        "Field cv is requied."
+                    ]
+                ],
+                "status" => 400
+            ];
+        }
 
         global $wpdb;
         try {
@@ -110,7 +130,13 @@ class ProfileController
             $wpdb->query('COMMIT');
         } catch (Error $e) {
             $wpdb->query('ROLLBACK');
-            return wp_send_json_error(['error' => $e, 'status' => 500], 500);
+            // return wp_send_json_error(['error' => $e, 'status' => 500], 500);
+
+            return [
+                "message" => $this->message->get("profile.setup.failed"),
+                "errors" => $e,
+                "status" => 500
+            ];
         }
 
         return [
@@ -235,7 +261,13 @@ class ProfileController
             ];
         } catch (Error $e) {
             $wpdb->query('ROLLBACK');
-            return wp_send_json_error(['error' => $e, 'status' => 500], 500);
+            // return wp_send_json_error(['error' => $e, 'status' => 500], 500);
+
+            return [
+                "status" => 500,
+                "message" => $this->message->get('profile.update.failed'),
+                "errors" => $e
+            ];
         }
     }
 
