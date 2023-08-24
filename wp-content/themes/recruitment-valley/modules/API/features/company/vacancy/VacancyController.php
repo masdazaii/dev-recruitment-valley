@@ -6,6 +6,7 @@ use Constant\Message;
 use Model\Company;
 use Model\Term;
 use Vacancy\Vacancy;
+use WP_Post;
 use WP_Query;
 use WP_Term;
 
@@ -107,6 +108,29 @@ class VacancyController
             ],
             'status'  => 200
         ];
+    }
+
+    public function get( $request )
+    {
+        $vacancy = new Vacancy;
+
+        $vacancyId = $request['vacancy_id'];
+
+        $vacancy = get_post( $vacancyId );
+
+        if ($vacancy instanceof WP_Post) {
+            return [
+                "status" => 200,
+                "message" => $this->_message->get("vacancy.get_all"),
+                "data" => $vacancy
+            ];
+        } else {
+            return [
+                "status" => 404,
+                "message" => $this->_message->get("vacancy.not_found"),
+                // "data" => []
+            ];
+        }
     }
 
 }

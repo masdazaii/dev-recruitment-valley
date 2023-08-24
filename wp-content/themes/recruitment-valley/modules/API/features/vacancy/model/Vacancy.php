@@ -242,6 +242,12 @@ class Vacancy
         }, $steps);
     }
 
+    public function getIsNew()
+    {
+        $post_date = $this->getPublishDate();
+        return strtotime($post_date) < time();
+    }
+
     public function getVideoUrl()
     {
         if ($this->getProp($this->acf_video_url)) {
@@ -318,6 +324,52 @@ class Vacancy
         return $this->getProp($this->acf_salary_start);
     }
 
+    public function getTax()
+    {
+        $taxonomies = [
+            [
+                "name" => "sector",
+            ],
+            [
+                "name" => "role",
+            ],
+            [
+                "name" => "type",
+            ],
+            [
+                "name" => "education",
+            ],
+            [
+                "name" => "working-hours",
+            ],
+            [
+                "name" => "status",
+            ],
+            [
+                "name" => "location",
+            ],
+            [
+                "name" => "experiences",
+            ]
+        ];
+
+        $result = [];
+
+        foreach ($taxonomies as $key => $taxonomy) {
+             $terms = get_terms([
+                "taxonomy" => $taxonomy,
+                "object_ids" => $this->vacancy_id
+            ]);
+
+            foreach ($terms as $key => $term) {
+                $result[$taxonomy["name"]][$key]["label"] = $term->name;
+                $result[$taxonomy["name"]][$key]["value"] = $term->term_id;
+            }
+        }
+
+        return $result;
+    }
+
     public function getSalaryEnd()
     {
         return $this->getProp($this->acf_salary_end);
@@ -351,7 +403,9 @@ class Vacancy
         return $vacancy->post_author;
     }
 
-    public function getPublishDate($format)
+    
+
+    public function getPublishDate($format = "Y-m-d H:i:s")
     {
         return get_post_time($format, true, $this->vacancy_id);
     }
