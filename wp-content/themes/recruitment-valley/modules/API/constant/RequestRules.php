@@ -63,6 +63,16 @@ class RequestRules
                 "secondaryEmploymentConditions" => [],
                 // "gallery" => []
             ],
+            'candidateSetupProfile' => [
+                "firstName" => ["required"],
+                "lastName" => ["required"],
+                "dateOfBirth" => ["required"], // Add : Date
+                "phoneNumber" => ["required"], // Add : Regex
+                "phoneNumberCode" => ["required"],
+                "country" => ["required"],
+                "city" => ["required"],
+                "linkedinPage" => [], // Add : Url
+            ],
             'candidateUpdateProfile' => [
                 "firstName" => ["required"],
                 "dateOfBirth" => ["required"],
@@ -70,7 +80,7 @@ class RequestRules
                 "phoneNumberCode" => ["required"],
                 "country" => ["required"],
                 "city" => ["required"],
-                "linkedinPage" => ["required"],
+                "linkedinPage" => [],
             ],
             'candidateChangeEmail' => [
                 'newEmail' => ["required", "email"] // Must add rules exists to check if email already used!
@@ -156,19 +166,12 @@ class RequestRules
                 "password" => null,
                 "accountType" => "text"
             ],
-            /** When using rule other than these 2. Please add following sanitize rule in Validator.php. */
-            "example" => [
+            'login' => [
                 "email" => "email",
-                "string" => "text", // Will use sanitize_text_field
+                "password" => ""
             ],
-            "applyVacancy" => [
-                'phoneNumberCode' => "text",
-                'phoneNumber' => "text",
-                'coverLetter' => "textarea",
-                'vacancy' => "text",
-            ],
-            "candidateChangeEmail" => [
-                'newEmail' => "email"
+            'forgotPassword' => [
+                "email" => "email",
             ],
             'companySetupProfile' => [
                 "companyName" => "text",
@@ -194,11 +197,91 @@ class RequestRules
                 "gallery" => "",
                 "image" => ""
             ],
+            'companyUpdateDetail' => [
+                "companyName" => "text",
+                "sector.*" => "text",
+                "phoneNumberCode" => "text",
+                "phoneNumber" => "text",
+                "website" => "",
+                "employees" => "text",
+                "kvkNumber" => "text",
+                "btwNumber" => "text",
+            ],
             'companyUpdateInformation' => [
                 "shortDescription" => "textarea",
                 "videoUrl" => "",
                 "secondaryEmploymentConditions" => "",
                 "gallery" => ""
+            ],
+            "applyVacancy" => [
+                'phoneNumberCode' => "text",
+                'phoneNumber' => "text",
+                'coverLetter' => "textarea",
+                'vacancy' => "text",
+            ],
+            'candidateUpdateProfile' => [
+                "firstName" => "text",
+                "dateOfBirth" => "text",
+                "phoneNumber" => "text",
+                "phoneNumberCode" => "text",
+                "country" => "text",
+                "city" => "text",
+                "linkedinPage" => "",
+            ],
+            "candidateChangeEmail" => [
+                'newEmail' => "email"
+            ],
+            'candidateChangepassword' => [
+                'newPassword' => "",
+                'repeatNewPassword' => "",
+                'key' => ""
+            ],
+            'vacancyCreateFree' => [
+                "name" => "text",
+                "description" => "ksespost",
+                "city" => "text",
+                "placementAddress" => "text",
+                "salaryStart" => "text",
+                "salaryEnd" => "text",
+                "sector.*" => "text",
+                "role.*" => "text",
+                "workingHours.*" => "text",
+                "location.*" => "text",
+                "education.*" => "text",
+                "employmentType.*" => "text",
+                "externalUrl" => "",
+                "experience.*" => "text",
+            ],
+            'vacancyCreatePaid' => [
+                "name" => "text",
+                "description" => "ksespost",
+                "city" => "text",
+                "placementAddress" => "text",
+                "terms" => "text",
+                "salaryStart" => "text",
+                "salaryEnd" => "text",
+                "sector.*" => "text",
+                "role.*" => "text",
+                "workingHours.*" => "text",
+                "location.*" => "text",
+                "education.*" => "text",
+                "employmentType.*" => "text",
+                "externalUrl" => "text",
+                "applicationProcedureTitle" => "text",
+                "applicationProcedureText" => "text",
+                "applicationProcedureSteps.*" => "text",
+                "video" => "",
+                "facebook" => "",
+                "linkedin" => "",
+                "instagram" => "",
+                "twitter" => "",
+                "review" => "",
+                "experience.*" => "text"
+            ],
+            /** When using rule other than these 2. Please add following sanitize rule in Validator.php. */
+            "example" => [
+                "email" => "email",
+                "string" => "text", // Will use sanitize_text_field
             ],
         ];
     }
