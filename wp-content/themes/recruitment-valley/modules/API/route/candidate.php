@@ -8,6 +8,7 @@ use Candidate\Vacancy\VacancyAppliedService;
 use Candidate\Profile\FavoriteVacancyService;
 use Candidate\Profile\ProfileService;
 use Global\LoginService;
+use Global\User\UserService;
 use Global\RegistrationService;
 use Middleware\AuthMiddleware;
 
@@ -31,6 +32,7 @@ class CandidateEndpoint
         $profileService = new ProfileService;
         $vacancyAppliedService = new VacancyAppliedService;
         $favoriteVacancyService = new FavoriteVacancyService;
+        $userService = new UserService;
         $authMiddleware = new AuthMiddleware;
 
         $endpoint = [
@@ -94,8 +96,9 @@ class CandidateEndpoint
                 'candidate_nav' => [
                     'url'                   => '/profile/user-nav',
                     'methods'               => 'GET',
-                    'permission_callback'   => [$authMiddleware, 'authorize_candidate'],
-                    'callback'              => [$profileService, 'getUserNav'],
+                    'permission_callback'   => '__return_true',
+                    // 'callback'              => [$profileService, 'getUserNav'],
+                    'callback'              => [$userService, 'getUserNav'],
                 ],
                 'apply-job' => [
                     'url'                   => 'apply',
