@@ -128,7 +128,6 @@ class VacancyController
             return [
                 "status" => 404,
                 "message" => $this->_message->get("vacancy.not_found"),
-                // "data" => []
             ];
         }
     }

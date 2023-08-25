@@ -361,6 +361,12 @@ class Vacancy
                 "object_ids" => $this->vacancy_id
             ]);
 
+            if(count($terms) == 0)
+            {
+                $result[$taxonomy["name"]] = [];
+                continue;
+            }
+
             foreach ($terms as $key => $term) {
                 $result[$taxonomy["name"]][$key]["label"] = $term->name;
                 $result[$taxonomy["name"]][$key]["value"] = $term->term_id;

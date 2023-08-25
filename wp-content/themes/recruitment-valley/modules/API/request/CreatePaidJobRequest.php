@@ -13,7 +13,7 @@ class CreatePaidJobRequest implements MiRequest
     public function __construct(WP_REST_Request $request)
     {
         $this->_request = $request;
-        $this->_validator = new Validator($this->_request->get_params(), $this->rules());
+        $this->_validator = new Validator($this->_request->get_params(), $this->rules(), $this->sanitizeRules());
     }
 
     public function rules(): array
@@ -48,16 +48,33 @@ class CreatePaidJobRequest implements MiRequest
         ];
     }
 
-    public function sanitizes()
+    public function sanitizeRules()
     {
         return [
-            "sector" => ["array:1"],
-            "role" => ["array:1"],
-            "workingHours" => ["array:1"],
-            "location" => ["array:1"],
-            "education" => ["array:1"],
-            "applicationProcedureSteps" => ["array:1"],
-            "review" => ["arrayofobject:name,role,text"],
+            "name" => "text",
+            "description" => "ksespost",
+            "city" => "text",
+            "placementAddress" => "text",
+            "terms" => "ksespost",
+            "salaryStart" => "text",
+            "salaryEnd" => "text",
+            "sector.*" => "text",
+            "role.*" => "text",
+            "workingHours.*" => "text",
+            "location.*" => "text",
+            "education.*" => "text",
+            "employmentType.*" => "text",
+            "externalUrl" => "text",
+            "applicationProcedureTitle" => "text",
+            "applicationProcedureText" => "text",
+            "applicationProcedureSteps.*" => "text",
+            "video" => "",
+            "facebook" => "",
+            "linkedin" => "",
+            "instagram" => "",
+            "twitter" => "",
+            "review" => "",
+            "experience.*" => "text"
         ];
     }
 
@@ -68,7 +85,7 @@ class CreatePaidJobRequest implements MiRequest
 
     public function sanitize()
     {
-        return $this->_validator->sanitize($this->sanitizes());
+        return $this->_validator->tempSanitize();
     }
 
     public function getData(): array

@@ -48,6 +48,12 @@ class VacancyService
         $params = $request->get_params();
         $params["user_id"] = $request["user_id"];
         $response = $this->vacancyController->get($request);
+
+        if(!isset($response["data"]))
+        {
+            return ResponseHelper::build($response);
+        }
+        
         $this->vacancyResponse->setCollection($response["data"]);
         $response["data"] = $this->vacancyResponse->formatResponseUpdate();
         return ResponseHelper::build($response);
