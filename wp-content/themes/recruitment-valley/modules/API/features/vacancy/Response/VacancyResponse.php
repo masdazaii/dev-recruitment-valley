@@ -95,6 +95,7 @@ class VacancyResponse
                 "totalEmployee" => $company->getTotalEmployees(),
                 "tel" => $company->getPhoneCode() . $company->getPhone(),
                 "email" => $company->getEmail(),
+                "gallery" => $company->getGallery(),
                 // "socialMedia" => [
                 //     "facebook" => $company->getFacebook(),
                 //     "twitter" => $company->getTwitter(),
@@ -112,7 +113,7 @@ class VacancyResponse
             "placementAddress" => $vacancyModel->getPlacementAddress(),
             // "videoId" => $company->getVideoUrl(), // Changed below
             "videoId" => $company->getVideoUrl() ? StringHelper::getYoutubeID($company->getVideoUrl()) : null, // Added Line
-            "gallery" => $company->getGallery(),
+            "gallery" => $vacancyModel->getGallery(),
             "reviews" => $vacancyModel->getReviews(),
             "steps" => $vacancyModel->getApplicationProcessStep(),
             "salaryStart" => $vacancyModel->getSalaryStart(),
