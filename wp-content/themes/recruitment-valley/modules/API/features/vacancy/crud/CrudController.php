@@ -473,6 +473,31 @@ class VacancyCrudController
         ];
     }
 
+    public function updateFree($request)
+    {
+        $vacancy_id = $request["vacancy_id"];
+        $vacancyModel = new Vacancy($vacancy_id);
+
+        // $vacancyIsPaid = $vacancyModel->getIsPaid();
+
+        // $payload = $this->createVacancyPayload($vacancyIsPaid, $request);
+
+        $payload = $this->createFreeVacancyPayload( $request );
+
+        $vacancyModel->setTaxonomy($payload["taxonomy"]);
+
+        foreach ($payload as $acf_field => $value) {
+            if ($acf_field !== "taxonomy") {
+                $vacancyModel->setProp($acf_field, $value, is_array($value));
+            }
+        }
+
+        return [
+            "status" => 200,
+            "message" => $this->_message->get("vacancy.update.free.success")
+        ];
+    }
+
     public function trash($request)
     {
         $vacancy = new Vacancy($request["vacancy_id"]);
@@ -564,6 +589,31 @@ class VacancyCrudController
                 ],
             ];
         }
+
+        return $payload;
+    }
+
+    public function createFreeVacancyPayload( $request )
+    {
+        $payload = [
+            "title" => $request["name"],
+            "description" => $request["description"],
+            "salary_start" => $request["salaryStart"],
+            "salary_end" => $request["salaryEnd"],
+            "external_url" => $request["externalUrl"],
+            "apply_from_this_platform" => isset($request["externalUrl"]) ? true : false,
+            "user_id" => $request["user_id"],
+            "taxonomy" => [
+                "sector" => $request["sector"],
+                "role" => $request["role"],
+                "working-hours" => $request["workingHours"],
+                "location" => $request["location"],
+                "education" => $request["education"],
+                "type" => $request["employmentType"],
+                "experiences" => $request["experiences"] ?? [], // Added Line
+                "status" => [31] // set free job become pending category
+            ],
+        ];
 
         return $payload;
     }

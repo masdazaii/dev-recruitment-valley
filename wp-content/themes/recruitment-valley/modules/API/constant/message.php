@@ -11,8 +11,8 @@ class Message
         $this->list = [
             'auth' => [
                 'unauthenticate' => __('Unauthorized', THEME_DOMAIN),
-                'invalid_token' => __('Unauthorized', THEME_DOMAIN),
-                'expired' => __('Unauthorized', THEME_DOMAIN),
+                'invalid_token' => __('Invalid token', THEME_DOMAIN),
+                'expired' => __('Expired', THEME_DOMAIN),
                 'generate_token_success' => __('Success generating token', THEME_DOMAIN),
                 'generate_token_error' => __('Something error when generating token', THEME_DOMAIN),
                 'forgot_password' => [
