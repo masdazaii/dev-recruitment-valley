@@ -66,10 +66,10 @@ class AuthMiddleware
     private function _handle_token($request)
     {
         $token = $request->get_header('Authorization');
-
         if ($token == "") {
             return new WP_Error("rest_forbidden", $this->_message->get('auth.invalid_token'), array("status" => 403));
         }
+
         try {
             $decodedToken = JWT::decode($token, new Key(JWT_SECRET, "HS256"));
 

@@ -13,14 +13,14 @@ class CreateFreeJobRequest implements MiRequest
     public function __construct(WP_REST_Request $request)
     {
         $this->_request = $request;
-        $this->_validator = new Validator($this->_request->get_params(), $this->rules());
+        $this->_validator = new Validator($this->_request->get_params(), $this->rules(), $this->sanitizeRules());
     }
 
     public function rules(): array
     {
         return [
             "name" => ['required'],
-            "description" => ["required"],
+            "description" => ["required", "wywsig"],
             "city" => ["required"],
             "placementAddress" => ["required"],
             // "salaryStart" => ["required", "numeric"],
@@ -36,6 +36,27 @@ class CreateFreeJobRequest implements MiRequest
         ];
     }
 
+    public function sanitizeRules()
+    {
+        return [
+            "name" => "text",
+            "description" => "ksespost",
+            "city" => "text",
+            "placementAddress" => "text",
+            // "salaryStart" => ["required", "numeric"],
+            // "salaryEnd" => ["required", "numeric"],
+            "sector.*" => "text",
+            "role.*" => "text",
+            "workingHours.*" => "text",
+            "location.*" => "text",
+            "education.*" => "text",
+            "employmentType.*" => "text",
+            "externalUrl" => "url",
+            "experience.*" => "text"
+        ];
+    }
+
+
     public function validate(): bool
     {
         return $this->_validator->validate();
@@ -43,7 +64,7 @@ class CreateFreeJobRequest implements MiRequest
 
     public function sanitize()
     {
-        return $this->_validator->sanitize();
+        return $this->_validator->tempSanitize();
     }
 
     public function getData(): array
