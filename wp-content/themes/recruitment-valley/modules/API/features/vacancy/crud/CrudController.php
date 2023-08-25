@@ -4,6 +4,7 @@ namespace Vacancy;
 
 use Constant\Message;
 use DateTimeImmutable;
+use Exception;
 use JWTHelper;
 use Model\Company;
 use Model\ModelHelper;
@@ -486,11 +487,7 @@ class VacancyCrudController
         $vacancy_id = $request["vacancy_id"];
         $vacancyModel = new Vacancy($vacancy_id);
 
-        // $vacancyIsPaid = $vacancyModel->getIsPaid();
-
-        // $payload = $this->createVacancyPayload($vacancyIsPaid, $request);
-
-        $payload = $this->createFreeVacancyPayload($request);
+        $payload = $this->createFreeVacancyPayload( $request );
 
         $vacancyModel->setTaxonomy($payload["taxonomy"]);
 
@@ -504,6 +501,73 @@ class VacancyCrudController
             "status" => 200,
             "message" => $this->_message->get("vacancy.update.free.success")
         ];
+    }
+
+    public function updatePaid($request)
+    {
+        $vacancy_id = $request["vacancy_id"];
+        
+        global $wpdb;
+
+        try {
+            $wpdb->query('START TRANSACTION');
+
+            $vacancyModel = new Vacancy($vacancy_id);
+            $payload = $this->createPaidVacancyPayload( $request );
+
+            $vacancyModel->setTaxonomy($payload["taxonomy"]);
+
+            foreach ($payload as $acf_field => $value) {
+                if ($acf_field !== "taxonomy") {
+                    $vacancyModel->setProp($acf_field, $value, is_array($value));
+                }
+            }
+
+            $galleries = ModelHelper::handle_uploads('galleryJob', 'vacancy/' . $vacancy_id);
+            if (array_key_exists('galleryCompany', $request)) {
+                if (is_array($request['galleryCompany'])) {
+                    $galleryIds = array_map(function ($gallery) {
+                        return explode('-', $gallery)[0];
+                    }, $request['galleryCompany']);
+                }
+            }
+
+            $vacancyGallery = $galleryIds ?? [];
+            
+            if ($galleries) {
+                foreach ($galleries as $key => $gallery) {
+                    $vacancyGallery[] = wp_insert_attachment($gallery['attachment'], $gallery['file']);
+                }
+            }
+
+            $vacancyModel->setProp($vacancyModel->acf_gallery, $vacancyGallery, false);
+
+
+            if ($galleries) {
+                foreach ($galleries as $key => $gallery) {
+                    $vacancyGallery[] = wp_insert_attachment($gallery['attachment'], $gallery['file']);
+                }
+            }
+
+            $wpdb->query('COMMIT');
+            
+            return [
+                "status" => 200,
+                "message" => $this->_message->get("vacancy.update.paid.success")
+            ];
+        } catch (\Throwable $th) {
+            $wpdb->query('ROLLBACK');
+            return [
+                "status" => 400,
+                "message" => $this->_message->get("system.overall_failed")
+            ];
+        } catch ( Exception $e) {
+            $wpdb->query('ROLLBACK');
+            return [
+                "status" => 400,
+                "message" => $this->_message->get("system.overall_failed")
+            ];
+        }
     }
 
     public function trash($request)
@@ -619,8 +683,42 @@ class VacancyCrudController
                 "education" => $request["education"],
                 "type" => $request["employmentType"],
                 "experiences" => $request["experiences"] ?? [], // Added Line
-                // "status" => [31] // set free job become pending category
             ],
+        ];
+
+        return $payload;
+    }
+
+    public function createPaidVacancyPayload( $request )
+    {
+        $payload = [
+            "title" => $request["name"],
+            "description" => $request["description"],
+            "term" => $request["terms"],
+            "salary_start" => $request["salaryStart"],
+            "salary_end" => $request["salaryEnd"],
+            "external_url" => $request["externalUrl"],
+            "apply_from_this_platform" => isset($request["externalUrl"]) ? true : false,
+            "user_id" => $request["user_id"],
+            "application_process_title" => $request["applicationProcedureTitle"],
+            "application_process_description" => $request["applicationProcedureText"],
+            "video_url" => $request["video"],
+            "facebook_url" => $request["facebook"],
+            "linkedin_url" => $request["linkedin"],
+            "instagram_url" => $request["instagram"],
+            "twitter_url" => $request["twitter"],
+            "reviews" => $request["review"],
+            "placement_address" => $request["placementAddress"], 
+            "taxonomy" => [
+                "sector" => $request["sector"],
+                "role" => $request["role"],
+                "working-hours" => $request["workingHours"],
+                "location" => $request["location"],
+                "education" => $request["education"],
+                "type" => $request["employmentType"],
+                "experiences" => $request["experience"] ?? [], // Added Line
+            ],
+            "application_process_step" => $request["applicationProcedureSteps"],
         ];
 
         return $payload;

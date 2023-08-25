@@ -169,12 +169,12 @@ class Vacancy
 
     public function setReviews($reviews)
     {
-        $existing_repeater_data = get_field($this->acf_reviews, $this->vacancy_id, true);
+        // $existing_repeater_data = get_field($this->acf_reviews, $this->vacancy_id, true);
         // Add the new data to the existing repeater data
 
-        $updated_repeater_data = $existing_repeater_data ? array_merge($existing_repeater_data, $reviews) : $reviews;
+        // $updated_repeater_data = $existing_repeater_data ? array_merge($existing_repeater_data, $reviews) : $reviews;
         // Update the repeater field with the new data
-        return update_field($this->acf_reviews, $updated_repeater_data, $this->vacancy_id);
+        return update_field($this->acf_reviews, $reviews, $this->vacancy_id);
     }
 
     public function setTaxonomy($taxonomies)
