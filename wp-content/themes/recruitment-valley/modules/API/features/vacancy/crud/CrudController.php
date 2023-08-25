@@ -67,7 +67,9 @@ class VacancyCrudController
             'city' => $request['city'] ?? null,
             'salaryStart' => isset($request['salaryStart']) ? intval($request['salaryStart']) : 0,
             'salaryEnd' => isset($request['salaryEnd']) ? intval($request['salaryEnd']) : null,
-            'postPerPage' => $request['perPage'] ?? 10
+            'postPerPage' => $request['perPage'] ?? 10,
+            'orderBy' => isset($request['orderBy']) ? isset($request['orderBy']) : false,
+            'order' => isset($request['sort']) ? $request['sort'] : false,
         ];
 
         $taxonomyFilters = [
@@ -90,6 +92,12 @@ class VacancyCrudController
             "post_status" => "publish",
             'tax_query' => []
         ];
+
+        /** Sort */
+        if ($filters['orderBy']) {
+            $args['order_by'] = $filters['orderBy'];
+            $args['order'] = $filters['order'];
+        }
 
         /** Set tax query */
         // only display open job status
@@ -657,7 +665,7 @@ class VacancyCrudController
         return $payload;
     }
 
-    public function createFreeVacancyPayload( $request )
+    public function createFreeVacancyPayload($request)
     {
         $payload = [
             "title" => $request["name"],

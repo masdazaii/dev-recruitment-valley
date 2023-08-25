@@ -83,8 +83,8 @@ class VacancyResponse
             "isPaid" => $vacancyModel->getIsPaid(),
             "shortDescription" => $vacancyTaxonomy,
             "title" => $this->vacancyCollection->post_title, // later get company here
-            "isFavorite" => $candidate ? $candidate->isFavorite($this->vacancyCollection->post_author) : false,
-            
+            // "isFavorite" => $candidate ? $candidate->isFavorite($this->vacancyCollection->post_author) : false, // Changed below
+            "isFavorite" => $candidate ? $candidate->isFavorite($this->vacancyCollection->ID) : false,
             "company" =>  [
                 "company_id" => $company->user_id,
                 "logo" => $company->getThumbnail(),
@@ -186,8 +186,8 @@ class VacancyResponse
             ],
             "city" => $vacancyModel->getCity(),
             "placementAddress" => $vacancyModel->getPlacementAddress(),
-            "videoId" => $company->getVideoUrl() , // Added Line
-            "gallery" => $company->getGallery( true ),
+            "videoId" => $company->getVideoUrl(), // Added Line
+            "gallery" => $company->getGallery(true),
             "reviews" => $vacancyModel->getReviews(),
             "steps" => $vacancyModel->getApplicationProcessStep(),
             "salaryStart" => $vacancyModel->getSalaryStart(),
@@ -199,7 +199,19 @@ class VacancyResponse
 
         $vacancyTax = $vacancyModel->getTax();
 
-        $formattedResponse = array_merge($formattedResponse, $vacancyTax);
+        /** Changes Start here
+         * convert key to camelCase
+         */
+        $taxonomy = [];
+        if (is_array($vacancyTax)) {
+            foreach ($vacancyTax as $key => $value) {
+                $camelKey = StringHelper::convertCamelCase($key, '-', 'string');
+                $taxonomy[$camelKey] = $value;
+            }
+        }
+
+        // $formattedResponse = array_merge($formattedResponse, $vacancyTax); // Changed Below
+        $formattedResponse = array_merge($formattedResponse, $taxonomy);
 
         return $formattedResponse;
     }
