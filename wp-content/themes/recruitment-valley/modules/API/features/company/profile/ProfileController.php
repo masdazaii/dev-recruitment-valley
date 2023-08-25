@@ -544,20 +544,6 @@ class ProfileController
         try {
             $company = new Company($request["user_id"]);
 
-            $galleries = $company->getGallery(false, true);
-            if ($galleries) {
-                $galleries = array_map(function ($gallery) {
-                    static $i = 0;
-                    $result = [
-                        "id" => $gallery,
-                        "url" => wp_get_attachment_url($gallery),
-                        "title" => get_the_title($gallery)
-                    ];
-                    $i++;
-                    return $result;
-                }, $galleries);
-            }
-
             return [
                 'status' => 200,
                 'message' => $this->message->get('company.profile.get_success'),
@@ -570,7 +556,7 @@ class ProfileController
                         'twitter' => $company->getTwitter(),
                     ],
                     'secondaryEmploymentCondition' => $company->getSecondaryEmploymentCondition() ?? NULL,
-                    'gallery' => $galleries
+                    'gallery' => $company->getGallery(true)
                 ]
             ];
         } catch (\Exception $e) {
