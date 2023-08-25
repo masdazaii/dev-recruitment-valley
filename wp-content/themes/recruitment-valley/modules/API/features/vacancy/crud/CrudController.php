@@ -373,15 +373,15 @@ class VacancyCrudController
                 }
             }
 
+            $vacancyGallery = $galleryIds ?? [];
+
             if ($galleries) {
-                $vacancyGallery = $galleryIds ?? [];
                 foreach ($galleries as $key => $gallery) {
                     $vacancyGallery[] = wp_insert_attachment($gallery['attachment'], $gallery['file']);
                 }
-
-                $vacancyModel->setProp($vacancyModel->acf_gallery, $vacancyGallery, false);
             }
 
+            $vacancyModel->setProp($vacancyModel->acf_gallery, $vacancyGallery, false);
 
             $this->add_expired_date_to_option([
                 'post_id' => $vacancyModel->vacancy_id,
