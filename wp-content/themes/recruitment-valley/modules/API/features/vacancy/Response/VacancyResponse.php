@@ -192,7 +192,8 @@ class VacancyResponse
             "salaryStart" => $vacancyModel->getSalaryStart(),
             "salaryEnd" => $vacancyModel->getSalaryEnd(),
             "postedDate" => $vacancyModel->getPublishDate("Y-m-d H:i A"),
-            "expiredDate" => $vacancyModel->getExpiredAt()
+            "expiredDate" => $vacancyModel->getExpiredAt(),
+            "applyFromThisPlatform" => $vacancyModel->getApplyFromThisPlatform(),
         ];
 
         $vacancyTax = $vacancyModel->getTax();

@@ -155,7 +155,7 @@ class Company
                 return [
                     "id" => $attachmentId,
                     "url" => wp_get_attachment_url($attachmentId),
-                    "title" => wp_get_attachment_caption($attachmentId)
+                    "title" => get_the_title($attachmentId)
                 ];    
             }
 
