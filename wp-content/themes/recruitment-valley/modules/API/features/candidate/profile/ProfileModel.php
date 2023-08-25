@@ -25,12 +25,11 @@ class Candidate
 
     private $changeEmailToken = "change_email_token";
 
-    public function __construct( $user_id = false)
+    public function __construct($user_id = false)
     {
-        if($user_id) {
+        if ($user_id) {
             $user = get_user_by('id', $user_id);
-            if(!$user)
-            {
+            if (!$user) {
                 $message = new Message;
                 throw new Exception($message->get('candidate.get.not_found'), 400);
             }
@@ -41,12 +40,10 @@ class Candidate
 
     public function setuserId($user_id)
     {
-
     }
 
     public function setUser(WP_User $user)
     {
-
     }
 
     public function getFirstName()
@@ -99,7 +96,7 @@ class Candidate
         $image = $this->getProp($this->image);
         return $image ? $image["url"] : null;
     }
-    
+
     public function getDateOfBirth()
     {
         return $this->getProp($this->dateOfBirth);
@@ -110,14 +107,15 @@ class Candidate
         return $this->getProp($this->linkedin);
     }
 
-    public function isFavorite( $vacancyId )
+    public function isFavorite($vacancyId)
     {
-        $favoriteJobs = get_user_meta($this->user_id, $this->favoriteJob);
+        // $favoriteJobs = get_user_meta($this->user_id, $this->favoriteJob); // Changed Below
+        $favoriteJobs = get_user_meta($this->user_id, $this->favoriteJob, true);
         return in_array($vacancyId, $favoriteJobs);
     }
 
     public function getProp($acf_field, $single = true)
     {
-        return get_field($acf_field, 'user_'.$this->user_id, $single);
+        return get_field($acf_field, 'user_' . $this->user_id, $single);
     }
 }
