@@ -124,6 +124,12 @@ class CompanyEndpoint
                     'permission_callback'   => [$authMiddleware, 'authorize_company'],
                     'callback'              => [$vacancyCrudService, 'updateFree']
                 ],
+                'vacancy_update_paid' => [
+                    'url'                   => 'vacancy/paid/(?P<vacancy_id>[-\w]+)',
+                    'methods'               => 'POST',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company'],
+                    'callback'              => [$vacancyCrudService, 'updatePaid']
+                ],
                 'vacancy_delete' => [
                     'url'                   => 'vacancy/(?P<vacancy_id>[-\w]+)',
                     'methods'               => 'DElETE',
