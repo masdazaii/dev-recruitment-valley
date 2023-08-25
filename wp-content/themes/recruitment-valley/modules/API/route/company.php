@@ -112,11 +112,17 @@ class CompanyEndpoint
                     'permission_callback'   => [$authMiddleware, 'authorize_company'],
                     'callback'              => [$vacancyService, 'getAll']
                 ],
-                'vacancy_update' => [
-                    'url'                   => 'vacancy/(?P<vacancy_id>[-\w]+)',
+                // 'vacancy_update' => [
+                //     'url'                   => 'vacancy/(?P<vacancy_id>[-\w]+)',
+                //     'methods'               => 'POST',
+                //     'permission_callback'   => [$authMiddleware, 'authorize_company'],
+                //     'callback'              => [$vacancyCrudService, 'update']
+                // ],
+                'vacancy_update_free' => [
+                    'url'                   => 'vacancy/free/(?P<vacancy_id>[-\w]+)',
                     'methods'               => 'POST',
                     'permission_callback'   => [$authMiddleware, 'authorize_company'],
-                    'callback'              => [$vacancyCrudService, 'update']
+                    'callback'              => [$vacancyCrudService, 'updateFree']
                 ],
                 'vacancy_delete' => [
                     'url'                   => 'vacancy/(?P<vacancy_id>[-\w]+)',
