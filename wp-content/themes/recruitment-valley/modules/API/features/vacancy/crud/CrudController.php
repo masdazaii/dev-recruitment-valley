@@ -619,7 +619,7 @@ class VacancyCrudController
                 "education" => $request["education"],
                 "type" => $request["employmentType"],
                 "experiences" => $request["experiences"] ?? [], // Added Line
-                "status" => [31] // set free job become pending category
+                // "status" => [31] // set free job become pending category
             ],
         ];
 
