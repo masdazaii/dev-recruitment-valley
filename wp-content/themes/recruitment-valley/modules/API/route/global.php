@@ -74,6 +74,12 @@ class GlobalEndpoint
                     'permission_callback'   => [$authMiddleware, 'authorize_candidate'],
                     'callback'              => [$favoriteVacancyService, 'addFavoriteVacancy'],
                 ],
+                'check_if_favorite' => [
+                    'url'                   => '/vacancies/check-favorite/(?P<vacancy_slug>[a-zA-Z0-9-]+)',
+                    'methods'               => 'GET',
+                    'permission_callback'   => [$authMiddleware, 'authorize_candidate'],
+                    'callback'              => [$favoriteVacancyService, 'check']
+                ],
                 'vacancies_single' => [
                     'url'                   => 'vacancies/(?P<vacancy_slug>[a-zA-Z0-9-]+)',
                     'methods'               => 'GET',

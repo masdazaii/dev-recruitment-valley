@@ -3,7 +3,9 @@
 namespace Candidate\Profile;
 
 use Constant\Message;
+use PostType\Vacancy;
 use WP_Query;
+use WP_POST;
 
 class FavoriteVacancyController
 {
@@ -107,6 +109,37 @@ class FavoriteVacancyController
             return [
                 "message"   => $this->_message->get('system.overall_failed'),
                 "status"  => 500
+            ];
+        }
+    }
+
+    public function check($request)
+    {
+        $vacancy = new \Vacancy\Vacancy();
+        // $vacancy = $vacancy->getBySlug($request['vacancy_slug']);
+        $vacancy = get_page_by_path($request['vacancy_slug'], OBJECT, 'vacancy');
+
+        if ($vacancy instanceof WP_Post) {
+            $favorites = get_user_meta($request['user_id'], 'favorite_vacancy', true) ?? [];
+            if (is_array($favorites)) {
+                if (in_array($vacancy->ID, $favorites)) {
+                    return [
+                        "status" => 200,
+                        "message" => $this->_message->get("candidate.favorite.get_success"),
+                        "data" => true
+                    ];
+                } else {
+                    return [
+                        "status" => 200,
+                        "message" => $this->_message->get("candidate.favorite.get_success"),
+                        "data" => false
+                    ];
+                }
+            }
+        } else {
+            return [
+                "status" => 404,
+                "message" => $this->_message->get("vacancy.not_found"),
             ];
         }
     }

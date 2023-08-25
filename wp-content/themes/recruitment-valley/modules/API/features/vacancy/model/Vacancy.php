@@ -356,13 +356,12 @@ class Vacancy
         $result = [];
 
         foreach ($taxonomies as $key => $taxonomy) {
-             $terms = get_terms([
+            $terms = get_terms([
                 "taxonomy" => $taxonomy,
                 "object_ids" => $this->vacancy_id
             ]);
 
-            if(count($terms) == 0)
-            {
+            if (count($terms) == 0) {
                 $result[$taxonomy["name"]] = [];
                 continue;
             }
@@ -409,7 +408,7 @@ class Vacancy
         return $vacancy->post_author;
     }
 
-    
+
 
     public function getPublishDate($format = "Y-m-d H:i:s")
     {
@@ -525,5 +524,10 @@ class Vacancy
         ]);
 
         return $trashed;
+    }
+
+    public function getBySlug(String $slug)
+    {
+        return get_page_by_path($slug, OBJECT, 'vacancy');
     }
 }

@@ -111,6 +111,9 @@ class Candidate
     {
         // $favoriteJobs = get_user_meta($this->user_id, $this->favoriteJob); // Changed Below
         $favoriteJobs = get_user_meta($this->user_id, $this->favoriteJob, true);
+        if (!is_array($favoriteJobs)) {
+            return false;
+        }
         return in_array($vacancyId, $favoriteJobs);
     }
 

@@ -76,6 +76,13 @@ class FavoriteVacancyService
         return ResponseHelper::build($response);
     }
 
+    public function check(WP_REST_Request $request)
+    {
+        $body = $request->get_params();
+        $response = $this->favoriteVacancyController->check($body);
+        return ResponseHelper::build($response);
+    }
+
     protected function _validate_vacancy($vacancyID)
     {
         if (!isset($vacancyID)) {
