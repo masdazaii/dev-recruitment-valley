@@ -264,6 +264,12 @@ class Validator
             case 'text':
                 return sanitize_text_field($data);
                 break;
+            case 'kses':
+                return wp_kses($data, []);
+                break;
+            case 'ksespost':
+                return wp_kses_post($data);
+                break;
             default:
                 return $data;
                 break;
