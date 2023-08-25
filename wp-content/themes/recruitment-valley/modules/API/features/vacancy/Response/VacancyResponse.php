@@ -61,6 +61,8 @@ class VacancyResponse
     {
         $vacancyModel = new Vacancy($this->vacancyCollection->ID);
 
+        $candidate = $this->userPayload ? new Candidate($this->userPayload->user_id) : null;
+
         $company = new Company($this->vacancyCollection->post_author);
         $vacancyTaxonomy = $vacancyModel->getTaxonomy(false);
 
@@ -81,6 +83,8 @@ class VacancyResponse
             "isPaid" => $vacancyModel->getIsPaid(),
             "shortDescription" => $vacancyTaxonomy,
             "title" => $this->vacancyCollection->post_title, // later get company here
+            "isFavorite" => $candidate ? $candidate->isFavorite($this->vacancyCollection->post_author) : false,
+            
             "company" =>  [
                 "company_id" => $company->user_id,
                 "logo" => $company->getThumbnail(),
@@ -168,27 +172,11 @@ class VacancyResponse
     {
         $vacancyModel = new Vacancy($this->vacancyCollection->ID);
 
-        $candidate = $this->userPayload ? new Candidate($this->userPayload->user_id) : null;
-
         $company = new Company($this->vacancyCollection->post_author);
-        $vacancyTaxonomy = $vacancyModel->getTaxonomy(false);
-
-        /** Set social media response */
-        $socialMedia = ["facebook", "linkedin", "instagram", "twitter"];
-
-        $socialMediaResponse = [];
-        foreach ($socialMedia as $key => $socmed) {
-            $socialMediaResponse[$key] = [
-                "id" => $key + 1,
-                "type" => $socmed,
-                "url" => $company->getSocialMedia($socmed)
-            ];
-        }
 
         $formattedResponse = [
             "id" => $this->vacancyCollection->ID,
             "isPaid" => $vacancyModel->getIsPaid(),
-            "isFavorite" => $candidate ? $candidate->isFavorite($this->vacancyCollection->post_author) : false,
             // "shortDescription" => $vacancyTaxonomy,
             "title" => $this->vacancyCollection->post_title,
             "contents" => [
@@ -210,8 +198,6 @@ class VacancyResponse
         $vacancyTax = $vacancyModel->getTax();
 
         $formattedResponse = array_merge($formattedResponse, $vacancyTax);
-
-        // $formattedResponse = get_field($vacancyModel->acf_application_process_step,$this->vacancyCollection->ID);
 
         return $formattedResponse;
     }
