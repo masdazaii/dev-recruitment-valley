@@ -199,7 +199,19 @@ class VacancyResponse
 
         $vacancyTax = $vacancyModel->getTax();
 
-        $formattedResponse = array_merge($formattedResponse, $vacancyTax);
+        /** Changes Start here
+         * convert key to camelCase
+         */
+        $taxonomy = [];
+        if (is_array($vacancyTax)) {
+            foreach ($vacancyTax as $key => $value) {
+                $camelKey = StringHelper::convertCamelCase($key, '-', 'string');
+                $taxonomy[$camelKey] = $value;
+            }
+        }
+
+        // $formattedResponse = array_merge($formattedResponse, $vacancyTax); // Changed Below
+        $formattedResponse = array_merge($formattedResponse, $taxonomy);
 
         return $formattedResponse;
     }

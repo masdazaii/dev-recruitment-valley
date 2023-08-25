@@ -53,4 +53,22 @@ class StringHelper
             return $url;
         }
     }
+
+    public static function convertCamelCase(String $str, String $separator, $return = 'string')
+    {
+        $splitStr = explode($separator, $str);
+        for ($i = 0; $i < count($splitStr); $i++) {
+            if ($i < 1) {
+                $splitStr[$i] = strtolower($splitStr[$i]);
+            } else {
+                $splitStr[$i] = ucwords($splitStr[$i]);
+            }
+        }
+
+        if ($return === 'array') {
+            return $splitStr;
+        } else {
+            return implode('', $splitStr);
+        }
+    }
 }
