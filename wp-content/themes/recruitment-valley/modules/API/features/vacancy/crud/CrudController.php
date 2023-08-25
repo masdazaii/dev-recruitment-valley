@@ -365,10 +365,12 @@ class VacancyCrudController
 
             /** Added syntax for gallery */
             $galleries = ModelHelper::handle_uploads('galleryJob', 'vacancy/' . $vacancyID);
-            if (isset($request['galleryCompany'])) {
-                $galleryIds = array_map(function ($gallery) {
-                    return explode('-', $gallery)[0];
-                }, $request['galleryCompany']);
+            if (array_key_exists('galleryCompany', $request)) {
+                if (is_array($request['galleryCompany'])) {
+                    $galleryIds = array_map(function ($gallery) {
+                        return explode('-', $gallery)[0];
+                    }, $request['galleryCompany']);
+                }
             }
 
             if ($galleries) {
