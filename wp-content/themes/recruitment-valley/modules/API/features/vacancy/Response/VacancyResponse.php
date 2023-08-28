@@ -96,7 +96,7 @@ class VacancyResponse
                 "totalEmployee" => $company->getTotalEmployees(),
                 "tel" => $company->getPhoneCode() . $company->getPhone(),
                 "email" => $company->getEmail(),
-                "gallery" => $company->getGallery( true ),
+                "gallery" => $company->getGallery(true),
                 // "socialMedia" => [
                 //     "facebook" => $company->getFacebook(),
                 //     "twitter" => $company->getTwitter(),
@@ -155,12 +155,15 @@ class VacancyResponse
     {
         $formattedResponse = array_map(function (WP_Post $vacancy) {
             $vacancyModel = new Vacancy($vacancy->ID);
+            $company = new Company($vacancyModel->getAuthor()); // Added Line
+
             $vacancyTaxonomy = $vacancyModel->getTaxonomy(true);
             return [
                 "id" => $vacancy->ID,
                 "slug" => $vacancy->post_name,
                 "name" => $vacancy->post_title,
-                "thumbnail" => $vacancyModel->getThumbnail(),
+                // "image" => $vacancyModel->getThumbnail(), // Changed below
+                "image" => $company->getThumbnail('object'),
                 "description" => $vacancyModel->getDescription() !== "" ? StringHelper::shortenString($vacancyModel->getDescription(), 0, 500, '...') : "",
                 "status" => $vacancyTaxonomy['status'][0]['name'] ?? null,
                 "jobPostedDate" => $vacancy->post_date,
@@ -181,7 +184,7 @@ class VacancyResponse
 
         $socialMediaResponse = [];
         foreach ($socialMedia as $key => $socmed) {
-            $socialMediaResponse[$socmed] = $company->getSocialMedia( $socmed );
+            $socialMediaResponse[$socmed] = $company->getSocialMedia($socmed);
         }
 
         $formattedResponse = [
@@ -205,11 +208,11 @@ class VacancyResponse
             "socialMedia" => $socialMediaResponse,
             "applicationProcedure" =>  [
                 "title" => $vacancyModel->getApplicationProcessTitle(),
-                "text"=> $vacancyModel->getApplicationProcessDescription(),
+                "text" => $vacancyModel->getApplicationProcessDescription(),
                 "steps" =>  $vacancyModel->getApplicationProcessStep(),
             ],
             "applyFromThisPlatform" => [
-                "externalUrl" => $vacancyModel-> getExternalUrl()
+                "externalUrl" => $vacancyModel->getExternalUrl()
             ]
         ];
 
