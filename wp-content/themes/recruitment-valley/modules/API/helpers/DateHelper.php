@@ -21,10 +21,10 @@ class DateHelper
      * @param string $locale
      * @return mixed
      */
-    public static function doLocale($date, $locale = 'en_US'): mixed
+    public static function doLocale($date, $locale = 'en_US', $pattern = 'dd MMMM yyyy, HH:mm'): mixed
     {
         $dateFormatter = new IntlDateFormatter($locale, IntlDateFormatter::FULL, IntlDateFormatter::FULL);
-        $dateFormatter->setPattern('dd MMMM yyyy, HH:mm');
+        $dateFormatter->setPattern($pattern);
 
         if (self::_isValidTimestamp($date)) {
             return $dateFormatter->format($date);

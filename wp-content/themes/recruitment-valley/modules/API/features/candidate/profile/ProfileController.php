@@ -8,6 +8,7 @@ use Exception;
 use Helper\ValidationHelper;
 use JWTHelper;
 use Model\ModelHelper;
+use Helper\DateHelper;
 use ResponseHelper;
 use WP_REST_Request;
 
@@ -41,7 +42,8 @@ class ProfileController
                 "cv" => [
                     'url' => $user->getCv() ? $user->getCv()["url"] : null,
                     'fileName' => $user->getCv() ? $user->getCv()["filename"] : null,
-                    'createdAt' => $user->getCv() ? date('M jS, Y', strtotime($user->getCv()["date"])) : null,
+                    // 'createdAt' => $user->getCv() ? date('M jS, Y', strtotime($user->getCv()["date"])) : null, // Changed Below
+                    'createdAt' => $user->getCv() ? DateHelper::doLocale(strtotime($user->getCv()["date"]), 'nl_NL') : null,
                 ]
             ];
 
