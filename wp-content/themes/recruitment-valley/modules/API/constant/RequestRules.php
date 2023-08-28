@@ -155,6 +155,9 @@ class RequestRules
                 'coverLetter' => [],
                 'vacancy' => ["required", "exists:post/vacancy/post_id/single"],
             ],
+            'userChangeEmail' => [
+                'newEmail' => ["required", "email"] // Must add rules exists to check if email already used!
+            ],
             'test' => [
                 'test.*.name' => ["required", "mime:jpg,jpeg,png,bmp,gif,svg,webp"]
             ]
@@ -277,6 +280,9 @@ class RequestRules
                 "twitter" => "",
                 "review" => "",
                 "experience.*" => "text"
+            ],
+            "userChangeEmail" => [
+                'newEmail' => "email"
             ],
             /** When using rule other than these 2. Please add following sanitize rule in Validator.php. */
             "example" => [

@@ -4,6 +4,8 @@ namespace Route;
 
 use Global\LoginService;
 use Global\RegistrationService;
+use Global\User\UserService;
+use Candidate\Profile\ProfileService;
 use Middleware\AuthMiddleware;
 use RefreshToken\RefreshTokenService;
 
@@ -23,6 +25,8 @@ class AuthEndpoint
         $loginService = new LoginService;
         $registrationService = new RegistrationService;
         $refreshTokenService = new RefreshTokenService;
+        $userService = new UserService;
+        $candidateProfileService = new ProfileService;
         $authMiddleware = new AuthMiddleware;
 
         $endpoint = [
@@ -83,6 +87,24 @@ class AuthEndpoint
                     'methods'               => 'POST',
                     'permission_callback'   => '__return_true',
                     'callback'              => [$registrationService, 'resendOTP']
+                ],
+                'change-email-request' => [
+                    'url'                   => '/change-email-request',
+                    'methods'               => 'POST',
+                    'permission_callback'   => [$authMiddleware, 'authorize_both'],
+                    'callback'              => [$candidateProfileService, 'changeEmailRequest'],
+                ],
+                'change_email' => [
+                    'url'                   => '/change-email',
+                    'methods'               => 'POST',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$candidateProfileService, 'changeEmail'],
+                ],
+                'change_password' => [
+                    'url'                   => '/change-password',
+                    'methods'               => 'POST',
+                    'permission_callback'   => [$authMiddleware, 'check_token'],
+                    'callback'              => [$candidateProfileService, 'changePassword'],
                 ]
             ]
 

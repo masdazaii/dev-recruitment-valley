@@ -26,10 +26,10 @@ class VacancyController
         $this->_message = new Message;
     }
 
-    public function getByStatus( $request )
+    public function getByStatus($request)
     {
         $status = $request["status"];
-        $vacancies = $this->vacancyModel->getByStatus( $status );
+        $vacancies = $this->vacancyModel->getByStatus($status);
         return [
             "status" => 200,
             "data" => $vacancies,
@@ -37,7 +37,7 @@ class VacancyController
         ];
     }
 
-    public function getTermCount( $request )
+    public function getTermCount($request)
     {
         $this->company->setUserId($request["user_id"]);
 
@@ -52,7 +52,7 @@ class VacancyController
         ];
     }
 
-    public function getAll( $request )
+    public function getAll($request)
     {
         $vacancy = new Vacancy;
         $filters = [
@@ -74,6 +74,7 @@ class VacancyController
             "offset" => $offset,
             "order" => "ASC",
             "post_status" => "publish",
+            "search_columns" => ['post_title']
         ];
 
         foreach ($taxonomyFilters as $key => $value) {
@@ -110,13 +111,13 @@ class VacancyController
         ];
     }
 
-    public function get( $request )
+    public function get($request)
     {
         $vacancy = new Vacancy;
 
         $vacancyId = $request['vacancy_id'];
 
-        $vacancy = get_post( $vacancyId );
+        $vacancy = get_post($vacancyId);
 
         if ($vacancy instanceof WP_Post) {
             return [
@@ -131,5 +132,4 @@ class VacancyController
             ];
         }
     }
-
 }
