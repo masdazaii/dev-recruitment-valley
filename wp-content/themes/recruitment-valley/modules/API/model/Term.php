@@ -52,9 +52,30 @@ class Term
         return $results;
     }
 
-    // public function selectInTerm($filters) {
+    public function selectInTerm($taxonomy, $filters = [])
+    {
+        $theArguments = $this->_setArguments($taxonomy, $filters);
+        $results = get_terms($theArguments);
 
-    // }
+        $countVacancies = new \WP_Query([
+            'post_type' => 'vacancy',
+            'tax_query' => array(
+                'relation' => 'AND',
+                [
+                    'taxonomy' => 'status',
+                    'field' => 'id',
+                    'terms' => 24
+                ],
+                [
+                    'taxonomy' => 'status',
+                    'field' => 'id',
+                    'terms' => 24
+                ]
+            )
+        ]);
+
+        return $results;
+    }
 
     private function _setArguments($taxonomy, $filters)
     {
