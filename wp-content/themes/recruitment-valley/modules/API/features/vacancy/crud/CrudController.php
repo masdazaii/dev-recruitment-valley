@@ -45,11 +45,6 @@ class VacancyCrudController
         $response = file_get_contents($apiUrl);
         $data = json_decode($response, true);
 
-        echo '<pre>';
-        var_dump($data);
-        echo '<pre>';
-        die();
-
         // standarization city name
 
         // get data by city
@@ -201,10 +196,24 @@ class VacancyCrudController
             }
         }
 
+        // filter by city
+        if($filters["city"])
+        {
+            array_push($args['meta_query'], [
+                'key' => 'placement_city',
+                'value' => $filters['city'],
+                'compare' => '=',
+            ]);
+        }
+
         /** Search */
         if (array_key_exists('search', $filters) && $filters['search'] !== '' && isset($filters['search'])) {
             $args['s'] = $filters['search'];
         }
+
+        // echo '<pre>';
+        // var_dump($args);
+        // echo '</pre>';die;
 
         $vacancies = new WP_Query($args);
 
