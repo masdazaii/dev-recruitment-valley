@@ -201,8 +201,7 @@ class VacancyCrudController
         }
 
         // filter by city
-        if($filters["city"])
-        {
+        if ($filters["city"]) {
             array_push($args['meta_query'], [
                 'key' => 'placement_city',
                 'value' => $filters['city'],
@@ -510,7 +509,7 @@ class VacancyCrudController
         $vacancy_id = $request["vacancy_id"];
         $vacancyModel = new Vacancy($vacancy_id);
 
-        $payload = $this->createFreeVacancyPayload( $request );
+        $payload = $this->createFreeVacancyPayload($request);
 
         $vacancyModel->setTaxonomy($payload["taxonomy"]);
 
@@ -529,14 +528,14 @@ class VacancyCrudController
     public function updatePaid($request)
     {
         $vacancy_id = $request["vacancy_id"];
-        
+
         global $wpdb;
 
         try {
             $wpdb->query('START TRANSACTION');
 
             $vacancyModel = new Vacancy($vacancy_id);
-            $payload = $this->createPaidVacancyPayload( $request );
+            $payload = $this->createPaidVacancyPayload($request);
 
             $vacancyModel->setTaxonomy($payload["taxonomy"]);
 
@@ -556,7 +555,7 @@ class VacancyCrudController
             }
 
             $vacancyGallery = $galleryIds ?? [];
-            
+
             if ($galleries) {
                 foreach ($galleries as $key => $gallery) {
                     $vacancyGallery[] = wp_insert_attachment($gallery['attachment'], $gallery['file']);
@@ -573,7 +572,7 @@ class VacancyCrudController
             }
 
             $wpdb->query('COMMIT');
-            
+
             return [
                 "status" => 200,
                 "message" => $this->_message->get("vacancy.update.paid.success")
@@ -584,7 +583,7 @@ class VacancyCrudController
                 "status" => 400,
                 "message" => $this->_message->get("system.overall_failed")
             ];
-        } catch ( Exception $e) {
+        } catch (Exception $e) {
             $wpdb->query('ROLLBACK');
             return [
                 "status" => 400,
@@ -712,7 +711,7 @@ class VacancyCrudController
         return $payload;
     }
 
-    public function createPaidVacancyPayload( $request )
+    public function createPaidVacancyPayload($request)
     {
         $payload = [
             "title" => $request["name"],
@@ -731,7 +730,7 @@ class VacancyCrudController
             "instagram_url" => $request["instagram"],
             "twitter_url" => $request["twitter"],
             "reviews" => $request["review"],
-            "placement_address" => $request["placementAddress"], 
+            "placement_address" => $request["placementAddress"],
             "taxonomy" => [
                 "sector" => $request["sector"],
                 "role" => $request["role"],
