@@ -279,7 +279,7 @@ class Vacancy
 
     public function getGallery( $properties = ["id", "title" , "url"]  )
     {
-        $galleries = $this->getProp($this->acf_gallery); 
+        $galleries = $this->getProp($this->acf_gallery);
         $result = [];
 
         foreach ($galleries as $key => $gallery) {
