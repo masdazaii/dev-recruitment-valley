@@ -60,4 +60,29 @@ class Email
 
 		return $content;
 	}
+	
+	/**
+	 * send
+	 * 
+	 * to send email using template in `wp-content\themes\recruitment-valley\templates\email`
+	 *
+	 * @param  string $to
+	 * @param  string $subject
+	 * @param  array $args
+	 * @param  string $template
+	 * @param  array $headers
+	 * @return bool
+	 */
+	public function send($to, $subject, $args, $template, $headers = []): bool
+	{
+		$headers = [
+			'Content-Type: text/html; charset=UTF-8',
+			...$headers
+		];
+
+		$contents = self::render_html_email($template, $args);
+
+		$is_success = wp_mail($to, $subject, $contents, $headers);
+		return $is_success;
+	}
 }
