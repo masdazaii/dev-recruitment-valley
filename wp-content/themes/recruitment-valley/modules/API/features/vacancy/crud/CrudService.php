@@ -128,14 +128,14 @@ class VacancyCrudService
         return ResponseHelper::build($response);
     }
 
-    public function updatePaid( WP_REST_Request $request)
+    public function updatePaid(WP_REST_Request $request)
     {
         $params = $request->get_params();
         $params["user_id"] = $request["user_id"];
 
-        if(get_post_status( $params['vacancy_id']) === false) return ResponseHelper::build(['status' => 400, 'message' => 'invalid post']);
+        if (get_post_status($params['vacancy_id']) === false) return ResponseHelper::build(['status' => 400, 'message' => 'invalid post']);
 
-        $response = $this->vacancyCrudController->updatePaid( $params );
+        $response = $this->vacancyCrudController->updatePaid($params);
         return ResponseHelper::build($response);
     }
 
