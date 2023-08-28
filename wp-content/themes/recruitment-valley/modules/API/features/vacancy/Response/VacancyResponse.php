@@ -75,9 +75,9 @@ class VacancyResponse
             $socialMediaResponse[$key] = [
                 "id" => $key + 1,
                 "type" => $socmed,
-                "url" => $vacancyModel->getSocialMedia($socmed) != null ||$vacancyModel->getSocialMedia($socmed) != "" ?
-                $vacancyModel->getSocialMedia($socmed) :  
-                $company->getSocialMedia($socmed)
+                "url" => $vacancyModel->getSocialMedia($socmed) != null || $vacancyModel->getSocialMedia($socmed) != "" ?
+                    $vacancyModel->getSocialMedia($socmed) :
+                    $company->getSocialMedia($socmed)
             ];
         }
 
@@ -169,7 +169,8 @@ class VacancyResponse
                 "image" => $company->getThumbnail('object'),
                 "description" => $vacancyModel->getDescription() !== "" ? StringHelper::shortenString($vacancyModel->getDescription(), 0, 500, '...') : "",
                 "status" => $vacancyTaxonomy['status'][0]['name'] ?? null,
-                "jobPostedDate" => $vacancy->post_date,
+                // "jobPostedDate" => $vacancy->post_date, // Changed below
+                "jobPostedDate" => DateHelper::doLocale($vacancy->post_date, 'nl_NL')
             ];
         }, $this->vacancyCollection);
 
