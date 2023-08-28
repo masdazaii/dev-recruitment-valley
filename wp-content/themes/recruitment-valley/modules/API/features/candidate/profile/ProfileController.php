@@ -460,7 +460,7 @@ class ProfileController
         }
 
         return [
-            "status" => 200,
+            "status" => 400,
             "message" => $this->message->get('candidate.profile.delete_cv_not_found')
         ];
     }
