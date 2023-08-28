@@ -67,7 +67,7 @@ class VacancyCrudController
             'salaryStart' => isset($request['salaryStart']) ? intval($request['salaryStart']) : 0,
             'salaryEnd' => isset($request['salaryEnd']) ? intval($request['salaryEnd']) : null,
             'postPerPage' => $request['perPage'] ?? 10,
-            'orderBy' => isset($request['orderBy']) ? isset($request['orderBy']) : false,
+            'orderBy' => isset($request['orderBy']) ? $request['orderBy'] : false,
             'order' => isset($request['sort']) ? $request['sort'] : false,
         ];
 
@@ -94,7 +94,7 @@ class VacancyCrudController
 
         /** Sort */
         if ($filters['orderBy']) {
-            $args['order_by'] = $filters['orderBy'];
+            $args['orderby'] = $filters['orderBy'];
             $args['order'] = $filters['order'];
         }
 
@@ -223,6 +223,7 @@ class VacancyCrudController
         return [
             'message' => $this->_message->get('vacancy.get_all'),
             'data'    => $vacancies->posts,
+            'args' => $args,
             'meta'    => [
                 'currentPage' => isset($filters['page']) ? intval($filters['page']) : 1,
                 'totalPage' => $vacancies->max_num_pages,
@@ -301,24 +302,24 @@ class VacancyCrudController
             // $expiredAt = $expiredAt->modify("+30 days")->format("Y-m-d H:i:s");
 
             $vacancyModel->setCityLongLat($payload["city"]);
-            $vacancyModel->setAddressLongLat( $payload["placementAddress"] );
-            $vacancyModel->setDistance($payload["city"], $payload["city"]. " " . $payload["placementAddress"] );
-            
+            $vacancyModel->setAddressLongLat($payload["placementAddress"]);
+            $vacancyModel->setDistance($payload["city"], $payload["city"] . " " . $payload["placementAddress"]);
+
             $vacancyModel->setStatus('processing');
             // $vacancyModel->setProp("expired_at", $expiredAt);
-            $this->wpdb->query( "COMMIT" );
+            $this->wpdb->query("COMMIT");
             return [
                 "status" => 201,
                 "message" => $this->_message->get("vacancy.create.free.success"),
             ];
         } catch (\Throwable $th) {
-            $this->wpdb->query( "ROLLBACK" );
+            $this->wpdb->query("ROLLBACK");
             return [
                 "status" => 500,
                 "message" => $th->getMessage(),
             ];
         } catch (\Exception $e) {
-            $this->wpdb->query( "ROLLBACK" );
+            $this->wpdb->query("ROLLBACK");
             return [
                 "status" => 500,
                 "message" => $e->getMessage(),
