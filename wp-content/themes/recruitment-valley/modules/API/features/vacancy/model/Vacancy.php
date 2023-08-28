@@ -393,6 +393,11 @@ class Vacancy
         return $result;
     }
 
+    public function getSocialMedia( $socialMedia )
+    {
+        return $this->getProp($socialMedia. "_url");
+    }
+
     public function getSalaryEnd()
     {
         return $this->getProp($this->acf_salary_end);
@@ -431,7 +436,11 @@ class Vacancy
         return $vacancy->post_author;
     }
 
-
+    public function getSlug()
+    {
+        $vacancy = get_post($this->vacancy_id);
+        return $vacancy->post_name;
+    }
 
     public function getPublishDate($format = "Y-m-d H:i:s")
     {
