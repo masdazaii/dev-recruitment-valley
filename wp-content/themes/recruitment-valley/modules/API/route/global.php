@@ -149,6 +149,12 @@ class GlobalEndpoint
                     'permission_callback'   => '__return_true',
                     'callback'              => [$termVacancyService, 'getSpesificTaxonomyTerm']
                 ],
+                'testGetAllTerm' => [
+                    'url'                   => '/test-get-all-term',
+                    'methods'               => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$termVacancyService, 'testGetAllTerm']
+                ],
             ]
 
         ];

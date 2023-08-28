@@ -61,4 +61,11 @@ class VacancyTermService
         $response = $this->vacancyTermController->getSpesificTaxonomyTerm($params);
         return ResponseHelper::build($response);
     }
+
+    public function testGetAllTerm(WP_REST_Request $request)
+    {
+        $params = $request->get_params();
+        $response = $this->vacancyTermController->testGetAllTerm($params);
+        return ResponseHelper::build($response);
+    }
 }
