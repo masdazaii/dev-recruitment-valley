@@ -221,6 +221,7 @@ class VacancyCrudController
         /** Search */
         if (array_key_exists('search', $filters) && $filters['search'] !== '' && isset($filters['search'])) {
             $args['s'] = $filters['search'];
+            $args['search_columns'] = ['post_title'];
         }
 
         // echo '<pre>';
@@ -232,7 +233,6 @@ class VacancyCrudController
         return [
             'message' => $this->_message->get('vacancy.get_all'),
             'data'    => $vacancies->posts,
-            'args' => $args,
             'meta'    => [
                 'currentPage' => isset($filters['page']) ? intval($filters['page']) : 1,
                 'totalPage' => $vacancies->max_num_pages,
@@ -420,10 +420,10 @@ class VacancyCrudController
             }
 
             $vacancyModel->setProp($vacancyModel->acf_gallery, $vacancyGallery, false);
-            
+
             $vacancyModel->setCityLongLat($payload["city"]);
-            $vacancyModel->setAddressLongLat( $payload["placementAddress"] );
-            $vacancyModel->setDistance($payload["city"], $payload["city"]. " " . $payload["placementAddress"] );
+            $vacancyModel->setAddressLongLat($payload["placementAddress"]);
+            $vacancyModel->setDistance($payload["city"], $payload["city"] . " " . $payload["placementAddress"]);
 
             $this->add_expired_date_to_option([
                 'post_id' => $vacancyModel->vacancy_id,
