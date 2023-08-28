@@ -212,7 +212,6 @@ class VacancyResponse
                 "steps" =>  $vacancyModel->getApplicationProcessStep(),
             ],
             "applyFromThisPlatform" => [
-                "status" => $vacancyModel->getApplyFromThisPlatform(),
                 "externalUrl" => $vacancyModel->getExternalUrl()
             ]
         ];

@@ -15,9 +15,13 @@ class VacancyCrudController
 {
     private $_posttype = 'vacancy';
     private $_message;
+    private $wpdb;
 
     public function __construct()
     {
+        global $wpdb;
+
+        $this->wpdb = $wpdb;
         $this->_message = new Message;
         add_filter('posts_search', [$this, 'filterVacancySearch'], 10, 2);
     }
@@ -275,6 +279,7 @@ class VacancyCrudController
             ],
         ];
 
+        $this->wpdb->query("START TRANSACTION");
         try {
             $vacancyModel = new Vacancy;
             $vacancyModel->storePost($payload);
@@ -292,25 +297,31 @@ class VacancyCrudController
                 $vacancyModel->setProp($vacancyModel->acf_external_url, $payload["external_url"]);
             }
 
-            $expiredAt = new DateTimeImmutable();
+            // $expiredAt = new DateTimeImmutable();
             // $expiredAt = $expiredAt->modify("+30 days")->format("Y-m-d H:i:s");
 
+            $vacancyModel->setCityLongLat($payload["city"]);
+            $vacancyModel->setAddressLongLat( $payload["placementAddress"] );
+            $vacancyModel->setDistance($payload["city"], $payload["city"]. " " . $payload["placementAddress"] );
+            
             $vacancyModel->setStatus('processing');
             // $vacancyModel->setProp("expired_at", $expiredAt);
-
+            $this->wpdb->query( "COMMIT" );
             return [
                 "status" => 201,
                 "message" => $this->_message->get("vacancy.create.free.success"),
             ];
         } catch (\Throwable $th) {
+            $this->wpdb->query( "ROLLBACK" );
             return [
                 "status" => 500,
-                "message" => $this->_message->get("vacancy.create.fail"),
+                "message" => $th->getMessage(),
             ];
-        } catch (\WP_Error $e) {
+        } catch (\Exception $e) {
+            $this->wpdb->query( "ROLLBACK" );
             return [
                 "status" => 500,
-                "message" => $this->_message->get("vacancy.create.fail"),
+                "message" => $e->getMessage(),
             ];
         }
     }
