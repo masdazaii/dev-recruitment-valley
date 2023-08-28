@@ -92,7 +92,7 @@ class Validator
                 return new NotExistsRule();
             case 'max_stored':
                 return new MaxStoredRule();
-            case 'wywsig' : 
+            case 'wywsig':
                 return new RequiredRule();
             default:
                 throw new Exception("Rule '{$ruleName}' not supported.");
@@ -139,9 +139,9 @@ class Validator
 
                 //     case "arrayofobject" :
                 //         default break;
-            } else if (in_array("wywsig", $this->rules[$key])){
+            } else if (in_array("wywsig", $this->rules[$key])) {
                 $this->data[$key] = wp_kses_post($value);
-            }else {
+            } else {
                 $this->data[$key] = sanitize_text_field($value);
             }
         }
@@ -247,12 +247,13 @@ class Validator
         if (is_array($data)) {
             foreach ($data as $key => $value) {
                 if (is_array($value)) {
-                    $data = $this->_sanitizeArray($rule, $value);
+                    $data[$key] = $this->_sanitizeArray($rule, $value);
                 } else {
-                    $data = $this->_doSanitize($rule, $value);
+                    $data[$key] = $this->_doSanitize($rule, $value);
                 }
             }
         }
+
         return $data;
     }
 
