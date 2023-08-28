@@ -277,9 +277,21 @@ class Vacancy
         return $this->getProp($this->acf_twitter_url);
     }
 
-    public function getGallery()
+    public function getGallery( $properties = ["id", "title" , "url"]  )
     {
-        return $this->getProp($this->acf_gallery);
+        $galleries = $this->getProp($this->acf_gallery); 
+        $result = [];
+
+        foreach ($galleries as $key => $gallery) {
+            $single = [];
+            foreach ($properties as $key => $property) {
+                $single[$property] = $gallery[$property];
+            }
+
+            array_push($result,$single);
+        }
+
+        return $result;
     }
 
     public function getCity()

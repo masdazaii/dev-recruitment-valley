@@ -95,7 +95,7 @@ class VacancyResponse
                 "totalEmployee" => $company->getTotalEmployees(),
                 "tel" => $company->getPhoneCode() . $company->getPhone(),
                 "email" => $company->getEmail(),
-                "gallery" => $company->getGallery(),
+                "gallery" => $company->getGallery( true ),
                 // "socialMedia" => [
                 //     "facebook" => $company->getFacebook(),
                 //     "twitter" => $company->getTwitter(),
