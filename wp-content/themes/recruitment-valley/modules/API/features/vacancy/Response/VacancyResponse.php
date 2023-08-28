@@ -49,7 +49,7 @@ class VacancyResponse
                 "salaryStart" => $vacancyModel->getSalaryStart(),
                 "salaryEnd" => $vacancyModel->getSalaryEnd(),
                 "thumbnail" => $company->getThumbnail(),
-                "description" => $vacancyModel->getDescription(),
+                "description" => StringHelper::shortenString($vacancyModel->getDescription(), 0, 10000),
                 // "postedDate" => date_format(new DateTime($vacancy->post_date_gmt), "Y-m-d H:i A")
                 "postedDate" => DateHelper::doLocale($vacancy->post_date_gmt, 'nl_NL')
             ];
@@ -83,7 +83,7 @@ class VacancyResponse
             "id" => $this->vacancyCollection->ID,
             "isPaid" => $vacancyModel->getIsPaid(),
             "shortDescription" => $vacancyTaxonomy,
-            "title" => $this->vacancyCollection->post_title, // later get company here
+            "title" => $this->vacancyCollection->post_title,
             // "isFavorite" => $candidate ? $candidate->isFavorite($this->vacancyCollection->post_author) : false, // Changed below
             "isFavorite" => $candidate ? $candidate->isFavorite($this->vacancyCollection->ID) : false,
             "company" =>  [
@@ -96,7 +96,7 @@ class VacancyResponse
                 "totalEmployee" => $company->getTotalEmployees(),
                 "tel" => $company->getPhoneCode() . $company->getPhone(),
                 "email" => $company->getEmail(),
-                "gallery" => $company->getGallery(),
+                "gallery" => $company->getGallery( true ),
                 // "socialMedia" => [
                 //     "facebook" => $company->getFacebook(),
                 //     "twitter" => $company->getTwitter(),
@@ -176,6 +176,14 @@ class VacancyResponse
 
         $company = new Company($this->vacancyCollection->post_author);
 
+        /** Set social media response */
+        $socialMedia = ["facebook", "linkedin", "instagram", "twitter"];
+
+        $socialMediaResponse = [];
+        foreach ($socialMedia as $key => $socmed) {
+            $socialMediaResponse[$socmed] = $company->getSocialMedia( $socmed );
+        }
+
         $formattedResponse = [
             "id" => $this->vacancyCollection->ID,
             "isPaid" => $vacancyModel->getIsPaid(),
@@ -188,14 +196,22 @@ class VacancyResponse
             "city" => $vacancyModel->getCity(),
             "placementAddress" => $vacancyModel->getPlacementAddress(),
             "videoId" => $company->getVideoUrl(), // Added Line
-            "gallery" => $company->getGallery(true),
+            "gallery" => $vacancyModel->getGallery(),
             "reviews" => $vacancyModel->getReviews(),
-            "steps" => $vacancyModel->getApplicationProcessStep(),
             "salaryStart" => $vacancyModel->getSalaryStart(),
             "salaryEnd" => $vacancyModel->getSalaryEnd(),
             "postedDate" => $vacancyModel->getPublishDate("Y-m-d H:i A"),
             "expiredDate" => $vacancyModel->getExpiredAt(),
-            "applyFromThisPlatform" => $vacancyModel->getApplyFromThisPlatform(),
+            "socialMedia" => $socialMediaResponse,
+            "applicationProcedure" =>  [
+                "title" => $vacancyModel->getApplicationProcessTitle(),
+                "text"=> $vacancyModel->getApplicationProcessDescription(),
+                "steps" =>  $vacancyModel->getApplicationProcessStep(),
+            ],
+            "applyFromThisPlatform" => [
+                "status" => $vacancyModel->getApplyFromThisPlatform(),
+                "externalUrl" => $vacancyModel-> getExternalUrl()
+            ]
         ];
 
         $vacancyTax = $vacancyModel->getTax();
