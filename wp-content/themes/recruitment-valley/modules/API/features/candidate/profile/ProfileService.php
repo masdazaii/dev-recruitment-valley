@@ -97,4 +97,11 @@ class ProfileService
         $response = $this->setupProfileController->getUserNav($params);
         return ResponseHelper::build($response);
     }
+
+    public function destroyCV(WP_REST_Request $request)
+    {
+        $params = $request->get_params();
+        $response = $this->setupProfileController->destroyCV($params);
+        return ResponseHelper::build($response);
+    }
 }

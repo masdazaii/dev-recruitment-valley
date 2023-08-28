@@ -52,27 +52,48 @@ class Term
         return $results;
     }
 
+    /**
+     * Select All term function
+     * This one using wp get_terms and wp_query to count posts instead raw query
+     *
+     * @param [type] $taxonomy
+     * @param array $filters
+     * @return void
+     */
     public function selectInTerm($taxonomy, $filters = [])
     {
         $theArguments = $this->_setArguments($taxonomy, $filters);
         $results = get_terms($theArguments);
 
-        $countVacancies = new \WP_Query([
-            'post_type' => 'vacancy',
-            'tax_query' => array(
-                'relation' => 'AND',
-                [
-                    'taxonomy' => 'status',
-                    'field' => 'id',
-                    'terms' => 24
-                ],
-                [
-                    'taxonomy' => 'status',
-                    'field' => 'id',
-                    'terms' => 24
-                ]
-            )
-        ]);
+        foreach ($results as $key => $value) {
+            $countVacancies = new \WP_Query([
+                'post_type' => 'vacancy',
+                'tax_query' => array(
+                    'relation' => 'AND',
+                    [
+                        'taxonomy' => 'status',
+                        'field' => 'id',
+                        'terms' => $filters['post_status'] ?? 24
+                    ],
+                    [
+                        'taxonomy' => $taxonomy,
+                        'field' => 'id',
+                        'terms' => $value->term_id
+                    ],
+                )
+            ]);
+
+            if ($filters['hideEmpty']) {
+                if ((int)$countVacancies->post_count > 0) {
+                    $results[$key]->count = $countVacancies->post_count;
+                } else {
+                    unset($results[$key]);
+                    unset($results->$key);
+                }
+            } else {
+                $results[$key]->count = $countVacancies->post_count;
+            }
+        }
 
         return $results;
     }
