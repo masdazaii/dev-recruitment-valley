@@ -82,7 +82,7 @@ class Company
 
     public function getThumbnail($result = 'url')
     {
-        if ($result = 'object') {
+        if ($result) {
             $attachment = $this->getProp($this->image, true);
             if (!empty($attachment)) {
                 return [
