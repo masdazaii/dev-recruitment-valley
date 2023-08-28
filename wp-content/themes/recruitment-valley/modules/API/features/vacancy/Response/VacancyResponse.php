@@ -75,7 +75,9 @@ class VacancyResponse
             $socialMediaResponse[$key] = [
                 "id" => $key + 1,
                 "type" => $socmed,
-                "url" => $company->getSocialMedia($socmed)
+                "url" => $vacancyModel->getSocialMedia($socmed) != null ||$vacancyModel->getSocialMedia($socmed) != "" ?
+                $vacancyModel->getSocialMedia($socmed) :  
+                $company->getSocialMedia($socmed)
             ];
         }
 
@@ -103,9 +105,10 @@ class VacancyResponse
                 //     "linkedin" => $company->getLinkedin(),
                 //     "instagram" => $company->getInstagram(),
                 // ],
-                "socialMedia" => $socialMediaResponse,
+                // "socialMedia" => $socialMediaResponse,
                 "website" => $company->getWebsite()
             ], // later get company here
+            "socialMedia" => $socialMediaResponse,
             "contents" => [
                 "description" => $vacancyModel->getDescription(),
                 "term" => $vacancyModel->getTerm(),

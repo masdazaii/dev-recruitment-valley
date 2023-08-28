@@ -425,6 +425,9 @@ class VacancyCrudController
 
             return [
                 "status" => 201,
+                "data" => [
+                    "slug" => $vacancyModel->getSlug(),
+                ],
                 "message" => $this->_message->get("vacancy.create.paid.success"),
             ];
         } catch (\Throwable $th) {
