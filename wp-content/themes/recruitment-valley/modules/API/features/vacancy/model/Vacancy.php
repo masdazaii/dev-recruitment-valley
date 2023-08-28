@@ -392,6 +392,11 @@ class Vacancy
         return $this->getProp($this->acf_salary_end);
     }
 
+    public function getExternalUrl()
+    {
+        return $this->getProp($this->acf_external_url);
+    }
+
     public function getExpiredAt($format = "Y-m-d H:i:s")
     {
         // return $this->getProp($this->acf_expired_at);
