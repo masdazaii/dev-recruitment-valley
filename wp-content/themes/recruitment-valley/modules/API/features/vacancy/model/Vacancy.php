@@ -3,6 +3,7 @@
 namespace Vacancy;
 
 use Helper;
+use Helper\Maphelper;
 use WP_Error;
 use WP_Post;
 use WP_Query;
@@ -60,6 +61,11 @@ class Vacancy
     public $acf_external_url = "external_url";
     public $acf_expired_at = "expired_at";
     public $acf_placement_address = "placement_address";
+    public $acf_city_latitude = "city_latitude";
+    public $acf_city_longitude = "city_longitude";
+    public $acf_placement_address_latitude = "placement_address_latitude";
+    public $acf_placement_address_longitude = "placement_address_longitude";
+    public $acf_distance_from_city = "distance_from_city";
 
     public function __construct($vacancy_id = false)
     {
@@ -546,5 +552,29 @@ class Vacancy
     public function getBySlug(String $slug)
     {
         return get_page_by_path($slug, OBJECT, 'vacancy');
+    }
+
+    public function setCityLongLat( string $city )
+    {
+        $coordinat = Maphelper::generateLongLat( $city );
+        $this->setProp( $this->acf_city_latitude, $coordinat["lat"] );
+        $this->setProp( $this->acf_city_longitude, $coordinat["long"] );
+    }
+
+    public function setAddressLongLat( string $address )
+    {
+        $coordinat = Maphelper::generateLongLat( $address );
+        $this->setProp( $this->acf_placement_address_latitude, $coordinat["lat"] );
+        $this->setProp( $this->acf_placement_address_longitude, $coordinat["long"] );
+    }
+
+    public function setDistance( $city, $placementAddress )
+    {
+        $cityCoordinat = $coordinat = Maphelper::generateLongLat( $city );
+        $placementAddressCoordinat = Maphelper::generateLongLat( $placementAddress );
+
+        $distance = Maphelper::calculateDistance($cityCoordinat, $placementAddressCoordinat);
+        
+        return $this->setProp($this->acf_distance_from_city, $distance);
     }
 }
