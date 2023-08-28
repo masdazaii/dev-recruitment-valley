@@ -93,6 +93,12 @@ class CandidateEndpoint
                     'permission_callback'   => [$authMiddleware, 'check_token_candidate'],
                     'callback'              => [$profileService, 'updateCv'],
                 ],
+                'delete_cv' => [
+                    'url'                   => 'profile/cv',
+                    'methods'               => 'DELETE',
+                    'permission_callback'   => [$authMiddleware, 'authorize_candidate'],
+                    'callback'              => [$profileService, 'destroyCV'],
+                ],
                 'candidate_nav' => [
                     'url'                   => '/profile/user-nav',
                     'methods'               => 'GET',

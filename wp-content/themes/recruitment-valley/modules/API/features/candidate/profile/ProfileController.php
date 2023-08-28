@@ -438,4 +438,30 @@ class ProfileController
             ];
         }
     }
+
+    public function destroyCV($request)
+    {
+        $candidate = new Candidate($request["user_id"]);
+
+        $theCV = $candidate->getCv() ?? NULL;
+        if ($theCV) {
+            $delete = $candidate->deleteCV();
+            if ($delete) {
+                return [
+                    "status" => 200,
+                    "message" => $this->message->get('candidate.profile.delete_cv_success')
+                ];
+            } else {
+                return [
+                    "status" => 500,
+                    "message" => $this->message->get('candidate.profile.delete_cv_failed')
+                ];
+            }
+        }
+
+        return [
+            "status" => 200,
+            "message" => $this->message->get('candidate.profile.delete_cv_not_found')
+        ];
+    }
 }
