@@ -217,7 +217,7 @@ class ProfileController
             "phoneNumberCode" => "required",
             "country" => "required",
             "city" => "required",
-            "linkedinPage" => "required",
+            // "linkedinPage" => "required",
         ]);
 
         if (!$validate['is_valid']) return wp_send_json_error(['validation' => $validate['fields'], 'status' => 400], 400);
