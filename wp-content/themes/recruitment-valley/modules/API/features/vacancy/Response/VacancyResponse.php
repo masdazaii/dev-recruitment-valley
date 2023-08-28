@@ -48,7 +48,7 @@ class VacancyResponse
                 "salaryStart" => $vacancyModel->getSalaryStart(),
                 "salaryEnd" => $vacancyModel->getSalaryEnd(),
                 "thumbnail" => $company->getThumbnail(),
-                "description" => $vacancyModel->getDescription(),
+                "description" => StringHelper::shortenString($vacancyModel->getDescription(), 0, 10000),
                 // "postedDate" => date_format(new DateTime($vacancy->post_date_gmt), "Y-m-d H:i A")
                 "postedDate" => date_format(new DateTime($vacancy->post_date_gmt), "d-m-Y H:i")
             ];
@@ -82,7 +82,7 @@ class VacancyResponse
             "id" => $this->vacancyCollection->ID,
             "isPaid" => $vacancyModel->getIsPaid(),
             "shortDescription" => $vacancyTaxonomy,
-            "title" => $this->vacancyCollection->post_title, // later get company here
+            "title" => $this->vacancyCollection->post_title,
             // "isFavorite" => $candidate ? $candidate->isFavorite($this->vacancyCollection->post_author) : false, // Changed below
             "isFavorite" => $candidate ? $candidate->isFavorite($this->vacancyCollection->ID) : false,
             "company" =>  [
@@ -180,11 +180,7 @@ class VacancyResponse
 
         $socialMediaResponse = [];
         foreach ($socialMedia as $key => $socmed) {
-            $socialMediaResponse[$key] = [
-                "id" => $key + 1,
-                "type" => $socmed,
-                "url" => $company->getSocialMedia($socmed)
-            ];
+            $socialMediaResponse[$socmed] = $company->getSocialMedia( $socmed );
         }
 
         $formattedResponse = [
