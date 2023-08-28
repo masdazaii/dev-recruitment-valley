@@ -95,7 +95,7 @@ class VacancyResponse
                 "totalEmployee" => $company->getTotalEmployees(),
                 "tel" => $company->getPhoneCode() . $company->getPhone(),
                 "email" => $company->getEmail(),
-                "gallery" => $company->getGallery(),
+                "gallery" => $company->getGallery( true ),
                 // "socialMedia" => [
                 //     "facebook" => $company->getFacebook(),
                 //     "twitter" => $company->getTwitter(),
@@ -175,6 +175,18 @@ class VacancyResponse
 
         $company = new Company($this->vacancyCollection->post_author);
 
+        /** Set social media response */
+        $socialMedia = ["facebook", "linkedin", "instagram", "twitter"];
+
+        $socialMediaResponse = [];
+        foreach ($socialMedia as $key => $socmed) {
+            $socialMediaResponse[$key] = [
+                "id" => $key + 1,
+                "type" => $socmed,
+                "url" => $company->getSocialMedia($socmed)
+            ];
+        }
+
         $formattedResponse = [
             "id" => $this->vacancyCollection->ID,
             "isPaid" => $vacancyModel->getIsPaid(),
@@ -189,12 +201,20 @@ class VacancyResponse
             "videoId" => $company->getVideoUrl(), // Added Line
             "gallery" => $company->getGallery(true),
             "reviews" => $vacancyModel->getReviews(),
-            "steps" => $vacancyModel->getApplicationProcessStep(),
             "salaryStart" => $vacancyModel->getSalaryStart(),
             "salaryEnd" => $vacancyModel->getSalaryEnd(),
             "postedDate" => $vacancyModel->getPublishDate("Y-m-d H:i A"),
             "expiredDate" => $vacancyModel->getExpiredAt(),
-            "applyFromThisPlatform" => $vacancyModel->getApplyFromThisPlatform(),
+            "socialMedia" => $socialMediaResponse,
+            "applicationProcedure" =>  [
+                "title" => $vacancyModel->getApplicationProcessTitle(),
+                "text"=> $vacancyModel->getApplicationProcessDescription(),
+                "steps" =>  $vacancyModel->getApplicationProcessStep(),
+            ],
+            "applyFromThisPlatform" => [
+                "status" => $vacancyModel->getApplyFromThisPlatform(),
+                "externalUrl" => $vacancyModel-> getExternalUrl()
+            ]
         ];
 
         $vacancyTax = $vacancyModel->getTax();
