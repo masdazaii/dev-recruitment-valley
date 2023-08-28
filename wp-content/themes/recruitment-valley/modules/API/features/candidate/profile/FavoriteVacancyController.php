@@ -84,7 +84,7 @@ class FavoriteVacancyController
         ];
 
         if ($filters['orderBy']) {
-            $args['order_by'] = $filters['orderBy'];
+            $args['orderby'] = $filters['orderBy'];
             $args['order'] = $filters['order'];
         }
 
