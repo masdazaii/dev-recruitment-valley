@@ -410,6 +410,10 @@ class VacancyCrudController
             }
 
             $vacancyModel->setProp($vacancyModel->acf_gallery, $vacancyGallery, false);
+            
+            $vacancyModel->setCityLongLat($payload["city"]);
+            $vacancyModel->setAddressLongLat( $payload["placementAddress"] );
+            $vacancyModel->setDistance($payload["city"], $payload["city"]. " " . $payload["placementAddress"] );
 
             $this->add_expired_date_to_option([
                 'post_id' => $vacancyModel->vacancy_id,
