@@ -69,6 +69,7 @@ class VacancyCrudController
             'postPerPage' => $request['perPage'] ?? 10,
             'orderBy' => isset($request['orderBy']) ? $request['orderBy'] : false,
             'order' => isset($request['sort']) ? $request['sort'] : false,
+            "radius" => isset($request['radius']) ? $request['radius'] : false,
         ];
 
         $taxonomyFilters = [
@@ -206,6 +207,14 @@ class VacancyCrudController
                 'key' => 'placement_city',
                 'value' => $filters['city'],
                 'compare' => '=',
+            ]);
+        }
+
+        if ($filters["radius"]) {
+            array_push($args['meta_query'], [
+                'key' => 'distance_from_city',
+                'value' => (int) $filters['radius'],
+                'compare' => '<=',
             ]);
         }
 
@@ -411,6 +420,10 @@ class VacancyCrudController
             }
 
             $vacancyModel->setProp($vacancyModel->acf_gallery, $vacancyGallery, false);
+            
+            $vacancyModel->setCityLongLat($payload["city"]);
+            $vacancyModel->setAddressLongLat( $payload["placementAddress"] );
+            $vacancyModel->setDistance($payload["city"], $payload["city"]. " " . $payload["placementAddress"] );
 
             $this->add_expired_date_to_option([
                 'post_id' => $vacancyModel->vacancy_id,

@@ -188,7 +188,7 @@ class VacancyResponse
 
         $socialMediaResponse = [];
         foreach ($socialMedia as $key => $socmed) {
-            $socialMediaResponse[$socmed] = $company->getSocialMedia($socmed);
+            $socialMediaResponse[$socmed] = $vacancyModel->getSocialMedia($socmed);
         }
 
         $formattedResponse = [
