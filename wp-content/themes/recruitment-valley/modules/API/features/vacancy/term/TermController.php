@@ -61,14 +61,27 @@ class VacancyTermController
         ];
     }
 
-    public function testGetAllTerm()
+    /**
+     * Select All term function
+     * Same as getAllTerm, but using wp get_terms and wp_query instead raw query
+     *
+     * @param array $parameters
+     * @return array
+     */
+    public function testGetAllTerm($parameters)
     {
         /** Get Taxonomy */
         $taxonomies = get_object_taxonomies('vacancy', 'names');
+
+        $termStatusOpen = get_term_by('slug', 'open', 'status', 'OBJECT');
+        $filters = [
+            'post_status' => $termStatusOpen->term_id,
+            'hideEmpty' => isset($parameters['hideEmpty']) && $parameters['hideEmpty'] === 'true' ? true : false
+        ];
+
         foreach ($taxonomies as $value) {
             /** Get Terms each taxonomy */
-            // $termData[$value] = $this->_setResponse($this->termModel->selectInTerm($value, []));
-            $termData[$value] = $this->_setResponse($this->termModel->selectInTerm($value, []));
+            $termData[$value] = $this->_setResponse($this->termModel->selectInTerm($value, $filters), 'single');
         }
 
         return [
@@ -88,6 +101,7 @@ class VacancyTermController
                 'value' => (int)$value->term_id,
                 'total' => (int)$value->count
             ];
+
             if ($format == 'all') {
                 $response[$value->taxonomy][] = $term;
             } else if ($format == 'single') {

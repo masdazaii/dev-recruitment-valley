@@ -121,4 +121,14 @@ class Candidate
     {
         return get_field($acf_field, 'user_' . $this->user_id, $single);
     }
+
+    public function setProp($acf_field, $value)
+    {
+        return update_field($acf_field, $value, 'user_' . $this->user_id);
+    }
+
+    public function deleteCV()
+    {
+        return $this->setProp($this->cv, '');
+    }
 }

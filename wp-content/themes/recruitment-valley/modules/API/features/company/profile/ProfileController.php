@@ -489,9 +489,9 @@ class ProfileController
         }
 
         // Delete old image
-        if (isset($currentImage) && !empty($currentImage)) {
-            wp_delete_attachment($currentImage['ID']);
-        }
+        // if (isset($currentImage) && !empty($currentImage)) {
+        //     wp_delete_attachment($currentImage['ID']);
+        // }
 
         return [
             "status" => 200,
