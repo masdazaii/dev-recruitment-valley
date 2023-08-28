@@ -61,6 +61,23 @@ class VacancyTermController
         ];
     }
 
+    public function testGetAllTerm()
+    {
+        /** Get Taxonomy */
+        $taxonomies = get_object_taxonomies('vacancy', 'names');
+        foreach ($taxonomies as $value) {
+            /** Get Terms each taxonomy */
+            // $termData[$value] = $this->_setResponse($this->termModel->selectInTerm($value, []));
+            $termData[$value] = $this->_setResponse($this->termModel->selectInTerm($value, []));
+        }
+
+        return [
+            "status" => 200,
+            "message" => $this->_message->get('vacancy.term.show_term_success'),
+            "data" => $termData
+        ];
+    }
+
     private function _setResponse($terms, $format = 'all')
     {
         $response = [];

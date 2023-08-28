@@ -37,6 +37,9 @@ class Company
 
     private $secondaryEmploymentCondition = "ucma_benefit";
 
+    /** Added Line */
+    private $_acfSector = "ucma_sector";
+
     public function __construct($userId = false)
     {
         $this->vacancyModel = new Vacancy;
@@ -162,7 +165,7 @@ class Company
                     "id" => $attachmentId,
                     "url" => wp_get_attachment_url($attachmentId),
                     "title" => get_the_title($attachmentId)
-                ];    
+                ];
             }
 
             return wp_get_attachment_url($attachmentId);
@@ -228,5 +231,32 @@ class Company
     public function getSecondaryEmploymentCondition()
     {
         return $this->getProp($this->secondaryEmploymentCondition);
+    }
+
+    public function getTerms(String $taxonomy)
+    {
+        switch ($taxonomy) {
+            case ('sector'):
+                $acf = $this->_acfSector;
+                break;
+            default:
+                return [];
+        }
+
+        $terms = get_terms([
+            'taxonomy' => $taxonomy,
+            'include' => $this->getProp($acf) ?? []
+        ]);
+
+        $termsResponse = [];
+
+        foreach ($terms as $term) {
+            $termsResponse[] = [
+                'label' => $term->name,
+                'value' => $term->term_id,
+            ];
+        }
+
+        return $termsResponse;
     }
 }

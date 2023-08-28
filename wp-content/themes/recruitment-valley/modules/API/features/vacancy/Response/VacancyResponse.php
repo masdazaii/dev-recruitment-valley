@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use Model\Company;
 use WP_Post;
 use Helper\StringHelper;
+use Helper\DateHelper;
 
 class VacancyResponse
 {
@@ -50,7 +51,7 @@ class VacancyResponse
                 "thumbnail" => $company->getThumbnail(),
                 "description" => $vacancyModel->getDescription(),
                 // "postedDate" => date_format(new DateTime($vacancy->post_date_gmt), "Y-m-d H:i A")
-                "postedDate" => date_format(new DateTime($vacancy->post_date_gmt), "d-m-Y H:i")
+                "postedDate" => DateHelper::doLocale($vacancy->post_date_gmt, 'nl_NL')
             ];
         }, $this->vacancyCollection);
 
@@ -91,7 +92,7 @@ class VacancyResponse
                 "name" => $company->getName(),
                 "about" => $company->getDescription(),
                 "maps" => "",
-                "sector" => "",
+                "sector" => $company->getTerms('sector'),
                 "totalEmployee" => $company->getTotalEmployees(),
                 "tel" => $company->getPhoneCode() . $company->getPhone(),
                 "email" => $company->getEmail(),
@@ -205,7 +206,12 @@ class VacancyResponse
         $taxonomy = [];
         if (is_array($vacancyTax)) {
             foreach ($vacancyTax as $key => $value) {
-                $camelKey = StringHelper::convertCamelCase($key, '-', 'string');
+                if ($key === 'working-hours') {
+                    $camelKey = 'hoursPerWeek';
+                } else {
+                    $camelKey = StringHelper::convertCamelCase($key, '-', 'string');
+                }
+
                 $taxonomy[$camelKey] = $value;
             }
         }
