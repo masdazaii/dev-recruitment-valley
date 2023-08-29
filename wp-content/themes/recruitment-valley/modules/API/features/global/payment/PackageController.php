@@ -41,7 +41,7 @@ class PackageController
         foreach ($data as $post) {
             $isFavorite = get_field('is_favorite', $post->ID) ?? false;
 
-            $package = new Package( $post->ID );
+            $package = new Package($post->ID);
             $responseData[] = [
                 'id' => $post->ID,
                 'slug' => $post->post_name,
@@ -141,7 +141,7 @@ class PackageController
                         ],
                         'unit_amount' => $amount, // divide by 2 zero example ; 2000 it will converted to 20
                         'tax_behavior' => "exclusive",
-                        
+
                     ],
                     'quantity' => 1, // for current situation it will always by one because its only one time product
                 ]
@@ -154,14 +154,14 @@ class PackageController
             ],
             'metadata' => $stripeMetadata,
             'invoice_creation' => [
-				'enabled' => true,
-				'invoice_data' => [
-					'rendering_options' => ['amount_tax_display' => 'exclude_tax'],
-				],
-			],
+                'enabled' => true,
+                'invoice_data' => [
+                    'rendering_options' => ['amount_tax_display' => 'exclude_tax'],
+                ],
+            ],
             'automatic_tax' => [
-				'enabled' => true,
-			],
+                'enabled' => true,
+            ],
             "payment_method_types" => [
                 "card", "ideal"
             ],
@@ -169,7 +169,7 @@ class PackageController
 
         $transaction->setTransactionStripeId($session->id);
 
-        EmailHelper::sendPaymentConfirmation( $transactionId );
+        EmailHelper::sendPaymentConfirmation($transactionId);
 
         return [
             "status" => 200,
@@ -223,6 +223,9 @@ class PackageController
                     "price" => intval($package->getPrice()),
                     "credit" => intval($package->getCredit()),
                     "pricePerCredit" => $package->getPrice() / $package->getCredit(),
+                    /** Added line start here */
+                    "taxAmount" => $transaction->getTaxAmount(),
+                    "totalPayment" => $transaction->getTotalAmount()
                 ],
                 "status" => $transaction->getStatus(),
                 "date" => $transaction->getDate("d F Y"),
@@ -240,7 +243,11 @@ class PackageController
 
         $payload = @file_get_contents('php://input');
         // $endpoint_secret = 'whsec_3Z07iu7314TUwmpuohrnAEuV6BwcgcoT';
-        
+
+        /** Local */
+        // $endpoint_secret = 'whsec_02c7938964b4c50fc49380728f70538105c68b52df5a50da93130db4e6023ebf';
+
+        /** Staging */
         $endpoint_secret = 'whsec_3Z07iu7314TUwmpuohrnAEuV6BwcgcoT';
 
         $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
@@ -313,12 +320,31 @@ class PackageController
                 ];
             }
 
-            $this->sendInvoice($transaction_data->invoice, $company->getEmail() );
+            $this->sendInvoice($transaction_data->invoice, $company->getEmail());
 
             error_log("granting user");
             $transaction->setStatus("success");
             $transaction->granted();
-            $company->grant($package->getCredit());
+
+            /** Anggit's syntax start here */
+            // $company->grant($package->getCredit());
+
+            /** Changes start here */
+            // Set acf tax and total amount
+            $transaction->setTaxAmount((float)$transaction_data->total_details->amount_tax / 100);
+            $transaction->setTotalAmount((float)$transaction_data->amount_total / 100);
+
+            // Get unlimited package data
+            $unlimitedPackage = get_field('rv_package_credit_quantity', $transaction->getPackageId(), true);
+            // Check if purchased package is unlimited or not
+            if ($unlimitedPackage == 999999999) {
+                // if true, set user meta
+                $company->grantUnlimited();
+            } else {
+                // if false, set user credit
+                $company->grant($package->getCredit());
+            }
+            /** Changes end here */
 
             return [
                 "status" => 200,
@@ -348,7 +374,7 @@ class PackageController
         ];
     }
 
-    public function sendInvoice( $invoiceId , $email = false )
+    public function sendInvoice($invoiceId, $email = false)
     {
         error_log("start sending invoice");
 
@@ -358,26 +384,23 @@ class PackageController
         try {
             // Retrieve the invoice
             $invoice = \Stripe\Invoice::retrieve($invoiceId);
-        
+
             // Update customer email
-            if($email)
-            {
+            if ($email) {
                 $customer = \Stripe\Customer::retrieve($invoice->customer);
                 $customer->email = $email;
                 $customer->save();
             }
-        
+
             // Send the invoice
             $invoice->sendInvoice();
             error_log("invoice {$invoice->id} already sent to customer");
-            
         } catch (\Stripe\Exception\ApiErrorException $e) {
-            error_log("Sent invoice error : ". $e->getMessage());
+            error_log("Sent invoice error : " . $e->getMessage());
         }
-        
     }
 
-    public function onChargeSucceeded( $data )
+    public function onChargeSucceeded($data)
     {
         error_log("send receipt start");
 
@@ -399,7 +422,7 @@ class PackageController
 
     //         $paymentIntent->sendInvoice();
     //         error_log("invoice {$invoice->id} already sent to customer");
-            
+
     //     } catch (\Stripe\Exception\ApiErrorException $e) {
     //         error_log("Sent invoice error : ". $e->getMessage());
     //     }

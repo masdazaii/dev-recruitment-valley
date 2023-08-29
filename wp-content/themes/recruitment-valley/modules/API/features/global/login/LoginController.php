@@ -8,6 +8,7 @@ use Constant\Message;
 use Firebase\JWT\JWT as JWT;
 use Firebase\JWT\Key;
 use DateTimeImmutable;
+use Model\Company;
 
 class LoginController
 {
@@ -63,32 +64,63 @@ class LoginController
         $expireAccessToken  = $issuedAt->modify($timeToLive)->getTimestamp(); // valid until 60 minutes after toket issued
 
         /** Changes Start here */
+        $extraClaims = [];
         if ($user->roles[0] == 'candidate') {
             $setupStatus = get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false;
         } else if ($user->roles[0] == 'company') {
             $setupStatus = get_field("ucma_is_full_registered", "user_" . $user->ID) ?? false;
+
+            /** Additional line start here */
+            $company = new Company($user->ID);
+            $extraClaims = [
+                'is_unlimited' => $company->checkUnlimited() ? true : false,
+                // 'unlimited_expired_date' => $company->getUnlimitedExpired()
+            ];
         }
 
-        $payloadAccessToken = [
+        /** Anggit's Syntax start here */
+        // $payloadAccessToken = [
+        //     "exp" => $expireAccessToken,
+        //     "user_id" => $user->ID,
+        //     "user_email" => $user->user_email,
+        //     "role" => $user->roles[0],
+        //     // "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
+        //     "setup_status" => $setupStatus,
+        // ];
+
+        // /** For Refresh Token */
+        // // $expireRefreshToken  = $issuedAt->modify("+120 minutes")->getTimestamp(); // valid until 60 minutes after toket issued
+        // $payloadRefreshToken = [
+        //     // "exp" => $expireRefreshToken, // make time-to-live unimited base on mas esa feedback on 18 August 2023
+        //     "user_id" => $user->ID,
+        //     "user_email" => $user->user_email,
+        //     "role" => $user->roles[0],
+        //     // "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
+        //     "setup_status" => $setupStatus,
+        // ];
+        /** Anggit's Syntax end here */
+
+        /** Changes start here */
+        $payloadAccessToken = array_merge([
             "exp" => $expireAccessToken,
             "user_id" => $user->ID,
             "user_email" => $user->user_email,
             "role" => $user->roles[0],
             // "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
             "setup_status" => $setupStatus,
-        ];
+        ], $extraClaims);
 
         /** For Refresh Token */
         // $expireRefreshToken  = $issuedAt->modify("+120 minutes")->getTimestamp(); // valid until 60 minutes after toket issued
-        $payloadRefreshToken = [
+        $payloadRefreshToken = array_merge([
             // "exp" => $expireRefreshToken, // make time-to-live unimited base on mas esa feedback on 18 August 2023
             "user_id" => $user->ID,
             "user_email" => $user->user_email,
             "role" => $user->roles[0],
             // "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
             "setup_status" => $setupStatus,
-        ];
-
+        ], $extraClaims);
+        /** Changes end here */
 
         // store refresh token to db
         update_user_meta($user->ID, 'refresh_token', JWT::encode($payloadRefreshToken, $key, 'HS256'));

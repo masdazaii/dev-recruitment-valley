@@ -379,10 +379,25 @@ class VacancyCrudController
             $vacancyModel = new Vacancy;
 
             // paid job validation
+
+            /** Anggit's syntax */
+            // $company = new Company($payload["user_id"]);
+            // $companyCredit = $company->getCredit();
+            // $paidJobPrice = 1;
+            // if ($companyCredit < $paidJobPrice) return ["status" => 402, "message" => "Your credit is insufficient."];
+            /** Anggit's syntax end here */
+
+            /** Changes start here */
             $company = new Company($payload["user_id"]);
-            $companyCredit = $company->getCredit();
-            $paidJobPrice = 1;
-            if ($companyCredit < $paidJobPrice) return ["status" => 402, "message" => "Your credit is insufficient."];
+
+            // Check if user is on unlimited and check if unlimited package is expired or not
+            $isUnlimited = $this->_checkUserUnlimitedPackage($payload["user_id"]);
+            if (!$isUnlimited) {
+                $companyCredit = $company->getCredit();
+                $paidJobPrice = 1;
+                if ($companyCredit < $paidJobPrice) return ["status" => 402, "message" => "Your credit is insufficient."];
+            }
+
             //end job validation
 
             $vacancyModel->storePost($payload);
@@ -432,9 +447,21 @@ class VacancyCrudController
                 'expired_at' => $expiredAt
             ]);
 
+            /** Anggit's syntax */
             // charge credit
-            $companyCredit -= $paidJobPrice;
-            $company->setCredit($companyCredit);
+            // $companyCredit -= $paidJobPrice;
+            // $company->setCredit($companyCredit);
+
+            /** Changes for unlimited package :
+             * check user_meta if company is on unlimited package
+             */
+            if (!$isUnlimited) {
+                // charge credit
+                $companyCredit -= $paidJobPrice;
+                $company->setCredit($companyCredit);
+            }
+
+            /** Changes End Here */
 
             $wpdb->query('COMMIT');
 
@@ -845,5 +872,35 @@ class VacancyCrudController
         array_push($jobExpireDate, $jobExpiredAt);
 
         update_option("job_expires", maybe_serialize($jobExpireDate));
+    }
+
+    /**
+     * check if user on unlimited package function
+     *
+     * @param int|string $userID
+     * @return mixed (array|bool)
+     */
+    private function _checkUserUnlimitedPackage($userID)
+    {
+        $company = new Company($userID);
+        $onUnlimited = $company->checkUnlimited() ?? false;
+        if ($onUnlimited) {
+            $checkExpiredDate = $company->getUnlimitedExpired();
+            if ($checkExpiredDate) {
+                $expiredDateTimestamp = strtotime($checkExpiredDate);
+                if ($expiredDateTimestamp >= time()) {
+                    return [
+                        'onUnlimited' => $company->checkUnlimited(),
+                        'unlimitedExpiredDate' => $checkExpiredDate
+                    ];
+                }
+
+                return false;
+            }
+
+            return false;
+        } else {
+            return false;
+        }
     }
 }
