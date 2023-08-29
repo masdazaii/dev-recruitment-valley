@@ -49,7 +49,7 @@ class VacancyResponse
                 "salaryStart" => $vacancyModel->getSalaryStart(),
                 "salaryEnd" => $vacancyModel->getSalaryEnd(),
                 "thumbnail" => $company->getThumbnail(),
-                "description" => $vacancyModel->getDescription(),
+                "description" => StringHelper::shortenString($vacancyModel->getDescription(), 0, 10000),
                 // "postedDate" => date_format(new DateTime($vacancy->post_date_gmt), "Y-m-d H:i A")
                 "postedDate" => DateHelper::doLocale($vacancy->post_date_gmt, 'nl_NL')
             ];
@@ -75,7 +75,9 @@ class VacancyResponse
             $socialMediaResponse[$key] = [
                 "id" => $key + 1,
                 "type" => $socmed,
-                "url" => $company->getSocialMedia($socmed)
+                "url" => $vacancyModel->getSocialMedia($socmed) != null || $vacancyModel->getSocialMedia($socmed) != "" ?
+                    $vacancyModel->getSocialMedia($socmed) :
+                    $company->getSocialMedia($socmed)
             ];
         }
 
@@ -83,7 +85,7 @@ class VacancyResponse
             "id" => $this->vacancyCollection->ID,
             "isPaid" => $vacancyModel->getIsPaid(),
             "shortDescription" => $vacancyTaxonomy,
-            "title" => $this->vacancyCollection->post_title, // later get company here
+            "title" => $this->vacancyCollection->post_title,
             // "isFavorite" => $candidate ? $candidate->isFavorite($this->vacancyCollection->post_author) : false, // Changed below
             "isFavorite" => $candidate ? $candidate->isFavorite($this->vacancyCollection->ID) : false,
             "company" =>  [
@@ -96,16 +98,19 @@ class VacancyResponse
                 "totalEmployee" => $company->getTotalEmployees(),
                 "tel" => $company->getPhoneCode() . $company->getPhone(),
                 "email" => $company->getEmail(),
-                "gallery" => $company->getGallery( true ),
+                "gallery" => $company->getGallery(true),
                 // "socialMedia" => [
                 //     "facebook" => $company->getFacebook(),
                 //     "twitter" => $company->getTwitter(),
                 //     "linkedin" => $company->getLinkedin(),
                 //     "instagram" => $company->getInstagram(),
                 // ],
-                "socialMedia" => $socialMediaResponse,
-                "website" => $company->getWebsite()
+                // "socialMedia" => $socialMediaResponse,
+                "website" => $company->getWebsite(),
+                "latitude" => '-7.7302233',
+                "longitude" => '110.3915621'
             ], // later get company here
+            "socialMedia" => $socialMediaResponse,
             "contents" => [
                 "description" => $vacancyModel->getDescription(),
                 "term" => $vacancyModel->getTerm(),
@@ -155,15 +160,19 @@ class VacancyResponse
     {
         $formattedResponse = array_map(function (WP_Post $vacancy) {
             $vacancyModel = new Vacancy($vacancy->ID);
+            $company = new Company($vacancyModel->getAuthor()); // Added Line
+
             $vacancyTaxonomy = $vacancyModel->getTaxonomy(true);
             return [
                 "id" => $vacancy->ID,
                 "slug" => $vacancy->post_name,
                 "name" => $vacancy->post_title,
-                "thumbnail" => $vacancyModel->getThumbnail(),
+                // "image" => $vacancyModel->getThumbnail(), // Changed below
+                "image" => $company->getThumbnail('object'),
                 "description" => $vacancyModel->getDescription() !== "" ? StringHelper::shortenString($vacancyModel->getDescription(), 0, 500, '...') : "",
                 "status" => $vacancyTaxonomy['status'][0]['name'] ?? null,
-                "jobPostedDate" => $vacancy->post_date,
+                // "jobPostedDate" => $vacancy->post_date, // Changed below
+                "jobPostedDate" => DateHelper::doLocale($vacancy->post_date, 'nl_NL')
             ];
         }, $this->vacancyCollection);
 
@@ -181,11 +190,7 @@ class VacancyResponse
 
         $socialMediaResponse = [];
         foreach ($socialMedia as $key => $socmed) {
-            $socialMediaResponse[$key] = [
-                "id" => $key + 1,
-                "type" => $socmed,
-                "url" => $company->getSocialMedia($socmed)
-            ];
+            $socialMediaResponse[$socmed] = $vacancyModel->getSocialMedia($socmed);
         }
 
         $formattedResponse = [
@@ -200,7 +205,7 @@ class VacancyResponse
             "city" => $vacancyModel->getCity(),
             "placementAddress" => $vacancyModel->getPlacementAddress(),
             "videoId" => $company->getVideoUrl(), // Added Line
-            "gallery" => $company->getGallery(true),
+            "gallery" => $vacancyModel->getGallery(),
             "reviews" => $vacancyModel->getReviews(),
             "salaryStart" => $vacancyModel->getSalaryStart(),
             "salaryEnd" => $vacancyModel->getSalaryEnd(),
@@ -209,12 +214,11 @@ class VacancyResponse
             "socialMedia" => $socialMediaResponse,
             "applicationProcedure" =>  [
                 "title" => $vacancyModel->getApplicationProcessTitle(),
-                "text"=> $vacancyModel->getApplicationProcessDescription(),
+                "text" => $vacancyModel->getApplicationProcessDescription(),
                 "steps" =>  $vacancyModel->getApplicationProcessStep(),
             ],
             "applyFromThisPlatform" => [
-                "status" => $vacancyModel->getApplyFromThisPlatform(),
-                "externalUrl" => $vacancyModel-> getExternalUrl()
+                "externalUrl" => $vacancyModel->getExternalUrl()
             ]
         ];
 

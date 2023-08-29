@@ -123,6 +123,9 @@ class Message
             'candidate' => [
                 "profile" => [
                     "get_success" => __("Success get candidate profile.", THEME_DOMAIN),
+                    "delete_cv_success" => __("Candidate CV deleted.", THEME_DOMAIN),
+                    "delete_cv_failed" => __("System error, failed to delete candidate CV.", THEME_DOMAIN),
+                    "delete_cv_not_found" => __("Candidate didn't have CV uploaded.", THEME_DOMAIN),
                 ],
                 "apply_vacancy" => [
                     "apply_success" => __("Success apply this job.", THEME_DOMAIN),
@@ -148,6 +151,7 @@ class Message
                 "change_email_request" => [
                     "success" => __("Success, change email request already sent to your email", THEME_DOMAIN),
                     "not_found" => __("candidate not found", THEME_DOMAIN),
+                    "user_not_found" => __("User not found", THEME_DOMAIN),
                     "email_exist" => __("Email already exist", THEME_DOMAIN),
                     "invalid" => __("Invalid user input.", THEME_DOMAIN),
                 ],

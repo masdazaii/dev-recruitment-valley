@@ -68,19 +68,9 @@ class FavoriteVacancyController
         $filters = [
             'page' => isset($request['page']) ? sanitize_text_field($request['page']) : 1,
             'postPerPage' => isset($request['perPage']) ? sanitize_text_field($request['perPage']) : 0,
+            'orderBy' => isset($request['orderBy']) ? isset($request['orderBy']) : 'date',
+            'order' => isset($request['sort']) ? $request['sort'] : 'desc',
         ];
-
-        if (isset($request['sort'])) {
-            switch (sanitize_text_field($request['sort'])) {
-                case 'recent':
-                    $filters['order'] = 'post_date';
-                    $filters['orderBy'] = 'DESC';
-                    break;
-                default:
-                    $filters['order'] = 'ID';
-                    $filters['orderBy'] = 'ASC';
-            }
-        }
 
         $offset = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['postPerPage']));
 
@@ -88,10 +78,15 @@ class FavoriteVacancyController
             "post_type" => $this->_posttype,
             "posts_per_page" => $filters['postPerPage'],
             "offset" => $offset,
-            "order" => "ASC",
             "post_status" => "publish",
-            "post__in" => $favorites
+            "post__in" => $favorites,
+            // "order" => "ASC",
         ];
+
+        if ($filters['orderBy']) {
+            $args['orderby'] = $filters['orderBy'];
+            $args['order'] = $filters['order'];
+        }
 
         $vacancies = new WP_Query($args);
 

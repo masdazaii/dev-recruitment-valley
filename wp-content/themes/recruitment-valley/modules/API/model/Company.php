@@ -80,10 +80,23 @@ class Company
         return $vacancies->found_posts;
     }
 
-    public function getThumbnail()
+    public function getThumbnail($result = 'url')
     {
-        $attachment_id = $this->getProp($this->image);
-        return wp_get_attachment_url($attachment_id) ? wp_get_attachment_url($attachment_id) : null;
+        if ($result === 'object') {
+            $attachment = $this->getProp($this->image, true);
+            if (!empty($attachment)) {
+                return [
+                    'id' => $attachment['ID'],
+                    'title' => $attachment['title'],
+                    'url' => $attachment['url']
+                ];
+            } else {
+                return null;
+            }
+        } else {
+            $attachment_id = $this->getProp($this->image);
+            return wp_get_attachment_url($attachment_id) ? wp_get_attachment_url($attachment_id) : null;
+        }
     }
 
     public function getId()

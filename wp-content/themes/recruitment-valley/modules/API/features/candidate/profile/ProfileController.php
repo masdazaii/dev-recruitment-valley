@@ -8,6 +8,7 @@ use Exception;
 use Helper\ValidationHelper;
 use JWTHelper;
 use Model\ModelHelper;
+use Helper\DateHelper;
 use ResponseHelper;
 use WP_REST_Request;
 
@@ -41,7 +42,8 @@ class ProfileController
                 "cv" => [
                     'url' => $user->getCv() ? $user->getCv()["url"] : null,
                     'fileName' => $user->getCv() ? $user->getCv()["filename"] : null,
-                    'createdAt' => $user->getCv() ? date('M jS, Y', strtotime($user->getCv()["date"])) : null,
+                    // 'createdAt' => $user->getCv() ? date('M jS, Y', strtotime($user->getCv()["date"])) : null, // Changed Below
+                    'createdAt' => $user->getCv() ? DateHelper::doLocale(strtotime($user->getCv()["date"]), 'nl_NL') : null,
                 ]
             ];
 
@@ -217,7 +219,7 @@ class ProfileController
             "phoneNumberCode" => "required",
             "country" => "required",
             "city" => "required",
-            "linkedinPage" => "required",
+            // "linkedinPage" => "required",
         ]);
 
         if (!$validate['is_valid']) return wp_send_json_error(['validation' => $validate['fields'], 'status' => 400], 400);
@@ -295,7 +297,8 @@ class ProfileController
         $admin = get_option('admin_email');
         $subject = __("NEW CHANGE EMAIL REQUEST");
 
-        $chang_email_url = get_site_url() . "/changeEmail?token=" . $token;
+        // $chang_email_url = get_site_url() . "/changeEmail?token=" . $token; // Changed below
+        $chang_email_url = get_site_url() . "/autorisatie/verander-email?token=" . $token;
 
         $message = "new change email request, if this is not by you just skip it <br>";
         $message .= "<br>";
@@ -437,5 +440,31 @@ class ProfileController
                 "message" => $e->getMessage()
             ];
         }
+    }
+
+    public function destroyCV($request)
+    {
+        $candidate = new Candidate($request["user_id"]);
+
+        $theCV = $candidate->getCv() ?? NULL;
+        if ($theCV) {
+            $delete = $candidate->deleteCV();
+            if ($delete) {
+                return [
+                    "status" => 200,
+                    "message" => $this->message->get('candidate.profile.delete_cv_success')
+                ];
+            } else {
+                return [
+                    "status" => 500,
+                    "message" => $this->message->get('candidate.profile.delete_cv_failed')
+                ];
+            }
+        }
+
+        return [
+            "status" => 400,
+            "message" => $this->message->get('candidate.profile.delete_cv_not_found')
+        ];
     }
 }

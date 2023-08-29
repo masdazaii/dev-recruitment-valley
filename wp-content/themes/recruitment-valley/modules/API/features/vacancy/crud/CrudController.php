@@ -15,9 +15,13 @@ class VacancyCrudController
 {
     private $_posttype = 'vacancy';
     private $_message;
+    private $wpdb;
 
     public function __construct()
     {
+        global $wpdb;
+
+        $this->wpdb = $wpdb;
         $this->_message = new Message;
         add_filter('posts_search', [$this, 'filterVacancySearch'], 10, 2);
     }
@@ -45,11 +49,6 @@ class VacancyCrudController
         $response = file_get_contents($apiUrl);
         $data = json_decode($response, true);
 
-        echo '<pre>';
-        var_dump($data);
-        echo '<pre>';
-        die();
-
         // standarization city name
 
         // get data by city
@@ -68,8 +67,9 @@ class VacancyCrudController
             'salaryStart' => isset($request['salaryStart']) ? intval($request['salaryStart']) : 0,
             'salaryEnd' => isset($request['salaryEnd']) ? intval($request['salaryEnd']) : null,
             'postPerPage' => $request['perPage'] ?? 10,
-            'orderBy' => isset($request['orderBy']) ? isset($request['orderBy']) : false,
+            'orderBy' => isset($request['orderBy']) ? $request['orderBy'] : false,
             'order' => isset($request['sort']) ? $request['sort'] : false,
+            "radius" => isset($request['radius']) ? $request['radius'] : false,
         ];
 
         $taxonomyFilters = [
@@ -95,7 +95,7 @@ class VacancyCrudController
 
         /** Sort */
         if ($filters['orderBy']) {
-            $args['order_by'] = $filters['orderBy'];
+            $args['orderby'] = $filters['orderBy'];
             $args['order'] = $filters['order'];
         }
 
@@ -201,12 +201,36 @@ class VacancyCrudController
             }
         }
 
+        // filter by city
+        if ($filters["city"]) {
+            array_push($args['meta_query'], [
+                'key' => 'placement_city',
+                'value' => $filters['city'],
+                'compare' => '=',
+            ]);
+        }
+
+        if ($filters["radius"]) {
+            array_push($args['meta_query'], [
+                'key' => 'distance_from_city',
+                'value' => (int) $filters['radius'],
+                'compare' => '<=',
+            ]);
+        }
+
         /** Search */
         if (array_key_exists('search', $filters) && $filters['search'] !== '' && isset($filters['search'])) {
             $args['s'] = $filters['search'];
+            $args['search_columns'] = ['post_title'];
         }
 
+        // echo '<pre>';
+        // var_dump($args);
+        // echo '</pre>';die;
+
         $vacancies = new WP_Query($args);
+        apply_filters('post_search', $vacancies->request, $vacancies);
+        remove_filter('posts_search', [$this, 'filterVacancySearch'], 10, 2);
 
         return [
             'message' => $this->_message->get('vacancy.get_all'),
@@ -267,6 +291,7 @@ class VacancyCrudController
             ],
         ];
 
+        $this->wpdb->query("START TRANSACTION");
         try {
             $vacancyModel = new Vacancy;
             $vacancyModel->storePost($payload);
@@ -284,25 +309,31 @@ class VacancyCrudController
                 $vacancyModel->setProp($vacancyModel->acf_external_url, $payload["external_url"]);
             }
 
-            $expiredAt = new DateTimeImmutable();
+            // $expiredAt = new DateTimeImmutable();
             // $expiredAt = $expiredAt->modify("+30 days")->format("Y-m-d H:i:s");
+
+            $vacancyModel->setCityLongLat($payload["city"]);
+            $vacancyModel->setAddressLongLat($payload["placementAddress"]);
+            $vacancyModel->setDistance($payload["city"], $payload["city"] . " " . $payload["placementAddress"]);
 
             $vacancyModel->setStatus('processing');
             // $vacancyModel->setProp("expired_at", $expiredAt);
-
+            $this->wpdb->query("COMMIT");
             return [
                 "status" => 201,
                 "message" => $this->_message->get("vacancy.create.free.success"),
             ];
         } catch (\Throwable $th) {
+            $this->wpdb->query("ROLLBACK");
             return [
                 "status" => 500,
-                "message" => $this->_message->get("vacancy.create.fail"),
+                "message" => $th->getMessage(),
             ];
-        } catch (\WP_Error $e) {
+        } catch (\Exception $e) {
+            $this->wpdb->query("ROLLBACK");
             return [
                 "status" => 500,
-                "message" => $this->_message->get("vacancy.create.fail"),
+                "message" => $e->getMessage(),
             ];
         }
     }
@@ -392,6 +423,10 @@ class VacancyCrudController
 
             $vacancyModel->setProp($vacancyModel->acf_gallery, $vacancyGallery, false);
 
+            $vacancyModel->setCityLongLat($payload["city"]);
+            $vacancyModel->setAddressLongLat($payload["placementAddress"]);
+            $vacancyModel->setDistance($payload["city"], $payload["city"] . " " . $payload["placementAddress"]);
+
             $this->add_expired_date_to_option([
                 'post_id' => $vacancyModel->vacancy_id,
                 'expired_at' => $expiredAt
@@ -405,6 +440,9 @@ class VacancyCrudController
 
             return [
                 "status" => 201,
+                "data" => [
+                    "slug" => $vacancyModel->getSlug(),
+                ],
                 "message" => $this->_message->get("vacancy.create.paid.success"),
             ];
         } catch (\Throwable $th) {
@@ -437,7 +475,7 @@ class VacancyCrudController
     {
         global $wpdb;
 
-        if ($query->is_search && $query->get('post-type') == $this->_posttype) {
+        if ($query->is_search && $query->get('post_type') == $this->_posttype) {
             $searchKeyword = $query->get('s');
 
             if (!empty($searchKeyword)) {
@@ -487,7 +525,7 @@ class VacancyCrudController
         $vacancy_id = $request["vacancy_id"];
         $vacancyModel = new Vacancy($vacancy_id);
 
-        $payload = $this->createFreeVacancyPayload( $request );
+        $payload = $this->createFreeVacancyPayload($request);
 
         $vacancyModel->setTaxonomy($payload["taxonomy"]);
 
@@ -506,14 +544,14 @@ class VacancyCrudController
     public function updatePaid($request)
     {
         $vacancy_id = $request["vacancy_id"];
-        
+
         global $wpdb;
 
         try {
             $wpdb->query('START TRANSACTION');
 
             $vacancyModel = new Vacancy($vacancy_id);
-            $payload = $this->createPaidVacancyPayload( $request );
+            $payload = $this->createPaidVacancyPayload($request);
 
             $vacancyModel->setTaxonomy($payload["taxonomy"]);
 
@@ -533,7 +571,7 @@ class VacancyCrudController
             }
 
             $vacancyGallery = $galleryIds ?? [];
-            
+
             if ($galleries) {
                 foreach ($galleries as $key => $gallery) {
                     $vacancyGallery[] = wp_insert_attachment($gallery['attachment'], $gallery['file']);
@@ -550,9 +588,12 @@ class VacancyCrudController
             }
 
             $wpdb->query('COMMIT');
-            
+
             return [
                 "status" => 200,
+                "data" => [
+                    "slug" => $vacancyModel->getSlug(),
+                ],
                 "message" => $this->_message->get("vacancy.update.paid.success")
             ];
         } catch (\Throwable $th) {
@@ -561,7 +602,7 @@ class VacancyCrudController
                 "status" => 400,
                 "message" => $this->_message->get("system.overall_failed")
             ];
-        } catch ( Exception $e) {
+        } catch (Exception $e) {
             $wpdb->query('ROLLBACK');
             return [
                 "status" => 400,
@@ -689,7 +730,7 @@ class VacancyCrudController
         return $payload;
     }
 
-    public function createPaidVacancyPayload( $request )
+    public function createPaidVacancyPayload($request)
     {
         $payload = [
             "title" => $request["name"],
@@ -708,7 +749,7 @@ class VacancyCrudController
             "instagram_url" => $request["instagram"],
             "twitter_url" => $request["twitter"],
             "reviews" => $request["review"],
-            "placement_address" => $request["placementAddress"], 
+            "placement_address" => $request["placementAddress"],
             "taxonomy" => [
                 "sector" => $request["sector"],
                 "role" => $request["role"],

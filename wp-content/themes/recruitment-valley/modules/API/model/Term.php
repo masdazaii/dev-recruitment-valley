@@ -26,13 +26,15 @@ class Term
         }
 
         global $wpdb;
-        $status = $filters['post_status'] ?? '24';
+
         // $results = $wpdb->get_results("SELECT wpt.term_id, wpt.name, wpt.slug, COUNT(wptr.object_id) as count FROM wp_terms as wpt LEFT JOIN wp_term_relationships as wptr ON wpt.term_id = wptr.term_taxonomy_id WHERE wpt.term_id IN ( SELECT term_id FROM wp_term_taxonomy WHERE taxonomy = '$taxonomy') AND wptr.object_id IN ( SELECT object_id FROM wp_term_relationships WHERE term_taxonomy_id = '$status') GROUP BY wpt.term_id", OBJECT);
+        $status = $filters['post_status'] ?? get_term_by('slug', 'open', 'status', 'OBJECT')->term_id;
+        $subqueryCondition = $status ? "WHERE term_taxonomy_id in ($status)" : '';
 
         if ($filters['hideEmpty']) {
-            $results = $wpdb->get_results("SELECT wpt.term_id as term_id, wpt.name, wpt.slug, wptt.taxonomy, wptr.count, wptm.meta_key, wptm.term_position FROM wp_terms as wpt LEFT JOIN ( SELECT wptr.term_taxonomy_id as term_taxonomy_id, count(wptr.object_id) as count FROM wp_term_relationships as wptr WHERE wptr.object_id IN ( SELECT object_id from wp_term_relationships WHERE term_taxonomy_id = '$status' ) GROUP BY wptr.term_taxonomy_id ) as wptr ON wpt.term_id = wptr.term_taxonomy_id LEFT JOIN wp_term_taxonomy as wptt ON wpt.term_id = wptt.term_taxonomy_id LEFT JOIN ( select term_id, meta_key, meta_value as term_position FROM wp_termmeta WHERE meta_key = 'tax_position' ) as wptm ON wpt.term_id = wptm.term_id WHERE wpt.term_id IN ( SELECT term_id FROM wp_term_taxonomy WHERE taxonomy = '$taxonomy' ) AND ( wptr.count IS NOT NULL OR wptr.count > 0 ) ORDER BY wptm.term_position ASC");
+            $results = $wpdb->get_results("SELECT wpt.term_id as term_id, wpt.name, wpt.slug, wptt.taxonomy, wptr.count, wptm.meta_key, wptm.term_position FROM wp_terms as wpt LEFT JOIN ( SELECT wptr.term_taxonomy_id as term_taxonomy_id, count(wptr.object_id) as count FROM wp_term_relationships as wptr WHERE wptr.object_id IN ( SELECT object_id from wp_term_relationships " . $subqueryCondition . " ) GROUP BY wptr.term_taxonomy_id ) as wptr ON wpt.term_id = wptr.term_taxonomy_id LEFT JOIN wp_term_taxonomy as wptt ON wpt.term_id = wptt.term_taxonomy_id LEFT JOIN ( select term_id, meta_key, meta_value as term_position FROM wp_termmeta WHERE meta_key = 'tax_position' ) as wptm ON wpt.term_id = wptm.term_id WHERE wpt.term_id IN ( SELECT term_id FROM wp_term_taxonomy WHERE taxonomy = '$taxonomy' ) AND ( wptr.count IS NOT NULL OR wptr.count > 0 ) ORDER BY wptm.term_position ASC");
         } else {
-            $results = $wpdb->get_results("SELECT wpt.term_id as term_id, wpt.name, wpt.slug, wptt.taxonomy, wptr.count, wptm.meta_key, wptm.term_position FROM wp_terms as wpt LEFT JOIN ( SELECT wptr.term_taxonomy_id as term_taxonomy_id, count(wptr.object_id) as count FROM wp_term_relationships as wptr WHERE wptr.object_id IN ( SELECT object_id from wp_term_relationships WHERE term_taxonomy_id = '$status' ) GROUP BY wptr.term_taxonomy_id ) as wptr ON wpt.term_id = wptr.term_taxonomy_id LEFT JOIN wp_term_taxonomy as wptt ON wpt.term_id = wptt.term_taxonomy_id LEFT JOIN ( select term_id, meta_key, meta_value as term_position FROM wp_termmeta WHERE meta_key = 'tax_position' ) as wptm ON wpt.term_id = wptm.term_id WHERE wpt.term_id IN ( SELECT term_id FROM wp_term_taxonomy WHERE taxonomy = '$taxonomy' ) ORDER BY wptm.term_position ASC");
+            $results = $wpdb->get_results("SELECT wpt.term_id as term_id, wpt.name, wpt.slug, wptt.taxonomy, wptr.count, wptm.meta_key, wptm.term_position FROM wp_terms as wpt LEFT JOIN ( SELECT wptr.term_taxonomy_id as term_taxonomy_id, count(wptr.object_id) as count FROM wp_term_relationships as wptr WHERE wptr.object_id IN ( SELECT object_id from wp_term_relationships " . $subqueryCondition . " ) GROUP BY wptr.term_taxonomy_id ) as wptr ON wpt.term_id = wptr.term_taxonomy_id LEFT JOIN wp_term_taxonomy as wptt ON wpt.term_id = wptt.term_taxonomy_id LEFT JOIN ( select term_id, meta_key, meta_value as term_position FROM wp_termmeta WHERE meta_key = 'tax_position' ) as wptm ON wpt.term_id = wptm.term_id WHERE wpt.term_id IN ( SELECT term_id FROM wp_term_taxonomy WHERE taxonomy = '$taxonomy' ) ORDER BY wptm.term_position ASC");
         }
 
         return $results;
@@ -41,38 +43,61 @@ class Term
     public function selectAllTerm($filters = [])
     {
         global $wpdb;
-        $status = $filters['post_status'] ?? '24';
+
+        $status = $filters['post_status'] ?? get_term_by('slug', 'open', 'status', 'OBJECT')->term_id;
+        $subqueryCondition = $status ? "WHERE term_taxonomy_id in ($status)" : '';
 
         if ($filters['hideEmpty']) {
-            $results = $wpdb->get_results("SELECT wpt.term_id as term_id, wpt.name, wpt.slug,wptt.taxonomy, wptr.count, wptm.meta_key, wptm.term_position FROM wp_terms as wpt LEFT JOIN ( SELECT wptr.term_taxonomy_id as term_taxonomy_id, count(wptr.object_id) as count FROM wp_term_relationships as wptr WHERE wptr.object_id in ( select object_id from wp_term_relationships WHERE term_taxonomy_id = $status ) GROUP BY wptr.term_taxonomy_id ) as wptr ON wpt.term_id = wptr.term_taxonomy_id LEFT JOIN wp_term_taxonomy as wptt ON wpt.term_id = wptt.term_taxonomy_id LEFT JOIN ( select term_id, meta_key, meta_value as term_position FROM wp_termmeta WHERE meta_key = 'tax_position' ) as wptm ON wpt.term_id = wptm.term_id WHERE wpt.term_id NOT IN ( SELECT term_id FROM wp_term_taxonomy WHERE taxonomy = 'status' OR taxonomy = 'payment_status' OR taxonomy = 'category' ) AND ( wptr.count IS NOT NULL OR wptr.count > 0 ) ORDER BY wptm.term_position ASC");
+            $results = $wpdb->get_results("SELECT wpt.term_id as term_id, wpt.name, wpt.slug,wptt.taxonomy, wptr.count, wptm.meta_key, wptm.term_position FROM wp_terms as wpt LEFT JOIN ( SELECT wptr.term_taxonomy_id as term_taxonomy_id, count(wptr.object_id) as count FROM wp_term_relationships as wptr WHERE wptr.object_id in ( select object_id from wp_term_relationships " . $subqueryCondition . " ) GROUP BY wptr.term_taxonomy_id ) as wptr ON wpt.term_id = wptr.term_taxonomy_id LEFT JOIN wp_term_taxonomy as wptt ON wpt.term_id = wptt.term_taxonomy_id LEFT JOIN ( select term_id, meta_key, meta_value as term_position FROM wp_termmeta WHERE meta_key = 'tax_position' ) as wptm ON wpt.term_id = wptm.term_id WHERE wpt.term_id NOT IN ( SELECT term_id FROM wp_term_taxonomy WHERE taxonomy = 'status' OR taxonomy = 'payment_status' OR taxonomy = 'category' ) AND ( wptr.count IS NOT NULL OR wptr.count > 0 ) ORDER BY wptm.term_position ASC");
         } else {
-            $results = $wpdb->get_results("SELECT wpt.term_id as term_id, wpt.name, wpt.slug,wptt.taxonomy, wptr.count, wptm.meta_key, wptm.term_position FROM wp_terms as wpt LEFT JOIN ( SELECT wptr.term_taxonomy_id as term_taxonomy_id, count(wptr.object_id) as count FROM wp_term_relationships as wptr WHERE wptr.object_id in ( select object_id from wp_term_relationships WHERE term_taxonomy_id = $status ) GROUP BY wptr.term_taxonomy_id ) as wptr ON wpt.term_id = wptr.term_taxonomy_id LEFT JOIN wp_term_taxonomy as wptt ON wpt.term_id = wptt.term_taxonomy_id LEFT JOIN ( select term_id, meta_key, meta_value as term_position FROM wp_termmeta WHERE meta_key = 'tax_position' ) as wptm ON wpt.term_id = wptm.term_id WHERE wpt.term_id NOT IN ( SELECT term_id FROM wp_term_taxonomy WHERE taxonomy = 'status' OR taxonomy = 'payment_status' OR taxonomy = 'category' ) ORDER BY wptm.term_position ASC");
+            $results = $wpdb->get_results("SELECT wpt.term_id as term_id, wpt.name, wpt.slug,wptt.taxonomy, wptr.count, wptm.meta_key, wptm.term_position FROM wp_terms as wpt LEFT JOIN ( SELECT wptr.term_taxonomy_id as term_taxonomy_id, count(wptr.object_id) as count FROM wp_term_relationships as wptr WHERE wptr.object_id in ( select object_id from wp_term_relationships " . $subqueryCondition . " ) GROUP BY wptr.term_taxonomy_id ) as wptr ON wpt.term_id = wptr.term_taxonomy_id LEFT JOIN wp_term_taxonomy as wptt ON wpt.term_id = wptt.term_taxonomy_id LEFT JOIN ( select term_id, meta_key, meta_value as term_position FROM wp_termmeta WHERE meta_key = 'tax_position' ) as wptm ON wpt.term_id = wptm.term_id WHERE wpt.term_id NOT IN ( SELECT term_id FROM wp_term_taxonomy WHERE taxonomy = 'status' OR taxonomy = 'payment_status' OR taxonomy = 'category' ) ORDER BY wptm.term_position ASC");
         }
 
         return $results;
     }
 
+    /**
+     * Select All term function
+     * This one using wp get_terms and wp_query to count posts instead raw query
+     *
+     * @param [type] $taxonomy
+     * @param array $filters
+     * @return void
+     */
     public function selectInTerm($taxonomy, $filters = [])
     {
         $theArguments = $this->_setArguments($taxonomy, $filters);
         $results = get_terms($theArguments);
 
-        $countVacancies = new \WP_Query([
-            'post_type' => 'vacancy',
-            'tax_query' => array(
-                'relation' => 'AND',
-                [
-                    'taxonomy' => 'status',
-                    'field' => 'id',
-                    'terms' => 24
-                ],
-                [
-                    'taxonomy' => 'status',
-                    'field' => 'id',
-                    'terms' => 24
-                ]
-            )
-        ]);
+        foreach ($results as $key => $value) {
+            $countVacancies = new \WP_Query([
+                'post_type' => 'vacancy',
+                'tax_query' => array(
+                    'relation' => 'AND',
+                    [
+                        'taxonomy' => 'status',
+                        'field' => 'id',
+                        'terms' => $filters['post_status'] ?? 24
+                    ],
+                    [
+                        'taxonomy' => $taxonomy,
+                        'field' => 'id',
+                        'terms' => $value->term_id
+                    ],
+                )
+            ]);
+
+            if ($filters['hideEmpty']) {
+                if ((int)$countVacancies->post_count > 0) {
+                    $results[$key]->count = $countVacancies->post_count;
+                } else {
+                    unset($results[$key]);
+                    unset($results->$key);
+                }
+            } else {
+                $results[$key]->count = $countVacancies->post_count;
+            }
+        }
 
         return $results;
     }
