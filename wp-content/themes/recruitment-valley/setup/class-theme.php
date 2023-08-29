@@ -61,6 +61,8 @@ class Theme
 		define('MODULES_URL', THEME_URL . '/modules');
 		define('MODULES_DIR', THEME_DIR . '/modules');
 
+		define('APP_URL', 'https://dev-recruitment-valley.vercel.app/');
+
 		// load dependencies.
 		require_once THEME_DIR . '/vendor/autoload.php';
 		require_once THEME_DIR . '/libraries/autoload.php';
