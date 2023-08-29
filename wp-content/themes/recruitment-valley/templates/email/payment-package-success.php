@@ -614,6 +614,7 @@
                                     font-weight: 500;
                                     line-height: 24px; /* 150% */
                                     letter-spacing: 0.5px;
+                                    word-wrap: anywhere;
                                     ">{{ transaction.number }}</td>
                             </tr>
                             <tr style="margin-bottom: 20px;">
@@ -696,7 +697,7 @@
                             font-style: normal;
                             font-weight: 500;
                             line-height: 24px;
-                            " href="<?= home_url();?>">
+                            " href="<?= APP_URL;?>">
                             Bekijk vacatures
                             <img style="vertical-align: middle;" src="<?= THEME_URL; ?>/assets/images/chevron-right.png" alt="chevron-right">
                           </a>
