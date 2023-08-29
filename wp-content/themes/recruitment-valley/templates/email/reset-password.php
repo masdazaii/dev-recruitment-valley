@@ -224,7 +224,7 @@
                                 <td style="width: 100px">
                                   <img
                                     height="auto"
-                                    src="../../assets/images/logo-header.webp"
+                                    src="<?= THEME_URL;  ?>/assets/images/logo-header.webp"
                                     style="
                                       border: 0;
                                       display: block;
@@ -317,7 +317,7 @@
                                 <td style="width: 600px">
                                   <img
                                     height="auto"
-                                    src="../../assets/images/hero-img.webp"
+                                    src="<?= THEME_URL;  ?>/assets/images/hero-img.webp"
                                     style="
                                       border: 0;
                                       display: block;
@@ -447,7 +447,7 @@
                                         style="
                                           font-family: Neue Montreal Medium;
                                         "
-                                        >{{Gebruikersnaam}}</span
+                                        >{{ user.name }}</span
                                       >
                                     </p>
                                   </div>
@@ -520,7 +520,7 @@
                         <td
                           style="
                             background-color: #f5f5f5;
-                            border-radius: 8px;
+                            border-radius: 8px 8px 0px 0px;
                             vertical-align: top;
                             padding: 32px;
                           "
@@ -593,7 +593,7 @@
                                         padding-block: 10px;
                                     ">
                                     <p>
-                                        Hi, {{Anne@example.com}}
+                                        Hi, {{ user.email }}
                                     </p>
 
                                     <p>
@@ -617,7 +617,13 @@
                         </td>
                       </tr>
                       <tr>
-                        <td align="center">
+                        <td align="center"
+                        style="
+                            background-color: #f5f5f5;
+                            border-radius: 0px 0px 8px 8px;
+                            vertical-align: top;
+                            padding: 32px;
+                          ">
                             <a 
                           style="
                             padding: 12px 16px 12px 22px;
@@ -630,8 +636,11 @@
                             font-size: 14px;
                             font-style: normal;
                             font-weight: 500;
-                            line-height: 24px; /* 171.429% */">
-                            Vacature plaatsen 
+                            line-height: 24px; /* 171.429% */"
+                            href="{{ reset_url }}"
+                            >
+                            Stel mijn wachtwoord opnieuw in
+                            <img style="vertical-align: middle;" src="<?= THEME_URL;  ?>/assets/images/chevron-right.png" alt="chevron-right">
                           </a>
                         </td>
                       </tr>
@@ -731,7 +740,7 @@
                                         <td style="width: 100px">
                                           <img
                                             height="auto"
-                                            src="../../assets/images/logo-footer.webp"
+                                            src="<?= THEME_URL;  ?>/assets/images/logo-footer.webp"
                                             style="
                                               border: 0;
                                               display: block;
@@ -952,7 +961,7 @@
                                     <p
                                       style="
                                         font-family: Neue Montreal Medium;
-                                        \font-size: 14px;
+                                        font-size: 14px;
                                         font-style: normal;
                                         font-weight: 500;
                                         line-height: 20px;
@@ -1103,7 +1112,7 @@
                                               >
                                                 <img
                                                   height="30"
-                                                  src="../../assets/images/circle-ig.webp"
+                                                  src="<?= THEME_URL;  ?>/assets/images/circle-ig.webp"
                                                   style="
                                                     border-radius: 20px;
                                                     display: block;
@@ -1159,7 +1168,7 @@
                                               >
                                                 <img
                                                   height="30"
-                                                  src="../../assets/images/circle-twitter.webp"
+                                                  src="<?= THEME_URL;  ?>/assets/images/circle-twitter.webp"
                                                   style="
                                                     border-radius: 20px;
                                                     display: block;
@@ -1215,7 +1224,7 @@
                                               >
                                                 <img
                                                   height="30"
-                                                  src="../../assets/images/circle-linked.webp"
+                                                  src="<?= THEME_URL;  ?>/assets/images/circle-linked.webp"
                                                   style="
                                                     border-radius: 20px;
                                                     display: block;
@@ -1271,7 +1280,7 @@
                                               >
                                                 <img
                                                   height="30"
-                                                  src="../../assets/images/circle-fb.webp"
+                                                  src="<?= THEME_URL;  ?>/assets/images/circle-fb.webp"
                                                   style="
                                                     border-radius: 20px;
                                                     display: block;
