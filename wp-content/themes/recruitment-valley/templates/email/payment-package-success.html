@@ -447,7 +447,7 @@
                                         style="
                                           font-family: Neue Montreal Medium;
                                         "
-                                        >{{Gebruikersnaam}}</span
+                                        >{{ client.name }}</span
                                       >
                                     </p>
                                   </div>
@@ -579,7 +579,7 @@
                                   font-style: normal;
                                   font-weight: 500;
                                   line-height: 52px;">
-                              {{ €270.00 }}
+                              {{ price.total }}
                             </p>
                                   </div>
                                 </td>
@@ -614,7 +614,7 @@
                                     font-weight: 500;
                                     line-height: 24px; /* 150% */
                                     letter-spacing: 0.5px;
-                                    ">{{2139j21eik0230a}}</td>
+                                    ">{{ transaction.number }}</td>
                             </tr>
                             <tr style="margin-bottom: 20px;">
                               <td style="
@@ -633,7 +633,7 @@
                                     font-style: normal;
                                     font-weight: 500;
                                     line-height: 24px; /* 150% */
-                                    letter-spacing: 0.5px;">{{270 /3 vacatures}}</td>
+                                    letter-spacing: 0.5px;">{{ transaction.package }}</td>
                             </tr>
                             <tr>
                               <td style="
@@ -652,7 +652,7 @@
                                     font-style: normal;
                                     font-weight: 500;
                                     line-height: 24px; /* 150% */
-                                    letter-spacing: 0.5px;">{{8 augustus 2023}}</td>
+                                    letter-spacing: 0.5px;">{{ transaction.date }}</td>
                             </tr>
                             <tr>
                               <td style="
@@ -671,7 +671,7 @@
                                     font-style: normal;
                                     font-weight: 500;
                                     line-height: 24px; /* 150% */
-                                    letter-spacing: 0.5px;">{{Betaald}}</td>
+                                    letter-spacing: 0.5px;">{{ transaction.toestand }}</td>
                             </tr>
                           </tbody>
                           </table>

@@ -73,11 +73,10 @@ class Email
 	 * @param  array $headers
 	 * @return bool
 	 */
-	public function send($to, $subject, $args, $template, $headers = []): bool
+	public static function send($to, $subject, $args, $template, $headers = []): bool
 	{
-		$headers = [
+		$headers = (bool) $headers ? $headers : [
 			'Content-Type: text/html; charset=UTF-8',
-			...$headers
 		];
 
 		$contents = self::render_html_email($template, $args);
