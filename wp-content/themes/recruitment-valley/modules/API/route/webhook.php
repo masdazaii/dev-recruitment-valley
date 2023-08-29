@@ -15,6 +15,10 @@ class WebhookEndpoint
 
     public function webhookEndpoints()
     {
+        echo "<pre>";
+            var_dump(getenv('APP_URL'));
+        echo "</pre>";
+        die;
         $packageService = new PackageService;
 
         $endpoint = [

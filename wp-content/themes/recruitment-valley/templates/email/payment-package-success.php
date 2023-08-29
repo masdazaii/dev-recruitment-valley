@@ -696,7 +696,7 @@
                             font-style: normal;
                             font-weight: 500;
                             line-height: 24px;
-                            " href="<?= home_url();?>">
+                            " href="<?= APP_URL;?>">
                             Bekijk vacatures
                             <img style="vertical-align: middle;" src="<?= THEME_URL; ?>/assets/images/chevron-right.png" alt="chevron-right">
                           </a>
