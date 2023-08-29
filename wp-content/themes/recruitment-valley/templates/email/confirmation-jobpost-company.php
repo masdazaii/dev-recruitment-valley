@@ -319,7 +319,7 @@
                                       color: #000000;
                                     ">
                                   <p align="center" style="
-                                        font-family: Neue Montreal Regular;
+                                        font-family: Neue Montreal Regular, Helvetica;
                                         font-size: 24px;
                                         font-style: normal;
                                         font-weight: 500;
@@ -328,7 +328,7 @@
                                       ">
                                     Beste
                                     <span style="
-                                          font-family: Neue Montreal Medium;
+                                          font-family: Neue Montreal Medium, Helvetica;
                                         ">
                                       heer/mevrouw,</span>
                                   </p>
@@ -400,7 +400,7 @@
                                       color: #000000;
                                     ">
                                   <p class="text-title" align="center" style="
-                                        font-family: Neue Montreal Medium;
+                                        font-family: Neue Montreal Medium, Helvetica;
                                         font-size: 36px;
                                         font-style: normal;
                                         font-weight: 500;
@@ -408,7 +408,7 @@
                                         color: #234943;
                                       "></p>
                                   <p align="center" style="
-                                        font-family: Neue Montreal Regular;
+                                        font-family: Neue Montreal Regular, Helvetica;
                                         font-size: 16px;
                                         font-style: normal;
                                         font-weight: 400;
@@ -566,7 +566,7 @@
                                       color: #000000;
                                     ">
                                   <p class="text-title" style="
-                                        font-family: Neue Montreal Medium;
+                                        font-family: Neue Montreal Medium, Helvetica;
                                         font-size: 45px;
                                         font-style: normal;
                                         font-weight: 500;
@@ -629,14 +629,14 @@
                                     word-break: break-word;
                                   ">
                                 <div style="
-                                      font-family: Neue Montreal Light;
+                                      font-family: Neue Montreal Light, Helvetica;
                                       font-size: 13px;
                                       line-height: 1;
                                       text-align: left;
                                       color: #f45e43;
                                     ">
                                   <p style="
-                                        font-family: Neue Montreal Medium;
+                                        font-family: Neue Montreal Medium, Helvetica;
                                         \font-size: 14px;
                                         font-style: normal;
                                         font-weight: 500;
@@ -648,7 +648,7 @@
                                     Contact
                                   </p>
                                   <p style="
-                                        font-family: Neue Montreal Regular;
+                                        font-family: Neue Montreal Regular, Helvetica;
                                         font-size: 14px;
                                         font-style: normal;
                                         font-weight: 400;
@@ -690,14 +690,14 @@
                                     word-break: break-word;
                                   ">
                                 <div style="
-                                      font-family: Neue Montreal Light;
+                                      font-family: Neue Montreal Light, Helvetica;
                                       font-size: 13px;
                                       line-height: 1;
                                       text-align: left;
                                       color: #f45e43;
                                     ">
                                   <a href="mailto:info@recruitmentvalley.com" style="
-                                        font-family: Neue Montreal Medium;
+                                        font-family: Neue Montreal Medium, Helvetica;
                                         font-size: 14px;
                                         font-style: normal;
                                         font-weight: 500;
@@ -901,7 +901,7 @@
                                       color: #000000;
                                     ">
                                   <p align="center" style="
-                                        font-family: Neue Montreal Regular;
+                                        font-family: Neue Montreal Regular, Helvetica;
                                         font-size: 12px;
                                         font-style: normal;
                                         font-weight: 400;
