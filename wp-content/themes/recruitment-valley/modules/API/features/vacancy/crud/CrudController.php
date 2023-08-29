@@ -229,6 +229,8 @@ class VacancyCrudController
         // echo '</pre>';die;
 
         $vacancies = new WP_Query($args);
+        apply_filters('post_search', $vacancies->request, $vacancies);
+        remove_filter('posts_search', [$this, 'filterVacancySearch'], 10, 2);
 
         return [
             'message' => $this->_message->get('vacancy.get_all'),
@@ -473,7 +475,7 @@ class VacancyCrudController
     {
         global $wpdb;
 
-        if ($query->is_search && $query->get('post-type') == $this->_posttype) {
+        if ($query->is_search && $query->get('post_type') == $this->_posttype) {
             $searchKeyword = $query->get('s');
 
             if (!empty($searchKeyword)) {
