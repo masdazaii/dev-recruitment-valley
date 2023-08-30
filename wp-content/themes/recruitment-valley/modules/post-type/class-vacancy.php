@@ -10,7 +10,7 @@ class Vacancy extends RegisterCPT
     public function __construct()
     {
         add_action('init', [$this, 'RegisterVacancyCPT']);
-        add_action('save_post', [$this, 'setExpiredDate'], 10, 3);
+        add_action('set_object_terms', [$this, 'setExpiredDate'], 10, 5);
     }
 
     public function RegisterVacancyCPT()
@@ -80,14 +80,15 @@ class Vacancy extends RegisterCPT
         }
     }
 
-    public function setExpiredDate($post_id, $post, $postBefore)
+    public function setExpiredDate($object_id, $terms = [], $tt_ids = [], $taxonomy = '', $append = true, $old_tt_ids = [])
     {
+        $post = get_post($object_id, 'object');
         if ($post->post_type == 'vacancy') {
-            /** 'open' is term slug, 'status' is taxonomy name */
-            if (has_term('open', 'status', $post)) {
-                if (!get_field('is_paid', $post_id, true)) {
-                    error_log('free');
-                    $vacancyModel = new VacancyModel($post_id);
+            $openTerm = get_term_by('slug', 'open', 'status', 'OBJECT');
+
+            if ($taxonomy === 'status' && in_array($openTerm->term_id, $terms)) {
+                if (!get_field('is_paid', $object_id, true)) {
+                    $vacancyModel = new VacancyModel($object_id);
                     $today = new DateTimeImmutable("now");
                     $vacancyModel->setProp($vacancyModel->acf_expired_at, $today->modify("+30 days")->format("Y-m-d H:i:s"));
                 }
