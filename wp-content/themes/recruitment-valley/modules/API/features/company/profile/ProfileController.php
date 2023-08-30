@@ -162,6 +162,8 @@ class ProfileController
             "city" => "required",
             "street" => "required",
             "postcode" => "required",
+            "latitude" => "required", // Added Line
+            "longitude" => "required", // Added Line
         ]);
         if (!$validate['is_valid']) wp_send_json_error(['validation' => $validate['fields'], 'status' => 400], 400);
 
@@ -174,8 +176,8 @@ class ProfileController
             update_field('ucma_postcode', $fields['postcode'], 'user_' . $user_id);
 
             // Added Line
-            update_field('ucma_company_latitude', array_key_exists('latitude', $fields) ? $fields['latitude'] : null, 'user_' . $user_id);
-            update_field('ucma_company_longitude', array_key_exists('longitude', $fields) ? $fields['longitude'] : null, 'user_' . $user_id);
+            update_field('ucma_company_latitude', array_key_exists('latitude', $fields) ? sanitize_text_field($fields['latitude']) : null, 'user_' . $user_id);
+            update_field('ucma_company_longitude', array_key_exists('longitude', $fields) ? sanitize_text_field($fields['longitude']) : null, 'user_' . $user_id);
 
             $wpdb->query('COMMIT');
         } catch (Error $e) {
