@@ -106,7 +106,9 @@ class VacancyResponse
                 //     "instagram" => $company->getInstagram(),
                 // ],
                 // "socialMedia" => $socialMediaResponse,
-                "website" => $company->getWebsite()
+                "website" => $company->getWebsite(),
+                "latitude" => '-7.7302233',
+                "longitude" => '110.3915621'
             ], // later get company here
             "socialMedia" => $socialMediaResponse,
             "contents" => [

@@ -2,6 +2,7 @@
 
 namespace Global;
 
+use BD\Emails\Email;
 use PostType\Payment;
 use WP_REST_Request;
 use ResponseHelper;

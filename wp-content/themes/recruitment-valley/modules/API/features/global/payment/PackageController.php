@@ -2,6 +2,7 @@
 
 namespace Global;
 
+use BD\Emails\Email;
 use Constant\Message;
 use Error;
 use Exception;
@@ -239,9 +240,9 @@ class PackageController
         $stripe = new \Stripe\StripeClient($secretKey);
 
         $payload = @file_get_contents('php://input');
-        // $endpoint_secret = 'whsec_3Z07iu7314TUwmpuohrnAEuV6BwcgcoT';
+        $endpoint_secret = 'whsec_02c7938964b4c50fc49380728f70538105c68b52df5a50da93130db4e6023ebf';
         
-        $endpoint_secret = 'whsec_3Z07iu7314TUwmpuohrnAEuV6BwcgcoT';
+        // $endpoint_secret = 'whsec_3Z07iu7314TUwmpuohrnAEuV6BwcgcoT';
 
         $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
 
@@ -319,6 +320,24 @@ class PackageController
             $transaction->setStatus("success");
             $transaction->granted();
             $company->grant($package->getCredit());
+
+            $user = get_user_by('id', $user_id);
+
+            $args = [
+                'client.name' => $user->display_name,
+                'price.total' => $transaction->getTransactionAmount(),
+                'transaction.number' => $transaction->getTransactionStripeId(),
+                'transaction.package' => $transaction->getPackageName(),
+                'transaction.date'  => $transaction->getDate('j F Y'),
+            ];
+
+            $site_title = get_bloginfo('name');
+            Email::send(
+                $user->user_email,
+                sprintf(__('Betaling gelukt - %s', "THEME_DOMAIN"), $site_title),
+                $args,
+                'payment-package-success.php'
+            );
 
             return [
                 "status" => 200,
