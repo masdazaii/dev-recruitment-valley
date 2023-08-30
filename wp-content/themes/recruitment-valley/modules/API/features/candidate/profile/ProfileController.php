@@ -403,6 +403,7 @@ class ProfileController
         $theCV = $user->getCv() ?? NULL;
         if ($theCV) {
             $responseCV = [
+                'id' => $theCV['id'],
                 'fileName' => $theCV['filename'],
                 'url' => $theCV['url'] ?? NULL,
                 'createdAt' => $theCV['date'] ? date('M jS, Y', strtotime($theCV['date'])) : NULL,
