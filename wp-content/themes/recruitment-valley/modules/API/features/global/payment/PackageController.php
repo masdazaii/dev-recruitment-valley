@@ -49,7 +49,7 @@ class PackageController
                 'packageName' => $post->post_title,
                 'packageDescription' => $post->post_content,
                 'packagePrice' => $package->getPrice(),
-                'packageCreditQuantity' => $package->getCredit(),
+                'packageCreditQuantity' => $package->getCredit() < 0 ? "unlimited" : $package->getCredit(),
                 'pricePerCredit' => $package->getPricePerVacany(),
                 'isFavorite' => $isFavorite
             ];
@@ -246,10 +246,10 @@ class PackageController
         // $endpoint_secret = 'whsec_3Z07iu7314TUwmpuohrnAEuV6BwcgcoT';
 
         /** Local */
-        // $endpoint_secret = 'whsec_02c7938964b4c50fc49380728f70538105c68b52df5a50da93130db4e6023ebf';
+        $endpoint_secret = 'whsec_02c7938964b4c50fc49380728f70538105c68b52df5a50da93130db4e6023ebf';
 
         /** Staging */
-        $endpoint_secret = 'whsec_3Z07iu7314TUwmpuohrnAEuV6BwcgcoT';
+        // $endpoint_secret = 'whsec_3Z07iu7314TUwmpuohrnAEuV6BwcgcoT';
 
         $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
 
@@ -338,7 +338,7 @@ class PackageController
             // Get unlimited package data
             $unlimitedPackage = get_field('rv_package_credit_quantity', $transaction->getPackageId(), true);
             // Check if purchased package is unlimited or not
-            if ($unlimitedPackage == 999999999) {
+            if ($unlimitedPackage == -1) {
                 // if true, set user meta
                 $company->grantUnlimited();
             } else {
