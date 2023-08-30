@@ -206,7 +206,7 @@ class VacancyResponse
                 "description" => $vacancyModel->getDescription(),
                 "term" => $vacancyModel->getTerm(),
             ],
-            "city" => $vacancyModel->getCity(),
+            "city" => $vacancyModel->getCity('object'),
             "placementAddress" => $vacancyModel->getPlacementAddress(),
             "videoId" => $company->getVideoUrl(), // Added Line
             "gallery" => $vacancyModel->getGallery(),
