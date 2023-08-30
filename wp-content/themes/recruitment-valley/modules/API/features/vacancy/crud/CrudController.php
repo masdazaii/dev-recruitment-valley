@@ -78,7 +78,7 @@ class VacancyCrudController
             'working-hours' => isset($request['hoursPerWeek']) && $request['hoursPerWeek'] !== "" ? explode(',', $request['hoursPerWeek']) : NULL,
             'type'          => isset($request['employmentType']) && $request['employmentType'] !== "" ? explode(',', $request['employmentType']) : NULL,
             'location'      => isset($request['location']) && $request['location'] !== "" ? explode(',', $request['location']) : NULL,
-            'experiences'   => isset($request['experience']) && $request['experience'] !== "" ? explode(',', $request['experience']) : NULL,
+            'experiences'   => isset($request['experiences']) && $request['experiences'] !== "" ? explode(',', $request['experiences']) : NULL,
         ];
 
         $offset = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['postPerPage']));
@@ -298,7 +298,7 @@ class VacancyCrudController
                 "location" => $request["location"],
                 "education" => $request["education"],
                 "type" => $request["employmentType"],
-                "experiences" => $request["experience"] ?? [], // Added Line
+                "experiences" => $request["experiences"] ?? [], // Added Line
                 "status" => [31] // set free job become pending category
             ],
         ];
@@ -379,7 +379,7 @@ class VacancyCrudController
                 "location" => $request["location"],
                 "education" => $request["education"],
                 "type" => $request["employmentType"],
-                "experiences" => $request["experience"] ?? [], // Added Line
+                "experiences" => $request["experiences"] ?? [], // Added Line
                 "status" => [32] // set free job become pending category
             ],
             "application_process_step" => $request["applicationProcedureSteps"],
@@ -771,7 +771,7 @@ class VacancyCrudController
                     "location" => $request["location"],
                     "education" => $request["education"],
                     "type" => $request["employmentType"],
-                    "experiences" => $request["experience"] ?? [], // Added Line
+                    "experiences" => $request["experiences"] ?? [], // Added Line
                     "status" => [32] // set free job become pending category
                 ],
                 "application_process_step" => $request["applicationProcedureSteps"],
@@ -857,7 +857,7 @@ class VacancyCrudController
                 "location" => $request["location"],
                 "education" => $request["education"],
                 "type" => $request["employmentType"],
-                "experiences" => $request["experience"] ?? [], // Added Line
+                "experiences" => $request["experiences"] ?? [], // Added Line
             ],
             "application_process_step" => $request["applicationProcedureSteps"],
         ];
