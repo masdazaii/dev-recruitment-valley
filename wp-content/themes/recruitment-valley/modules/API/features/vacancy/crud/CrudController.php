@@ -212,8 +212,9 @@ class VacancyCrudController
         if ($filters["radius"]) {
             array_push($args['meta_query'], [
                 'key' => 'distance_from_city',
-                'value' => (int) $filters['radius'],
-                'compare' => '<=',
+                'value' => $filters['radius'],
+                'compare' => '<',
+                "type" => "numeric",
             ]);
         }
 

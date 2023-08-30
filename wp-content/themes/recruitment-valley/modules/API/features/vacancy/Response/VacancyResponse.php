@@ -119,6 +119,7 @@ class VacancyResponse
                 "term" => $vacancyModel->getTerm(),
             ],
             "city" => $vacancyModel->getCity(),
+            "externalUrl" => $vacancyModel->getExternalUrl(),
             "placementAddress" => $vacancyModel->getPlacementAddress(),
             // "videoId" => $company->getVideoUrl(), // Changed below
             "videoId" => $company->getVideoUrl() ? StringHelper::getYoutubeID($company->getVideoUrl()) : null, // Added Line
