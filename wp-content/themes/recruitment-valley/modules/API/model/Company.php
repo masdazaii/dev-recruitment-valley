@@ -40,6 +40,9 @@ class Company
     private $_isOnUnlimited = "company_on_unlimited";
     private $_unlimitedExpiredDate = "company_unlimited_expired_date";
 
+    private $_companyLatitude = "ucma_company_latitude";
+    private $_companyLongitude = "ucma_company_longitude";
+
     /** Added Line */
     private $_acfSector = "ucma_sector";
 
@@ -310,5 +313,15 @@ class Company
     public function getUnlimitedExpired()
     {
         return $this->getProp($this->_unlimitedExpiredDate, true);
+    }
+
+    public function getLongitude()
+    {
+        return $this->getProp($this->_companyLongitude, true);
+    }
+
+    public function getLatitude()
+    {
+        return $this->getProp($this->_companyLatitude, true);
     }
 }

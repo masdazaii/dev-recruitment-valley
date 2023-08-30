@@ -45,7 +45,9 @@ class RequestRules
                 "secondaryEmploymentConditions" => [],
                 "companyVideo" => [],
                 "gallery" => [],
-                "image" => []
+                "image" => [],
+                "longitude" => [],
+                "latitude" => []
             ],
             'companyUpdateDetail' => [
                 "companyName" => ["required"],
@@ -198,7 +200,9 @@ class RequestRules
                 "secondaryEmploymentConditions" => "",
                 "companyVideo" => "text",
                 "gallery" => "",
-                "image" => ""
+                "image" => "",
+                "longitude" => "",
+                "latitude" => ""
             ],
             'companyUpdateDetail' => [
                 "companyName" => "text",
