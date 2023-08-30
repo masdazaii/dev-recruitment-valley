@@ -89,6 +89,15 @@ class VacancyCrudController
             "offset" => $offset,
             "order" => "ASC",
             "post_status" => "publish",
+            "meta_query" => [
+                "relation" => "AND",
+                [
+                    'key' => 'expired_at',
+                    'value' => date("Y-m-d H:i:s"),
+                    'compare' => '>',
+                    'type' => "DATE"
+                ],
+            ],
             'tax_query' => []
         ];
 
@@ -217,6 +226,8 @@ class VacancyCrudController
                 "type" => "numeric",
             ]);
         }
+
+        
 
         /** Search */
         if (array_key_exists('search', $filters) && $filters['search'] !== '' && isset($filters['search'])) {
