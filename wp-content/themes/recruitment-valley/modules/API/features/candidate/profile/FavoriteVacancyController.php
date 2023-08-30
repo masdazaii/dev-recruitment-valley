@@ -117,7 +117,6 @@ class FavoriteVacancyController
         if ($vacancy instanceof WP_Post) {
             $favorites = get_user_meta($request['user_id'], 'favorite_vacancy', true) ?? [];
             if (is_array($favorites)) {
-                print('<pre>' . print_r($favorites, true) . '</pre>');
                 if (in_array($vacancy->ID, $favorites)) {
                     return [
                         "status" => 200,
