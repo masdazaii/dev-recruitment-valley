@@ -70,19 +70,6 @@ class ProfileService
         return ResponseHelper::build($response);
     }
 
-    public function updatePhoto(WP_REST_Request $request)
-    {
-        $response = $this->setupProfileController->updatePhoto($request);
-        return ResponseHelper::build($response);
-    }
-
-    public function updateDetail(WP_REST_Request $request)
-    {
-        $body = $request->get_params();
-        $response = $this->setupProfileController->updateDetail($body);
-        return ResponseHelper::build($response);
-    }
-
     public function setup(WP_REST_Request $request)
     {
         $extraRules = [
@@ -105,6 +92,19 @@ class ProfileService
         $body = $validator->getData();
 
         $response = $this->setupProfileController->setup($body);
+        return ResponseHelper::build($response);
+    }
+
+    public function updatePhoto(WP_REST_Request $request)
+    {
+        $response = $this->setupProfileController->updatePhoto($request);
+        return ResponseHelper::build($response);
+    }
+
+    public function updateDetail(WP_REST_Request $request)
+    {
+        $body = $request->get_params();
+        $response = $this->setupProfileController->updateDetail($body);
         return ResponseHelper::build($response);
     }
 

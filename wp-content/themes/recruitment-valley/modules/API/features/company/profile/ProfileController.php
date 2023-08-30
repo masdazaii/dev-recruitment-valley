@@ -136,6 +136,8 @@ class ProfileController
                     'street' => Helper::isset($user_data_acf, 'ucma_street'),
                     'city' => Helper::isset($user_data_acf, 'ucma_city'),
                     'postcode' => Helper::isset($user_data_acf, 'ucma_postcode'),
+                    'longitude' => Helper::isset($user_data_acf, 'ucma_company_longitude'),
+                    'latitude' => Helper::isset($user_data_acf, 'ucma_company_latitude')
                 ],
                 'information' => [
                     'shortDescription' => Helper::isset($user_data_acf, 'ucma_short_decription'),
@@ -170,6 +172,10 @@ class ProfileController
             update_field('ucma_street', $fields['street'], 'user_' . $user_id);
             update_field('ucma_city', $fields['city'], 'user_' . $user_id);
             update_field('ucma_postcode', $fields['postcode'], 'user_' . $user_id);
+
+            // Added Line
+            update_field('ucma_company_latitude', array_key_exists('latitude', $fields) ? $fields['latitude'] : null, 'user_' . $user_id);
+            update_field('ucma_company_longitude', array_key_exists('longitude', $fields) ? $fields['longitude'] : null, 'user_' . $user_id);
 
             $wpdb->query('COMMIT');
         } catch (Error $e) {
@@ -256,39 +262,6 @@ class ProfileController
 
         return [
             'message' => $this->message->get("profile.update.success")
-        ];
-    }
-
-    public function updateDetail($request)
-    {
-        global $wpdb;
-        try {
-            $wpdb->query('START TRANSACTION');
-
-            /** Update ACF */
-            update_field('ucma_company_name', $request['companyName'], 'user_' . $request['user_id']);
-            update_field('ucma_sector', $request['sector'], 'user_' . $request['user_id']);
-            update_field('ucma_phone_code', $request['phoneNumberCode'], 'user_' . $request['user_id']);
-            update_field('ucma_phone', $request['phoneNumber'], 'user_' . $request['user_id']);
-            update_field('ucma_website_url', $request['website'], 'user_' . $request['user_id']);
-            update_field('ucma_employees', $request['employees']['value'], 'user_' . $request['user_id']);
-            update_field('ucma_kvk_number', $request['kvkNumber'], 'user_' . $request['user_id']);
-            update_field('ucma_btw_number', $request['btwNumber'], 'user_' . $request['user_id']);
-
-            $wpdb->query('COMMIT');
-        } catch (Error $errors) {
-            $wpdb->query('ROLLBACK');
-
-            return [
-                "message" => $this->message->get("company.profile.setup_failed"),
-                "errors" => $errors,
-                "status" => 500
-            ];
-        }
-
-        return [
-            "status" => 200,
-            "message" => $this->message->get("company.profile.update_success")
         ];
     }
 
@@ -443,6 +416,8 @@ class ProfileController
             update_field('ucma_benefit', $request['secondaryEmploymentConditions'], 'user_' . $request['user_id']);
             update_field('ucma_company_video_url', $request['companyVideo'], 'user_' . $request['user_id']);
             update_field('ucma_is_full_registered', 1, 'user_' . $request['user_id']);
+            update_field('ucma_company_longitude', $request['longitude'], 'user_' . $request['user_id']);
+            update_field('ucma_company_latitude', $request['latitude'], 'user_' . $request['user_id']);
 
             $wpdb->query('COMMIT');
         } catch (Error $errors) {
@@ -492,6 +467,39 @@ class ProfileController
         // if (isset($currentImage) && !empty($currentImage)) {
         //     wp_delete_attachment($currentImage['ID']);
         // }
+
+        return [
+            "status" => 200,
+            "message" => $this->message->get("company.profile.update_success")
+        ];
+    }
+
+    public function updateDetail($request)
+    {
+        global $wpdb;
+        try {
+            $wpdb->query('START TRANSACTION');
+
+            /** Update ACF */
+            update_field('ucma_company_name', $request['companyName'], 'user_' . $request['user_id']);
+            update_field('ucma_sector', $request['sector'], 'user_' . $request['user_id']);
+            update_field('ucma_phone_code', $request['phoneNumberCode'], 'user_' . $request['user_id']);
+            update_field('ucma_phone', $request['phoneNumber'], 'user_' . $request['user_id']);
+            update_field('ucma_website_url', $request['website'], 'user_' . $request['user_id']);
+            update_field('ucma_employees', $request['employees']['value'], 'user_' . $request['user_id']);
+            update_field('ucma_kvk_number', $request['kvkNumber'], 'user_' . $request['user_id']);
+            update_field('ucma_btw_number', $request['btwNumber'], 'user_' . $request['user_id']);
+
+            $wpdb->query('COMMIT');
+        } catch (Error $errors) {
+            $wpdb->query('ROLLBACK');
+
+            return [
+                "message" => $this->message->get("company.profile.setup_failed"),
+                "errors" => $errors,
+                "status" => 500
+            ];
+        }
 
         return [
             "status" => 200,
