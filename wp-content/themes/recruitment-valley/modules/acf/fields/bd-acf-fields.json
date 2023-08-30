@@ -764,6 +764,50 @@
                 "allow_null": 0,
                 "ui": 1,
                 "bidirectional_target": []
+            },
+            {
+                "key": "field_64edc7e05ec45",
+                "label": "Transaction tax amount",
+                "name": "transaction_tax_amount",
+                "aria-label": "",
+                "type": "number",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "min": "",
+                "max": "",
+                "placeholder": "",
+                "step": 2,
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_64edc7fe5ec46",
+                "label": "Transaction total amount",
+                "name": "transaction_total_amount",
+                "aria-label": "",
+                "type": "number",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "min": "",
+                "max": "",
+                "placeholder": "",
+                "step": 2,
+                "prepend": "",
+                "append": ""
             }
         ],
         "location": [

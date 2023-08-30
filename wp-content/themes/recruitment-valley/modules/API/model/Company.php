@@ -37,6 +37,9 @@ class Company
 
     private $secondaryEmploymentCondition = "ucma_benefit";
 
+    private $_isOnUnlimited = "company_on_unlimited";
+    private $_unlimitedExpiredDate = "company_unlimited_expired_date";
+
     /** Added Line */
     private $_acfSector = "ucma_sector";
 
@@ -271,5 +274,41 @@ class Company
         }
 
         return $termsResponse;
+    }
+
+    public function getCity()
+    {
+        return $this->getProp($this->city);
+    }
+
+    public function getCountry()
+    {
+        return $this->getProp($this->country);
+    }
+
+    /**
+     * grant unlimited
+     * granting unlimited credit to company when purchased unlimited package
+     * set exp date for 1 year
+     *
+     * @param  mixed $totalCredit
+     * @return void
+     */
+    public function grantUnlimited()
+    {
+        $now = new \DateTimeImmutable("now");
+
+        update_user_meta($this->user_id, $this->_unlimitedExpiredDate, $now->modify("+1 year")->format("Y-m-d H:i:s"));
+        return update_user_meta($this->user_id, $this->_isOnUnlimited, 1);
+    }
+
+    public function checkUnlimited()
+    {
+        return $this->getProp($this->_isOnUnlimited, true);
+    }
+
+    public function getUnlimitedExpired()
+    {
+        return $this->getProp($this->_unlimitedExpiredDate, true);
     }
 }
