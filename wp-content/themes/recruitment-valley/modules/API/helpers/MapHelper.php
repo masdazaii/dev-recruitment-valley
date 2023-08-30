@@ -31,7 +31,7 @@ class Maphelper
                 "long" => $response['results'][0]['geometry']['location']['lng'],
             ];
         }else{
-            throw new Exception("Error Processing Request", 400);
+            throw new Exception("Invalid location, pleas insert valid location", 400);
         }
     }
     
