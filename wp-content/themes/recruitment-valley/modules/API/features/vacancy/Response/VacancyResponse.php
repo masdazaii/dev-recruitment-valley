@@ -93,7 +93,6 @@ class VacancyResponse
                 "logo" => $company->getThumbnail(),
                 "name" => $company->getName(),
                 "about" => $company->getDescription(),
-                "maps" => "",
                 "sector" => $company->getTerms('sector'),
                 "totalEmployee" => $company->getTotalEmployees(),
                 "tel" => $company->getPhoneCode() . $company->getPhone(),
@@ -107,6 +106,9 @@ class VacancyResponse
                 // ],
                 // "socialMedia" => $socialMediaResponse,
                 "website" => $company->getWebsite(),
+                // "maps" => "", // not needed - esa feedback 29-08-2023
+                "city" => $company->getCity(),
+                "country" => $company->getCountry(),
                 "latitude" => '-7.7302233',
                 "longitude" => '110.3915621'
             ], // later get company here

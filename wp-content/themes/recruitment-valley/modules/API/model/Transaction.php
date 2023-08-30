@@ -10,29 +10,30 @@ class Transaction
 
     private $transaction_stripe_id = "transaction_stripe_id";
     private $transaction_user_name = "transaction_user_name";
-    private $transaction_package_name= "transaction_package_name";
+    private $transaction_package_name = "transaction_package_name";
     private $transaction_amount = "transaction_amount";
     private $transaction_user_id = "transaction_user_id";
     private $transaction_package_id = "transaction_pacakge_id";
+
+    private $_transaction_tax_amount = "transaction_tax_amount";
+    private $_transaction_total_amount = "transaction_total_amount";
 
     private $granted = "granted";
 
     public function __construct($transactionId = false)
     {
-        if($transactionId)
-        {
+        if ($transactionId) {
             $this->transaction_id = $transactionId;
             $transaction = get_post($transactionId);
-            if($transaction)
-            {
-                $this->post = $transaction; 
-            }else{
-                throw new Exception( "Transaction was not valid", 400 );
+            if ($transaction) {
+                $this->post = $transaction;
+            } else {
+                throw new Exception("Transaction was not valid", 400);
             }
         }
     }
 
-    public function storePost( $args )
+    public function storePost($args)
     {
         $transaction = wp_insert_post([
             "post_title" => $args["title"],
@@ -40,8 +41,7 @@ class Transaction
             "post_status" => "publish"
         ]);
 
-        if($transaction)
-        {
+        if ($transaction) {
             $this->transaction_id = $transaction;
         }
 
@@ -84,14 +84,14 @@ class Transaction
         return $this->getProp($this->transaction_package_id);
     }
 
-    public function setTransactionStripeId( $stripeId )
+    public function setTransactionStripeId($stripeId)
     {
-        return $this->setProp($this->transaction_stripe_id, $stripeId );
+        return $this->setProp($this->transaction_stripe_id, $stripeId);
     }
 
-    public function setUserName( $username)
+    public function setUserName($username)
     {
-        return $this->setProp($this->transaction_user_name, $username );
+        return $this->setProp($this->transaction_user_name, $username);
     }
 
     public function setPackageName($packageName)
@@ -99,60 +99,60 @@ class Transaction
         return $this->setProp($this->transaction_package_name, $packageName);
     }
 
-    public function setTransactionAmount( $amount )
+    public function setTransactionAmount($amount)
     {
         return $this->setProp($this->transaction_amount, $amount);
     }
 
-    public function setUserId( $userId )
+    public function setUserId($userId)
     {
         return $this->setProp($this->transaction_user_id, $userId);
     }
 
-    public function setPackageId( $packageId )
+    public function setPackageId($packageId)
     {
         return $this->setProp($this->transaction_package_id, $packageId);
     }
 
-    public function getDate( $format )
+    public function getDate($format)
     {
         $date = $this->post->post_date;
-        $date = date_create($date); 
+        $date = date_create($date);
         return date_format($date, $format);
     }
 
-    public function getProp( $field )
+    public function getProp($field)
     {
         return get_field($field, $this->transaction_id);
     }
 
-    public function setProp( $field, $value )
+    public function setProp($field, $value)
     {
         return update_field($field, $value, $this->transaction_id);
     }
 
-    public function setStatus( $status )
+    public function setStatus($status)
     {
-        $valid_statuses = array( 'pending', 'success', 'failed' ); // Add more as needed
-        
-        if ( in_array( $status, $valid_statuses ) ) {
+        $valid_statuses = array('pending', 'success', 'failed'); // Add more as needed
+
+        if (in_array($status, $valid_statuses)) {
             // Remove any existing payment status terms
-            wp_set_post_terms( $this->transaction_id, null, 'payment_status', false );
-            $termExist = term_exists($status,'payment_status');
+            wp_set_post_terms($this->transaction_id, null, 'payment_status', false);
+            $termExist = term_exists($status, 'payment_status');
 
             // Set the new payment status term
-            wp_set_post_terms( $this->transaction_id, $termExist["term_id"], 'payment_status', false );
+            wp_set_post_terms($this->transaction_id, $termExist["term_id"], 'payment_status', false);
         }
     }
 
-    public function getStatus( )
+    public function getStatus()
     {
-        $status_terms = wp_get_post_terms( $this->transaction_id, 'payment_status' );
-        if ( ! empty( $status_terms ) ) {
+        $status_terms = wp_get_post_terms($this->transaction_id, 'payment_status');
+        if (!empty($status_terms)) {
             return $status_terms[0]->name;
         }
     }
-    
+
     /**
      * isGranted
      * check if the transaction aready granted or not yet
@@ -161,13 +161,13 @@ class Transaction
      */
     public function isGranted()
     {
-        return get_post_meta($this->transaction_id, $this->granted, true) != true ? true : false; 
+        return get_post_meta($this->transaction_id, $this->granted, true) != true ? true : false;
     }
 
     /**
      * granted
      * make the transaction cannot be use again in the future
-     * 
+     *
      * @return void
      */
     public function granted()
@@ -175,4 +175,22 @@ class Transaction
         update_post_meta($this->transaction_id, $this->granted, true);
     }
 
+    public function setTaxAmount($amount)
+    {
+        return $this->setProp($this->_transaction_tax_amount, $amount);
+    }
+
+    public function setTotalAmount($amount)
+    {
+        return $this->setProp($this->_transaction_total_amount, $amount);
+    }
+
+    public function getTaxAmount()
+    {
+        return $this->getProp($this->_transaction_tax_amount);
+    }
+    public function getTotalAmount()
+    {
+        return $this->getProp($this->_transaction_total_amount);
+    }
 }
