@@ -101,12 +101,16 @@ class RegistrationController
             'token' => $otp,
             'email' => $request['email'],
         ];
-        $content = Email::render_html_email('email-otp.php', $args);
-        $headers = array(
-            'Content-Type: text/html; charset=UTF-8',
-        );
-
-        wp_mail($request["email"], "One Time Password - $site_title", $content, $headers);
+        
+        $sendMail = Email::send($request["email"], "One Time Password - $site_title", $args, 'email-otp.php');
+        
+        if(!$sendMail)
+        {
+            return [
+                "message"   => $this->_message->get('registration.new_otp_failed'),
+                "status"    => 500
+            ];
+        }
 
         return [
             "message"   => $this->_message->get('registration.registration_success'),
@@ -196,7 +200,12 @@ class RegistrationController
         update_user_meta($user, "otp_is_verified", "0"); // Set OTP verified status, if 1 => true / validated, 0 => false / invalid
 
         /** Send OTP code */
-        $sendMail = wp_mail($request["email"], "One Time Password", "Your OTP : " . $otp);
+        $args = [
+            'token' => $otp,
+            'email' => $request['email'],
+        ];
+        $site_title = get_bloginfo('name');
+        $sendMail = Email::send($request["email"], "One Time Password - $site_title", $args, 'email-otp.php');
 
         if (!$sendMail) {
             return [
