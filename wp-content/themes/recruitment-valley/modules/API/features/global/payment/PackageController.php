@@ -222,7 +222,7 @@ class PackageController
             "data" => [
                 "package" => [
                     "price" => intval($package->getPrice()),
-                    "credit" => intval($package->getCredit()),
+                    "credit" => $package->getCredit(),
                     "pricePerCredit" => $package->getCredit() == "unlimited" ? "unlimited" : $package->getPrice() / $package->getCredit(),
                     /** Added line start here */
                     "taxAmount" => $transaction->getTaxAmount(),
