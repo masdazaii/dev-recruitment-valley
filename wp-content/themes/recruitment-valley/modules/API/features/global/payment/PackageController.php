@@ -49,7 +49,7 @@ class PackageController
                 'packageName' => $post->post_title,
                 'packageDescription' => $post->post_content,
                 'packagePrice' => $package->getPrice(),
-                'packageCreditQuantity' => $package->getCredit(),
+                'packageCreditQuantity' => $package->getCredit() < 0 ? "unlimited" : $package->getCredit(),
                 'pricePerCredit' => $package->getPricePerVacany(),
                 'isFavorite' => $isFavorite
             ];
@@ -338,7 +338,7 @@ class PackageController
             // Get unlimited package data
             $unlimitedPackage = get_field('rv_package_credit_quantity', $transaction->getPackageId(), true);
             // Check if purchased package is unlimited or not
-            if ($unlimitedPackage == 999999999) {
+            if ($unlimitedPackage == -1) {
                 // if true, set user meta
                 $company->grantUnlimited();
             } else {
