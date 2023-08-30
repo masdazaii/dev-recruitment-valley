@@ -23,7 +23,6 @@ class VacancyCrudController
 
         $this->wpdb = $wpdb;
         $this->_message = new Message;
-        add_filter('posts_search', [$this, 'filterVacancySearch'], 10, 2);
     }
 
     public function show()
@@ -228,8 +227,9 @@ class VacancyCrudController
         // var_dump($args);
         // echo '</pre>';die;
 
+        add_filter('posts_search', [$this, 'filterVacancySearch'], 10, 2);
         $vacancies = new WP_Query($args);
-        apply_filters('post_search', $vacancies->request, $vacancies);
+        apply_filters('posts_search', $vacancies->request, $vacancies);
         remove_filter('posts_search', [$this, 'filterVacancySearch'], 10, 2);
 
         return [
