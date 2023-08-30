@@ -48,7 +48,7 @@ class VacancyResponse
                 // "salaryRange"=> "2500-3000",
                 "salaryStart" => $vacancyModel->getSalaryStart(),
                 "salaryEnd" => $vacancyModel->getSalaryEnd(),
-                "thumbnail" => $company->getThumbnail(),
+                "thumbnail" => $company->getThumbnail('object'),
                 "description" => StringHelper::shortenString($vacancyModel->getDescription(), 0, 10000),
                 // "postedDate" => date_format(new DateTime($vacancy->post_date_gmt), "Y-m-d H:i A")
                 "postedDate" => DateHelper::doLocale($vacancy->post_date_gmt, 'nl_NL')
@@ -109,8 +109,8 @@ class VacancyResponse
                 // "maps" => "", // not needed - esa feedback 29-08-2023
                 "city" => $company->getCity(),
                 "country" => $company->getCountry(),
-                "latitude" => '-7.7302233',
-                "longitude" => '110.3915621'
+                "longitude" => $company->getLongitude(),
+                "latitude" => $company->getLatitude(),
             ], // later get company here
             "socialMedia" => $socialMediaResponse,
             "contents" => [
