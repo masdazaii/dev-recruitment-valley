@@ -223,7 +223,7 @@ class PackageController
                 "package" => [
                     "price" => intval($package->getPrice()),
                     "credit" => intval($package->getCredit()),
-                    "pricePerCredit" => $package->getPrice() / $package->getCredit(),
+                    "pricePerCredit" => $package->getCredit() == "unlimited" ? "unlimited" : $package->getPrice() / $package->getCredit(),
                     /** Added line start here */
                     "taxAmount" => $transaction->getTaxAmount(),
                     "totalPayment" => $transaction->getTotalAmount()
