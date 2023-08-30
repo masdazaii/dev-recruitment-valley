@@ -405,7 +405,7 @@ class Vacancy
 
     public function getExternalUrl()
     {
-        return $this->getProp($this->acf_external_url);
+        return $this->getProp($this->acf_external_url) ?? null;
     }
 
     public function getExpiredAt($format = "Y-m-d H:i:s")
