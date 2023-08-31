@@ -238,6 +238,14 @@ class ProfileController
         ]);
         if (!$validate['is_valid']) wp_send_json_error(['validation' => $validate['fields'], 'status' => 400], 400);
 
+        /** Check if phone number is already used */
+        if (!$this->_validatePhoneNumber($request)) {
+            return [
+                "status" => 400,
+                "message" => $this->message->get('profile.update.phone.already_exists')
+            ];
+        }
+
         global $wpdb;
         try {
             $wpdb->query('START TRANSACTION');
@@ -364,6 +372,14 @@ class ProfileController
     // public function setup(WP_REST_Request $request)
     public function setup($request)
     {
+        /** Check if phone number is already used */
+        if (!$this->_validatePhoneNumber($request)) {
+            return [
+                "status" => 400,
+                "message" => $this->message->get('profile.update.phone.already_exists')
+            ];
+        }
+
         global $wpdb;
 
         try {
@@ -478,6 +494,14 @@ class ProfileController
 
     public function updateDetail($request)
     {
+        /** Check if phone number is already used */
+        if (!$this->_validatePhoneNumber($request)) {
+            return [
+                "status" => 400,
+                "message" => $this->message->get('profile.update.phone.already_exists')
+            ];
+        }
+
         global $wpdb;
         try {
             $wpdb->query('START TRANSACTION');
@@ -594,6 +618,20 @@ class ProfileController
                 'is_valid' => true,
                 'errors' => []
             ];
+        }
+    }
+
+    private function _validatePhoneNumber($request)
+    {
+        $userID = $request['user_id'] ?? $request->user_id;
+        $userWithMeta = get_users([
+            'meta_key' => ['ucaa_phone', 'ucma_phone'],
+            'meta_value' => $request['phoneNumber'],
+            'exclude' => [$userID]
+        ]);
+
+        if (is_array($userWithMeta)) {
+            return count($userWithMeta) > 0 ? false : true;
         }
     }
 }
