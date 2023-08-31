@@ -215,7 +215,7 @@ class VacancyResponse
             ],
             "city" => [$vacancyModel->getCity('object')],
             "placementAddress" => $vacancyModel->getPlacementAddress(),
-            "videoId" =>  $vacancyModel->getVideoUrl() == "" || $vacancyModel->getVideoUrl() == null  ? $vacancyModel->getVideoUrl() : $company->getVideoUrl(), // Added Line
+            "videoId" =>  $vacancyModel->getVideoUrl() == "" || $vacancyModel->getVideoUrl() == null  ? $company->getVideoUrl() : $vacancyModel->getVideoUrl() , // Added Line
             "gallery" => $vacancyModel->getGallery(),
             "reviews" => $vacancyModel->getReviews(),
             "salaryStart" => $vacancyModel->getSalaryStart(),
