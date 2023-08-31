@@ -72,6 +72,7 @@ class Term
         foreach ($results as $key => $value) {
             $countVacancies = new \WP_Query([
                 'post_type' => 'vacancy',
+                'post_status' => 'publish',
                 'tax_query' => array(
                     'relation' => 'AND',
                     [
