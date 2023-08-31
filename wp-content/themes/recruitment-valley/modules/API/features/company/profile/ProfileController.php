@@ -239,12 +239,12 @@ class ProfileController
         if (!$validate['is_valid']) wp_send_json_error(['validation' => $validate['fields'], 'status' => 400], 400);
 
         /** Check if phone number is already used */
-        if (!$this->_validatePhoneNumber($request)) {
-            return [
-                "status" => 400,
-                "message" => $this->message->get('profile.update.phone.already_exists')
-            ];
-        }
+        // if (!$this->_validatePhoneNumber($request)) {
+        //     return [
+        //         "status" => 400,
+        //         "message" => $this->message->get('profile.update.phone.already_exists')
+        //     ];
+        // }
 
         global $wpdb;
         try {
@@ -373,12 +373,12 @@ class ProfileController
     public function setup($request)
     {
         /** Check if phone number is already used */
-        if (!$this->_validatePhoneNumber($request)) {
-            return [
-                "status" => 400,
-                "message" => $this->message->get('profile.update.phone.already_exists')
-            ];
-        }
+        // if (!$this->_validatePhoneNumber($request)) {
+        //     return [
+        //         "status" => 400,
+        //         "message" => $this->message->get('profile.update.phone.already_exists')
+        //     ];
+        // }
 
         global $wpdb;
 
@@ -495,12 +495,12 @@ class ProfileController
     public function updateDetail($request)
     {
         /** Check if phone number is already used */
-        if (!$this->_validatePhoneNumber($request)) {
-            return [
-                "status" => 400,
-                "message" => $this->message->get('profile.update.phone.already_exists')
-            ];
-        }
+        // if (!$this->_validatePhoneNumber($request)) {
+        //     return [
+        //         "status" => 400,
+        //         "message" => $this->message->get('profile.update.phone.already_exists')
+        //     ];
+        // }
 
         global $wpdb;
         try {
