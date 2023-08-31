@@ -99,6 +99,14 @@ class ProfileController
             ];
         }
 
+        /** Check if phone number is already used */
+        // if (!$this->_validatePhoneNumber($request)) {
+        //     return [
+        //         "status" => 400,
+        //         "message" => $this->message->get('profile.update.phone.already_exists')
+        //     ];
+        // }
+
         global $wpdb;
         try {
             $wpdb->query('START TRANSACTION');
@@ -223,6 +231,14 @@ class ProfileController
         ]);
 
         if (!$validate['is_valid']) return wp_send_json_error(['validation' => $validate['fields'], 'status' => 400], 400);
+
+        /** Check if phone number is already used */
+        // if (!$this->_validatePhoneNumber($request)) {
+        //     return [
+        //         "status" => 400,
+        //         "message" => $this->message->get('profile.update.phone.already_exists')
+        //     ];
+        // }
 
         global $wpdb;
         try {
@@ -374,6 +390,13 @@ class ProfileController
         $user = get_user_by('id', $user_id);
         $body = $request->get_params();
 
+        if ($body["password"] === $body["newPassword"]) {
+            return [
+                "status" => 400,
+                "message" => $this->message->get('auth.change_password.match_old_password')
+            ];
+        }
+
         if (!($user && wp_check_password($body["password"], $user->user_pass, $user->ID))) {
             return [
                 "status" => 400,
@@ -403,6 +426,7 @@ class ProfileController
         $theCV = $user->getCv() ?? NULL;
         if ($theCV) {
             $responseCV = [
+                'id' => $theCV['id'],
                 'fileName' => $theCV['filename'],
                 'url' => $theCV['url'] ?? NULL,
                 'createdAt' => $theCV['date'] ? date('M jS, Y', strtotime($theCV['date'])) : NULL,
@@ -466,5 +490,19 @@ class ProfileController
             "status" => 400,
             "message" => $this->message->get('candidate.profile.delete_cv_not_found')
         ];
+    }
+
+    private function _validatePhoneNumber($request)
+    {
+        $userID = $request['user_id'] ?? $request->user_id;
+        $userWithMeta = get_users([
+            'meta_key' => ['ucaa_phone', 'ucma_phone'],
+            'meta_value' => $request['phoneNumber'],
+            'exclude' => [$userID]
+        ]);
+
+        if (is_array($userWithMeta)) {
+            return count($userWithMeta) > 0 ? false : true;
+        }
     }
 }

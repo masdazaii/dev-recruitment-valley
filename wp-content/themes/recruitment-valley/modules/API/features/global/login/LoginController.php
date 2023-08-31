@@ -4,10 +4,12 @@ namespace Global;
 
 require_once get_stylesheet_directory() . "/vendor/firebase/php-jwt/src/JWT.php";
 
+use BD\Emails\Email;
 use Constant\Message;
 use Firebase\JWT\JWT as JWT;
 use Firebase\JWT\Key;
 use DateTimeImmutable;
+use Model\Company;
 
 class LoginController
 {
@@ -63,32 +65,63 @@ class LoginController
         $expireAccessToken  = $issuedAt->modify($timeToLive)->getTimestamp(); // valid until 60 minutes after toket issued
 
         /** Changes Start here */
+        $extraClaims = [];
         if ($user->roles[0] == 'candidate') {
             $setupStatus = get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false;
         } else if ($user->roles[0] == 'company') {
             $setupStatus = get_field("ucma_is_full_registered", "user_" . $user->ID) ?? false;
+
+            /** Additional line start here */
+            $company = new Company($user->ID);
+            $extraClaims = [
+                'is_unlimited' => $company->checkUnlimited() ? true : false,
+                // 'unlimited_expired_date' => $company->getUnlimitedExpired()
+            ];
         }
 
-        $payloadAccessToken = [
+        /** Anggit's Syntax start here */
+        // $payloadAccessToken = [
+        //     "exp" => $expireAccessToken,
+        //     "user_id" => $user->ID,
+        //     "user_email" => $user->user_email,
+        //     "role" => $user->roles[0],
+        //     // "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
+        //     "setup_status" => $setupStatus,
+        // ];
+
+        // /** For Refresh Token */
+        // // $expireRefreshToken  = $issuedAt->modify("+120 minutes")->getTimestamp(); // valid until 60 minutes after toket issued
+        // $payloadRefreshToken = [
+        //     // "exp" => $expireRefreshToken, // make time-to-live unimited base on mas esa feedback on 18 August 2023
+        //     "user_id" => $user->ID,
+        //     "user_email" => $user->user_email,
+        //     "role" => $user->roles[0],
+        //     // "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
+        //     "setup_status" => $setupStatus,
+        // ];
+        /** Anggit's Syntax end here */
+
+        /** Changes start here */
+        $payloadAccessToken = array_merge([
             "exp" => $expireAccessToken,
             "user_id" => $user->ID,
             "user_email" => $user->user_email,
             "role" => $user->roles[0],
             // "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
             "setup_status" => $setupStatus,
-        ];
+        ], $extraClaims);
 
         /** For Refresh Token */
         // $expireRefreshToken  = $issuedAt->modify("+120 minutes")->getTimestamp(); // valid until 60 minutes after toket issued
-        $payloadRefreshToken = [
+        $payloadRefreshToken = array_merge([
             // "exp" => $expireRefreshToken, // make time-to-live unimited base on mas esa feedback on 18 August 2023
             "user_id" => $user->ID,
             "user_email" => $user->user_email,
             "role" => $user->roles[0],
             // "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
             "setup_status" => $setupStatus,
-        ];
-
+        ], $extraClaims);
+        /** Changes end here */
 
         // store refresh token to db
         update_user_meta($user->ID, 'refresh_token', JWT::encode($payloadRefreshToken, $key, 'HS256'));
@@ -145,16 +178,16 @@ class LoginController
         $reset_password_token = base64_encode($user_login . "_" . $key);
         $reset_password_url = $this->reset_password_url . "?key=" . $reset_password_token;
 
-        $subject = 'Password Reset';
-        $message = '<p>Hallo ' . $user_login . '</p>
-        <p>Please click on the following link to reset your password: </p>  <a href="' . $reset_password_url . '">' . $reset_password_url . '</a>';
+        $site_title = get_bloginfo('name');
+        $subject = sprintf(__('Wachtwoord opnieuw instellen - %s', 'THEME_DOMAIN'), $site_title);
 
-        $headers = array(
-            'Content-Type: text/html; charset=UTF-8',
-            'From: Recruitment Valley <info@recruitmentvalley.com>',
-        );
+        $args = [
+            'reset_url'     => $reset_password_url,
+            'user.email'    => $user->user_email,
+            'user.name'     => $user->first_name !== '' ? $user->first_name : $user->user_email,
+        ];
 
-        $email_sent = wp_mail($user->user_email, $subject, $message, $headers);
+        $email_sent = Email::send($user->user_email, $subject, $args, 'reset-password.php');
 
         if ($email_sent) {
             return [

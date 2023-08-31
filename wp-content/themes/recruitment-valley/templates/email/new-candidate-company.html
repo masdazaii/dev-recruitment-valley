@@ -136,6 +136,7 @@
           font-size: 24px !important;
           line-height: 30px !important;
         }
+
         .rv-section-hallo,
         .rv-section-body {
           padding-inline: 16px !important;
@@ -224,7 +225,7 @@
                                 <td style="width: 100px">
                                   <img
                                     height="auto"
-                                    src="../../assets/images/logo-header.webp"
+                                    src="<?= THEME_URL ?>/assets/images/logo-header.png"
                                     style="
                                       border: 0;
                                       display: block;
@@ -317,7 +318,7 @@
                                 <td style="width: 600px">
                                   <img
                                     height="auto"
-                                    src="../../assets/images/hero-img.webp"
+                                    src="<?= THEME_URL ?>/assets/images/hero-img.webp"
                                     style="
                                       border: 0;
                                       display: block;
@@ -434,7 +435,8 @@
                                     <p
                                       align="center"
                                       style="
-                                        font-family: Neue Montreal Regular;
+                                        font-family: Neue Montreal Regular,
+                                          Helvetica;
                                         font-size: 24px;
                                         font-style: normal;
                                         font-weight: 500;
@@ -557,7 +559,8 @@
                                       class="text-title"
                                       align="center"
                                       style="
-                                        font-family: Neue Montreal Medium;
+                                        font-family: Neue Montreal Medium,
+                                          Helvetica;
                                         font-size: 36px;
                                         font-style: normal;
                                         font-weight: 500;
@@ -568,7 +571,8 @@
                                     <p
                                       align="center"
                                       style="
-                                        font-family: Neue Montreal Regular;
+                                        font-family: Neue Montreal Regular,
+                                          Helvetica;
                                         font-size: 16px;
                                         font-style: normal;
                                         font-weight: 400;
@@ -587,6 +591,155 @@
 
                                       Team Recruitment Valley
                                     </p>
+
+                                    <table
+                                      border="0"
+                                      cellpadding="0"
+                                      cellspacing="0"
+                                      role="presentation"
+                                      width="100%"
+                                      style="margin-top: 40px"
+                                    >
+                                      <tbody>
+                                        <tr>
+                                          <td
+                                            style="
+                                              color: #1f1f1f;
+                                              font-family: Neue Montreal Regular,
+                                                Helvetica;
+                                              font-size: 16px;
+                                              font-style: normal;
+                                              font-weight: 600;
+                                              line-height: 24px;
+                                              letter-spacing: 0.5px;
+                                              padding-block: 10px;
+                                            "
+                                          >
+                                            Transactienummer
+                                          </td>
+                                          <td
+                                            style="
+                                              color: var(
+                                                --neutral-black,
+                                                #3a3a3a
+                                              );
+                                              font-family: Neue Montreal Regular,
+                                                Helvetica;
+                                              font-size: 16px;
+                                              font-style: normal;
+                                              font-weight: 500;
+                                              line-height: 24px; /* 150% */
+                                              letter-spacing: 0.5px;
+                                              word-wrap: anywhere;
+                                            "
+                                          >
+                                            {{ transaction.numberFormatted }}
+                                          </td>
+                                        </tr>
+                                        <tr style="margin-bottom: 20px">
+                                          <td
+                                            style="
+                                              color: #1f1f1f;
+                                              font-family: Neue Montreal Regular,
+                                                Helvetica;
+                                              font-size: 16px;
+                                              font-style: normal;
+                                              font-weight: 600;
+                                              line-height: 24px;
+                                              letter-spacing: 0.5px;
+                                              padding-block: 10px;
+                                            "
+                                          >
+                                            Pakketen
+                                          </td>
+                                          <td
+                                            style="
+                                              color: var(
+                                                --neutral-black,
+                                                #3a3a3a
+                                              );
+                                              font-family: Neue Montreal Regular,
+                                                Helvetica;
+                                              font-size: 16px;
+                                              font-style: normal;
+                                              font-weight: 500;
+                                              line-height: 24px; /* 150% */
+                                              letter-spacing: 0.5px;
+                                            "
+                                          >
+                                            {{ transaction.package }}
+                                          </td>
+                                        </tr>
+                                        <tr>
+                                          <td
+                                            style="
+                                              color: #1f1f1f;
+                                              font-family: Neue Montreal Regular,
+                                                Helvetica;
+                                              font-size: 16px;
+                                              font-style: normal;
+                                              font-weight: 600;
+                                              line-height: 24px;
+                                              letter-spacing: 0.5px;
+                                              padding-block: 10px;
+                                            "
+                                          >
+                                            Datum
+                                          </td>
+                                          <td
+                                            style="
+                                              color: var(
+                                                --neutral-black,
+                                                #3a3a3a
+                                              );
+                                              font-family: Neue Montreal Regular,
+                                                Helvetica;
+                                              font-size: 16px;
+                                              font-style: normal;
+                                              font-weight: 500;
+                                              line-height: 24px; /* 150% */
+                                              letter-spacing: 0.5px;
+                                            "
+                                          >
+                                            {{ transaction.date }}
+                                          </td>
+                                        </tr>
+                                        <tr>
+                                          <td
+                                            style="
+                                              color: #1f1f1f;
+                                              font-family: Neue Montreal Regular,
+                                                Helvetica;
+                                              font-size: 16px;
+                                              font-style: normal;
+                                              font-weight: 600;
+                                              line-height: 24px;
+                                              letter-spacing: 0.5px;
+                                              padding-block: 10px;
+                                            "
+                                          >
+                                            Toestand
+                                          </td>
+                                          <td
+                                            style="
+                                              color: var(
+                                                --neutral-black,
+                                                #3a3a3a
+                                              );
+                                              font-family: Neue Montreal Regular,
+                                                Helvetica;
+                                              font-size: 16px;
+                                              font-style: normal;
+                                              font-weight: 500;
+                                              line-height: 24px; /* 150% */
+                                              letter-spacing: 0.5px;
+                                            "
+                                          >
+                                            {{ transaction.toestand }}
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
                                   </div>
                                 </td>
                               </tr>
@@ -689,7 +842,7 @@
                                         <td style="width: 100px">
                                           <img
                                             height="auto"
-                                            src="../../assets/images/logo-footer.webp"
+                                            src="<?= THEME_URL ?>/assets/images/logo-footer.png"
                                             style="
                                               border: 0;
                                               display: block;
@@ -801,7 +954,8 @@
                                     <p
                                       class="text-title"
                                       style="
-                                        font-family: Neue Montreal Medium;
+                                        font-family: Neue Montreal Medium,
+                                          Helvetica;
                                         font-size: 45px;
                                         font-style: normal;
                                         font-weight: 500;
@@ -900,7 +1054,8 @@
                                 >
                                   <div
                                     style="
-                                      font-family: Neue Montreal Light;
+                                      font-family: Neue Montreal Light,
+                                        Helvetica;
                                       font-size: 13px;
                                       line-height: 1;
                                       text-align: left;
@@ -909,7 +1064,8 @@
                                   >
                                     <p
                                       style="
-                                        font-family: Neue Montreal Medium;
+                                        font-family: Neue Montreal Medium,
+                                          Helvetica;
                                         \font-size: 14px;
                                         font-style: normal;
                                         font-weight: 500;
@@ -923,7 +1079,8 @@
                                     </p>
                                     <p
                                       style="
-                                        font-family: Neue Montreal Regular;
+                                        font-family: Neue Montreal Regular,
+                                          Helvetica;
                                         font-size: 14px;
                                         font-style: normal;
                                         font-weight: 400;
@@ -986,7 +1143,8 @@
                                 >
                                   <div
                                     style="
-                                      font-family: Neue Montreal Light;
+                                      font-family: Neue Montreal Light,
+                                        Helvetica;
                                       font-size: 13px;
                                       line-height: 1;
                                       text-align: left;
@@ -996,7 +1154,8 @@
                                     <a
                                       href="mailto:info@recruitmentvalley.com"
                                       style="
-                                        font-family: Neue Montreal Medium;
+                                        font-family: Neue Montreal Medium,
+                                          Helvetica;
                                         font-size: 14px;
                                         font-style: normal;
                                         font-weight: 500;
@@ -1061,7 +1220,7 @@
                                               >
                                                 <img
                                                   height="30"
-                                                  src="../../assets/images/circle-ig.webp"
+                                                  src="<?= THEME_URL ?>/assets/images/circle-ig.webp"
                                                   style="
                                                     border-radius: 20px;
                                                     display: block;
@@ -1117,7 +1276,7 @@
                                               >
                                                 <img
                                                   height="30"
-                                                  src="../../assets/images/circle-twitter.webp"
+                                                  src="<?= THEME_URL ?>/assets/images/circle-twitter.webp"
                                                   style="
                                                     border-radius: 20px;
                                                     display: block;
@@ -1173,7 +1332,7 @@
                                               >
                                                 <img
                                                   height="30"
-                                                  src="../../assets/images/circle-linked.webp"
+                                                  src="<?= THEME_URL ?>/assets/images/circle-linked.webp"
                                                   style="
                                                     border-radius: 20px;
                                                     display: block;
@@ -1229,7 +1388,7 @@
                                               >
                                                 <img
                                                   height="30"
-                                                  src="../../assets/images/circle-fb.webp"
+                                                  src="<?= THEME_URL ?>/assets/images/circle-fb.webp"
                                                   style="
                                                     border-radius: 20px;
                                                     display: block;
@@ -1339,7 +1498,8 @@
                                     <p
                                       align="center"
                                       style="
-                                        font-family: Neue Montreal Regular;
+                                        font-family: Neue Montreal Regular,
+                                          Helvetica;
                                         font-size: 12px;
                                         font-style: normal;
                                         font-weight: 400;

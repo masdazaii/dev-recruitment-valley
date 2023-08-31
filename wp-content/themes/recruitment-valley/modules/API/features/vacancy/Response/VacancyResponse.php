@@ -48,10 +48,11 @@ class VacancyResponse
                 // "salaryRange"=> "2500-3000",
                 "salaryStart" => $vacancyModel->getSalaryStart(),
                 "salaryEnd" => $vacancyModel->getSalaryEnd(),
-                "thumbnail" => $company->getThumbnail(),
+                "thumbnail" => $company->getThumbnail('object'),
                 "description" => StringHelper::shortenString($vacancyModel->getDescription(), 0, 10000),
                 // "postedDate" => date_format(new DateTime($vacancy->post_date_gmt), "Y-m-d H:i A")
-                "postedDate" => DateHelper::doLocale($vacancy->post_date_gmt, 'nl_NL')
+                "postedDate" => DateHelper::doLocale($vacancy->post_date_gmt, 'nl_NL'),
+                "isNew" => date('Y-m-d') === date('Y-m-d', strtotime($vacancy->post_date_gmt))
             ];
         }, $this->vacancyCollection);
 
@@ -93,7 +94,6 @@ class VacancyResponse
                 "logo" => $company->getThumbnail(),
                 "name" => $company->getName(),
                 "about" => $company->getDescription(),
-                "maps" => "",
                 "sector" => $company->getTerms('sector'),
                 "totalEmployee" => $company->getTotalEmployees(),
                 "tel" => $company->getPhoneCode() . $company->getPhone(),
@@ -107,8 +107,11 @@ class VacancyResponse
                 // ],
                 // "socialMedia" => $socialMediaResponse,
                 "website" => $company->getWebsite(),
-                "latitude" => '-7.7302233',
-                "longitude" => '110.3915621'
+                // "maps" => "", // not needed - esa feedback 29-08-2023
+                "city" => $company->getCity(),
+                "country" => $company->getCountry(),
+                "longitude" => $company->getLongitude(),
+                "latitude" => $company->getLatitude(),
             ], // later get company here
             "socialMedia" => $socialMediaResponse,
             "contents" => [
@@ -116,17 +119,25 @@ class VacancyResponse
                 "term" => $vacancyModel->getTerm(),
             ],
             "city" => $vacancyModel->getCity(),
+            "externalUrl" => $vacancyModel->getExternalUrl(),
             "placementAddress" => $vacancyModel->getPlacementAddress(),
             // "videoId" => $company->getVideoUrl(), // Changed below
             "videoId" => $company->getVideoUrl() ? StringHelper::getYoutubeID($company->getVideoUrl()) : null, // Added Line
             "gallery" => $vacancyModel->getGallery(),
             "reviews" => $vacancyModel->getReviews(),
+            "applicationProcessTitle" => $vacancyModel->getApplicationProcessTitle(),
+            "applicationProcessDescription" => $vacancyModel->getApplicationProcessDescription(),
             "steps" => $vacancyModel->getApplicationProcessStep(),
             "salaryStart" => $vacancyModel->getSalaryStart(),
             "salaryEnd" => $vacancyModel->getSalaryEnd(),
             // "postedDate" => $vacancyModel->getPublishDate("Y-m-d H:i A"),
             "postedDate" => $vacancyModel->getPublishDate("d-m-Y H:i"),
-            "expiredDate" => $vacancyModel->getExpiredAt("d-m-Y H:i")
+            "expiredDate" => $vacancyModel->getExpiredAt("d-m-Y H:i"),
+            "applicationProcedure" => [
+                "title" => $vacancyModel->getApplicationProcessTitle(),
+                "text" => $vacancyModel->getApplicationProcessDescription(),
+                "steps" => $vacancyModel->getApplicationProcessStep()
+            ]
         ];
 
         // $formattedResponse = get_field($vacancyModel->acf_application_process_step,$this->vacancyCollection->ID);
@@ -202,9 +213,9 @@ class VacancyResponse
                 "description" => $vacancyModel->getDescription(),
                 "term" => $vacancyModel->getTerm(),
             ],
-            "city" => $vacancyModel->getCity(),
+            "city" => [$vacancyModel->getCity('object')],
             "placementAddress" => $vacancyModel->getPlacementAddress(),
-            "videoId" => $company->getVideoUrl(), // Added Line
+            "videoId" =>  $vacancyModel->getVideoUrl() == "" || $vacancyModel->getVideoUrl() == null  ? $company->getVideoUrl() : $vacancyModel->getVideoUrl() , // Added Line
             "gallery" => $vacancyModel->getGallery(),
             "reviews" => $vacancyModel->getReviews(),
             "salaryStart" => $vacancyModel->getSalaryStart(),

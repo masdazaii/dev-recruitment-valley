@@ -45,7 +45,9 @@ class RequestRules
                 "secondaryEmploymentConditions" => [],
                 "companyVideo" => [],
                 "gallery" => [],
-                "image" => []
+                "image" => [],
+                "longitude" => [],
+                "latitude" => []
             ],
             'companyUpdateDetail' => [
                 "companyName" => ["required"],
@@ -104,14 +106,13 @@ class RequestRules
                 "education.*" => ["required", "numeric"],
                 "employmentType.*" => ["required", "numeric"],
                 "externalUrl" => ["url"],
-                "experience.*" => ["numeric"]
+                "experiences.*" => ["numeric"]
             ],
             'vacancyCreatePaid' => [
                 "name" => ['required'],
                 "description" => ["required"],
                 "city" => ['required'],
                 "placementAddress" => ["required"],
-                "terms" => ["required"],
                 "salaryStart" => ["numeric"],
                 "salaryEnd" => ["numeric"],
                 "sector.*" => ["required", "numeric"],
@@ -130,7 +131,47 @@ class RequestRules
                 "instagram" => ["url"],
                 "twitter" => ["url"],
                 "review" => [],
-                "experience.*" => ["numeric"] // Added Line
+                "experiences.*" => ["numeric"] // Added Line
+            ],
+            'vacancyUpdateFree' => [
+                "description" => ["required"],
+                "city" => ["required"],
+                "placementAddress" => ["required"],
+                "salaryStart" => ["numeric"],
+                "salaryEnd" => ["numeric"],
+                "sector.*" => ["required", "numeric", "exists:term/sector/term_id/single"],
+                "role.*" => ["required", "numeric", "exists:term/role/term_id/single"],
+                "workingHours.*" => ["required", "numeric", "exists:term/working-hours/term_id/single"],
+                "location.*" => ["required", "numeric", "exists:term/location/term_id/single"],
+                "education.*" => ["required", "numeric", "exists:term/education/term_id/single"],
+                "employmentType.*" => ["required", "numeric", "exists:term/type/term_id/single"],
+                "externalUrl" => ["url"],
+                "experiences.*" => ["numeric", "exists:term/experiences/term_id/single"] // Added Line
+            ],
+            'vacancyUpdatePaid' => [
+                "city"              => ["required"],
+                "placementAddress"  => ["required"],
+                "description"       => ["required"],
+                "terms"             => ["required"],
+                "salaryStart"       => ["numeric"],
+                "salaryEnd"         => ["numeric"],
+                "externalUrl"       => ["url"],
+                "video"             => ["url"],
+                "facebook"          => ["url"],
+                "linkedin"          => ["url"],
+                "instagram"         => ["url"],
+                "twitter"           => ["url"],
+                "sector.*"          => ["required", "numeric", "exists:term/sector/term_id/single"],
+                "role.*"            => ["required", "numeric", "exists:term/role/term_id/single"],
+                "workingHours.*"    => ["required", "numeric", "exists:term/working-hours/term_id/single"],
+                "location.*"        => ["required", "numeric", "exists:term/location/term_id/single"],
+                "education.*"       => ["required", "numeric", "exists:term/education/term_id/single"],
+                "employmentType.*"  => ["required", "numeric", "exists:term/type/term_id/single"],
+                "experiences.*"     => ["required", "numeric", "exists:term/experiences/term_id/single"], // Added Line
+                "applicationProcedureSteps" => [],
+                "applicationProcedureTitle" => [],
+                "applicationProcedureText"  => [],
+                "review"                    => [],
             ],
             'addFavorite' => [
                 /**
@@ -198,7 +239,9 @@ class RequestRules
                 "secondaryEmploymentConditions" => "",
                 "companyVideo" => "text",
                 "gallery" => "",
-                "image" => ""
+                "image" => "",
+                "longitude" => "",
+                "latitude" => ""
             ],
             'companyUpdateDetail' => [
                 "companyName" => "text",
@@ -260,7 +303,7 @@ class RequestRules
                 "description" => "ksespost",
                 "city" => "text",
                 "placementAddress" => "text",
-                "terms" => "text",
+                "terms" => "ksespost",
                 "salaryStart" => "text",
                 "salaryEnd" => "text",
                 "sector.*" => "text",
@@ -280,6 +323,48 @@ class RequestRules
                 "twitter" => "",
                 "review" => "",
                 "experience.*" => "text"
+            ],
+            'vacancyUpdateFree' => [
+                "description"       => "ksespost",
+                "city"              => "text",
+                "placementAddress"  => "text",
+                "salaryStart"       => "text",
+                "salaryEnd"         => "text",
+                "sector.*"          => "text",
+                "role.*"            => "text",
+                "workingHours.*"    => "text",
+                "location.*"        => "text",
+                "education.*"       => "text",
+                "employmentType.*"  => "text",
+                "externalUrl"       => "",
+                "experience.*"      => "text",
+            ],
+            'vacancyUpdatePaid' => [
+                "city"              => "text",
+                "placementAddress"  => "text",
+                "description"       => "ksespost",
+                "terms"             => "ksespost",
+                "salaryStart"       => "text",
+                "salaryEnd"         => "text",
+                "externalUrl"       => "",
+                "video"             => "",
+                "facebook"          => "",
+                "linkedin"          => "",
+                "instagram"         => "",
+                "twitter"           => "",
+                "sector.*"          => "text",
+                "role.*"            => "text",
+                "workingHours.*"    => "text",
+                "location.*"        => "text",
+                "education.*"       => "text",
+                "employmentType.*"  => "text",
+                "experiences.*"     => "text", // Added Line
+                "applicationProcedureSteps" => "",
+                "applicationProcedureTitle" => "",
+                "applicationProcedureText"  => "",
+                "review."                    => "",
+                "galleryJob"                => "",
+                "galleryCompany"            => ""
             ],
             "userChangeEmail" => [
                 'newEmail' => "email"

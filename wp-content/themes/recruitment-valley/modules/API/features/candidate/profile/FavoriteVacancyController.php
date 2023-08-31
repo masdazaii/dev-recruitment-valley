@@ -130,6 +130,12 @@ class FavoriteVacancyController
                         "data" => false
                     ];
                 }
+            } else {
+                return [
+                    "status" => 200,
+                    "message" => $this->_message->get("candidate.favorite.get_success"),
+                    "data" => false
+                ];
             }
         } else {
             return [

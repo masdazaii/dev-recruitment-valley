@@ -44,7 +44,7 @@ class ProfileController
         }
 
         /** Added line Start here */
-        $image = Helper::isset($user_data_acf, 'ucma_image') ?? [];
+        $image = Helper::isset($user_data_acf, 'ucma_image') ?? null;
         if (!empty($image)) {
             $image = [
                 'id' => $image['ID'],
@@ -136,6 +136,8 @@ class ProfileController
                     'street' => Helper::isset($user_data_acf, 'ucma_street'),
                     'city' => Helper::isset($user_data_acf, 'ucma_city'),
                     'postcode' => Helper::isset($user_data_acf, 'ucma_postcode'),
+                    'longitude' => Helper::isset($user_data_acf, 'ucma_company_longitude'),
+                    'latitude' => Helper::isset($user_data_acf, 'ucma_company_latitude')
                 ],
                 'information' => [
                     'shortDescription' => Helper::isset($user_data_acf, 'ucma_short_decription'),
@@ -160,6 +162,8 @@ class ProfileController
             "city" => "required",
             "street" => "required",
             "postcode" => "required",
+            "latitude" => "required", // Added Line
+            "longitude" => "required", // Added Line
         ]);
         if (!$validate['is_valid']) wp_send_json_error(['validation' => $validate['fields'], 'status' => 400], 400);
 
@@ -170,6 +174,10 @@ class ProfileController
             update_field('ucma_street', $fields['street'], 'user_' . $user_id);
             update_field('ucma_city', $fields['city'], 'user_' . $user_id);
             update_field('ucma_postcode', $fields['postcode'], 'user_' . $user_id);
+
+            // Added Line
+            update_field('ucma_company_latitude', array_key_exists('latitude', $fields) ? sanitize_text_field($fields['latitude']) : null, 'user_' . $user_id);
+            update_field('ucma_company_longitude', array_key_exists('longitude', $fields) ? sanitize_text_field($fields['longitude']) : null, 'user_' . $user_id);
 
             $wpdb->query('COMMIT');
         } catch (Error $e) {
@@ -230,6 +238,14 @@ class ProfileController
         ]);
         if (!$validate['is_valid']) wp_send_json_error(['validation' => $validate['fields'], 'status' => 400], 400);
 
+        /** Check if phone number is already used */
+        // if (!$this->_validatePhoneNumber($request)) {
+        //     return [
+        //         "status" => 400,
+        //         "message" => $this->message->get('profile.update.phone.already_exists')
+        //     ];
+        // }
+
         global $wpdb;
         try {
             $wpdb->query('START TRANSACTION');
@@ -256,39 +272,6 @@ class ProfileController
 
         return [
             'message' => $this->message->get("profile.update.success")
-        ];
-    }
-
-    public function updateDetail($request)
-    {
-        global $wpdb;
-        try {
-            $wpdb->query('START TRANSACTION');
-
-            /** Update ACF */
-            update_field('ucma_company_name', $request['companyName'], 'user_' . $request['user_id']);
-            update_field('ucma_sector', $request['sector'], 'user_' . $request['user_id']);
-            update_field('ucma_phone_code', $request['phoneNumberCode'], 'user_' . $request['user_id']);
-            update_field('ucma_phone', $request['phoneNumber'], 'user_' . $request['user_id']);
-            update_field('ucma_website_url', $request['website'], 'user_' . $request['user_id']);
-            update_field('ucma_employees', $request['employees']['value'], 'user_' . $request['user_id']);
-            update_field('ucma_kvk_number', $request['kvkNumber'], 'user_' . $request['user_id']);
-            update_field('ucma_btw_number', $request['btwNumber'], 'user_' . $request['user_id']);
-
-            $wpdb->query('COMMIT');
-        } catch (Error $errors) {
-            $wpdb->query('ROLLBACK');
-
-            return [
-                "message" => $this->message->get("company.profile.setup_failed"),
-                "errors" => $errors,
-                "status" => 500
-            ];
-        }
-
-        return [
-            "status" => 200,
-            "message" => $this->message->get("company.profile.update_success")
         ];
     }
 
@@ -389,6 +372,14 @@ class ProfileController
     // public function setup(WP_REST_Request $request)
     public function setup($request)
     {
+        /** Check if phone number is already used */
+        // if (!$this->_validatePhoneNumber($request)) {
+        //     return [
+        //         "status" => 400,
+        //         "message" => $this->message->get('profile.update.phone.already_exists')
+        //     ];
+        // }
+
         global $wpdb;
 
         try {
@@ -443,6 +434,8 @@ class ProfileController
             update_field('ucma_benefit', $request['secondaryEmploymentConditions'], 'user_' . $request['user_id']);
             update_field('ucma_company_video_url', $request['companyVideo'], 'user_' . $request['user_id']);
             update_field('ucma_is_full_registered', 1, 'user_' . $request['user_id']);
+            update_field('ucma_company_longitude', $request['longitude'], 'user_' . $request['user_id']);
+            update_field('ucma_company_latitude', $request['latitude'], 'user_' . $request['user_id']);
 
             $wpdb->query('COMMIT');
         } catch (Error $errors) {
@@ -499,6 +492,47 @@ class ProfileController
         ];
     }
 
+    public function updateDetail($request)
+    {
+        /** Check if phone number is already used */
+        // if (!$this->_validatePhoneNumber($request)) {
+        //     return [
+        //         "status" => 400,
+        //         "message" => $this->message->get('profile.update.phone.already_exists')
+        //     ];
+        // }
+
+        global $wpdb;
+        try {
+            $wpdb->query('START TRANSACTION');
+
+            /** Update ACF */
+            update_field('ucma_company_name', $request['companyName'], 'user_' . $request['user_id']);
+            update_field('ucma_sector', $request['sector'], 'user_' . $request['user_id']);
+            update_field('ucma_phone_code', $request['phoneNumberCode'], 'user_' . $request['user_id']);
+            update_field('ucma_phone', $request['phoneNumber'], 'user_' . $request['user_id']);
+            update_field('ucma_website_url', $request['website'], 'user_' . $request['user_id']);
+            update_field('ucma_employees', $request['employees']['value'], 'user_' . $request['user_id']);
+            update_field('ucma_kvk_number', $request['kvkNumber'], 'user_' . $request['user_id']);
+            update_field('ucma_btw_number', $request['btwNumber'], 'user_' . $request['user_id']);
+
+            $wpdb->query('COMMIT');
+        } catch (Error $errors) {
+            $wpdb->query('ROLLBACK');
+
+            return [
+                "message" => $this->message->get("company.profile.setup_failed"),
+                "errors" => $errors,
+                "status" => 500
+            ];
+        }
+
+        return [
+            "status" => 200,
+            "message" => $this->message->get("company.profile.update_success")
+        ];
+    }
+
     public function getPhoto($request)
     {
         $image = get_field('ucma_image', 'user_' . $request['user_id']) ?? [];
@@ -531,7 +565,8 @@ class ProfileController
                 "status" => 200,
                 "message" => "success get company credit",
                 "data" => [
-                    "credit" => $company->getCredit()
+                    "credit" => $company->getCredit(),
+                    "timeExpired" => $company->getUnlimitedExpired() ?? null
                 ]
             ];
         } catch (\Exception $e) {
@@ -556,7 +591,7 @@ class ProfileController
                         'twitter' => $company->getTwitter(),
                     ],
                     'secondaryEmploymentCondition' => $company->getSecondaryEmploymentCondition() ?? NULL,
-                    'gallery' => $company->getGallery(true)
+                    'gallery' => array_values($company->getGallery(true))
                 ]
             ];
         } catch (\Exception $e) {
@@ -584,6 +619,20 @@ class ProfileController
                 'is_valid' => true,
                 'errors' => []
             ];
+        }
+    }
+
+    private function _validatePhoneNumber($request)
+    {
+        $userID = $request['user_id'] ?? $request->user_id;
+        $userWithMeta = get_users([
+            'meta_key' => ['ucaa_phone', 'ucma_phone'],
+            'meta_value' => $request['phoneNumber'],
+            'exclude' => [$userID]
+        ]);
+
+        if (is_array($userWithMeta)) {
+            return count($userWithMeta) > 0 ? false : true;
         }
     }
 }

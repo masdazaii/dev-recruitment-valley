@@ -8,6 +8,7 @@ use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use JWTHelper;
+use Model\Company;
 use UnexpectedValueException;
 
 class RefreshTokenController
@@ -57,13 +58,27 @@ class RefreshTokenController
                 $setupStatus = get_field("ucma_is_full_registered", "user_" . $user->ID) ?? false;
             }
 
-            $payloadNewAccessToken = [
+            $extraClaims = [];
+            if ($user->roles[0] == 'candidate') {
+                $setupStatus = get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false;
+            } else if ($user->roles[0] == 'company') {
+                $setupStatus = get_field("ucma_is_full_registered", "user_" . $user->ID) ?? false;
+
+                /** Additional line start here */
+                $company = new Company($user->ID);
+                $extraClaims = [
+                    'is_unlimited' => $company->checkUnlimited() ? true : false,
+                    // 'unlimited_expired_date' => $company->getUnlimitedExpired()
+                ];
+            }
+
+            $payloadNewAccessToken = array_merge([
                 "user_id" => $user->ID,
                 "role" => $user->roles[0],
                 "user_email" => $user->user_email,
                 // "setup_status" => get_field("ucaa_is_full_registered", "user_" . $user->ID) ?? false,
                 "setup_status" => $setupStatus,
-            ];
+            ], $extraClaims);
 
             $payloadNewrefreshToken = [
                 "user_id" => $user->ID,

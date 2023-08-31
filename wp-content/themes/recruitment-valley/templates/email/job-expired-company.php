@@ -319,7 +319,7 @@
                                       color: #000000;
                                     ">
                                   <p align="center" style="
-                                        font-family: Neue Montreal Regular;
+                                        font-family: Neue Montreal Regular, Helvetica;
                                         font-size: 24px;
                                         font-style: normal;
                                         font-weight: 500;
@@ -403,7 +403,7 @@
                                       color: #000000;
                                     ">
                                   <p class="text-title" align="center" style="
-                                        font-family: Neue Montreal Medium;
+                                        font-family: Neue Montreal Medium, Helvetica;
                                         font-size: 36px;
                                         font-style: normal;
                                         font-weight: 500;
@@ -411,7 +411,7 @@
                                         color: #234943;
                                       "></p>
                                   <p align="center" style="
-                                        font-family: Neue Montreal Regular;
+                                        font-family: Neue Montreal Regular, Helvetica;
                                         font-size: 16px;
                                         font-style: normal;
                                         font-weight: 400;
@@ -498,7 +498,7 @@
                                   <tbody>
                                     <tr>
                                       <td style="width: 100px">
-                                        <img height="auto" src="<?= THEME_URL ?>/assets/images/logo-footer.png" style="
+                                        <img height="auto" src="<?= THEME_URL; ?>/assets/images/logo-footer.png" style="
                                               border: 0;
                                               display: block;
                                               outline: none;
@@ -572,7 +572,7 @@
                                       color: #000000;
                                     ">
                                   <p class="text-title" style="
-                                        font-family: Neue Montreal Medium;
+                                        font-family: Neue Montreal Medium, Helvetica;
                                         font-size: 45px;
                                         font-style: normal;
                                         font-weight: 500;
@@ -635,15 +635,15 @@
                                     word-break: break-word;
                                   ">
                                 <div style="
-                                      font-family: Neue Montreal Light;
+                                      font-family: Neue Montreal Light, Helvetica;
                                       font-size: 13px;
                                       line-height: 1;
                                       text-align: left;
                                       color: #f45e43;
                                     ">
                                   <p style="
-                                        font-family: Neue Montreal Medium;
-                                        \font-size: 14px;
+                                        font-family: Neue Montreal Medium, Helvetica;
+                                        font-size: 14px;
                                         font-style: normal;
                                         font-weight: 500;
                                         line-height: 20px;
@@ -654,7 +654,7 @@
                                     Contact
                                   </p>
                                   <p style="
-                                        font-family: Neue Montreal Regular;
+                                        font-family: Neue Montreal Regular, Helvetica;
                                         font-size: 14px;
                                         font-style: normal;
                                         font-weight: 400;
@@ -696,14 +696,14 @@
                                     word-break: break-word;
                                   ">
                                 <div style="
-                                      font-family: Neue Montreal Light;
+                                      font-family: Neue Montreal Light, Helvetica;
                                       font-size: 13px;
                                       line-height: 1;
                                       text-align: left;
                                       color: #f45e43;
                                     ">
                                   <a href="mailto:info@recruitmentvalley.com" style="
-                                        font-family: Neue Montreal Medium;
+                                        font-family: Neue Montreal Medium, Helvetica;
                                         font-size: 14px;
                                         font-style: normal;
                                         font-weight: 500;
@@ -741,7 +741,7 @@
                                                 width: 30px;
                                               ">
                                             <a href="https://www.instagram.com/recruitmentvalley/" target="_blank">
-                                              <img height="30" src="<?= THEME_URL ?>/assets/images/circle-ig.webp" style="
+                                              <img height="30" src="<?= THEME_URL; ?>/assets/images/circle-ig.webp" style="
                                                     border-radius: 20px;
                                                     display: block;
                                                   " width="30" />
@@ -772,7 +772,7 @@
                                                 width: 30px;
                                               ">
                                             <a href="https://twitter.com/recruitvalley" target="_blank">
-                                              <img height="30" src="<?= THEME_URL ?>/assets/images/circle-twitter.webp" style="
+                                              <img height="30" src="<?= THEME_URL; ?>/assets/images/circle-twitter.webp" style="
                                                     border-radius: 20px;
                                                     display: block;
                                                   " width="30" />
@@ -803,7 +803,7 @@
                                                 width: 30px;
                                               ">
                                             <a href="https://www.linkedin.com/company/recruitmentvalley" target="_blank">
-                                              <img height="30" src="<?= THEME_URL ?>/assets/images/circle-linked.webp" style="
+                                              <img height="30" src="<?= THEME_URL; ?>/assets/images/circle-linked.webp" style="
                                                     border-radius: 20px;
                                                     display: block;
                                                   " width="30" />
@@ -834,7 +834,7 @@
                                                 width: 30px;
                                               ">
                                             <a href="https://www.facebook.com/recruitmentvalley" target="_blank">
-                                              <img height="30" src="<?= THEME_URL ?>/assets/images/circle-fb.webp" style="
+                                              <img height="30" src="<?= THEME_URL; ?>/assets/images/circle-fb.webp" style="
                                                     border-radius: 20px;
                                                     display: block;
                                                   " width="30" />
@@ -907,7 +907,7 @@
                                       color: #000000;
                                     ">
                                   <p align="center" style="
-                                        font-family: Neue Montreal Regular;
+                                        font-family: Neue Montreal Regular, Helvetica;
                                         font-size: 12px;
                                         font-style: normal;
                                         font-weight: 400;
