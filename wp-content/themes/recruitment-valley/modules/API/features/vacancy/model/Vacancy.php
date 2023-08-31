@@ -256,11 +256,7 @@ class Vacancy
 
     public function getVideoUrl()
     {
-        if ($this->getProp($this->acf_video_url)) {
-            return Helper::yt_id($this->getProp($this->acf_video_url));
-        }
-
-        return "";
+        return $this->getProp($this->acf_video_url) ?? "";
     }
 
     public function getFacebookUrl()
