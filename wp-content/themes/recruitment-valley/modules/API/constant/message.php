@@ -28,6 +28,9 @@ class Message
                     "incorrect_key" => __("Incorrect key for requested user", THEME_DOMAIN),
                     'success' => __("success reset password", THEME_DOMAIN),
                 ],
+                "change_password" => [
+                    "match_old_password" => __("Your new password can not be same as old password", THEME_DOMAIN)
+                ],
                 'not_found_user' => __("User was not found", THEME_DOMAIN),
                 'unfinish_registration' => __("Unfinished registration.", THEME_DOMAIN),
                 'invalid_credential' => __("Credentials is invalid.", THEME_DOMAIN),
