@@ -59,7 +59,7 @@ class EmailHelper
                 'Content-Type: text/html; charset=UTF-8',
             );
 
-            wp_mail($company->getEmail(), "Betalingsbevestiging - $site_title", $content, $headers);
+            wp_mail($company->getEmail(), "Bevestiging van aankoop credits - $site_title", $content, $headers);
         } catch (Exception $e) {
             error_log($e->getMessage());
         }
