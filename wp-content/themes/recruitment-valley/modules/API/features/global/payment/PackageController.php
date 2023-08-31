@@ -355,6 +355,9 @@ class PackageController
                 'transaction.number' => $transaction->getTransactionStripeId(),
                 'transaction.package' => $transaction->getPackageName(),
                 'transaction.date'  => $transaction->getDate('j F Y'),
+                'transcation.numberFormatted' => substr($transaction->getTransactionStripeId(), 15) . "...",
+                'price.totalFormatted' => "€" . number_format($transaction->getTransactionAmount(), 2)
+
             ];
 
             $site_title = get_bloginfo('name');

@@ -453,7 +453,9 @@
                                     line-height: 24px; /* 150% */
                                     letter-spacing: 0.5px;
                                     word-wrap: anywhere;
-                                    ">{{ transaction.number }}</td>
+                                    ">
+                                {{ transaction.number }}
+                              </td>
                             </tr>
                             <tr style="margin-bottom: 20px;">
                               <td style="
