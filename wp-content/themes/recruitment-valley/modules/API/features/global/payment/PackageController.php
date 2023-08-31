@@ -355,6 +355,7 @@ class PackageController
                 'transaction.number' => $transaction->getTransactionStripeId(),
                 'transaction.package' => $transaction->getPackageName(),
                 'transaction.date'  => $transaction->getDate('j F Y'),
+                'transaction.toestand' => $transaction->getStatus()
             ];
 
             $site_title = get_bloginfo('name');
