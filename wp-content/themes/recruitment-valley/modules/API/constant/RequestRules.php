@@ -106,14 +106,13 @@ class RequestRules
                 "education.*" => ["required", "numeric"],
                 "employmentType.*" => ["required", "numeric"],
                 "externalUrl" => ["url"],
-                "experience.*" => ["numeric"]
+                "experiences.*" => ["numeric"]
             ],
             'vacancyCreatePaid' => [
                 "name" => ['required'],
                 "description" => ["required"],
                 "city" => ['required'],
                 "placementAddress" => ["required"],
-                "terms" => ["required"],
                 "salaryStart" => ["numeric"],
                 "salaryEnd" => ["numeric"],
                 "sector.*" => ["required", "numeric"],
@@ -132,8 +131,40 @@ class RequestRules
                 "instagram" => ["url"],
                 "twitter" => ["url"],
                 "review" => [],
-                "experience.*" => ["numeric"] // Added Line
+                "experiences.*" => ["numeric"] // Added Line
             ],
+            'vacancyUpdateFree' => [
+                "description" => ["required"],
+                "city" => ["required"],
+                "placementAddress" => ["required"],
+                "salaryStart" => ["numeric"],
+                "salaryEnd" => ["numeric"],
+                "sector.*" => ["required", "numeric", "exists:term/sector/term_id/single"],
+                "role.*" => ["required", "numeric", "exists:term/role/term_id/single"],
+                "workingHours.*" => ["required", "numeric", "exists:term/working-hours/term_id/single"],
+                "location.*" => ["required", "numeric", "exists:term/location/term_id/single"],
+                "education.*" => ["required", "numeric", "exists:term/education/term_id/single"],
+                "employmentType.*" => ["required", "numeric", "exists:term/type/term_id/single"],
+                "externalUrl" => ["url"],
+                "experiences.*" => ["numeric", "exists:term/experiences/term_id/single"] // Added Line
+            ],
+            // 'vacancyUpdatePaid' => [
+            //     "placement_city"    => ["required"],
+            //     "description"       => ["required"],
+            //     "term"              => ["required"],
+            //     "salary_start"      => ["numeric"],
+            //     "salary_end"        => ["numeric"],
+            //     "external_url"      => ["url"],
+            //     "application_process_title"         => [],
+            //     "application_process_description"   => [],
+            //     "video_url"         => ["url"],
+            //     "facebook_url"      => ["url"],
+            //     "linkedin_url"      => ["url"],
+            //     "instagram_url"     => ["url"],
+            //     "twitter_url"       => ["url"],
+            //     "reviews"           => [],
+            //     "placement_address" => [],
+            // ],
             'addFavorite' => [
                 /**
                  * exists parameter : {{ 1 }}/{{ 2 }}/{{ 3 }}/{{ 4 }},{{5}}
@@ -284,6 +315,21 @@ class RequestRules
                 "twitter" => "",
                 "review" => "",
                 "experience.*" => "text"
+            ],
+            'vacancyUpdateFree' => [
+                "description" => "ksespost",
+                "city" => "text",
+                "placementAddress" => "text",
+                "salaryStart" => "text",
+                "salaryEnd" => "text",
+                "sector.*" => "text",
+                "role.*" => "text",
+                "workingHours.*" => "text",
+                "location.*" => "text",
+                "education.*" => "text",
+                "employmentType.*" => "text",
+                "externalUrl" => "",
+                "experience.*" => "text",
             ],
             "userChangeEmail" => [
                 'newEmail' => "email"
