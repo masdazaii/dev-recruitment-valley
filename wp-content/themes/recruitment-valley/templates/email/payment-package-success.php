@@ -454,7 +454,7 @@
                                     letter-spacing: 0.5px;
                                     word-wrap: anywhere;
                                     ">
-                                {{ transcation.numberFormatted }}
+                                {{ transaction.numberFormatted }}
                               </td>
                             </tr>
                             <tr style="margin-bottom: 20px;">
@@ -535,8 +535,8 @@
                             font-style: normal;
                             font-weight: 500;
                             line-height: 24px;
-                            " href="<?= APP_URL; ?>">
-                          Bekijk vacatures
+                            " href="<?= APP_URL; ?>/werkgever/vacatures/add">
+                          Vacature Plaatsen
                           <img style="vertical-align: middle;" src="<?= THEME_URL; ?>/assets/images/chevron-right.png" alt="chevron-right">
                         </a>
                       </td>
