@@ -498,7 +498,7 @@
                                   <tbody>
                                     <tr>
                                       <td style="width: 100px">
-                                        <img height="auto" src="<?= THEME_URL ?>/assets/images/logo-footer.png" style="
+                                        <img height="auto" src="<?= THEME_URL; ?>/assets/images/logo-footer.png" style="
                                               border: 0;
                                               display: block;
                                               outline: none;
@@ -643,7 +643,7 @@
                                     ">
                                   <p style="
                                         font-family: Neue Montreal Medium, Helvetica;
-                                        \font-size: 14px;
+                                        font-size: 14px;
                                         font-style: normal;
                                         font-weight: 500;
                                         line-height: 20px;
@@ -741,7 +741,7 @@
                                                 width: 30px;
                                               ">
                                             <a href="https://www.instagram.com/recruitmentvalley/" target="_blank">
-                                              <img height="30" src="<?= THEME_URL ?>/assets/images/circle-ig.webp" style="
+                                              <img height="30" src="<?= THEME_URL; ?>/assets/images/circle-ig.webp" style="
                                                     border-radius: 20px;
                                                     display: block;
                                                   " width="30" />
@@ -772,7 +772,7 @@
                                                 width: 30px;
                                               ">
                                             <a href="https://twitter.com/recruitvalley" target="_blank">
-                                              <img height="30" src="<?= THEME_URL ?>/assets/images/circle-twitter.webp" style="
+                                              <img height="30" src="<?= THEME_URL; ?>/assets/images/circle-twitter.webp" style="
                                                     border-radius: 20px;
                                                     display: block;
                                                   " width="30" />
@@ -803,7 +803,7 @@
                                                 width: 30px;
                                               ">
                                             <a href="https://www.linkedin.com/company/recruitmentvalley" target="_blank">
-                                              <img height="30" src="<?= THEME_URL ?>/assets/images/circle-linked.webp" style="
+                                              <img height="30" src="<?= THEME_URL; ?>/assets/images/circle-linked.webp" style="
                                                     border-radius: 20px;
                                                     display: block;
                                                   " width="30" />
@@ -834,7 +834,7 @@
                                                 width: 30px;
                                               ">
                                             <a href="https://www.facebook.com/recruitmentvalley" target="_blank">
-                                              <img height="30" src="<?= THEME_URL ?>/assets/images/circle-fb.webp" style="
+                                              <img height="30" src="<?= THEME_URL; ?>/assets/images/circle-fb.webp" style="
                                                     border-radius: 20px;
                                                     display: block;
                                                   " width="30" />
