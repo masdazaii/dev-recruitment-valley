@@ -424,7 +424,7 @@
                                   font-style: normal;
                                   font-weight: 500;
                                   line-height: 52px;">
-                                    {{ price.total }}
+                                    {{ price.totalFormatted }}
                                   </p>
                                 </div>
                               </td>
@@ -454,7 +454,7 @@
                                     letter-spacing: 0.5px;
                                     word-wrap: anywhere;
                                     ">
-                                {{ transaction.number }}
+                                {{ transcation.numberFormatted }}
                               </td>
                             </tr>
                             <tr style="margin-bottom: 20px;">
