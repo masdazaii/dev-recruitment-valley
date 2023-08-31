@@ -813,7 +813,8 @@ class VacancyCrudController
             "salary_start" => $request["salaryStart"],
             "salary_end" => $request["salaryEnd"],
             "external_url" => $request["externalUrl"],
-            "apply_from_this_platform" => isset($request["externalUrl"]) ? true : false,
+            // "apply_from_this_platform" => isset($request["externalUrl"]) ? true : false, // Changed Below
+            "apply_from_this_platform" => (isset($request["externalUrl"]) && $request["externalUrl"] !== '' ? false : true),
             "user_id" => $request["user_id"],
             "taxonomy" => [
                 "sector" => $request["sector"],
@@ -839,7 +840,8 @@ class VacancyCrudController
             "salary_start" => $request["salaryStart"],
             "salary_end" => $request["salaryEnd"],
             "external_url" => $request["externalUrl"],
-            "apply_from_this_platform" => isset($request["externalUrl"]) ? true : false,
+            // "apply_from_this_platform" => isset($request["externalUrl"]) ? true : false, // Changed Below
+            "apply_from_this_platform" => (isset($request["externalUrl"]) && $request["externalUrl"] !== '' ? false : true),
             "user_id" => $request["user_id"],
             "application_process_title" => $request["applicationProcedureTitle"],
             "application_process_description" => $request["applicationProcedureText"],
