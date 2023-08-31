@@ -806,7 +806,7 @@ class VacancyCrudController
     public function createFreeVacancyPayload($request)
     {
         $payload = [
-            "title" => $request["name"],
+            // "title" => $request["name"],
             "placement_city" => $request["city"],
             "placement_address" => $request["placementAddress"],
             "description" => $request["description"],
@@ -833,7 +833,7 @@ class VacancyCrudController
     public function createPaidVacancyPayload($request)
     {
         $payload = [
-            "title" => $request["name"],
+            // "title" => $request["name"],
             "placement_city" => $request["city"],
             "description" => $request["description"],
             "term" => $request["terms"],
