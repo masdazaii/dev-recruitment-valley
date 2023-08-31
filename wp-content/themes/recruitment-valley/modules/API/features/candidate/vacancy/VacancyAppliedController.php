@@ -94,6 +94,8 @@ class VacancyAppliedController
                 ];
             }
     
+            $cv_id = 0;
+
             if (isset($_FILES['cv']) && $_FILES['cv']['error'] === UPLOAD_ERR_OK) {
                 $fileExtension = pathinfo($_FILES['cv']['name'], PATHINFO_EXTENSION);
                 if ($fileExtension != "pdf" && $fileExtension != "jpg" && $fileExtension != "png") {
@@ -113,6 +115,7 @@ class VacancyAppliedController
             $attachment = get_post( $request["cv"] );
             if($attachment)
             {
+                $cv_id = $attachment->ID;
                 update_field('apply_cv', $attachment->ID, $doApply);
             }
     
@@ -133,7 +136,10 @@ class VacancyAppliedController
 
             return [
                 "message"   => $this->_message->get('candidate.apply_vacancy.apply_success'),
-                "status"    => 201
+                "status"    => 201,
+                "cv" => $cv_id,
+                "vacancy_id" => $request["vacancy"],
+                "applicant" => $doApply,
             ];
         } catch (\Throwable $th) {
             $this->wpdb->query('ROLLBACK');
