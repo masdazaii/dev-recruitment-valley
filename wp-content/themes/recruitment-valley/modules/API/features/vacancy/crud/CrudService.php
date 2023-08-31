@@ -134,9 +134,12 @@ class VacancyCrudService
 
         if (!$validator->tempValidate()) {
             $errors = $validator->getErrors();
+            $keys = array_keys($errors);
+            $message = $errors[$keys[0]][0] ?? $this->_message->get('vacancy.update.paid.fail');
             return ResponseHelper::build([
-                'message' => $this->_message->get('vacancy.update.free.fail'),
-                'errors' => $errors,
+                // 'message' => $this->_message->get('vacancy.update.paid.fail'),
+                // 'errors' => $errors,
+                'message' => $message,
                 'status' => 400
             ]);
         }
@@ -162,9 +165,12 @@ class VacancyCrudService
 
         if (!$validator->tempValidate()) {
             $errors = $validator->getErrors();
+            $keys = array_keys($errors);
+            $message = $errors[$keys[0]][0] ?? $this->_message->get('vacancy.update.paid.fail');
             return ResponseHelper::build([
-                'message' => $this->_message->get('vacancy.update.paid.fail'),
-                'errors' => $errors,
+                // 'message' => $this->_message->get('vacancy.update.paid.fail'),
+                // 'errors' => $errors,
+                'message' => $message,
                 'status' => 400
             ]);
         }

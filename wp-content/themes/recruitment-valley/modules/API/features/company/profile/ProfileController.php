@@ -565,7 +565,8 @@ class ProfileController
                 "status" => 200,
                 "message" => "success get company credit",
                 "data" => [
-                    "credit" => $company->getCredit()
+                    "credit" => $company->getCredit(),
+                    "timeExpired" => $company->getUnlimitedExpired() ?? null
                 ]
             ];
         } catch (\Exception $e) {
