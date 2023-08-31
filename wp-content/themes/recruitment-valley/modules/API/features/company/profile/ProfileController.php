@@ -44,7 +44,7 @@ class ProfileController
         }
 
         /** Added line Start here */
-        $image = Helper::isset($user_data_acf, 'ucma_image') ?? [];
+        $image = Helper::isset($user_data_acf, 'ucma_image') ?? null;
         if (!empty($image)) {
             $image = [
                 'id' => $image['ID'],
