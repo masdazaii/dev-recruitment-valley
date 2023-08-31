@@ -355,7 +355,7 @@ class PackageController
                 'price.total' => $transaction->getTotalAmount(),
                 'transaction.number' => $transaction->getTransactionStripeId(),
                 'transaction.package' => $transaction->getPackageName(),
-                'transaction.date'  => $transaction->getDate('j F Y'), // DateHelper::doLocale(strtotime($transaction->getDate()), 'nl_NL', 'j F Y'),
+                'transaction.date'  => DateHelper::doLocale(strtotime($transaction->getDate()), 'nl_NL', 'd MMMM yyyy'), // DateHelper::doLocale(strtotime($transaction->getDate()), 'nl_NL', 'j F Y'),
                 'transcation.numberFormatted' => substr($transaction->getTransactionStripeId(), 15) . "...",
                 'price.totalFormatted' => "€" . number_format($transaction->getTotalAmount(), 2),
                 'transaction.toestand' => $transaction->getStatus()
