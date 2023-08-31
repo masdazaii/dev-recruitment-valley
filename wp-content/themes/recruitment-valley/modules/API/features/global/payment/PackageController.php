@@ -230,7 +230,7 @@ class PackageController
                     "totalPayment" => $transaction->getTotalAmount()
                 ],
                 "status" => $transaction->getStatus(),
-                "date" => $transaction->getDate('j F Y'), // DateHelper::doLocale(strtotime($transaction->getDate()), 'nl_NL', 'j F Y'),
+                "date" =>  DateHelper::doLocale(strtotime($transaction->getDate()), 'nl_NL', 'd MMMM yyyy'),
                 "transactionId" => $transaction->getTransactionId(),
                 "transactionStripeId" => $transaction->getTransactionStripeId()
             ]
