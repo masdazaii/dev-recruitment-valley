@@ -6,6 +6,7 @@ use BD\Emails\Email;
 use Constant\Message;
 use Error;
 use Exception;
+use Helper\DateHelper;
 use Helper\EmailHelper;
 use JWTHelper;
 use Model\Company;
@@ -222,14 +223,14 @@ class PackageController
             "data" => [
                 "package" => [
                     "price" => intval($package->getPrice()),
-                    "credit" => intval($package->getCredit()),
-                    "pricePerCredit" => $package->getPrice() / $package->getCredit(),
+                    "credit" => $package->getCredit(),
+                    "pricePerCredit" => $package->getCredit() == "unlimited" ? "unlimited" : $package->getPrice() / $package->getCredit(),
                     /** Added line start here */
                     "taxAmount" => $transaction->getTaxAmount(),
                     "totalPayment" => $transaction->getTotalAmount()
                 ],
                 "status" => $transaction->getStatus(),
-                "date" => $transaction->getDate("d F Y"),
+                "date" =>  DateHelper::doLocale(strtotime($transaction->getDate()), 'nl_NL', 'd MMMM yyyy'),
                 "transactionId" => $transaction->getTransactionId(),
                 "transactionStripeId" => $transaction->getTransactionStripeId()
             ]
@@ -351,10 +352,13 @@ class PackageController
 
             $args = [
                 'client.name' => $user->display_name,
-                'price.total' => $transaction->getTransactionAmount(),
+                'price.total' => $transaction->getTotalAmount(),
                 'transaction.number' => $transaction->getTransactionStripeId(),
                 'transaction.package' => $transaction->getPackageName(),
-                'transaction.date'  => $transaction->getDate('j F Y'),
+                'transaction.date'  => DateHelper::doLocale(strtotime($transaction->getDate()), 'nl_NL', 'd MMMM yyyy'), // DateHelper::doLocale(strtotime($transaction->getDate()), 'nl_NL', 'j F Y'),
+                'transcation.numberFormatted' => substr($transaction->getTransactionStripeId(), 15) . "...",
+                'price.totalFormatted' => "€" . number_format($transaction->getTotalAmount(), 2),
+                'transaction.toestand' => $transaction->getStatus()
             ];
 
             $site_title = get_bloginfo('name');

@@ -114,7 +114,7 @@ class Transaction
         return $this->setProp($this->transaction_package_id, $packageId);
     }
 
-    public function getDate($format)
+    public function getDate($format = "Y-m-d H:i:s")
     {
         $date = $this->post->post_date;
         $date = date_create($date);
