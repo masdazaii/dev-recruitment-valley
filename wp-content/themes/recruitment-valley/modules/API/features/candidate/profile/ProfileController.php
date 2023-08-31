@@ -374,6 +374,13 @@ class ProfileController
         $user = get_user_by('id', $user_id);
         $body = $request->get_params();
 
+        if ($body["password"] === $body["newPassword"]) {
+            return [
+                "status" => 400,
+                "mesage" => $this->message->get('auth.change_password.match_old_password')
+            ];
+        }
+
         if (!($user && wp_check_password($body["password"], $user->user_pass, $user->ID))) {
             return [
                 "status" => 400,
