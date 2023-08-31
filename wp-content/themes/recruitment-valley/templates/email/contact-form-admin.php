@@ -594,7 +594,7 @@
                                   <tbody>
                                     <tr>
                                       <td style="width: 100px">
-                                        <img height="auto" src="<?= THEME_URL; ?>/assets/images/logo-footer.webp" style="
+                                        <img height="auto" src="<?= THEME_URL; ?>/assets/images/logo-footer.png" style="
                                               border: 0;
                                               display: block;
                                               outline: none;
@@ -739,7 +739,7 @@
                                     ">
                                   <p style="
                                         font-family: Neue Montreal Medium, Helvetica;
-                                        \font-size: 14px;
+                                        font-size: 14px;
                                         font-style: normal;
                                         font-weight: 500;
                                         line-height: 20px;
