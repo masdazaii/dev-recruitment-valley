@@ -99,6 +99,14 @@ class ProfileController
             ];
         }
 
+        /** Check if phone number is already used */
+        if (!$this->_validatePhoneNumber($request)) {
+            return [
+                "status" => 400,
+                "message" => $this->message->get('profile.update.phone.already_exists')
+            ];
+        }
+
         global $wpdb;
         try {
             $wpdb->query('START TRANSACTION');
@@ -223,6 +231,14 @@ class ProfileController
         ]);
 
         if (!$validate['is_valid']) return wp_send_json_error(['validation' => $validate['fields'], 'status' => 400], 400);
+
+        /** Check if phone number is already used */
+        if (!$this->_validatePhoneNumber($request)) {
+            return [
+                "status" => 400,
+                "message" => $this->message->get('profile.update.phone.already_exists')
+            ];
+        }
 
         global $wpdb;
         try {
@@ -377,7 +393,7 @@ class ProfileController
         if ($body["password"] === $body["newPassword"]) {
             return [
                 "status" => 400,
-                "mesage" => $this->message->get('auth.change_password.match_old_password')
+                "message" => $this->message->get('auth.change_password.match_old_password')
             ];
         }
 
@@ -474,5 +490,19 @@ class ProfileController
             "status" => 400,
             "message" => $this->message->get('candidate.profile.delete_cv_not_found')
         ];
+    }
+
+    private function _validatePhoneNumber($request)
+    {
+        $userID = $request['user_id'] ?? $request->user_id;
+        $userWithMeta = get_users([
+            'meta_key' => ['ucaa_phone', 'ucma_phone'],
+            'meta_value' => $request['phoneNumber'],
+            'exclude' => [$userID]
+        ]);
+
+        if (is_array($userWithMeta)) {
+            return count($userWithMeta) > 0 ? false : true;
+        }
     }
 }
