@@ -4,7 +4,7 @@ namespace V\Rules;
 
 use V\Rule;
 
-class MimeRule implements Rule
+class FileMaxSizeRule implements Rule
 {
     public function validate($field, $value, $parameters): bool
     {
@@ -16,18 +16,22 @@ class MimeRule implements Rule
             if (strpos($field, '.*') !== false) {
                 $checkValue = [];
                 foreach ($value as $key => $values) {
-                    $checkValue[$key] = in_array(strtolower($_FILES[$theField][$key]['type']), $parameters);
+                    $checkValue[$key] = $_FILES[$theField][$key]['size'] <= $parameters[0];
                 }
 
                 return in_array(false, $checkValue) ? false : true;
             } else {
-                return in_array(strtolower($_FILES[$theField]['type']), $parameters);
+                return (int)$_FILES[$theField]['size'] <= (int)$parameters[0];
             }
         }
     }
 
     public function getErrorMessage($field, $parameters): string
     {
-        return "{$field} mime-type is not allowed. Allowed mime : " . implode(',', $parameters) . ".";
+        if (strpos($field, '.*') !== false) {
+            return "One of the '" . substr($field, 0, -2) . "' value didn't exists.";
+        } else {
+            return "The {$field} didn't exists.";
+        }
     }
 }
