@@ -100,12 +100,12 @@ class ProfileController
         }
 
         /** Check if phone number is already used */
-        if (!$this->_validatePhoneNumber($request)) {
-            return [
-                "status" => 400,
-                "message" => $this->message->get('profile.update.phone.already_exists')
-            ];
-        }
+        // if (!$this->_validatePhoneNumber($request)) {
+        //     return [
+        //         "status" => 400,
+        //         "message" => $this->message->get('profile.update.phone.already_exists')
+        //     ];
+        // }
 
         global $wpdb;
         try {
@@ -233,12 +233,12 @@ class ProfileController
         if (!$validate['is_valid']) return wp_send_json_error(['validation' => $validate['fields'], 'status' => 400], 400);
 
         /** Check if phone number is already used */
-        if (!$this->_validatePhoneNumber($request)) {
-            return [
-                "status" => 400,
-                "message" => $this->message->get('profile.update.phone.already_exists')
-            ];
-        }
+        // if (!$this->_validatePhoneNumber($request)) {
+        //     return [
+        //         "status" => 400,
+        //         "message" => $this->message->get('profile.update.phone.already_exists')
+        //     ];
+        // }
 
         global $wpdb;
         try {
