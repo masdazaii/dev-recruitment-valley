@@ -42,9 +42,10 @@ class ContactService
         if ($response['status'] !== 200) return;
 
         $args = [
+            'client.name' => $type === "candidate" ? $body['firstName'] : $body['companyName'],
             'contact.firstName' => $type === 'candidate' ? $body['firstName'] : $body['companyName'],
             'contact.lastName'  => $type === 'candidate' ? $body['lastName'] : $body['name'],
-            'contact.phone'  => "(+" . $body['phoneNumberCode'] . ") " . $body['phoneNumber'],
+            'contact.phone'  => "(" . $body['phoneNumberCode'] . ") " . $body['phoneNumber'],
             'contact.email'  => $body['email'],
             'contact.remark'  => $body['message'] ?? "",
         ];
