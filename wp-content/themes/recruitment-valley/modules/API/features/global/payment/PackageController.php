@@ -351,7 +351,7 @@ class PackageController
 
             $args = [
                 'client.name' => $user->display_name,
-                'price.total' => $transaction->getTransactionAmount(),
+                'price.total' => $transaction->getTotalAmount(),
                 'transaction.number' => $transaction->getTransactionStripeId(),
                 'transaction.package' => $transaction->getPackageName(),
                 'transaction.date'  => $transaction->getDate('j F Y'),
