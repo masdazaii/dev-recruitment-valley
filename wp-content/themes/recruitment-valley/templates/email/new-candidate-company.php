@@ -386,6 +386,50 @@
                             vertical-align: top;
                             padding: 32px;
                           ">
+                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="margin-top: 40px;">
+                          <tbody>
+                            <tr>
+                              <td style="
+                                        color: #1F1F1F;
+                                        font-family: Neue Montreal Regular, Helvetica;
+                                        font-size: 16px;
+                                        font-style: normal;
+                                        font-weight: 600;
+                                        line-height: 24px; 
+                                        letter-spacing: 0.5px;
+                                        padding-block: 10px;
+                                    ">Telefonummer</td>
+                              <td style="color: var(--neutral-black, #3A3A3A);
+                                    font-family: Neue Montreal Regular, Helvetica;
+                                    font-size: 16px;
+                                    font-style: normal;
+                                    font-weight: 500;
+                                    line-height: 24px; /* 150% */
+                                    letter-spacing: 0.5px;
+                                    word-wrap: anywhere;
+                                    ">{{ applicant.phoneNumber }}</td>
+                            </tr>
+                            <tr style="margin-bottom: 20px;">
+                              <td style="
+                                    color: #1F1F1F;
+                                    font-family: Neue Montreal Regular, Helvetica;
+                                    font-size: 16px;
+                                    font-style: normal;
+                                    font-weight: 600;
+                                    line-height: 24px; 
+                                    letter-spacing: 0.5px;
+                                    padding-block: 10px;
+                                ">Cover letter</td>
+                              <td style="color: var(--neutral-black, #3A3A3A);
+                                    font-family: Neue Montreal Regular, Helvetica;
+                                    font-size: 16px;
+                                    font-style: normal;
+                                    font-weight: 500;
+                                    line-height: 24px; /* 150% */
+                                    letter-spacing: 0.5px;">{{ applicant.cover_letter }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
                         <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="" width="100%">
                           <tbody>
                             <tr>
@@ -491,7 +535,7 @@
                                   <tbody>
                                     <tr>
                                       <td style="width: 100px">
-                                        <img height="auto" src="<?= THEME_URL ?>/assets/images/logo-footer.png" style="
+                                        <img height="auto" src="<?= THEME_URL; ?>/assets/images/logo-footer.png" style="
                                               border: 0;
                                               display: block;
                                               outline: none;
@@ -636,7 +680,7 @@
                                     ">
                                   <p style="
                                         font-family: Neue Montreal Medium, Helvetica;
-                                        \font-size: 14px;
+                                        font-size: 14px;
                                         font-style: normal;
                                         font-weight: 500;
                                         line-height: 20px;
@@ -734,7 +778,7 @@
                                                 width: 30px;
                                               ">
                                             <a href="https://www.instagram.com/recruitmentvalley/" target="_blank">
-                                              <img height="30" src="<?= THEME_URL ?>/assets/images/circle-ig.webp" style="
+                                              <img height="30" src="<?= THEME_URL; ?>/assets/images/circle-ig.webp" style="
                                                     border-radius: 20px;
                                                     display: block;
                                                   " width="30" />
@@ -765,7 +809,7 @@
                                                 width: 30px;
                                               ">
                                             <a href="https://twitter.com/recruitvalley" target="_blank">
-                                              <img height="30" src="<?= THEME_URL ?>/assets/images/circle-twitter.webp" style="
+                                              <img height="30" src="<?= THEME_URL; ?>/assets/images/circle-twitter.webp" style="
                                                     border-radius: 20px;
                                                     display: block;
                                                   " width="30" />
@@ -796,7 +840,7 @@
                                                 width: 30px;
                                               ">
                                             <a href="https://www.linkedin.com/company/recruitmentvalley" target="_blank">
-                                              <img height="30" src="<?= THEME_URL ?>/assets/images/circle-linked.webp" style="
+                                              <img height="30" src="<?= THEME_URL; ?>/assets/images/circle-linked.webp" style="
                                                     border-radius: 20px;
                                                     display: block;
                                                   " width="30" />
@@ -827,7 +871,7 @@
                                                 width: 30px;
                                               ">
                                             <a href="https://www.facebook.com/recruitmentvalley" target="_blank">
-                                              <img height="30" src="<?= THEME_URL ?>/assets/images/circle-fb.webp" style="
+                                              <img height="30" src="<?= THEME_URL; ?>/assets/images/circle-fb.webp" style="
                                                     border-radius: 20px;
                                                     display: block;
                                                   " width="30" />

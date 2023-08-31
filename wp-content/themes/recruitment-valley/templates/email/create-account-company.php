@@ -634,7 +634,7 @@
                                     ">
                                   <p style="
                                         font-family: Neue Montreal Medium, Helvetica;
-                                        \font-size: 14px;
+                                        font-size: 14px;
                                         font-style: normal;
                                         font-weight: 500;
                                         line-height: 20px;

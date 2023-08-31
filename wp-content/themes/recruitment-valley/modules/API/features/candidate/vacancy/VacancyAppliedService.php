@@ -8,6 +8,7 @@ use BD\Emails\Email;
 use Vacancy\Vacancy;
 use Constant\Message;
 use Helper\ValidationHelper;
+use Model\Applicant;
 
 class VacancyAppliedService
 {
@@ -41,8 +42,11 @@ class VacancyAppliedService
 
         if ($response['status'] === 201 && $params['user_id']) {
             $this->_send_into_candidate($response, $params);
-
             $this->_send_into_company($response, $params);
+
+            unset($response["cv"]);
+            unset($response["vacancy_id"]);
+            unset($response["applicant"]);
         }
 
         // $this->_send_when_success_apply($response, $params);
@@ -87,9 +91,14 @@ class VacancyAppliedService
     {
         $vacancy = new Vacancy($params["vacancy"]);
         $user = get_user_by('id', $vacancy->getAuthor());
+        $applicant = new Applicant($response["applicant"]);
+
+        $attachment = get_attached_file($response['cv']);
 
         $args = [
             'applicant.vacancy.title' => $vacancy->getTitle(),
+            'applicant.phoneNumber'=> $applicant->getPhoneNumberCode() . $applicant->getPhoneNumber(),
+            'applicant.cover_letter'=> $applicant->getCoverLetter()
         ];
 
         $headers = array(
@@ -99,6 +108,6 @@ class VacancyAppliedService
         $content = Email::render_html_email('new-candidate-company.php', $args);
 
         $site_title = get_bloginfo('name');
-        wp_mail($user->user_email, "Bevestiging van sollicitatie - $site_title", $content, $headers);
+        wp_mail($user->user_email, "Bevestiging van sollicitatie - $site_title", $content, $headers, [$attachment]);
     }
 }
