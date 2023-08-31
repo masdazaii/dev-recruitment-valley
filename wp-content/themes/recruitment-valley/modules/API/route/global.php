@@ -10,6 +10,7 @@ use Vacancy\VacancyCrudService;
 use Vacancy\Term\VacancyTermService;
 use Candidate\Profile\FavoriteVacancyService;
 use Global\PackageService;
+use JobAlert\JobAlertService;
 
 class GlobalEndpoint
 {
@@ -33,6 +34,7 @@ class GlobalEndpoint
         $paymentService = new PackageService;
         $optionService = new OptionService;
         $authMiddleware = new AuthMiddleware;
+        $jobAlertService = new JobAlertService;
 
         $endpoint = [
             'path' => '',
@@ -154,6 +156,12 @@ class GlobalEndpoint
                     'methods'               => 'GET',
                     'permission_callback'   => '__return_true',
                     'callback'              => [$termVacancyService, 'testGetAllTerm']
+                ],
+                'Job_alert' => [
+                    'url'                   => '/job-alert',
+                    'methods'               => 'POST',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$jobAlertService, 'jobAlert']
                 ],
             ]
 

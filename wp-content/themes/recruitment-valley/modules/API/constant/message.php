@@ -126,6 +126,8 @@ class Message
                     "delete_cv_success" => __("Candidate CV deleted.", THEME_DOMAIN),
                     "delete_cv_failed" => __("System error, failed to delete candidate CV.", THEME_DOMAIN),
                     "delete_cv_not_found" => __("Candidate didn't have CV uploaded.", THEME_DOMAIN),
+                    "email_alert_success" => __( "Job alert subscription and email sent successfully.", THEME_DOMAIN ),
+                    "email_alert_failed" => __( "Failed to subscribe to job alert or send email.", THEME_DOMAIN ),
                 ],
                 "apply_vacancy" => [
                     "apply_success" => __("Success apply this job.", THEME_DOMAIN),
