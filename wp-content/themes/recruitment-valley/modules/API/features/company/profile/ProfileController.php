@@ -566,7 +566,7 @@ class ProfileController
                         'twitter' => $company->getTwitter(),
                     ],
                     'secondaryEmploymentCondition' => $company->getSecondaryEmploymentCondition() ?? NULL,
-                    'gallery' => $company->getGallery(true)
+                    'gallery' => array_values($company->getGallery(true))
                 ]
             ];
         } catch (\Exception $e) {
