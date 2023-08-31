@@ -386,6 +386,50 @@
                             vertical-align: top;
                             padding: 32px;
                           ">
+                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="margin-top: 40px;">
+                          <tbody>
+                            <tr>
+                              <td style="
+                                        color: #1F1F1F;
+                                        font-family: Neue Montreal Regular, Helvetica;
+                                        font-size: 16px;
+                                        font-style: normal;
+                                        font-weight: 600;
+                                        line-height: 24px; 
+                                        letter-spacing: 0.5px;
+                                        padding-block: 10px;
+                                    ">Telefonummer</td>
+                              <td style="color: var(--neutral-black, #3A3A3A);
+                                    font-family: Neue Montreal Regular, Helvetica;
+                                    font-size: 16px;
+                                    font-style: normal;
+                                    font-weight: 500;
+                                    line-height: 24px; /* 150% */
+                                    letter-spacing: 0.5px;
+                                    word-wrap: anywhere;
+                                    ">{{ applicant.phoneNumber }}</td>
+                            </tr>
+                            <tr style="margin-bottom: 20px;">
+                              <td style="
+                                    color: #1F1F1F;
+                                    font-family: Neue Montreal Regular, Helvetica;
+                                    font-size: 16px;
+                                    font-style: normal;
+                                    font-weight: 600;
+                                    line-height: 24px; 
+                                    letter-spacing: 0.5px;
+                                    padding-block: 10px;
+                                ">Cover letter</td>
+                              <td style="color: var(--neutral-black, #3A3A3A);
+                                    font-family: Neue Montreal Regular, Helvetica;
+                                    font-size: 16px;
+                                    font-style: normal;
+                                    font-weight: 500;
+                                    line-height: 24px; /* 150% */
+                                    letter-spacing: 0.5px;">{{ applicant.cover_letter }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
                         <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="" width="100%">
                           <tbody>
                             <tr>
