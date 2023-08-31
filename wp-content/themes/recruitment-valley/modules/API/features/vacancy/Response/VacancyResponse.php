@@ -51,7 +51,8 @@ class VacancyResponse
                 "thumbnail" => $company->getThumbnail('object'),
                 "description" => StringHelper::shortenString($vacancyModel->getDescription(), 0, 10000),
                 // "postedDate" => date_format(new DateTime($vacancy->post_date_gmt), "Y-m-d H:i A")
-                "postedDate" => DateHelper::doLocale($vacancy->post_date_gmt, 'nl_NL')
+                "postedDate" => DateHelper::doLocale($vacancy->post_date_gmt, 'nl_NL'),
+                "isNew" => date('Y-m-d') === date('Y-m-d', strtotime($vacancy->post_date_gmt))
             ];
         }, $this->vacancyCollection);
 
@@ -118,6 +119,7 @@ class VacancyResponse
                 "term" => $vacancyModel->getTerm(),
             ],
             "city" => $vacancyModel->getCity(),
+            "externalUrl" => $vacancyModel->getExternalUrl(),
             "placementAddress" => $vacancyModel->getPlacementAddress(),
             // "videoId" => $company->getVideoUrl(), // Changed below
             "videoId" => $company->getVideoUrl() ? StringHelper::getYoutubeID($company->getVideoUrl()) : null, // Added Line
@@ -204,7 +206,7 @@ class VacancyResponse
                 "description" => $vacancyModel->getDescription(),
                 "term" => $vacancyModel->getTerm(),
             ],
-            "city" => $vacancyModel->getCity(),
+            "city" => [$vacancyModel->getCity('object')],
             "placementAddress" => $vacancyModel->getPlacementAddress(),
             "videoId" => $company->getVideoUrl(), // Added Line
             "gallery" => $vacancyModel->getGallery(),

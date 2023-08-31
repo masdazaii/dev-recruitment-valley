@@ -78,7 +78,7 @@ class VacancyCrudController
             'working-hours' => isset($request['hoursPerWeek']) && $request['hoursPerWeek'] !== "" ? explode(',', $request['hoursPerWeek']) : NULL,
             'type'          => isset($request['employmentType']) && $request['employmentType'] !== "" ? explode(',', $request['employmentType']) : NULL,
             'location'      => isset($request['location']) && $request['location'] !== "" ? explode(',', $request['location']) : NULL,
-            'experiences'   => isset($request['experience']) && $request['experience'] !== "" ? explode(',', $request['experience']) : NULL,
+            'experiences'   => isset($request['experiences']) && $request['experiences'] !== "" ? explode(',', $request['experiences']) : NULL,
         ];
 
         $offset = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['postPerPage']));
@@ -89,6 +89,15 @@ class VacancyCrudController
             "offset" => $offset,
             "order" => "ASC",
             "post_status" => "publish",
+            "meta_query" => [
+                "relation" => "AND",
+                [
+                    'key' => 'expired_at',
+                    'value' => date("Y-m-d H:i:s"),
+                    'compare' => '>',
+                    'type' => "DATE"
+                ],
+            ],
             'tax_query' => []
         ];
 
@@ -212,10 +221,13 @@ class VacancyCrudController
         if ($filters["radius"]) {
             array_push($args['meta_query'], [
                 'key' => 'distance_from_city',
-                'value' => (int) $filters['radius'],
-                'compare' => '<=',
+                'value' => $filters['radius'],
+                'compare' => '<',
+                "type" => "numeric",
             ]);
         }
+
+
 
         /** Search */
         if (array_key_exists('search', $filters) && $filters['search'] !== '' && isset($filters['search'])) {
@@ -286,7 +298,7 @@ class VacancyCrudController
                 "location" => $request["location"],
                 "education" => $request["education"],
                 "type" => $request["employmentType"],
-                "experiences" => $request["experience"] ?? [], // Added Line
+                "experiences" => $request["experiences"] ?? [], // Added Line
                 "status" => [31] // set free job become pending category
             ],
         ];
@@ -302,7 +314,7 @@ class VacancyCrudController
             $vacancyModel->setProp($vacancyModel->acf_salary_start, $payload["salary_start"]);
             $vacancyModel->setProp($vacancyModel->acf_salary_end, $payload["salary_end"]);
             $vacancyModel->setProp($vacancyModel->acf_apply_from_this_platform, $payload["apply_from_this_platform"]);
-            $vacancyModel->setProp($vacancyModel->acf_expired_at, date("Y-m-d H:i:s"));
+            // $vacancyModel->setProp($vacancyModel->acf_expired_at, date("Y-m-d H:i:s"));
             $vacancyModel->setProp($vacancyModel->acf_placement_address, $payload["placementAddress"]);
 
             if ($payload["apply_from_this_platform"]) {
@@ -367,7 +379,7 @@ class VacancyCrudController
                 "location" => $request["location"],
                 "education" => $request["education"],
                 "type" => $request["employmentType"],
-                "experiences" => $request["experience"] ?? [], // Added Line
+                "experiences" => $request["experiences"] ?? [], // Added Line
                 "status" => [32] // set free job become pending category
             ],
             "application_process_step" => $request["applicationProcedureSteps"],
@@ -550,16 +562,69 @@ class VacancyCrudController
     public function updateFree($request)
     {
         $vacancy_id = $request["vacancy_id"];
-        $vacancyModel = new Vacancy($vacancy_id);
 
-        $payload = $this->createFreeVacancyPayload($request);
+        /** Anggit's syntax start here */
+        // $vacancyModel = new Vacancy($vacancy_id);
 
-        $vacancyModel->setTaxonomy($payload["taxonomy"]);
+        // $payload = $this->createFreeVacancyPayload($request);
 
-        foreach ($payload as $acf_field => $value) {
-            if ($acf_field !== "taxonomy") {
-                $vacancyModel->setProp($acf_field, $value, is_array($value));
+        // $vacancyModel->setTaxonomy($payload["taxonomy"]);
+
+        // foreach ($payload as $acf_field => $value) {
+        //     if ($acf_field !== "taxonomy") {
+        //         $vacancyModel->setProp($acf_field, $value, is_array($value));
+        //     }
+        // }
+
+        // /** Changes start here */
+        // $vacancyModel->setCityLongLat($payload["placement_city"]);
+        // $vacancyModel->setAddressLongLat($payload["placement_address"]);
+        // $vacancyModel->setDistance($payload["placement_city"], $payload["placement_city"] . " " . $payload["placement_address"]);
+
+        // return [
+        //     "status" => 200,
+        //     "message" => $this->_message->get("vacancy.update.free.success")
+        // ];
+
+        /** Changes start here */
+        global $wpdb;
+
+        try {
+            $wpdb->query('START TRANSACTION');
+            $vacancyModel = new Vacancy($vacancy_id);
+
+            $payload = $this->createFreeVacancyPayload($request);
+
+            $vacancyModel->setTaxonomy($payload["taxonomy"]);
+
+            foreach ($payload as $acf_field => $value) {
+                if ($acf_field !== "taxonomy") {
+                    $vacancyModel->setProp($acf_field, $value, is_array($value));
+                }
             }
+
+            /** Changes start here */
+            $vacancyModel->setCityLongLat($payload["placement_city"]);
+            $vacancyModel->setAddressLongLat($payload["placement_address"]);
+            $vacancyModel->setDistance($payload["placement_city"], $payload["placement_city"] . " " . $payload["placement_address"]);
+
+            $wpdb->query('COMMIT');
+        } catch (\Throwable $th) {
+            $wpdb->query('ROLLBACK');
+
+            return [
+                "message" => $this->_message->get("system.overall_failed"),
+                "errors" => $th->getMessage(),
+                "status" => 400,
+            ];
+        } catch (\Exception $e) {
+            $wpdb->query('ROLLBACK');
+
+            return [
+                'message' => $this->_message->get("vacancy.update.free.fail"),
+                'errors' => $e->getMessage(),
+                'status' => 400
+            ];
         }
 
         return [
@@ -613,6 +678,11 @@ class VacancyCrudController
                     $vacancyGallery[] = wp_insert_attachment($gallery['attachment'], $gallery['file']);
                 }
             }
+
+            /** Changes start here */
+            $vacancyModel->setCityLongLat($payload["placement_city"]);
+            $vacancyModel->setAddressLongLat($payload["placement_address"]);
+            $vacancyModel->setDistance($payload["placement_city"], $payload["placement_city"] . " " . $payload["placement_address"]);
 
             $wpdb->query('COMMIT');
 
@@ -701,7 +771,7 @@ class VacancyCrudController
                     "location" => $request["location"],
                     "education" => $request["education"],
                     "type" => $request["employmentType"],
-                    "experiences" => $request["experience"] ?? [], // Added Line
+                    "experiences" => $request["experiences"] ?? [], // Added Line
                     "status" => [32] // set free job become pending category
                 ],
                 "application_process_step" => $request["applicationProcedureSteps"],
@@ -737,6 +807,8 @@ class VacancyCrudController
     {
         $payload = [
             "title" => $request["name"],
+            "placement_city" => $request["city"],
+            "placement_address" => $request["placementAddress"],
             "description" => $request["description"],
             "salary_start" => $request["salaryStart"],
             "salary_end" => $request["salaryEnd"],
@@ -761,6 +833,7 @@ class VacancyCrudController
     {
         $payload = [
             "title" => $request["name"],
+            "placement_city" => $request["city"],
             "description" => $request["description"],
             "term" => $request["terms"],
             "salary_start" => $request["salaryStart"],
@@ -784,7 +857,7 @@ class VacancyCrudController
                 "location" => $request["location"],
                 "education" => $request["education"],
                 "type" => $request["employmentType"],
-                "experiences" => $request["experience"] ?? [], // Added Line
+                "experiences" => $request["experiences"] ?? [], // Added Line
             ],
             "application_process_step" => $request["applicationProcedureSteps"],
         ];

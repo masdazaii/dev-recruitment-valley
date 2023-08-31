@@ -283,7 +283,7 @@ class Vacancy
         return $this->getProp($this->acf_twitter_url);
     }
 
-    public function getGallery( $properties = ["id", "title" , "url"]  )
+    public function getGallery($properties = ["id", "title", "url"])
     {
         $galleries = $this->getProp($this->acf_gallery);
         $result = [];
@@ -294,15 +294,23 @@ class Vacancy
                 $single[$property] = $gallery[$property];
             }
 
-            array_push($result,$single);
+            array_push($result, $single);
         }
 
         return $result;
     }
 
-    public function getCity()
+    // public function getCity() // Changed below
+    public function getCity($result = 'default')
     {
-        return $this->getProp($this->acf_placement_city);
+        if ($result === 'object') {
+            return [
+                "label" => $this->getProp($this->acf_placement_city),
+                "value" => $this->getProp($this->acf_placement_city),
+            ];
+        } else {
+            return $this->getProp($this->acf_placement_city);
+        }
     }
 
     public function getCountry()
@@ -393,9 +401,9 @@ class Vacancy
         return $result;
     }
 
-    public function getSocialMedia( $socialMedia )
+    public function getSocialMedia($socialMedia)
     {
-        return $this->getProp($socialMedia. "_url");
+        return $this->getProp($socialMedia . "_url");
     }
 
     public function getSalaryEnd()
@@ -405,7 +413,7 @@ class Vacancy
 
     public function getExternalUrl()
     {
-        return $this->getProp($this->acf_external_url);
+        return $this->getProp($this->acf_external_url) ?? null;
     }
 
     public function getExpiredAt($format = "Y-m-d H:i:s")
@@ -563,27 +571,27 @@ class Vacancy
         return get_page_by_path($slug, OBJECT, 'vacancy');
     }
 
-    public function setCityLongLat( string $city )
+    public function setCityLongLat(string $city)
     {
-        $coordinat = Maphelper::generateLongLat( $city );
-        $this->setProp( $this->acf_city_latitude, $coordinat["lat"] );
-        $this->setProp( $this->acf_city_longitude, $coordinat["long"] );
+        $coordinat = Maphelper::generateLongLat($city);
+        $this->setProp($this->acf_city_latitude, $coordinat["lat"]);
+        $this->setProp($this->acf_city_longitude, $coordinat["long"]);
     }
 
-    public function setAddressLongLat( string $address )
+    public function setAddressLongLat(string $address)
     {
-        $coordinat = Maphelper::generateLongLat( $address );
-        $this->setProp( $this->acf_placement_address_latitude, $coordinat["lat"] );
-        $this->setProp( $this->acf_placement_address_longitude, $coordinat["long"] );
+        $coordinat = Maphelper::generateLongLat($address);
+        $this->setProp($this->acf_placement_address_latitude, $coordinat["lat"]);
+        $this->setProp($this->acf_placement_address_longitude, $coordinat["long"]);
     }
 
-    public function setDistance( $city, $placementAddress )
+    public function setDistance($city, $placementAddress)
     {
-        $cityCoordinat = $coordinat = Maphelper::generateLongLat( $city );
-        $placementAddressCoordinat = Maphelper::generateLongLat( $placementAddress );
+        $cityCoordinat = $coordinat = Maphelper::generateLongLat($city);
+        $placementAddressCoordinat = Maphelper::generateLongLat($placementAddress);
 
         $distance = Maphelper::calculateDistance($cityCoordinat, $placementAddressCoordinat);
-        
+
         return $this->setProp($this->acf_distance_from_city, $distance);
     }
 }

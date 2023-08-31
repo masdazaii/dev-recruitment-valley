@@ -222,8 +222,8 @@ class PackageController
             "data" => [
                 "package" => [
                     "price" => intval($package->getPrice()),
-                    "credit" => intval($package->getCredit()),
-                    "pricePerCredit" => $package->getPrice() / $package->getCredit(),
+                    "credit" => $package->getCredit(),
+                    "pricePerCredit" => $package->getCredit() == "unlimited" ? "unlimited" : $package->getPrice() / $package->getCredit(),
                     /** Added line start here */
                     "taxAmount" => $transaction->getTaxAmount(),
                     "totalPayment" => $transaction->getTotalAmount()
@@ -351,13 +351,13 @@ class PackageController
 
             $args = [
                 'client.name' => $user->display_name,
-                'price.total' => $transaction->getTransactionAmount(),
+                'price.total' => $transaction->getTotalAmount(),
                 'transaction.number' => $transaction->getTransactionStripeId(),
                 'transaction.package' => $transaction->getPackageName(),
                 'transaction.date'  => $transaction->getDate('j F Y'),
                 'transcation.numberFormatted' => substr($transaction->getTransactionStripeId(), 15) . "...",
-                'price.totalFormatted' => "€" . number_format($transaction->getTransactionAmount(), 2)
-
+                'price.totalFormatted' => "€" . number_format($transaction->getTransactionAmount(), 2),
+                'transaction.toestand' => $transaction->getStatus()
             ];
 
             $site_title = get_bloginfo('name');
