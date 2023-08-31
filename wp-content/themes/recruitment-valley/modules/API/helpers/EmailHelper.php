@@ -33,10 +33,10 @@ class EmailHelper
         wp_mail($receipient, $subject, $output, $headers);
     }
 
-    public static function sendPaymentConfirmation( $transactionId )
+    public static function sendPaymentConfirmation($transactionId)
     {
         try {
-            $transaction = new Transaction( $transactionId );
+            $transaction = new Transaction($transactionId);
 
             $companyId = $transaction->getUserId();
 
@@ -45,7 +45,7 @@ class EmailHelper
             $packageId = $transaction->getPackageId();
 
             $company = new Company($companyId);
-            $package = new Package( $packageId );
+            $package = new Package($packageId);
 
             $args = [
                 "company.contactPerson" => $company->getEmail(),
@@ -59,9 +59,9 @@ class EmailHelper
                 'Content-Type: text/html; charset=UTF-8',
             );
 
-            wp_mail($company->getEmail(), "payment confirmation - $site_title", $content, $headers);
+            wp_mail($company->getEmail(), "Betalingsbevestiging - $site_title", $content, $headers);
         } catch (Exception $e) {
-            error_log( $e->getMessage());
+            error_log($e->getMessage());
         }
     }
 }
