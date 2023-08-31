@@ -68,6 +68,9 @@ class Message
                     'cv' => [
                         "success" =>  __("CV updated successfully", THEME_DOMAIN)
                     ],
+                    'phone' => [
+                        "already_exists" => __("Phone number already used.", THEME_DOMAIN)
+                    ]
                 ],
             ],
             'input' => [
