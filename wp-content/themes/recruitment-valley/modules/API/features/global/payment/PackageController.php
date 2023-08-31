@@ -6,6 +6,7 @@ use BD\Emails\Email;
 use Constant\Message;
 use Error;
 use Exception;
+use Helper\DateHelper;
 use Helper\EmailHelper;
 use JWTHelper;
 use Model\Company;
@@ -229,7 +230,7 @@ class PackageController
                     "totalPayment" => $transaction->getTotalAmount()
                 ],
                 "status" => $transaction->getStatus(),
-                "date" => $transaction->getDate("d F Y"),
+                "date" =>  DateHelper::doLocale(strtotime($transaction->getDate()), 'nl_NL', 'd MMMM yyyy'),
                 "transactionId" => $transaction->getTransactionId(),
                 "transactionStripeId" => $transaction->getTransactionStripeId()
             ]
@@ -354,9 +355,9 @@ class PackageController
                 'price.total' => $transaction->getTotalAmount(),
                 'transaction.number' => $transaction->getTransactionStripeId(),
                 'transaction.package' => $transaction->getPackageName(),
-                'transaction.date'  => $transaction->getDate('j F Y'),
+                'transaction.date'  => DateHelper::doLocale(strtotime($transaction->getDate()), 'nl_NL', 'd MMMM yyyy'), // DateHelper::doLocale(strtotime($transaction->getDate()), 'nl_NL', 'j F Y'),
                 'transcation.numberFormatted' => substr($transaction->getTransactionStripeId(), 15) . "...",
-                'price.totalFormatted' => "€" . number_format($transaction->getTransactionAmount(), 2),
+                'price.totalFormatted' => "€" . number_format($transaction->getTotalAmount(), 2),
                 'transaction.toestand' => $transaction->getStatus()
             ];
 

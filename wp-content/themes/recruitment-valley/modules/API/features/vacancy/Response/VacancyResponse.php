@@ -125,6 +125,8 @@ class VacancyResponse
             "videoId" => $company->getVideoUrl() ? StringHelper::getYoutubeID($company->getVideoUrl()) : null, // Added Line
             "gallery" => $vacancyModel->getGallery(),
             "reviews" => $vacancyModel->getReviews(),
+            "applicationProcessTitle" => $vacancyModel->getApplicationProcessTitle(),
+            "applicationProcessDescription" => $vacancyModel->getApplicationProcessDescription(),
             "steps" => $vacancyModel->getApplicationProcessStep(),
             "salaryStart" => $vacancyModel->getSalaryStart(),
             "salaryEnd" => $vacancyModel->getSalaryEnd(),
