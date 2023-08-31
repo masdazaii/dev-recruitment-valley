@@ -132,7 +132,12 @@ class VacancyResponse
             "salaryEnd" => $vacancyModel->getSalaryEnd(),
             // "postedDate" => $vacancyModel->getPublishDate("Y-m-d H:i A"),
             "postedDate" => $vacancyModel->getPublishDate("d-m-Y H:i"),
-            "expiredDate" => $vacancyModel->getExpiredAt("d-m-Y H:i")
+            "expiredDate" => $vacancyModel->getExpiredAt("d-m-Y H:i"),
+            "applicationProcedure" => [
+                "title" => $vacancyModel->getApplicationProcessTitle(),
+                "text" => $vacancyModel->getApplicationProcessDescription(),
+                "steps" => $vacancyModel->getApplicationProcessStep()
+            ]
         ];
 
         // $formattedResponse = get_field($vacancyModel->acf_application_process_step,$this->vacancyCollection->ID);
