@@ -578,7 +578,6 @@
                     vertical-align: top;
                     width: 100%;
                   ">
-
                 <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%">
                   <tbody>
                     <tr>
@@ -598,7 +597,7 @@
                                   <tbody>
                                     <tr>
                                       <td style="width: 100px">
-                                        <img height="auto" src="<?= THEME_URL; ?>/assets/images/logo-footer.webp" style="
+                                        <img height="auto" src="<?= THEME_URL; ?>/assets/images/logo-footer.png" style="
                                               border: 0;
                                               display: block;
                                               outline: none;
@@ -743,7 +742,7 @@
                                     ">
                                   <p style="
                                         font-family: Neue Montreal Medium, Helvetica;
-                                        \font-size: 14px;
+                                        font-size: 14px;
                                         font-style: normal;
                                         font-weight: 500;
                                         line-height: 20px;
