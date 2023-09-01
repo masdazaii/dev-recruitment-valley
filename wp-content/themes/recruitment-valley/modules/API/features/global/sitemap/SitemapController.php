@@ -224,10 +224,10 @@ class SitemapController
                 [
                     'label' => 'Vacancy',
                     'count' => 0,
-                    'data'  => $vacancies,
+                    'data'  => $vacancies['data'],
                     'meta'  => [
-                        'page' => 1,
-                        'perPage' => 2
+                        'page' => $vacancies['page'],
+                        'perPage' => $vacancies['perPage']
                     ],
                     'sortParams' => [
                         [
