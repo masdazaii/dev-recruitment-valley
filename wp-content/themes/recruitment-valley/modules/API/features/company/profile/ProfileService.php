@@ -47,9 +47,12 @@ class ProfileService
 
         if (!$validator->tempValidate()) {
             $errors = $validator->getErrors();
+            $keys = array_keys($errors);
+            $message = $errors[$keys[0]][0] ?? $this->_message->get('company.profile.update_failed');
             return ResponseHelper::build([
-                'message' => $this->_message->get('company.profile.update_failed'),
-                'errors' => $errors,
+                // 'message' => $this->_message->get('company.profile.update_failed'),
+                // 'errors' => $errors,
+                'message' => $message,
                 'status' => 400
             ]);
         }
@@ -81,9 +84,12 @@ class ProfileService
 
         if (!$validator->tempValidate()) {
             $errors = $validator->getErrors();
+            $keys = array_keys($errors);
+            $message = $errors[$keys[0]][0] ?? $this->_message->get('company.profile.setup_invalid');
             return ResponseHelper::build([
-                'message' => $this->_message->get('company.profile.setup_invalid'),
-                'errors' => $errors,
+                // 'message' => $this->_message->get('company.profile.setup_invalid'),
+                // 'errors' => $errors,
+                'message' => $message,
                 'status' => 400
             ]);
         }

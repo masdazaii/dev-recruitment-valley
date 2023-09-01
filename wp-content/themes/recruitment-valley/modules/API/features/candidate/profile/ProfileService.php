@@ -57,9 +57,12 @@ class ProfileService
 
         if (!$validator->tempValidate()) {
             $errors = $validator->getErrors();
+            $keys = array_keys($errors);
+            $message = $errors[$keys[0]][0] ?? $this->_message->get('candidate.change_email_request.invalid');
             return ResponseHelper::build([
-                'message' => $this->_message->get('candidate.change_email_request.invalid'),
-                'errors' => $errors,
+                // 'message' => $this->_message->get('candidate.change_email_request.invalid'),
+                // 'errors' => $errors,
+                'message' => $message,
                 'status' => 400
             ]);
         }
