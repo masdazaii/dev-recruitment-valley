@@ -10,6 +10,7 @@ use Vacancy\VacancyCrudService;
 use Vacancy\Term\VacancyTermService;
 use Candidate\Profile\FavoriteVacancyService;
 use Global\PackageService;
+use Global\User\UserService;
 
 class GlobalEndpoint
 {
@@ -33,6 +34,7 @@ class GlobalEndpoint
         $paymentService = new PackageService;
         $optionService = new OptionService;
         $authMiddleware = new AuthMiddleware;
+        $userService = new UserService;
 
         $endpoint = [
             'path' => '',
@@ -109,6 +111,12 @@ class GlobalEndpoint
                     'methods'               => 'GET',
                     'permission_callback'   => [$authMiddleware, 'authorize_company'],
                     'callback'              => [$paymentService, 'show']
+                ],
+                'delete_account' => [
+                    'url'                   => '/account/delete',
+                    'methods'               => 'DELETE',
+                    'permission_callback'   => [$authMiddleware, 'check_token'],
+                    'callback'              => [$userService, 'deleteAccount']
                 ],
 
                 // 'get_sector_term' => [
