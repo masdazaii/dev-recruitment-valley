@@ -49,6 +49,9 @@ class SitemapController
                 case 'id':
                     $filters['orderBy'] = 'ID';
                     break;
+                case 'title':
+                    $filters['orderBy'] = 'title';
+                    break;
                 case 'date':
                 case 'post_date':
                     $filters['orderBy'] = 'date';
@@ -217,6 +220,16 @@ class SitemapController
                     'meta'  => [
                         'page' => 1,
                         'perPage' => 2
+                    ],
+                    'sortParams' => [
+                        [
+                            'label' => 'Title',
+                            'value' => 'title'
+                        ],
+                        [
+                            'label' => 'Post Date',
+                            'value' => 'date'
+                        ]
                     ]
                 ],
                 [
@@ -226,6 +239,16 @@ class SitemapController
                     'meta'  => [
                         'page' => $companies['page'],
                         'perPage' => $companies['perPage']
+                    ],
+                    'sortParams' => [
+                        [
+                            'label' => 'Company Name',
+                            'value' => 'name'
+                        ],
+                        [
+                            'label' => 'Registered Date',
+                            'value' => 'registered'
+                        ]
                     ]
                 ],
                 // [
