@@ -59,6 +59,50 @@ class UserController
         }
     }
 
+    public function deleteAccountPermanent(WP_REST_Request $request)
+    {
+
+        $userId = $request->user_id;
+        $request = $request->get_params();
+        $userPassword = $request["password"];
+
+        $user = get_user_by( "id", $userId );
+        if(!$user)
+        {
+            return [
+                "status" => 400, 
+                "message" => $this->_message->get("profile.delete.user_not_found"),
+            ];
+        }
+
+        if(UserHelper::is_deleted($user->ID))
+        {
+            return [
+                "status" => 400, 
+                "message" => $this->_message->get("profile.user_deleted"),
+            ];
+        }
+
+        $samePassword = wp_check_password( $userPassword, $user->user_pass, $user->ID );
+        if(!$samePassword)
+        {
+            return [
+                "status" => 400, 
+                "message" => $this->_message->get("profile.delete.password_missmatch"),
+            ];
+        }
+
+        
+        require_once(ABSPATH.'wp-admin/includes/user.php');
+        wp_delete_user($userId);
+
+        return [
+            "status" => 200, 
+            "message" => "Successfully delete user with id {$userId}",
+        ];
+
+    }
+
     public function deleteAccount( WP_REST_Request $request )
     {
         $userId = $request->user_id;

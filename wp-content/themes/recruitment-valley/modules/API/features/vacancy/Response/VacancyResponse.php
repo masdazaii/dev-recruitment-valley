@@ -82,6 +82,15 @@ class VacancyResponse
             ];
         }
 
+        $jobVideo = $vacancyModel->getVideoUrl();
+        $videoUrl = "";
+        if($jobVideo != "")
+        {
+            $videoUrl = strpos($vacancyModel->getVideoUrl(), "youtu") ? StringHelper::getYoutubeID($vacancyModel->getVideoUrl()) : $vacancyModel->getVideoUrl(); // Added Line
+        }else{
+            $videoUrl = strpos($company->getVideoUrl(), "youtu") ? StringHelper::getYoutubeID($company->getVideoUrl()) : $company->getVideoUrl(); // Added Line
+        }
+
         $formattedResponse = [
             "id" => $this->vacancyCollection->ID,
             "isPaid" => $vacancyModel->getIsPaid(),
@@ -122,7 +131,7 @@ class VacancyResponse
             "externalUrl" => $vacancyModel->getExternalUrl(),
             "placementAddress" => $vacancyModel->getPlacementAddress(),
             // "videoId" => $company->getVideoUrl(), // Changed below
-            "videoId" => $company->getVideoUrl() ? StringHelper::getYoutubeID($company->getVideoUrl()) : null, // Added Line
+            "videoId" => $videoUrl,
             "gallery" => $vacancyModel->getGallery(),
             "reviews" => $vacancyModel->getReviews(),
             "applicationProcessTitle" => $vacancyModel->getApplicationProcessTitle(),

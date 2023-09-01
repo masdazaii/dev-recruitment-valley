@@ -130,7 +130,7 @@ class Vacancy
 
     public function setVideoUrl($video_url)
     {
-        $this->video_url = $video_url;
+        return $this->setProp($this->acf_video_url, $video_url);
     }
 
     public function setFacebookUrl($facebook_url)
@@ -589,5 +589,166 @@ class Vacancy
         $distance = Maphelper::calculateDistance($cityCoordinat, $placementAddressCoordinat);
 
         return $this->setProp($this->acf_distance_from_city, $distance);
+    }
+
+    /**
+     * Get All Vacancies function
+     *
+     * @param array $filters
+     * @param array $taxonomyFilters
+     * @param array $args -> wp_query arguments
+     * @return void
+     */
+    public function getAllVacancies($filters = [], $taxonomyFilters = [], $args = [])
+    {
+        $args = $this->_setArguments($args, $filters, $taxonomyFilters = []);
+        $vacancies = new WP_Query($args);
+
+        return $vacancies;
+    }
+
+    private function _setArguments($args, $filters, $taxonomyFilters)
+    {
+        if (empty($args)) {
+            $args = [
+                "post_type" => $this->vacancy,
+                "posts_per_page" => $filters['postPerPage'] ?? -1,
+                "offset" => $filters['offset'] ?? 0,
+                "orderBy" => $filters['orderBy'] ?? "date",
+                "order" => $filters['sort'] ?? "DESC",
+                "post_status" => "publish",
+                "meta_query" => [
+                    "relation" => "AND",
+                    [
+                        'key' => 'expired_at',
+                        'value' => date("Y-m-d H:i:s"),
+                        'compare' => '>',
+                        'type' => "DATE"
+                    ],
+                ],
+                "tax_query" => [
+                    "relation" => 'AND',
+                    [
+                        'taxonomy' => 'status',
+                        'field'     => 'slug',
+                        'terms'     => 'open',
+                        'compare'  => 'IN'
+                    ]
+                ]
+            ];
+        }
+
+        /** Set tax_query */
+        if (!empty($taxonomyFilters)) {
+            foreach ($taxonomyFilters as $key => $value) {
+                if ($value && $value !== null && !empty($value)) {
+                    $args['tax_query'][1]['relation'] = 'OR';
+
+                    array_push($args['tax_query'][1], [
+                        'taxonomy' => $key,
+                        'field'    => 'term_id',
+                        'terms'    => $value,
+                        'compare'  => 'IN'
+                    ]);
+                }
+            }
+        }
+
+        /** Set meta query */
+        // If salaryStart and salaryEnd exist + more than 0
+        if (array_key_exists('salaryStart', $filters) || array_key_exists('salaryEnd', $filters)) {
+            if ($filters['salaryStart'] >= 0 && $filters['salaryStart'] >= 0 && $filters['salaryEnd'] !== null && $filters['salaryEnd'] > 0) {
+                if (!array_key_exists('meta_query', $args)) {
+                    $args['meta_query'] = [
+                        "relation" => 'OR'
+                    ];
+                }
+
+                array_push($args['meta_query'], [
+                    'relation' => 'AND',
+                    [
+                        'key' => 'salary_start',
+                        'value' => $filters['salaryStart'],
+                        'type' => 'NUMERIC',
+                        'compare' => '>=',
+                    ],
+                    [
+                        'key' => 'salary_end',
+                        'value' => $filters['salaryEnd'],
+                        'type' => 'NUMERIC',
+                        'compare' => '<=',
+                    ],
+                ]);
+                array_push($args['meta_query'], [
+                    'relation' => 'AND',
+                    [
+                        'key' => 'salary_start',
+                        'value' => [$filters['salaryStart'], $filters['salaryEnd']],
+                        'type' => 'NUMERIC',
+                        'compare' => 'BETWEEN',
+                    ],
+                    [
+                        'key' => 'salary_end',
+                        'value' => $filters['salaryEnd'],
+                        'type' => 'NUMERIC',
+                        'compare' => '<=',
+                    ],
+                ]);
+            } else if ($filters['salaryStart'] >= 0 || $filters['salaryEnd'] >= 0) { // if only one of them is filled
+                if (!array_key_exists('meta_query', $args)) {
+                    $args['meta_query'] = [
+                        "relation" => 'AND'
+                    ];
+                }
+
+                if ($filters['salaryStart'] >= 0 && $filters['salaryEnd'] === null) { // if start is filled but other is empty
+                    array_push($args['meta_query'], [
+                        'key' => 'salary_start',
+                        'value' => $filters['salaryStart'],
+                        'type' => 'NUMERIC',
+                        'compare' => '>=',
+                    ]);
+                    array_push($args['meta_query'], [
+                        'key' => 'salary_end',
+                        'value' => $filters['salaryStart'],
+                        'type' => 'NUMERIC',
+                        'compare' => '>=',
+                    ]);
+                } else if ($filters['salaryEnd'] !== null) { // vice versa
+                    array_push($args['meta_query'], [
+                        'key' => 'salary_start',
+                        'value' => $filters['salaryEnd'],
+                        'type' => 'NUMERIC',
+                        'compare' => '<=',
+                    ]);
+                    array_push($args['meta_query'], [
+                        'key' => 'salary_end',
+                        'value' => $filters['salaryEnd'],
+                        'type' => 'NUMERIC',
+                        'compare' => '<=',
+                    ]);
+                }
+            }
+        }
+
+        // filter by city
+        if (array_key_exists('city', $filters) && $filters["city"]) {
+            array_push($args['meta_query'], [
+                'key' => 'placement_city',
+                'value' => $filters['city'],
+                'compare' => '=',
+            ]);
+        }
+
+        if (array_key_exists('radius', $filters) && $filters["radius"]) {
+            array_push($args['meta_query'], [
+                'key' => 'distance_from_city',
+                'value' => $filters['radius'],
+                'compare' => '<',
+                "type" => "numeric",
+            ]);
+        }
+
+        return $args;
     }
 }
