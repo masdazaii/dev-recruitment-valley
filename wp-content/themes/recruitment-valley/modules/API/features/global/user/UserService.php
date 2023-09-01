@@ -66,4 +66,10 @@ class UserService
         $response = $this->userController->deleteAccount( $request );
         return ResponseHelper::build( $response );
     }
+
+    public function deleteAccountPermanent( WP_REST_Request $request )
+    {
+        $response = $this->userController->deleteAccountPermanent( $request );
+        return ResponseHelper::build( $response );
+    }
 }

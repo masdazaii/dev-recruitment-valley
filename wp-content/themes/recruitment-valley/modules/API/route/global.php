@@ -114,11 +114,18 @@ class GlobalEndpoint
                     'permission_callback'   => [$authMiddleware, 'authorize_company'],
                     'callback'              => [$paymentService, 'show']
                 ],
-                'delete_account' => [
-                    'url'                   => '/account/delete',
+                'deactivate' => [
+                    'url'                   => '/account/deactivate',
                     'methods'               => 'DELETE',
                     'permission_callback'   => [$authMiddleware, 'check_token'],
                     'callback'              => [$userService, 'deleteAccount']
+                ],
+
+                'delete_account_permanent' => [
+                    'url'                   => '/account/delete',
+                    'methods'               => 'DELETE',
+                    'permission_callback'   => [$authMiddleware, 'check_token'],
+                    'callback'              => [$userService, 'deleteAccountPermanent']
                 ],
 
                 // 'get_sector_term' => [
