@@ -38,6 +38,12 @@ class SitemapEndpoint
                 //     'permission_callback'   => '__return_true',
                 //     'callback'              => [$sitemapService, 'getCompanies']
                 // ],
+                // 'vacancy' => [
+                //     'url'                   => '/vacancies',
+                //     'methods'               => 'GET',
+                //     'permission_callback'   => '__return_true',
+                //     'callback'              => [$sitemapService, 'getVacancies']
+                // ],
                 // 'event' => [
                 //     'url'                   => '/events',
                 //     'methods'               => 'GET',

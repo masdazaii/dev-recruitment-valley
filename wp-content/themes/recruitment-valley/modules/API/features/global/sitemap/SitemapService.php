@@ -40,6 +40,14 @@ class SitemapService
         ]);
     }
 
+    public function getVacancies(WP_REST_Request $request)
+    {
+        $params = $request->get_params();
+        $response = $this->sitemapController->getVacancy($params);
+
+        return ResponseHelper::build($response);
+    }
+
     public function getEvents(WP_REST_Request $request)
     {
         return ResponseHelper::build([
