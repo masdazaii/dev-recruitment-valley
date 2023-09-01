@@ -444,6 +444,8 @@ class VacancyCrudController
             {
                 $video = ModelHelper::handle_upload('video' );
                 $vacancyModel->setVideoUrl($video["video"]["url"]);
+            }else{
+                $vacancyModel->setVideoUrl($payload["video_url"]);
             }
 
             $vacancyGallery = $galleryIds ?? [];
@@ -665,6 +667,14 @@ class VacancyCrudController
                         return explode('-', $gallery)[0];
                     }, $request['galleryCompany']);
                 }
+            }
+
+            if(isset($_FILES['video']['name']))
+            {
+                $video = ModelHelper::handle_upload('video' );
+                $vacancyModel->setVideoUrl($video["video"]["url"]);
+            }else{
+                $vacancyModel->setVideoUrl($payload["video_url"]);
             }
 
             $vacancyGallery = $galleryIds ?? [];
