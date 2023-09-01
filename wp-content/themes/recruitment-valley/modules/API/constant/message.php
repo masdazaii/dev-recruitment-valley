@@ -15,10 +15,12 @@ class Message
                 'expired' => __('Expired', THEME_DOMAIN),
                 'generate_token_success' => __('Success generating token', THEME_DOMAIN),
                 'generate_token_error' => __('Something error when generating token', THEME_DOMAIN),
+                'user_deleted' => __('User was not active', THEME_DOMAIN),
                 'forgot_password' => [
                     "required_email" => __('Email was required', THEME_DOMAIN),
                     "email_sent" => __('Email already sent', THEME_DOMAIN),
                     "email_not_sent" => __('Email wasnt sent', THEME_DOMAIN),
+                    "failed" => __('Failed making forgot password request.', THEME_DOMAIN)
                 ],
                 "reset_password" => [
                     "new_password_required" => __("New Password required", THEME_DOMAIN),
@@ -29,7 +31,9 @@ class Message
                     'success' => __("success reset password", THEME_DOMAIN),
                 ],
                 "change_password" => [
-                    "match_old_password" => __("Your new password can not be same as old password", THEME_DOMAIN)
+                    "match_old_password" => __("Your new password can not be same as old password", THEME_DOMAIN),
+                    "password_not_match" => __("New password missmatch.", THEME_DOMAIN),
+                    "success" => __("Success, password changed", THEME_DOMAIN)
                 ],
                 'not_found_user' => __("User was not found", THEME_DOMAIN),
                 'unfinish_registration' => __("Unfinished registration.", THEME_DOMAIN),
@@ -38,6 +42,8 @@ class Message
                 'login_success' => __("Login succes.", THEME_DOMAIN),
                 'logout_success' => __("User logged out succesfully.", THEME_DOMAIN),
                 'token_not_provided' => __("Token is not provided.", THEME_DOMAIN),
+                'incorrect_password' => __("Incorrect password.", THEME_DOMAIN),
+                'login_failed' => __("Login Failed", THEME_DOMAIN),
             ],
             'registration' => [
                 'email_required' => __("Email is required.", THEME_DOMAIN),
@@ -72,6 +78,12 @@ class Message
                         "already_exists" => __("Phone number already used.", THEME_DOMAIN)
                     ]
                 ],
+                'delete' => [
+                    "success" => __("Success delete account", THEME_DOMAIN),
+                    "fail" => __("Fail delete account", THEME_DOMAIN),
+                    "user_not_found" => __("User not found", THEME_DOMAIN),
+                    "password_missmatch" => __("Password missmatch", THEME_DOMAIN)
+                ]
             ],
             'input' => [
                 'invalid_input'   => __("Input is invalid.", THEME_DOMAIN),
@@ -139,6 +151,8 @@ class Message
                     "apply_success" => __("Success apply this job.", THEME_DOMAIN),
                     "apply_failed" => __("Failed apply this job.", THEME_DOMAIN),
                     "expired_job" => __("Cannot apply, the job was expired", THEME_DOMAIN),
+                    "already_apply" => __("You already apply to this job.", THEME_DOMAIN),
+                    "cv_filetype_not_support" => __("Filetype not supported.", THEME_DOMAIN)
                 ],
                 "favorite" => [
                     "vacancy_not_found" => __("Vacancy not found.", THEME_DOMAIN),
@@ -179,6 +193,10 @@ class Message
                     "update_detail_success" => __("Success update company profile", THEME_DOMAIN),
                     "get_image_success" => __("Success get company image.", THEME_DOMAIN),
                     "get_success" => __("Success get company profile.", THEME_DOMAIN),
+                    "get_credit" => [
+                        'success' => __("success get company credit.", THEME_DOMAIN),
+                    ],
+                    'insufficient_credit' => __("Your credit is insufficient.", THEME_DOMAIN)
                 ]
             ],
             'package' => [
@@ -201,7 +219,18 @@ class Message
             "package" => [
                 "purchase" => [
                     'success' => __("Success creating payment url", THEME_DOMAIN),
+                    "user_not_match" => __("user not match", THEME_DOMAIN),
+                    "trans_not_found" => __("Transaction not found", THEME_DOMAIN)
                 ],
+                "create_payment" => [
+                    "error" => __("something error when creating payment", THEME_DOMAIN)
+                ]
+            ],
+            'sitemap' => [
+                "get_success" => __("Success get all sitemaps", THEME_DOMAIN),
+                "get_failed"  => __("Failed get all sitemaps", THEME_DOMAIN),
+                "show_companies_success" => __("Success get companies sitemap", THEME_DOMAIN),
+                "show_companies_failed" => __("Failed get companies sitemap", THEME_DOMAIN)
             ]
         ];
     }

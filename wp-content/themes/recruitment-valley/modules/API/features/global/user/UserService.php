@@ -26,11 +26,6 @@ class UserService
     {
         $jwtoken = $request->get_header('Authorization');
 
-        // return ResponseHelper::build([
-        //     'status' => 200,
-        //     'message' => $jwtoken
-        // ]);
-
         if ($jwtoken == "") {
             return [
                 "status" => 401,
@@ -47,19 +42,16 @@ class UserService
         } catch (DomainException $e) {
             return [
                 "status" => 401,
-                'asd' => '1',
                 "message" => $e->getMessage()
             ];
         } catch (ExpiredException $e) {
             return [
                 "status" => 401,
-                'asd' => '2',
                 "message" => $e->getMessage()
             ];
         } catch (UnexpectedValueException $e) {
             return [
                 "status" => 401,
-                'asd' => '3',
                 "message" => $e->getMessage()
             ];
         }
@@ -67,5 +59,11 @@ class UserService
         // $params = $request->get_params();
         $response = $this->userController->getUserNav($params);
         return ResponseHelper::build($response);
+    }
+
+    public function deleteAccount( WP_REST_Request $request )
+    {
+        $response = $this->userController->deleteAccount( $request );
+        return ResponseHelper::build( $response );
     }
 }

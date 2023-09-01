@@ -7,6 +7,7 @@ use Error;
 use Exception;
 use Helper;
 use Helper\ValidationHelper;
+use Helper\DateHelper;
 use Model\Company;
 use Model\ModelHelper;
 use ResponseHelper;
@@ -566,7 +567,7 @@ class ProfileController
                 "message" => "success get company credit",
                 "data" => [
                     "credit" => $company->getCredit(),
-                    "timeExpired" => $company->getUnlimitedExpired() ?? null
+                    "timeExpired" => DateHelper::doLocale(strtotime($company->getUnlimitedExpired()), 'nl_NL', 'dd MMMM yyyy') ?? null
                 ]
             ];
         } catch (\Exception $e) {

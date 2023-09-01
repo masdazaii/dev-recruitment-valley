@@ -70,7 +70,7 @@ class Vacancy extends RegisterCPT
             [
                 "name" => "experiences",
                 "arguments" => [
-                    'label' => __("Experience", THEME_DOMAIN),
+                    'label' => __("Working Experience", THEME_DOMAIN),
                 ]
             ]
         ];

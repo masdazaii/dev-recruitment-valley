@@ -171,7 +171,7 @@ class PackageController
 
         $transaction->setTransactionStripeId($session->id);
 
-        EmailHelper::sendPaymentConfirmation($transactionId);
+        // EmailHelper::sendPaymentConfirmation($transactionId); //temporary disable 
 
         return [
             "status" => 200,
