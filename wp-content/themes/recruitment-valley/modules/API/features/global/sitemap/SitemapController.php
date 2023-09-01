@@ -102,6 +102,7 @@ class SitemapController
                 'page'  => (int)$filters['page'],
                 'perPage'  => (int)$filters['postPerPage'],
                 'total' => (int)$vacancies->found_posts ?? 0,
+                'totalPage' => (int)$vacancies->max_num_pages ?? 0,
                 'data'  => array_values($response)
             ];
         }
@@ -200,7 +201,8 @@ class SitemapController
             return [
                 'page'  => (int)$filters['page'],
                 'perPage'  => (int)$filters['perPage'],
-                'total' => (int)$companies->get_total,
+                'total' => (int)$companies->get_total(),
+                'totalPage' => (int)$companies->get_pages() ?? 0,
                 'data'  => array_values($response)
             ];
         }
@@ -223,11 +225,12 @@ class SitemapController
             'data'      => [
                 [
                     'label' => 'Vacancy',
-                    'count' => 0,
+                    'count' => $vacancies['total'],
                     'data'  => $vacancies['data'],
                     'meta'  => [
                         'page' => $vacancies['page'],
-                        'perPage' => $vacancies['perPage']
+                        'perPage' => $vacancies['perPage'],
+                        'totalPage' => $vacancies['totalPage']
                     ],
                     'sortParams' => [
                         [
@@ -246,7 +249,8 @@ class SitemapController
                     'data'  => $companies['data'],
                     'meta'  => [
                         'page' => $companies['page'],
-                        'perPage' => $companies['perPage']
+                        'perPage' => $companies['perPage'],
+                        'totalPage' => $vacancies['totalPage']
                     ],
                     'sortParams' => [
                         [
