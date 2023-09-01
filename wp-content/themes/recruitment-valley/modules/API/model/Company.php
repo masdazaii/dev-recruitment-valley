@@ -325,13 +325,18 @@ class Company
         return $this->getProp($this->_companyLatitude, true);
     }
 
-    public function setVideoUrl( $videoUrl )
+    public function checkFullregistered()
     {
-        return $this->setProp( $this->videoUrl, $videoUrl );
+        return $this->getProp($this->isFullRegistered, true);
+    }
+
+    public function setVideoUrl($videoUrl)
+    {
+        return $this->setProp($this->videoUrl, $videoUrl);
     }
 
     public function setProp($acf_field, $value, $repeater = false)
     {
-        return update_field($acf_field, $value, "user_".$this->user_id);
+        return update_field($acf_field, $value, "user_" . $this->user_id);
     }
 }

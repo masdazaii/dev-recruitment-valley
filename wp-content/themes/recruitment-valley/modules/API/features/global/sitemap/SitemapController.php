@@ -49,6 +49,9 @@ class SitemapController
                 case 'id':
                     $filters['orderBy'] = 'ID';
                     break;
+                case 'title':
+                    $filters['orderBy'] = 'title';
+                    break;
                 case 'date':
                 case 'post_date':
                     $filters['orderBy'] = 'date';
@@ -99,6 +102,7 @@ class SitemapController
                 'page'  => (int)$filters['page'],
                 'perPage'  => (int)$filters['postPerPage'],
                 'total' => (int)$vacancies->found_posts ?? 0,
+                'totalPage' => (int)$vacancies->max_num_pages ?? 0,
                 'data'  => array_values($response)
             ];
         }
@@ -155,15 +159,23 @@ class SitemapController
             'number'    => $filters['perPage'],
             'offset'    => $filters['offset'],
             'meta_query' => [
-                'relation' => 'OR',
+                'relation' => 'AND',
                 [
-                    'key'   => 'is_deleted',
-                    'value' => false,
-                    'compare' => '='
+                    'relation' => 'OR',
+                    [
+                        'key'   => 'is_deleted',
+                        'value' => false,
+                        'compare' => '='
+                    ],
+                    [
+                        'key'   => 'is_deleted',
+                        'compare' => 'NOT EXISTS'
+                    ],
                 ],
                 [
-                    'key'   => 'is_deleted',
-                    'compare' => 'NOT EXISTS'
+                    'key'   => 'ucma_is_full_registered',
+                    'compare' => true,
+                    'compare' => '='
                 ]
             ]
         ]);
@@ -189,7 +201,8 @@ class SitemapController
             return [
                 'page'  => (int)$filters['page'],
                 'perPage'  => (int)$filters['perPage'],
-                'total' => (int)$companies->get_total,
+                'total' => (int)$companies->get_total(),
+                'totalPage' => (int)$companies->get_pages() ?? 0,
                 'data'  => array_values($response)
             ];
         }
@@ -212,11 +225,22 @@ class SitemapController
             'data'      => [
                 [
                     'label' => 'Vacancy',
-                    'count' => 0,
-                    'data'  => $vacancies,
+                    'count' => $vacancies['total'],
+                    'data'  => $vacancies['data'],
                     'meta'  => [
-                        'page' => 1,
-                        'perPage' => 2
+                        'page' => $vacancies['page'],
+                        'perPage' => $vacancies['perPage'],
+                        'totalPage' => $vacancies['totalPage']
+                    ],
+                    'sortParams' => [
+                        [
+                            'label' => 'Title',
+                            'value' => 'title'
+                        ],
+                        [
+                            'label' => 'Post Date',
+                            'value' => 'date'
+                        ]
                     ]
                 ],
                 [
@@ -225,7 +249,18 @@ class SitemapController
                     'data'  => $companies['data'],
                     'meta'  => [
                         'page' => $companies['page'],
-                        'perPage' => $companies['perPage']
+                        'perPage' => $companies['perPage'],
+                        'totalPage' => $vacancies['totalPage']
+                    ],
+                    'sortParams' => [
+                        [
+                            'label' => 'Company Name',
+                            'value' => 'name'
+                        ],
+                        [
+                            'label' => 'Registered Date',
+                            'value' => 'registered'
+                        ]
                     ]
                 ],
                 // [
