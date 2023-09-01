@@ -33,6 +33,15 @@ class LoginController
             ];
         }
 
+        $isDeleted = get_user_meta($user->ID, "is_deleted", true);
+        if($isDeleted)
+        {
+            return [
+                "message" => $this->_message->get('auth.user_deleted'),
+                "status" => 400
+            ];
+        }
+
         if (!get_user_meta($user->ID, 'otp_is_verified', true)) {
             return [
                 "message" => $this->_message->get('auth.unfinish_registration'),

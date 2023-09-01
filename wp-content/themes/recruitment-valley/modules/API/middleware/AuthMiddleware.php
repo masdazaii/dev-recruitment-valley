@@ -7,6 +7,7 @@ use Exception;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use Helper\UserHelper;
 use UnexpectedValueException;
 use WP_Error;
 use WP_REST_Request;
@@ -52,6 +53,10 @@ class AuthMiddleware
         }
         try {
             $decodedToken = JWT::decode($token, new Key(JWT_SECRET, "HS256"));
+            
+            $isDeleted = UserHelper::is_deleted( $decodedToken->user_id ); 
+            if($isDeleted) return new WP_Error("user_deleted", $this->_message->get("auth.user_deleted") );
+
             $request->user_id = $decodedToken->user_id;
 
             return $request;
