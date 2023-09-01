@@ -59,9 +59,6 @@ class SitemapService
         $params = $request->get_params();
         $response = $this->sitemapController->get($params);
 
-        return ResponseHelper::build([
-            'status' => 503,
-            'message' => 'Endpoint not available for now'
-        ]);
+        return ResponseHelper::build($response);
     }
 }

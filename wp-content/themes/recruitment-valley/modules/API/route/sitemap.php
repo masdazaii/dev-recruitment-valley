@@ -44,12 +44,6 @@ class SitemapEndpoint
                 //     'permission_callback'   => '__return_true',
                 //     'callback'              => [$sitemapService, 'getEvents']
                 // ],
-                // 'root_sitemap' => [
-                //     'url'                   => '',
-                //     'methods'               => 'GET',
-                //     'permission_callback'   => '__return_true',
-                //     'callback'              => [$sitemapService, 'get']
-                // ]
             ]
         ];
 
