@@ -11,6 +11,7 @@ use Vacancy\Term\VacancyTermService;
 use Candidate\Profile\FavoriteVacancyService;
 use Global\PackageService;
 use Global\User\UserService;
+use Sitemap\SitemapService;
 
 class GlobalEndpoint
 {
@@ -35,6 +36,7 @@ class GlobalEndpoint
         $optionService = new OptionService;
         $authMiddleware = new AuthMiddleware;
         $userService = new UserService;
+        $sitemapService = new SitemapService;
 
         $endpoint = [
             'path' => '',
@@ -112,11 +114,18 @@ class GlobalEndpoint
                     'permission_callback'   => [$authMiddleware, 'authorize_company'],
                     'callback'              => [$paymentService, 'show']
                 ],
-                'delete_account' => [
-                    'url'                   => '/account/delete',
+                'deactivate' => [
+                    'url'                   => '/account/deactivate',
                     'methods'               => 'DELETE',
                     'permission_callback'   => [$authMiddleware, 'check_token'],
                     'callback'              => [$userService, 'deleteAccount']
+                ],
+
+                'delete_account_permanent' => [
+                    'url'                   => '/account/delete',
+                    'methods'               => 'DELETE',
+                    'permission_callback'   => [$authMiddleware, 'check_token'],
+                    'callback'              => [$userService, 'deleteAccountPermanent']
                 ],
 
                 // 'get_sector_term' => [
@@ -163,6 +172,12 @@ class GlobalEndpoint
                     'permission_callback'   => '__return_true',
                     'callback'              => [$termVacancyService, 'testGetAllTerm']
                 ],
+                'root_sitemap' => [
+                    'url'                   => '/sitemap',
+                    'methods'               => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$sitemapService, 'get']
+                ]
             ]
 
         ];

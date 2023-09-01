@@ -53,8 +53,8 @@ class RequestRules
             'companyUpdateDetail' => [
                 "companyName" => ["required"],
                 "sector.*" => [],
-                "phoneNumberCode" => [],
-                "phoneNumber" => [],
+                "phoneNumberCode" => ["required"],
+                "phoneNumber" => ["required"],
                 "website" => ["required", "url"],
                 "employees" => ["requred"],
                 "kvkNumber" => [],
