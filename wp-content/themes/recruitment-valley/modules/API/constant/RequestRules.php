@@ -51,9 +51,9 @@ class RequestRules
             ],
             'companyUpdateDetail' => [
                 "companyName" => ["required"],
-                "sector.*" => ["required"],
-                "phoneNumberCode" => ["required"],
-                "phoneNumber" => ["required"],
+                "sector.*" => [],
+                "phoneNumberCode" => [],
+                "phoneNumber" => [],
                 "website" => ["required", "url"],
                 "employees" => ["requred"],
                 "kvkNumber" => [],
@@ -68,18 +68,18 @@ class RequestRules
             'candidateSetupProfile' => [
                 "firstName" => ["required"],
                 "lastName" => ["required"],
-                "dateOfBirth" => ["required"], // Add : Date
-                "phoneNumber" => ["required"], // Add : Regex
-                "phoneNumberCode" => ["required"],
+                "dateOfBirth" => [], // Add : Date
+                "phoneNumber" => [], // Add : Regex
+                "phoneNumberCode" => [],
                 "country" => ["required"],
                 "city" => ["required"],
                 "linkedinPage" => [], // Add : Url
             ],
             'candidateUpdateProfile' => [
                 "firstName" => ["required"],
-                "dateOfBirth" => ["required"],
-                "phoneNumber" => ["required"],
-                "phoneNumberCode" => ["required"],
+                "dateOfBirth" => [],
+                "phoneNumber" => [],
+                "phoneNumberCode" => [],
                 "country" => ["required"],
                 "city" => ["required"],
                 "linkedinPage" => [],
