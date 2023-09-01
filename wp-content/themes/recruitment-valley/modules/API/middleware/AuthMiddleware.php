@@ -53,9 +53,9 @@ class AuthMiddleware
         }
         try {
             $decodedToken = JWT::decode($token, new Key(JWT_SECRET, "HS256"));
-            
-            $isDeleted = UserHelper::is_deleted( $decodedToken->user_id ); 
-            if($isDeleted) return new WP_Error("user_deleted", $this->_message->get("auth.user_deleted") );
+
+            $isDeleted = UserHelper::is_deleted($decodedToken->user_id);
+            if ($isDeleted) return new WP_Error("user_deleted", $this->_message->get("auth.user_deleted"));
 
             $request->user_id = $decodedToken->user_id;
 
@@ -77,6 +77,11 @@ class AuthMiddleware
 
         try {
             $decodedToken = JWT::decode($token, new Key(JWT_SECRET, "HS256"));
+
+            $isDeleted = UserHelper::is_deleted($decodedToken->user_id);
+            if ($isDeleted) {
+                return new WP_Error("user_deleted", $this->_message->get("auth.user_deleted"));
+            };
 
             return $decodedToken;
         } catch (ExpiredException $e) {
