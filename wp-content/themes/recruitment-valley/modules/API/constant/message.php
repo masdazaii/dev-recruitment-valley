@@ -216,6 +216,12 @@ class Message
                 "create_payment" => [
                     "error" => __("something error when creating payment", THEME_DOMAIN)
                 ]
+            ],
+            'sitemap' => [
+                "get_success" => __("Success get all sitemaps", THEME_DOMAIN),
+                "get_failed"  => __("Failed get all sitemaps", THEME_DOMAIN),
+                "show_companies_success" => __("Success get companies sitemap", THEME_DOMAIN),
+                "show_companies_failed" => __("Failed get companies sitemap", THEME_DOMAIN)
             ]
         ];
     }
