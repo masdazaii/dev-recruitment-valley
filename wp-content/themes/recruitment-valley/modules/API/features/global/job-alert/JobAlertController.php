@@ -40,7 +40,7 @@ class JobAlertController
         if(!isset($body)) {
             return [
                 "status"    => 500,
-                "message"   => $this->message->get('candidate.profile.email_alert_failed')
+                "message"   => $this->message->get('job_alert.email_alert_failed')
             ];
         }
 
@@ -72,13 +72,13 @@ class JobAlertController
             $this->_updateMeta($postId, $body);
             return [
                 "status"    => 200,
-                "message"   => $this->message->get('candidate.profile.email_alert_success')
+                "message"   => $this->message->get('job_alert.email_alert_success')
             ];
         }
 
         return [
             "status"    => 500,
-            "message"   => $this->message->get('candidate.profile.email_alert_failed')
+            "message"   => $this->message->get('job_alert.email_alert_failed')
         ];
     }
 

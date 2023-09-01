@@ -228,7 +228,7 @@ class Data
         }
 
         return [
-            'dayly'     => $Vday,
+            'daily'     => $Vday,
             'weekly'    => $Vweek,
             'monthly'   => $Vmonth,
         ];
@@ -246,9 +246,9 @@ class Data
         $Jweek  = [];
         $Jmonth = [];
         foreach($job_alert as $persons) {
-            if($persons['emailFrequency'] === 'dayly') {
+            if($persons['emailFrequency'] === 'daily') {
                 $Jday[]   = $persons;
-            } elseif($persons['emailFrequency'] === 'dayly') {
+            } elseif($persons['emailFrequency'] === 'weekly') {
                 $Jweek[]  = $persons;
             } elseif($persons['emailFrequency'] === 'monthly') {
                 $Jmonth[] = $persons;
@@ -256,7 +256,7 @@ class Data
         }
 
         return [
-            'dayly'     => $Jday,
+            'daily'     => $Jday,
             'weekly'    => $Jweek,
             'monthly'   => $Jmonth,
         ];
@@ -265,7 +265,7 @@ class Data
     /**
      * main
      *
-     * @return void
+     * @return array
      */
     public function main($schedule)
     {
