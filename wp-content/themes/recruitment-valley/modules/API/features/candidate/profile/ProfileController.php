@@ -222,9 +222,9 @@ class ProfileController
 
         $validate = ValidationHelper::doValidate($fields, [
             "firstName" => "required",
-            "dateOfBirth" => "required",
-            "phoneNumber" => "required",
-            "phoneNumberCode" => "required",
+            // "dateOfBirth" => "required",
+            // "phoneNumber" => "required",
+            // "phoneNumberCode" => "required",
             "country" => "required",
             "city" => "required",
             // "linkedinPage" => "required",

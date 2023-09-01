@@ -11,6 +11,7 @@ use Vacancy\Term\VacancyTermService;
 use Candidate\Profile\FavoriteVacancyService;
 use Global\PackageService;
 use Global\User\UserService;
+use Sitemap\SitemapService;
 
 class GlobalEndpoint
 {
@@ -35,6 +36,7 @@ class GlobalEndpoint
         $optionService = new OptionService;
         $authMiddleware = new AuthMiddleware;
         $userService = new UserService;
+        $sitemapService = new SitemapService;
 
         $endpoint = [
             'path' => '',
@@ -163,6 +165,12 @@ class GlobalEndpoint
                     'permission_callback'   => '__return_true',
                     'callback'              => [$termVacancyService, 'testGetAllTerm']
                 ],
+                'root_sitemap' => [
+                    'url'                   => '/sitemap',
+                    'methods'               => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$sitemapService, 'get']
+                ]
             ]
 
         ];
