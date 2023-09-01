@@ -59,6 +59,20 @@ class UserController
         }
     }
 
+    public function deleteAccountPermanent(WP_REST_Request $request)
+    {
+        require_once(ABSPATH.'wp-admin/includes/user.php');
+
+        $userId = $request->user_id;
+        wp_delete_user($userId);
+
+        return [
+            "status" => 200, 
+            "message" => "Successfully delete user with id {$userId}",
+        ];
+
+    }
+
     public function deleteAccount( WP_REST_Request $request )
     {
         $userId = $request->user_id;
