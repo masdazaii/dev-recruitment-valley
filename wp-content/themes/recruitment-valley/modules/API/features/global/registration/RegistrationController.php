@@ -195,9 +195,9 @@ class RegistrationController
         $otp = OTP::generate(6);
         $otpCreatedAt = new DateTimeImmutable();
         $otpExpiredAt = $otpCreatedAt->modify("+10 minute")->format("Y-m-d H:i:s");
-        update_user_meta($user, "otp", $otp);
-        update_user_meta($user, "otp_expired", $otpExpiredAt);
-        update_user_meta($user, "otp_is_verified", "0"); // Set OTP verified status, if 1 => true / validated, 0 => false / invalid
+        update_user_meta($user->ID, "otp", $otp);
+        update_user_meta($user->ID, "otp_expired", $otpExpiredAt);
+        update_user_meta($user->ID, "otp_is_verified", "0"); // Set OTP verified status, if 1 => true / validated, 0 => false / invalid
 
         /** Send OTP code */
         $args = [
