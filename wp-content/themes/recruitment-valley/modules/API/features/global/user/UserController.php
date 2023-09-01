@@ -139,12 +139,12 @@ class UserController
         try {
             $userRoles = $user->roles[0];
 
-            if($userRoles == "candidate")
-            {
-                update_user_meta($user->ID, "ucaa_is_full_registered", false);
-            }else{
-                update_user_meta($user->ID, "ucma_is_full_registered", false);    
-            }
+            // if($userRoles == "candidate")
+            // {
+            //     update_user_meta($user->ID, "ucaa_is_full_registered", false);
+            // }else{
+            //     update_user_meta($user->ID, "ucma_is_full_registered", false);    
+            // }
     
             update_user_meta($user->ID, 'is_deleted', true);
             
@@ -158,6 +158,51 @@ class UserController
             return [
                 "status" => 201,
                 "message" => $this->_message->get("profile.delete.fail") 
+            ];
+        }
+    }
+
+    public function reactivate( WP_REST_Request $request )
+    {
+        $request = $request->get_params();
+
+        $token = $request["token"];
+
+        $checkedToken = JWTHelper::check( $token );
+
+        if(is_array($checkedToken))
+        {
+            return $checkedToken;
+        }
+
+        $userId = $checkedToken->user_id;
+
+        $isUserDeleted = get_user_meta($userId, "is_deleted", true);
+        if(!$isUserDeleted)
+        {
+            return [
+                "status" => 400,
+                "message" => "User still active"
+            ];
+        }
+
+        $this->wpdb->query("START TRANSACTION");
+        try {
+            update_user_meta($userId, "is_deleted", false);
+            
+            $this->wpdb->query("COMMIT");
+
+            return [
+                "status" => 200,
+                "message" => "User reactivate successfully"
+            ];
+        } catch (\Throwable $th) {
+            //throw $th;
+            $this->wpdb->query('ROLLBACK');
+            error_log($th->getMessage());
+            return [
+                "status" => 400,
+                "message" => "User reactivate failed"
             ];
         }
     }
