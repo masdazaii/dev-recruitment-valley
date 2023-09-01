@@ -16,6 +16,7 @@ class Message
                 'generate_token_success' => __('Token succes aangemaakt', THEME_DOMAIN),
                 'generate_token_error' => __('Er iets misgegaan bij het aanmaken van een token', THEME_DOMAIN),
                 'user_deleted' => __('User was not active', THEME_DOMAIN),
+                'reactivation_sent' => __('Your account was non-active, reactivation email already sent to your email', THEME_DOMAIN),
                 'forgot_password' => [
                     "required_email" => __('Email is nodig', THEME_DOMAIN),
                     "email_sent" => __('Email is verstuurd', THEME_DOMAIN),
@@ -82,7 +83,7 @@ class Message
                     "success" => __("Success delete account", THEME_DOMAIN),
                     "fail" => __("Fail delete account", THEME_DOMAIN),
                     "user_not_found" => __("User not found", THEME_DOMAIN),
-                    "password_missmatch" => __("Password missmatch", THEME_DOMAIN)
+                    "password_missmatch" => __("Password missmatch", THEME_DOMAIN)   
                 ]
             ],
             'input' => [
