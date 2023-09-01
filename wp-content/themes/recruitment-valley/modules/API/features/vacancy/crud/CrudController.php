@@ -440,6 +440,14 @@ class VacancyCrudController
                 }
             }
 
+            if(isset($_FILES['video']['name']))
+            {
+                $video = ModelHelper::handle_upload('video' );
+                $vacancyModel->setVideoUrl($video["video"]["url"]);
+            }else{
+                $vacancyModel->setVideoUrl($payload["video_url"]);
+            }
+
             $vacancyGallery = $galleryIds ?? [];
 
             if ($galleries) {
@@ -636,7 +644,6 @@ class VacancyCrudController
     public function updatePaid($request)
     {
         $vacancy_id = $request["vacancy_id"];
-
         global $wpdb;
 
         try {
@@ -660,6 +667,14 @@ class VacancyCrudController
                         return explode('-', $gallery)[0];
                     }, $request['galleryCompany']);
                 }
+            }
+
+            if(isset($_FILES['video']['name']))
+            {
+                $video = ModelHelper::handle_upload('video' );
+                $vacancyModel->setVideoUrl($video["video"]["url"]);
+            }else{
+                $vacancyModel->setVideoUrl($payload["video_url"]);
             }
 
             $vacancyGallery = $galleryIds ?? [];
