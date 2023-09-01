@@ -158,15 +158,23 @@ class SitemapController
             'number'    => $filters['perPage'],
             'offset'    => $filters['offset'],
             'meta_query' => [
-                'relation' => 'OR',
+                'relation' => 'AND',
                 [
-                    'key'   => 'is_deleted',
-                    'value' => false,
-                    'compare' => '='
+                    'relation' => 'OR',
+                    [
+                        'key'   => 'is_deleted',
+                        'value' => false,
+                        'compare' => '='
+                    ],
+                    [
+                        'key'   => 'is_deleted',
+                        'compare' => 'NOT EXISTS'
+                    ],
                 ],
                 [
-                    'key'   => 'is_deleted',
-                    'compare' => 'NOT EXISTS'
+                    'key'   => 'ucma_is_full_registered',
+                    'compare' => true,
+                    'compare' => '='
                 ]
             ]
         ]);
