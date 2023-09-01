@@ -440,6 +440,12 @@ class VacancyCrudController
                 }
             }
 
+            if(isset($_FILES['video']['name']))
+            {
+                $video = ModelHelper::handle_upload('video' );
+                $vacancyModel->setVideoUrl($video["video"]["url"]);
+            }
+
             $vacancyGallery = $galleryIds ?? [];
 
             if ($galleries) {
@@ -636,7 +642,6 @@ class VacancyCrudController
     public function updatePaid($request)
     {
         $vacancy_id = $request["vacancy_id"];
-
         global $wpdb;
 
         try {

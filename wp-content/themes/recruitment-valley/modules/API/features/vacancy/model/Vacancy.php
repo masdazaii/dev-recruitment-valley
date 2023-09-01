@@ -130,7 +130,7 @@ class Vacancy
 
     public function setVideoUrl($video_url)
     {
-        $this->video_url = $video_url;
+        return $this->setProp($this->acf_video_url, $video_url);
     }
 
     public function setFacebookUrl($facebook_url)

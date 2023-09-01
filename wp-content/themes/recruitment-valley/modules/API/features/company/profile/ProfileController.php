@@ -294,8 +294,16 @@ class ProfileController
             // $galleries = ModelHelper::handle_uploads('gallery', 'test'); // Change below this
             $galleries = ModelHelper::handle_uploads('gallery', $user_id); // Changes!
 
+            $company = new Company($user_id);
+            if(isset($_FILES['videoUrl']['name']))
+            {
+                $video = ModelHelper::handle_upload('videoUrl' );
+                $company->setVideoUrl( $video["videoUrl"]["url"] );
+            }else{
+                update_field('ucma_company_video_url', Helper::isset($fields, 'videoUrl'), 'user_' . $user_id);
+            }
+
             update_field('ucma_short_decription', Helper::isset($fields, 'shortDescription'), 'user_' . $user_id);
-            update_field('ucma_company_video_url', Helper::isset($fields, 'videoUrl'), 'user_' . $user_id);
             update_field('ucma_benefit', Helper::isset($fields, 'secondaryEmploymentConditions'), 'user_' . $user_id); // Added Line
 
             $current_gallery = maybe_unserialize(get_user_meta($user_id, 'ucma_gallery_photo'));
@@ -412,6 +420,16 @@ class ProfileController
                 update_field('ucma_image', $image_id, 'user_' . $request['user_id']);
             }
 
+            
+            $company = new Company($request["user_id"]);
+            if(isset($_FILES['companyVideo']['name']))
+            {
+                $video = ModelHelper::handle_upload('companyVideo' );
+                $company->setVideoUrl( $video["companyVideo"]["url"] );
+            }else{
+                update_field('ucma_company_video_url', $request['companyVideo'], 'user_' . $request['user_id']);
+            }
+
             /** Store Meta && ACF */
             // update_field('ucma_company_email', $request['email'], 'user_' . $request['user_id']);
             update_field('ucma_company_name', $request['companyName'], 'user_' . $request['user_id']);
@@ -432,7 +450,6 @@ class ProfileController
             update_field('ucma_twitter_url', $request['twitter'], 'user_' . $request['user_id']);
             update_field('ucma_short_decription', $request['shortDescription'], 'user_' . $request['user_id']);
             update_field('ucma_benefit', $request['secondaryEmploymentConditions'], 'user_' . $request['user_id']);
-            update_field('ucma_company_video_url', $request['companyVideo'], 'user_' . $request['user_id']);
             update_field('ucma_is_full_registered', 1, 'user_' . $request['user_id']);
             update_field('ucma_company_longitude', $request['longitude'], 'user_' . $request['user_id']);
             update_field('ucma_company_latitude', $request['latitude'], 'user_' . $request['user_id']);
