@@ -37,6 +37,7 @@ class RequestRules
                 "instagram" => [],
                 "linkedin" => [],
                 "twitter" => [],
+                "sector" => ["required"],
                 "country" => ["required"],
                 "street" => ["required"],
                 "city" => ["required"],
