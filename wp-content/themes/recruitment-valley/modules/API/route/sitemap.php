@@ -25,7 +25,31 @@ class SitemapEndpoint
                     'methods'               => 'GET',
                     'permission_callback'   => "__return_true",
                     'callback'              => [$sitemapService, 'vacancies']
-                ]
+                ],
+                // 'blog' => [
+                //     'url'                   => '/blogs',
+                //     'methods'               => 'GET',
+                //     'permission_callback'   => '__return_true',
+                //     'callback'              => [$sitemapService, 'getBlogs']
+                // ],
+                // 'company' => [
+                //     'url'                   => '/companies',
+                //     'methods'               => 'GET',
+                //     'permission_callback'   => '__return_true',
+                //     'callback'              => [$sitemapService, 'getCompanies']
+                // ],
+                // 'event' => [
+                //     'url'                   => '/events',
+                //     'methods'               => 'GET',
+                //     'permission_callback'   => '__return_true',
+                //     'callback'              => [$sitemapService, 'getEvents']
+                // ],
+                // 'root_sitemap' => [
+                //     'url'                   => '',
+                //     'methods'               => 'GET',
+                //     'permission_callback'   => '__return_true',
+                //     'callback'              => [$sitemapService, 'get']
+                // ]
             ]
         ];
 
