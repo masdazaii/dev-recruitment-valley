@@ -15,6 +15,7 @@ class Message
                 'expired' => __('Expired', THEME_DOMAIN),
                 'generate_token_success' => __('Success generating token', THEME_DOMAIN),
                 'generate_token_error' => __('Something error when generating token', THEME_DOMAIN),
+                'user_deleted' => __('User was not active', THEME_DOMAIN),
                 'forgot_password' => [
                     "required_email" => __('Email was required', THEME_DOMAIN),
                     "email_sent" => __('Email already sent', THEME_DOMAIN),
@@ -72,6 +73,12 @@ class Message
                         "already_exists" => __("Phone number already used.", THEME_DOMAIN)
                     ]
                 ],
+                'delete' => [
+                    "success" => __("Success delete account", THEME_DOMAIN),
+                    "fail" => __("Fail delete account", THEME_DOMAIN),
+                    "user_not_found" => __("User not found", THEME_DOMAIN),
+                    "password_missmatch" => __("Password missmatch", THEME_DOMAIN)
+                ]
             ],
             'input' => [
                 'invalid_input'   => __("Input is invalid.", THEME_DOMAIN),
