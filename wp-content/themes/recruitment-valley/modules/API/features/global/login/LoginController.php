@@ -9,6 +9,7 @@ use Constant\Message;
 use Firebase\JWT\JWT as JWT;
 use Firebase\JWT\Key;
 use DateTimeImmutable;
+use JWTHelper;
 use Model\Company;
 
 class LoginController
@@ -34,10 +35,41 @@ class LoginController
         }
 
         $isDeleted = get_user_meta($user->ID, "is_deleted", true);
+
         if($isDeleted)
         {
+            // if(time() > get_user_meta( $user->ID, "reactivation_datetime", true ))
+            // {
+                $date = new DateTimeImmutable();
+                $expired = $date->modify("+2 hours")->getTimestamp();
+
+                $args = [
+                    "reactivation_link" => "dev-recruitment-valley.vercel.app/autorisatie/heractiveer-account?token=". JWTHelper::generate(["user_id" => $user->ID, "exp" => $expired ]),
+                    "user_name" => $user->user_nicename
+                ];
+
+                $content = Email::render_html_email('reactivation-email.php', $args);
+
+                $headers = array(
+                    'Content-Type: text/html; charset=UTF-8',
+                );
+
+                wp_mail($user->user_email, "Reactivate Acccount Email",$content, $headers);
+    
+                update_user_meta(
+                    $user->ID, 
+                    "reactivation_datetime",
+                    $expired
+                );
+
+                return [
+                    "message" => $this->_message->get('auth.reactivation_sent'),
+                    "status" => 400
+                ];
+            // }
+
             return [
-                "message" => $this->_message->get('auth.user_deleted'),
+                "message" => $this->_message->get('auth.reactivation_sent'),
                 "status" => 400
             ];
         }
