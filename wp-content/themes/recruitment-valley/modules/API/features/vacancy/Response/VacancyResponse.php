@@ -37,6 +37,7 @@ class VacancyResponse
                 "id" => $vacancy->ID,
                 "slug" => $vacancy->post_name,
                 "name" => $vacancy->post_title,
+                "country" => $vacancyModel->getCountry(),
                 "city" => $vacancyModel->getCity(),
                 "placementAddress" => $vacancyModel->getPlacementAddress(),
                 "education" => $vacancyTaxonomy["education"]  ?? null,
@@ -84,10 +85,9 @@ class VacancyResponse
 
         $jobVideo = $vacancyModel->getVideoUrl();
         $videoUrl = "";
-        if($jobVideo != "")
-        {
+        if ($jobVideo != "") {
             $videoUrl = strpos($vacancyModel->getVideoUrl(), "youtu") ? StringHelper::getYoutubeID($vacancyModel->getVideoUrl()) : $vacancyModel->getVideoUrl(); // Added Line
-        }else{
+        } else {
             $videoUrl = strpos($company->getVideoUrl(), "youtu") ? StringHelper::getYoutubeID($company->getVideoUrl()) : $company->getVideoUrl(); // Added Line
         }
 
@@ -127,6 +127,7 @@ class VacancyResponse
                 "description" => $vacancyModel->getDescription(),
                 "term" => $vacancyModel->getTerm(),
             ],
+            "country" => $vacancyModel->getCountry(), // Added Line
             "city" => $vacancyModel->getCity(),
             "externalUrl" => $vacancyModel->getExternalUrl(),
             "placementAddress" => $vacancyModel->getPlacementAddress(),
@@ -222,9 +223,10 @@ class VacancyResponse
                 "description" => $vacancyModel->getDescription(),
                 "term" => $vacancyModel->getTerm(),
             ],
+            "country" => [$vacancyModel->getCountry('object')], // Added Line
             "city" => [$vacancyModel->getCity('object')],
             "placementAddress" => $vacancyModel->getPlacementAddress(),
-            "videoId" =>  $vacancyModel->getVideoUrl() == "" || $vacancyModel->getVideoUrl() == null  ? $company->getVideoUrl() : $vacancyModel->getVideoUrl() , // Added Line
+            "videoId" =>  $vacancyModel->getVideoUrl() == "" || $vacancyModel->getVideoUrl() == null  ? $company->getVideoUrl() : $vacancyModel->getVideoUrl(), // Added Line
             "gallery" => $vacancyModel->getGallery(),
             "reviews" => $vacancyModel->getReviews(),
             "salaryStart" => $vacancyModel->getSalaryStart(),
