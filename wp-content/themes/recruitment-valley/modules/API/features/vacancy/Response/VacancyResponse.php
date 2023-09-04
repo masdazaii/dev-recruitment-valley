@@ -37,6 +37,7 @@ class VacancyResponse
                 "id" => $vacancy->ID,
                 "slug" => $vacancy->post_name,
                 "name" => $vacancy->post_title,
+                "country" => $vacancyModel->getCountry(),
                 "city" => $vacancyModel->getCity(),
                 "placementAddress" => $vacancyModel->getPlacementAddress(),
                 "education" => $vacancyTaxonomy["education"]  ?? null,
@@ -127,6 +128,7 @@ class VacancyResponse
                 "description" => $vacancyModel->getDescription(),
                 "term" => $vacancyModel->getTerm(),
             ],
+            "country" => $vacancyModel->getCountry(), // Added Line
             "city" => $vacancyModel->getCity(),
             "externalUrl" => $vacancyModel->getExternalUrl(),
             "placementAddress" => $vacancyModel->getPlacementAddress(),
@@ -231,6 +233,7 @@ class VacancyResponse
                 "description" => $vacancyModel->getDescription(),
                 "term" => $vacancyModel->getTerm(),
             ],
+            "country" => [$vacancyModel->getCountry('object')], // Added Line
             "city" => [$vacancyModel->getCity('object')],
             "placementAddress" => $vacancyModel->getPlacementAddress(),
             "videoId" => $videoUrl,  

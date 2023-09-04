@@ -310,9 +310,19 @@ class Vacancy
         }
     }
 
-    public function getCountry()
+    public function getCountry($result = 'string')
     {
-        return $this->getProp($this->acf_country);
+        // return $this->getProp($this->acf_country); // Changed below
+
+        if (strtolower($result) == 'object') {
+            $country = $this->getProp($this->acf_country);
+            return [
+                'label' => $country,
+                'value' => $country
+            ];
+        } else {
+            return $this->getProp($this->acf_country);
+        }
     }
 
     public function getStatus()
