@@ -32,9 +32,11 @@ class RegexRule implements Rule
     public function getErrorMessage($field, $parameters): string
     {
         if (strpos($field, '.*') !== false) {
-            return "One of the '" . substr($field, 0, -2) . "' value didn't match the pattern.";
+            // return "One of the '" . substr($field, 0, -2) . "' value didn't match the pattern.";
+            return "Een van de '" . substr($field, 0, -2) . "' veldwaarden kwam niet overeen met het patroon.";
         } else {
-            return "The {$field} didn't match the pattern.";
+            // return "The {$field} didn't match the pattern.";
+            return "Het veld: {$field} kwam niet overeen met het patroon.";
         }
     }
 }

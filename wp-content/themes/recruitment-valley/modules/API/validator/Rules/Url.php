@@ -17,6 +17,7 @@ class UrlRule implements Rule
 
     public function getErrorMessage($field, $parameters): string
     {
-        return "The {$field} must be a valid url.";
+        // return "The {$field} must be a valid url.";
+        return "Het veld {$field} moet een geldige URL zijn.";
     }
 }

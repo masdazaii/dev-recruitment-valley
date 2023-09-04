@@ -77,9 +77,11 @@ class ExistsRule implements Rule
     public function getErrorMessage($field, $parameters): string
     {
         if (strpos($field, '.*') !== false) {
-            return "One of the '" . substr($field, 0, -2) . "' value didn't exists.";
+            // return "One of the '" . substr($field, 0, -2) . "' value didn't exists.";
+            return "Een van de '" . substr($field, 0, -2) . "' veldwaarden bestaat niet.";
         } else {
-            return "The {$field} didn't exists.";
+            // return "The {$field} didn't exists.";
+            return "Het veld: {$field} bestond niet.";
         }
     }
 }

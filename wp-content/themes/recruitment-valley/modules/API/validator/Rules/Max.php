@@ -13,6 +13,7 @@ class MaxRule implements Rule
 
     public function getErrorMessage($field, $parameters): string
     {
-        return "The {$field} may not be greater than {$parameters[0]} characters.";
+        // return "The {$field} may not be greater than {$parameters[0]} characters.";
+        return "Het veld: {$field} mag niet groter zijn dan {$parameters[0]} tekens.";
     }
 }

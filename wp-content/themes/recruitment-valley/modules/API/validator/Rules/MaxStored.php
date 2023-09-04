@@ -76,6 +76,7 @@ class MaxStoredRule implements Rule
 
     public function getErrorMessage($field, $parameters): string
     {
-        return "You've reached the stored limit. The {$field} max stored value is : " . $parameters[0] . ".";
+        // return "You've reached the stored limit. The {$field} max stored value is : " . $parameters[0] . ".";
+        return "Je hebt de opgeslagen limiet bereikt. Het veld: {$field} maximale opgeslagen waarde : " . $parameters[0] . ".";
     }
 }
