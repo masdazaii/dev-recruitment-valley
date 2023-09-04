@@ -625,8 +625,8 @@ class Vacancy
                 "post_type" => $this->vacancy,
                 "posts_per_page" => $filters['postPerPage'] ?? -1,
                 "offset" => $filters['offset'] ?? 0,
-                "orderBy" => $filters['orderBy'] ?? "date",
-                "order" => $filters['sort'] ?? "DESC",
+                "orderby" => $filters['orderBy'] ?? "date",
+                "order" => $filters['sort'] ?? ($filters['orderBy'] && $filters['orderBy'] == 'title' ? 'aaaaa' : 'dddddd'),
                 "post_status" => "publish",
                 "meta_query" => [
                     "relation" => "AND",
