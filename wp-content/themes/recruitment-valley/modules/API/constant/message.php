@@ -80,11 +80,16 @@ class Message
                     ]
                 ],
                 'delete' => [
-                    "success" => __("Success delete account", THEME_DOMAIN),
+                    "success" => __("Succes, wachtwoord is gewijzigd", THEME_DOMAIN),
                     "fail" => __("Fail delete account", THEME_DOMAIN),
                     "user_not_found" => __("User not found", THEME_DOMAIN),
                     "password_missmatch" => __("Password missmatch", THEME_DOMAIN)   
-                ]
+                ],
+                "change_password" => [
+                    "incorrect_password" => __("Incorrect wachtwoord", THEME_DOMAIN),
+                    "new_password_missmatch" => __("nieuw wachtwoord komt niet overeen", THEME_DOMAIN),
+                    "success" => __("Succes, wachtwoord is gewijzigd", THEME_DOMAIN),
+                ],
             ],
             'input' => [
                 'invalid_input'   => __("Input is incorrect.", THEME_DOMAIN),
@@ -150,8 +155,8 @@ class Message
                     "apply_success" => __("Succesvol op deze vacature gesolliciteerd.", THEME_DOMAIN),
                     "apply_failed" => __("Het is niet gelukt om op deze vacature te solliciteren.", THEME_DOMAIN),
                     "expired_job" => __("Solliciteren is niet mogelijk. De vacature is verlopen", THEME_DOMAIN),
-                    "already_apply" => __("You already apply to this job.", THEME_DOMAIN),
-                    "cv_filetype_not_support" => __("Filetype not supported.", THEME_DOMAIN)
+                    "already_apply" => __("Je hebt al op deze functie gesolliciteerd.", THEME_DOMAIN),
+                    "cv_filetype_not_support" => __("bestandstype wordt niet ondersteund.", THEME_DOMAIN)
                 ],
                 "favorite" => [
                     "vacancy_not_found" => __("Vacature niet gevonden.", THEME_DOMAIN),
@@ -193,9 +198,9 @@ class Message
                     "get_image_success" => __("Bedrijfsfoto is succesvol ingeladen.", THEME_DOMAIN),
                     "get_success" => __("Bedrijfsprofiel is succesvol geupdate.", THEME_DOMAIN),
                     "get_credit" => [
-                        'success' => __("success get company credit.", THEME_DOMAIN),
+                        'success' => __("succes, bedrijfskrediet toegevoegd.", THEME_DOMAIN),
                     ],
-                    'insufficient_credit' => __("Your credit is insufficient.", THEME_DOMAIN)
+                    'insufficient_credit' => __("Uw krediet is onvoldoende.", THEME_DOMAIN)
                 ]
             ],
             'package' => [
@@ -203,6 +208,11 @@ class Message
                     "get_success" => __("Alle pakketten succesvol ingeladen.", THEME_DOMAIN),
                     "show_success" => __("Pakket succesvol ingeladen.", THEME_DOMAIN),
                     "show_not_found" => __("Pakket met deze url slug is niet gevonden.", THEME_DOMAIN),
+                    "something_error" => __("er is een fout opgetreden bij het aanmaken van de betaling", THEME_DOMAIN),
+                    "trx_not_found" => __("Transactie niet gevonden", THEME_DOMAIN),
+                    "success_grant" => __("Succes met het verlenen van krediet", THEME_DOMAIN),
+                    "payment_fail" => __("betaling mislukt", THEME_DOMAIN),
+                    "success_get_receipt" => __("Succes ontvang ontvangstbewijs", THEME_DOMAIN),
                 ]
             ],
             'system' => [

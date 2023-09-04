@@ -55,7 +55,7 @@ class VacancyAppliedController
         {
             return [
                 "status" => 400,
-                "message" => "You already apply to this job "
+                "message" => "Je hebt al op deze functie gesolliciteerd"
             ];
         }
 
@@ -101,7 +101,7 @@ class VacancyAppliedController
                 if ($fileExtension != "pdf" && $fileExtension != "jpg" && $fileExtension != "png") {
                     return [
                         "status" => 400,
-                        "message" => "filetype not supported",
+                        "message" => "bestandstype wordt niet ondersteund",
                     ];
                 }
                 

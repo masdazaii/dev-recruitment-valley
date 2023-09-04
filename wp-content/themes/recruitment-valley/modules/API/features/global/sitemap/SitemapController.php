@@ -29,7 +29,7 @@ class SitemapController
 
         return [
             "status" => 200,
-            "message" => "success get vacancy sitempa",
+            "message" => "succes ontvang vacature sitemap",
             "data" => $vacancySlugs
         ];
     }
