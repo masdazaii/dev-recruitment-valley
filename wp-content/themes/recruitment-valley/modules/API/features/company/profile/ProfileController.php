@@ -11,6 +11,8 @@ use Helper\DateHelper;
 use Model\Company;
 use Model\ModelHelper;
 use ResponseHelper;
+use Throwable;
+use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 
@@ -462,6 +464,30 @@ class ProfileController
             return [
                 "message" => $this->message->get("company.profile.setup_failed"),
                 "errors" => $errors,
+                "status" => 500
+            ];
+        } catch ( WP_Error $errors){
+            $wpdb->query('ROLLBACK');
+
+            return [
+                "message" => $this->message->get("company.profile.setup_failed"),
+                "errors" => $errors->get_error_message(),
+                "status" => 500
+            ];
+        } catch ( Exception $errors ){
+            $wpdb->query('ROLLBACK');
+
+            return [
+                "message" => $this->message->get("company.profile.setup_failed"),
+                "errors" => $errors->getMessage(),
+                "status" => 500
+            ];
+        } catch ( Throwable $errors ){
+            $wpdb->query('ROLLBACK');
+
+            return [
+                "message" => $this->message->get("company.profile.setup_failed"),
+                "errors" => $errors->getMessage(),
                 "status" => 500
             ];
         }
