@@ -230,6 +230,10 @@ class Message
                 "get_failed"  => __("Failed get all sitemaps", THEME_DOMAIN),
                 "show_companies_success" => __("Success get companies sitemap", THEME_DOMAIN),
                 "show_companies_failed" => __("Failed get companies sitemap", THEME_DOMAIN)
+            ],
+            'job_alert' => [
+                "email_alert_success" => __( "Bedankt voor het versturen van de job alert aanmaken!", THEME_DOMAIN ),
+                "email_alert_failed" => __( "Kan zich niet aanmelden voor jobwaarschuwing of e-mail verzenden.", THEME_DOMAIN ),
             ]
         ];
     }
