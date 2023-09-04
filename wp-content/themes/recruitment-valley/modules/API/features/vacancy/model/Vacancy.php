@@ -55,7 +55,8 @@ class Vacancy
     public $acf_twitter_url = "twitter_url";
     public $acf_gallery = "gallery";
     public $acf_reviews = "reviews";
-    public $acf_country = "country";
+    // public $acf_country = "country"; // Changed Below
+    public $acf_country = 'rv_vacancy_country';
     public $acf_salary_start = "salary_start";
     public $acf_salary_end = "salary_end";
     public $acf_external_url = "external_url";

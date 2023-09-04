@@ -111,6 +111,7 @@ class RequestRules
             ],
             'vacancyCreatePaid' => [
                 "name" => ['required'],
+                "country" => ["required"],
                 "description" => ["required"],
                 "city" => ['required'],
                 "placementAddress" => ["required"],
@@ -136,6 +137,7 @@ class RequestRules
             ],
             'vacancyUpdateFree' => [
                 "description" => ["required"],
+                "country" => ["required"],
                 "city" => ["required"],
                 "placementAddress" => ["required"],
                 "salaryStart" => ["numeric"],
@@ -173,6 +175,7 @@ class RequestRules
                 "applicationProcedureTitle" => [],
                 "applicationProcedureText"  => [],
                 "review"                    => [],
+                "country" => ["required"],
             ],
             'addFavorite' => [
                 /**
@@ -365,7 +368,8 @@ class RequestRules
                 "applicationProcedureText"  => "",
                 "review."                    => "",
                 "galleryJob"                => "",
-                "galleryCompany"            => ""
+                "galleryCompany"            => "",
+                "country"                   => "text",
             ],
             "userChangeEmail" => [
                 'newEmail' => "email"
