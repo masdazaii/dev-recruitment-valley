@@ -13,6 +13,7 @@ class EmailRule implements Rule
 
     public function getErrorMessage($field, $parameters): string
     {
-        return "The {$field} must be a valid email address.";
+        // return "The {$field} must be a valid email address.";
+        return "Het veld: {$field} moet een geldig e-mailadres zijn.";
     }
 }
