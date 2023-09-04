@@ -39,7 +39,7 @@ class CreatePaidJobRequest implements MiRequest
             "applicationProcedureTitle" => [],
             "applicationProcedureText" => [],
             "applicationProcedureSteps.*" => [],
-            "video" => ["url"],
+            "video" => ["max_file_size:10240000"],
             "facebook" => ["url"],
             "linkedin" => ["url"],
             "instagram" => ["url"],

@@ -6,6 +6,7 @@ use V\Rule;
 
 class FileMaxSizeRule implements Rule
 {
+
     public function validate($field, $value, $parameters): bool
     {
         $theField = strpos($field, '.*') !== false ? explode('.*', $field)[0] : $field;
@@ -31,7 +32,8 @@ class FileMaxSizeRule implements Rule
         if (strpos($field, '.*') !== false) {
             return "One of the '" . substr($field, 0, -2) . "' value didn't exists.";
         } else {
-            return "The {$field} didn't exists.";
+            // return "The {$field} didn't exists.";
+            return "Bestandsgrootte overschreden, toegestane grootte " . ($parameters[0]/1024000) . "MB";
         }
     }
 }
