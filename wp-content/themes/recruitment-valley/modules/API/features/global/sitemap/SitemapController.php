@@ -86,7 +86,7 @@ class SitemapController
                 $response[] = [
                     "title"         => $vacancy->getTitle(),
                     "description"   => $vacancy->getDescription(),
-                    "url"           => '/vacancy/' . $values->post_name,
+                    "url"           => '/vacatures/' . $values->post_name,
                 ];
             }
         }
@@ -187,7 +187,7 @@ class SitemapController
             $response[] = [
                 "title"         => $company->getName(),
                 "description"   => $company->getDescription(),
-                "url"           => '',
+                "url"           => null,
             ];
         }
 
