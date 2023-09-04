@@ -232,8 +232,8 @@ class Message
                 "show_companies_failed" => __("Failed get companies sitemap", THEME_DOMAIN)
             ],
             'job_alert' => [
-                "email_alert_success" => __( "Job alert subscription and email sent successfully.", THEME_DOMAIN ),
-                "email_alert_failed" => __( "Failed to subscribe to job alert or send email.", THEME_DOMAIN ),
+                "email_alert_success" => __( "Bedankt voor het versturen van de job alert aanmaken!", THEME_DOMAIN ),
+                "email_alert_failed" => __( "Kan zich niet aanmelden voor jobwaarschuwing of e-mail verzenden.", THEME_DOMAIN ),
             ]
         ];
     }

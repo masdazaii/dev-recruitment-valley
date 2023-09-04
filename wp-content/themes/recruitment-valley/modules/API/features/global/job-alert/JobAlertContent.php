@@ -62,9 +62,9 @@ class Data
     private function _getJobAlert() : array
     {
         $args = array(
-            'post_type' => 'jobalert',
-            'post_status' => 'publish',
-            'posts_per_page' => -1,
+            'post_type'         => 'jobalert',
+            'post_status'       => 'publish',
+            'posts_per_page'    => -1,
         );
         
         $jobAlertQuery = new WP_Query($args);
@@ -73,8 +73,8 @@ class Data
 
         $idx = 0;
         foreach ($jobAlertQuery->posts as $post) {
-            $jobAlertId = $post->ID;
-            $field_value = get_fields($jobAlertId);     
+            $jobAlertId     = $post->ID;
+            $field_value    = get_fields($jobAlertId);     
             
             // non object data
             foreach($this->_mapping_field_nonOBJ as $kMeta => $kAcf) {
@@ -118,10 +118,10 @@ class Data
         $one_month_ago = strtotime('-1 month');
 
         $args = [
-            'post_type' => 'vacancy',
-            'post_status' => 'publish',
-            'posts_per_page' => -1,
-            'date_query' => [
+            'post_type'         => 'vacancy',
+            'post_status'       => 'publish',
+            'posts_per_page'    => -1,
+            'date_query'        => [
                 [
                     'after' => date('Y-m-d', $one_month_ago),
                 ],
@@ -133,20 +133,20 @@ class Data
         $job = [];
         foreach ($query->posts as $post) {
   
-            $entry          = [];
-            $entry['id']    = $post->ID;
+            $entry                  = [];
+            $entry['id']            = $post->ID;
             $entry['post_date_gmt'] = $post->post_date_gmt;
-            $entry['url']   = get_permalink($post->ID);
+            $entry['url']           = get_permalink($post->ID);
 
-            $entry['name']  = $post->post_title;
-            $salary_start   = get_field('salary_start', $post->ID);
-            $salary_end     = get_field('salary_end', $post->ID);
+            $entry['name']          = $post->post_title;
+            $salary_start           = get_field('salary_start', $post->ID);
+            $salary_end             = get_field('salary_end', $post->ID);
             foreach($this->_job_taxonomy as $taxonomy) {
                 $terms = wp_get_object_terms( $post->ID, $taxonomy);
                 
                 foreach ($terms as $key => $value) {
-                    $entry[$taxonomy]['term_id'][] = $value->term_id;
-                    $entry[$taxonomy]['name'][] = $value->name;
+                    $entry[$taxonomy]['term_id'][]  = isset($value->term_id) ? $value->term_id : 0;
+                    $entry[$taxonomy]['name'][]     = isset($value->name) ? $value->name : '';
                 }
             }
             $entry['salary_start']  = $salary_start !== '' ? $salary_start : '0';
@@ -178,8 +178,8 @@ class Data
 
                     if(!isset($vacancie[$key]['term_id'])) continue;
 
-                    $vacancie_id = $vacancie[$key]['term_id'];
-                    $intersection = array_intersect($vacancie_id, $id);
+                    $vacancie_id    = $vacancie[$key]['term_id'];
+                    $intersection   = array_intersect($vacancie_id, $id);
 
                     if($intersection) {
                         $result[$filter['email']][$vacancie['id']] = [
@@ -209,13 +209,13 @@ class Data
 
         foreach($vacancies as $vacancie) {
 
-            $inputDate = $vacancie['post_date_gmt'];
-            $currentDate = date('Y-m-d'); 
+            $inputDate      = $vacancie['post_date_gmt'];
+            $currentDate    = date('Y-m-d'); 
 
-            $inputDateTime = new \DateTime($inputDate);
-            $currentDateTime = new \DateTime($currentDate);
+            $inputDateTime      = new \DateTime($inputDate);
+            $currentDateTime    = new \DateTime($currentDate);
 
-            $interval = $inputDateTime->diff($currentDateTime);
+            $interval       = $inputDateTime->diff($currentDateTime);
             $daysDifference = $interval->days;
 
             if ($daysDifference == 0) {
@@ -269,11 +269,9 @@ class Data
      */
     public function main($schedule)
     {
-        $vacancies = $this->_mappingVacanciesPerSchedule();
-
-        $jobAllert = $this->mappingJobPerSchedule();
-
-        $data = $this->_getContentEmail($vacancies[$schedule], $jobAllert[$schedule]);
+        $vacancies  = $this->_mappingVacanciesPerSchedule();
+        $jobAllert  = $this->mappingJobPerSchedule();
+        $data       = $this->_getContentEmail($vacancies[$schedule], $jobAllert[$schedule]);
 
         return $data;
     }
