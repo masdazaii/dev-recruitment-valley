@@ -86,9 +86,9 @@ class VacancyResponse
         $videoUrl = "";
         if($jobVideo != "")
         {
-            $videoUrl = strpos($vacancyModel->getVideoUrl(), "youtu") ? StringHelper::getYoutubeID($vacancyModel->getVideoUrl()) : $vacancyModel->getVideoUrl(); // Added Line
+            $videoUrl = strpos($vacancyModel->getVideoUrl(), "youtu") ? ["type" => "youtube", "url" => StringHelper::getYoutubeID($vacancyModel->getVideoUrl())] : [ "type" => "file", "url" => $vacancyModel->getVideoUrl()]; // Added Line
         }else{
-            $videoUrl = strpos($company->getVideoUrl(), "youtu") ? StringHelper::getYoutubeID($company->getVideoUrl()) : $company->getVideoUrl(); // Added Line
+            $videoUrl = strpos($company->getVideoUrl(), "youtu") ? ["type" => "youtube", "url" => StringHelper::getYoutubeID($company->getVideoUrl())] : ["type" => "file", "url" => $company->getVideoUrl()]; // Added Line
         }
 
         $formattedResponse = [
@@ -213,6 +213,15 @@ class VacancyResponse
             $socialMediaResponse[$socmed] = $vacancyModel->getSocialMedia($socmed);
         }
 
+        $jobVideo = $vacancyModel->getVideoUrl();
+        $videoUrl = "";
+        if($jobVideo != "")
+        {
+            $videoUrl = strpos($vacancyModel->getVideoUrl(), "youtu") ? ["type" => "youtube", "url" => StringHelper::getYoutubeID($vacancyModel->getVideoUrl())] : [ "type" => "file", "url" => $vacancyModel->getVideoUrl()]; // Added Line
+        }else{
+            $videoUrl = strpos($company->getVideoUrl(), "youtu") ? ["type" => "youtube", "url" => StringHelper::getYoutubeID($company->getVideoUrl())] : ["type" => "file", "url" => $company->getVideoUrl()]; // Added Line
+        }
+
         $formattedResponse = [
             "id" => $this->vacancyCollection->ID,
             "isPaid" => $vacancyModel->getIsPaid(),
@@ -224,7 +233,7 @@ class VacancyResponse
             ],
             "city" => [$vacancyModel->getCity('object')],
             "placementAddress" => $vacancyModel->getPlacementAddress(),
-            "videoId" =>  $vacancyModel->getVideoUrl() == "" || $vacancyModel->getVideoUrl() == null  ? $company->getVideoUrl() : $vacancyModel->getVideoUrl() , // Added Line
+            "videoId" => $videoUrl,  
             "gallery" => $vacancyModel->getGallery(),
             "reviews" => $vacancyModel->getReviews(),
             "salaryStart" => $vacancyModel->getSalaryStart(),
