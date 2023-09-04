@@ -94,6 +94,10 @@ class Validator
                 return new MaxStoredRule();
             case 'wywsig':
                 return new RequiredRule();
+            case 'mime':
+                return new MimeRule();
+            case 'max_file_size':
+                return new FileMaxSizeRule();
             default:
                 throw new Exception("Rule '{$ruleName}' not supported.");
         }
