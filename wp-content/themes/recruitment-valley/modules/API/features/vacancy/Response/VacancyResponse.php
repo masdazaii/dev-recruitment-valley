@@ -219,9 +219,9 @@ class VacancyResponse
         $videoUrl = "";
         if($jobVideo != "")
         {
-            $videoUrl = strpos($vacancyModel->getVideoUrl(), "youtu") ? ["type" => "url", "url" => StringHelper::getYoutubeID($vacancyModel->getVideoUrl())] : [ "type" => "file", "url" => $vacancyModel->getVideoUrl()]; // Added Line
+            $videoUrl = strpos($vacancyModel->getVideoUrl(), "youtu") ? ["type" => "url", "url" => $vacancyModel->getVideoUrl()] : [ "type" => "file", "url" => $vacancyModel->getVideoUrl()]; // Added Line
         }else{
-            $videoUrl = strpos($company->getVideoUrl(), "youtu") ? ["type" => "url", "url" => StringHelper::getYoutubeID($company->getVideoUrl())] : ["type" => "file", "url" => $company->getVideoUrl()]; // Added Line
+            $videoUrl = strpos($company->getVideoUrl(), "youtu") ? ["type" => "url", "url" => $company->getVideoUrl()] : ["type" => "file", "url" => $company->getVideoUrl()]; // Added Line
         }
 
         $formattedResponse = [
