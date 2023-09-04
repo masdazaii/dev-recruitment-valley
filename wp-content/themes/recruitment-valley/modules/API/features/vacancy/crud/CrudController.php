@@ -282,6 +282,7 @@ class VacancyCrudController
     {
         $payload = [
             "title" => $request["name"],
+            "country" => $request['country'], // Added Line
             "city" => $request["city"],
             "placementAddress" => $request["placementAddress"],
             "description" => $request["description"],
@@ -316,6 +317,8 @@ class VacancyCrudController
             $vacancyModel->setProp($vacancyModel->acf_apply_from_this_platform, $payload["apply_from_this_platform"]);
             // $vacancyModel->setProp($vacancyModel->acf_expired_at, date("Y-m-d H:i:s"));
             $vacancyModel->setProp($vacancyModel->acf_placement_address, $payload["placementAddress"]);
+
+            $vacancyModel->setProp($vacancyModel->acf_country, $payload['country']); // Added line
 
             if ($payload["apply_from_this_platform"]) {
                 $vacancyModel->setProp($vacancyModel->acf_external_url, $payload["external_url"]);
@@ -383,6 +386,7 @@ class VacancyCrudController
                 "status" => [32] // set free job become pending category
             ],
             "application_process_step" => $request["applicationProcedureSteps"],
+            'rv_vacancy_country' => $request['country'] // Added Line
         ];
 
         global $wpdb;
@@ -440,11 +444,10 @@ class VacancyCrudController
                 }
             }
 
-            if(isset($_FILES['video']['name']))
-            {
-                $video = ModelHelper::handle_upload('video' );
+            if (isset($_FILES['video']['name'])) {
+                $video = ModelHelper::handle_upload('video');
                 $vacancyModel->setVideoUrl($video["video"]["url"]);
-            }else{
+            } else {
                 $vacancyModel->setVideoUrl($payload["video_url"]);
             }
 
@@ -669,11 +672,10 @@ class VacancyCrudController
                 }
             }
 
-            if(isset($_FILES['video']['name']))
-            {
-                $video = ModelHelper::handle_upload('video' );
+            if (isset($_FILES['video']['name'])) {
+                $video = ModelHelper::handle_upload('video');
                 $vacancyModel->setVideoUrl($video["video"]["url"]);
-            }else{
+            } else {
                 $vacancyModel->setVideoUrl($payload["video_url"]);
             }
 
@@ -840,6 +842,7 @@ class VacancyCrudController
                 "type" => $request["employmentType"],
                 "experiences" => $request["experiences"] ?? [], // Added Line
             ],
+            'rv_vacancy_country' => $request['country']
         ];
 
         return $payload;
@@ -877,6 +880,7 @@ class VacancyCrudController
                 "experiences" => $request["experiences"] ?? [], // Added Line
             ],
             "application_process_step" => $request["applicationProcedureSteps"],
+            'rv_vacancy_country' => $request['country']
         ];
 
         return $payload;

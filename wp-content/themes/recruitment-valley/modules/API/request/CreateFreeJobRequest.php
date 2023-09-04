@@ -4,16 +4,19 @@ namespace Request;
 
 use V\Rules\Validator;
 use WP_REST_Request;
+use Constant\Message;
 
 class CreateFreeJobRequest implements MiRequest
 {
     private $_request;
     private $_validator;
+    private $_message;
 
     public function __construct(WP_REST_Request $request)
     {
         $this->_request = $request;
         $this->_validator = new Validator($this->_request->get_params(), $this->rules(), $this->sanitizeRules());
+        $this->_message = new Message();
     }
 
     public function rules(): array
@@ -21,6 +24,7 @@ class CreateFreeJobRequest implements MiRequest
         return [
             "name" => ['required'],
             "description" => ["required", "wywsig"],
+            "country" => ["required"], // Added Line
             "city" => ["required"],
             "placementAddress" => ["required"],
             // "salaryStart" => ["required", "numeric"],
@@ -41,6 +45,7 @@ class CreateFreeJobRequest implements MiRequest
         return [
             "name" => "text",
             "description" => "ksespost",
+            "country" => "text", // Added Line
             "city" => "text",
             "placementAddress" => "text",
             // "salaryStart" => ["required", "numeric"],
@@ -74,9 +79,17 @@ class CreateFreeJobRequest implements MiRequest
 
     public function getErrors(): array
     {
+        // return [
+        //     "status" => 400,
+        //     "message" => $this->_validator->getErrors(),
+        // ];
+
+        $errors = $this->_validator->getErrors();
+        $keys = array_keys($errors);
+        $message = $errors[$keys[0]][0] ?? $this->_message->get('vacancy.create.free.free');
         return [
             "status" => 400,
-            "message" => $this->_validator->getErrors(),
+            "message" => $message
         ];
     }
 }
