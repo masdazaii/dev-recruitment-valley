@@ -8,6 +8,7 @@ use Exception;
 use Helper;
 use Helper\ValidationHelper;
 use Helper\DateHelper;
+use Helper\StringHelper;
 use Model\Company;
 use Model\ModelHelper;
 use ResponseHelper;
@@ -68,35 +69,15 @@ class ProfileController
                 'value' => $term->term_id,
             ];
         }
-        /** Added line End here */
 
-        // $socialMedia = [
-        //     [
-        //         "type" => "facebook",
-        //         "url" => "ucma_facebook_url"
-        //     ],
-        //     [
-        //         "type" => "linkedin",
-        //         "url" => "ucma_linkedin_url"
-        //     ],
-        //     [
-        //         "type" => "instagram",
-        //         "url" => "ucma_instagram_url"
-        //     ],
-        //     [
-        //         "type" => "twitter",
-        //         "url" => "ucma_twitter_url"
-        //     ],
-        // ];
+        $company = new Company($user_id);
 
-        // $socialMediaResponse = [];
-        // foreach ($socialMedia as $key => $socmed) {
-        //     $socialMediaResponse[$key] = [
-        //         "id" => $key + 1,
-        //         "type" => $socmed["type"],
-        //         "url" => Helper::isset($user_data_acf, $socmed["url"])
-        //     ];
-        // }
+        $videoUrl = null;
+        if($company->getVideoUrl() != "")
+        {
+            $videoUrl = strpos($company->getVideoUrl(), "youtu") ? ["type" => "url", "url" => $company->getVideoUrl()] : ["type" => "file", "url" => $company->getVideoUrl()]; // Added Line
+        }
+        
 
         $addressResponse = '';
         if (Helper::isset($user_data_acf, 'ucma_city') !== null || Helper::isset($user_data_acf, 'ucma_country') !== null) {
@@ -145,7 +126,8 @@ class ProfileController
                 'information' => [
                     'shortDescription' => Helper::isset($user_data_acf, 'ucma_short_decription'),
                     'secondaryEmploymentConditions' => Helper::isset($user_data_acf, 'ucma_benefit'),
-                    'videoUrl' => Helper::isset($user_data_acf, 'ucma_company_video_url'),
+                    // 'videoUrl' => Helper::isset($user_data_acf, 'ucma_company_video_url'),
+                    'videoUrl' => $videoUrl,
                     'gallery' => $galleries
                 ],
             ],
