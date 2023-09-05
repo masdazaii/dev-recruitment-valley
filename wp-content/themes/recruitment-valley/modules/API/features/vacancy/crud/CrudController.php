@@ -400,7 +400,7 @@ class VacancyCrudController
             // $company = new Company($payload["user_id"]);
             // $companyCredit = $company->getCredit();
             // $paidJobPrice = 1;
-            // if ($companyCredit < $paidJobPrice) return ["status" => 402, "message" => "Your credit is insufficient."];
+            // if ($companyCredit < $paidJobPrice) return ["status" => 402, "message" => $this->_message->get('company.profile.insufficient_credit')];
             /** Anggit's syntax end here */
 
             /** Changes start here */
@@ -411,7 +411,7 @@ class VacancyCrudController
             if (!$isUnlimited) {
                 $companyCredit = $company->getCredit();
                 $paidJobPrice = 1;
-                if ($companyCredit < $paidJobPrice) return ["status" => 402, "message" => "Your credit is insufficient."];
+                if ($companyCredit < $paidJobPrice) return ["status" => 402, "message" => $this->_message->get('company.profile.insufficient_credit')];
             }
 
             //end job validation
@@ -907,7 +907,7 @@ class VacancyCrudController
         $author = (int) $vacancy->getAuthor();
 
         // return 400 if author and user id not match
-        if ($author !== $user_id) return ["status" => 400, "message" => "user not have permission to repost this job with"];
+        if ($author !== $user_id) return ["status" => 400, "message" => $this->_message->get('company.vacancy.repost_no_permission')];
 
         // return 400 if post id not found
         if (get_post_status($vacancy_id) === false)   return ["status" => 400, "message" => "invalid post"];
@@ -921,14 +921,15 @@ class VacancyCrudController
         $credit_per_post = 1;
 
         // return 402 if credit is insufficient
-        if ($job_credit < $credit_per_post) return ["status" => 402, "message" => "Your credit is insufficient."];
+        if ($job_credit < $credit_per_post) return ["status" => 402, "message" => $this->_message->get("company.profile.insufficient_credit")];
 
         // get status vacancies
         $status = $vacancy->getStatus();
         $status_lower = strtolower($status['name']);
 
         // return 400 if status post is not Close
-        if ($status_lower !== 'close') return ["status" => 402, "message" => "You cannot repost a job with id {$vacancy_id}, because the job is still in the {$status['name']} state."];
+        // if ($status_lower !== 'close') return ["status" => 402, "message" => "You cannot repost a job with id {$vacancy_id}, because the job is still in the {$status['name']} state."]; // Changed Below
+        if ($status_lower !== 'close') return ["status" => 402, "message" => $this->_message->get('company.vacancy.repost_can_not')];
 
         // remove old term status
         $taxonomy = 'status';
@@ -955,7 +956,7 @@ class VacancyCrudController
         // return status 200
         return [
             "status" => 402,
-            "message" => "vacancy successfully reposted"
+            "message" => $this->_message->get('company.vacancy.repost_success')
         ];
     }
 

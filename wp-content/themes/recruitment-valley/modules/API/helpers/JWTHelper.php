@@ -52,7 +52,7 @@ class JWTHelper
         if ($token == "") {
             return [
                 "status" => 400,
-                "message" => "Token Invalid"
+                "message" => self::$_message->get('auth.invalid_token')
             ];
         }
 
@@ -68,7 +68,7 @@ class JWTHelper
         } catch (UnexpectedValueException $e) {
             return [
                 "status" => 400,
-                "message" => "Token Invalid"
+                "message" => self::$_message->get('auth.invalid_token')
             ];
         }
     }
@@ -76,9 +76,8 @@ class JWTHelper
     public static function has(WP_REST_Request $request)
     {
         $token = $request->get_header("Authorization");
-        
-        if(!$token)
-        {
+
+        if (!$token) {
             return false;
         }
 
