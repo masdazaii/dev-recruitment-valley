@@ -187,6 +187,12 @@ class GlobalEndpoint
                     'permission_callback'   => '__return_true',
                     'callback'              => [$jobAlertService, 'jobAlert']
                 ],
+                'Job_alert_unsubscribe' => [
+                    'url'                   => 'job-alert/unsubscribe',
+                    'methods'               => 'DELETE',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$jobAlertService, 'unsubscribe']
+                ],
                 'root_sitemap' => [
                     'url'                   => '/sitemap',
                     'methods'               => 'GET',
