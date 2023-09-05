@@ -252,14 +252,14 @@ class Message
                     "trans_not_found" => __("Transactie niet gevonden", THEME_DOMAIN)
                 ],
                 "create_payment" => [
-                    "error" => __("something error when creating payment", THEME_DOMAIN)
+                    "error" => __("er is een fout opgetreden bij het aanmaken van de betaling", THEME_DOMAIN)
                 ]
             ],
             'sitemap' => [
-                "get_success" => __("Success get all sitemaps", THEME_DOMAIN),
-                "get_failed"  => __("Failed get all sitemaps", THEME_DOMAIN),
-                "show_companies_success" => __("Success get companies sitemap", THEME_DOMAIN),
-                "show_companies_failed" => __("Failed get companies sitemap", THEME_DOMAIN)
+                "get_success" => __("Succes, ontvang alle sitemaps", THEME_DOMAIN),
+                "get_failed"  => __("Kan niet alle sitemaps ophalen", THEME_DOMAIN),
+                "show_companies_success" => __("Succes krijg bedrijven sitemap", THEME_DOMAIN),
+                "show_companies_failed" => __("Kan de sitemap van bedrijven niet ophalen", THEME_DOMAIN)
             ],
             'job_alert' => [
                 "email_alert_success" => __("Bedankt voor het versturen van de job alert aanmaken!", THEME_DOMAIN),
