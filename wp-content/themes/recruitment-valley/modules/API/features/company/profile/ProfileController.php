@@ -73,11 +73,10 @@ class ProfileController
         $company = new Company($user_id);
 
         $videoUrl = null;
-        if($company->getVideoUrl() != "")
-        {
+        if ($company->getVideoUrl() != "") {
             $videoUrl = strpos($company->getVideoUrl(), "youtu") ? ["type" => "url", "url" => $company->getVideoUrl()] : ["type" => "file", "url" => $company->getVideoUrl()]; // Added Line
         }
-        
+
 
         $addressResponse = '';
         if (Helper::isset($user_data_acf, 'ucma_city') !== null || Helper::isset($user_data_acf, 'ucma_country') !== null) {
@@ -280,11 +279,10 @@ class ProfileController
             $galleries = ModelHelper::handle_uploads('gallery', $user_id); // Changes!
 
             $company = new Company($user_id);
-            if(isset($_FILES['videoUrl']['name']))
-            {
-                $video = ModelHelper::handle_upload('videoUrl' );
-                $company->setVideoUrl( $video["videoUrl"]["url"] );
-            }else{
+            if (isset($_FILES['videoUrl']['name'])) {
+                $video = ModelHelper::handle_upload('videoUrl');
+                $company->setVideoUrl($video["videoUrl"]["url"]);
+            } else {
                 update_field('ucma_company_video_url', Helper::isset($fields, 'videoUrl'), 'user_' . $user_id);
             }
 
@@ -405,13 +403,12 @@ class ProfileController
                 update_field('ucma_image', $image_id, 'user_' . $request['user_id']);
             }
 
-            
+
             $company = new Company($request["user_id"]);
-            if(isset($_FILES['companyVideo']['name']))
-            {
-                $video = ModelHelper::handle_upload('companyVideo' );
-                $company->setVideoUrl( $video["companyVideo"]["url"] );
-            }else{
+            if (isset($_FILES['companyVideo']['name'])) {
+                $video = ModelHelper::handle_upload('companyVideo');
+                $company->setVideoUrl($video["companyVideo"]["url"]);
+            } else {
                 update_field('ucma_company_video_url', $request['companyVideo'], 'user_' . $request['user_id']);
             }
 
@@ -448,7 +445,7 @@ class ProfileController
                 "errors" => $errors,
                 "status" => 500
             ];
-        } catch ( WP_Error $errors){
+        } catch (WP_Error $errors) {
             $wpdb->query('ROLLBACK');
 
             return [
@@ -456,7 +453,7 @@ class ProfileController
                 "errors" => $errors->get_error_message(),
                 "status" => 500
             ];
-        } catch ( Exception $errors ){
+        } catch (Exception $errors) {
             $wpdb->query('ROLLBACK');
 
             return [
@@ -464,7 +461,7 @@ class ProfileController
                 "errors" => $errors->getMessage(),
                 "status" => 500
             ];
-        } catch ( Throwable $errors ){
+        } catch (Throwable $errors) {
             $wpdb->query('ROLLBACK');
 
             return [
@@ -605,11 +602,16 @@ class ProfileController
         try {
             $company = new Company($request["user_id"]);
 
+            $videoUrl = $company->getVideoUrl() ?? null;
+            if ($videoUrl && !empty($videoUrl)) {
+                $videoUrl = strpos($company->getVideoUrl(), "youtu") ? ["type" => "url", "url" => $company->getVideoUrl()] : ["type" => "file", "url" => $company->getVideoUrl()];
+            }
+
             return [
                 'status' => 200,
                 'message' => $this->message->get('company.profile.get_success'),
                 'data' => [
-                    'videoUrl' => $company->getVideoUrl() ?? null,
+                    'videoUrl' => !empty($videoUrl) ? $videoUrl : null,
                     'socialMedia' => [
                         'facebook' => $company->getFacebook(),
                         'linkedin' => $company->getLinkedin(),

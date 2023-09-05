@@ -13,6 +13,7 @@ class FileRule implements Rule
 
     public function getErrorMessage($field, $parameters): string
     {
-        return "File type not allowed.";
+        // return "File type not allowed.";
+        return "Bestandstype niet toegestaan.";
     }
 }

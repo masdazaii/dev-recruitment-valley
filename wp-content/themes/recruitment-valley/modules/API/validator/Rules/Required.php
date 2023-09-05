@@ -13,6 +13,6 @@ class RequiredRule implements Rule
 
     public function getErrorMessage($field, $parameters): string
     {
-        return "The {$field} field is required.";
+        return "het veld: '{$field}' is verplicht.";
     }
 }

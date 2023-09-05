@@ -13,6 +13,7 @@ class MinRule implements Rule
 
     public function getErrorMessage($field, $parameters): string
     {
-        return "The {$field} must be at least {$parameters[0]} characters.";
+        // return "The {$field} must be at least {$parameters[0]} characters.";
+        return "Het veld: {$field} moet minimaal {$parameters[0]} tekens bevatten.";
     }
 }

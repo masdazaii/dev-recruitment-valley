@@ -51,6 +51,7 @@ class NotMatchRule implements RuleWithRequest
     public function getErrorMessage($field, $parameters): string
     {
         $parameters = is_array($parameters) ? $parameters[0] : $parameters;
-        return "The {$field} should be different from field {$parameters}.";
+        // return "The {$field} should be different from field {$parameters}.";
+        return "Het veld: {$field} moet anders zijn dan veld: {$parameters}.";
     }
 }
