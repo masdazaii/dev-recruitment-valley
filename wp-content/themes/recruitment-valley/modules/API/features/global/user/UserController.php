@@ -98,7 +98,7 @@ class UserController
 
         return [
             "status" => 200, 
-            "message" => "Successfully delete user with id {$userId}",
+            "message" => "Successfully delete user with",
         ];
 
     }

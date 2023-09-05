@@ -907,7 +907,7 @@ class VacancyCrudController
         $author = (int) $vacancy->getAuthor();
 
         // return 400 if author and user id not match
-        if ($author !== $user_id) return ["status" => 400, "message" => "user not have permission to repost this job with id {$vacancy_id}"];
+        if ($author !== $user_id) return ["status" => 400, "message" => "user not have permission to repost this job with"];
 
         // return 400 if post id not found
         if (get_post_status($vacancy_id) === false)   return ["status" => 400, "message" => "invalid post"];
@@ -955,7 +955,7 @@ class VacancyCrudController
         // return status 200
         return [
             "status" => 402,
-            "message" => "post with id {$vacancy_id} successfully reposted"
+            "message" => "vacancy successfully reposted"
         ];
     }
 

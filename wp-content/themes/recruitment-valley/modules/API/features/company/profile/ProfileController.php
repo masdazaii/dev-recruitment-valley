@@ -586,7 +586,7 @@ class ProfileController
 
             return [
                 "status" => 200,
-                "message" => "success get company credit",
+                "message" => "succes, bedrijfskrediet toegevoegd",
                 "data" => [
                     "credit" => $company->getCredit(),
                     "timeExpired" => DateHelper::doLocale(strtotime($company->getUnlimitedExpired()), 'nl_NL', 'dd MMMM yyyy') ?? null

@@ -108,7 +108,7 @@ class PackageController
         if (is_wp_error($transactionId) || !$transactionId) {
             return [
                 "status" => 500,
-                "message" => "something error when creating payment"
+                "message" => "er is een fout opgetreden bij het aanmaken van de betaling"
             ];
         }
 
@@ -195,7 +195,7 @@ class PackageController
         if ($request["user_id"] != $decodedToken->user_id) {
             return [
                 "status" => 400,
-                "message" => "user not match"
+                "message" => "gebruiker komt niet overeen"
             ];
         }
 
@@ -203,7 +203,7 @@ class PackageController
         if ($transaction instanceof Exception) {
             return [
                 "status" => 400,
-                "message" => "Transaction not found"
+                "message" => "Transactie niet gevonden"
             ];
         }
 
