@@ -11,7 +11,7 @@ class Message
         $this->list = [
             'auth' => [
                 'unauthenticate' => __('Unauthorized', THEME_DOMAIN),
-                'invalid_token' => __('Ongeldige token', THEME_DOMAIN),
+                'invalid_token' => __('Token ongeldig', THEME_DOMAIN),
                 'expired' => __('Verlopen', THEME_DOMAIN),
                 'generate_token_success' => __('Token succes aangemaakt', THEME_DOMAIN),
                 'generate_token_error' => __('Er iets misgegaan bij het aanmaken van een token', THEME_DOMAIN),
@@ -83,13 +83,19 @@ class Message
                     "success" => __("Succes, wachtwoord is gewijzigd", THEME_DOMAIN),
                     "fail" => __("Fail delete account", THEME_DOMAIN),
                     "user_not_found" => __("User not found", THEME_DOMAIN),
-                    "password_missmatch" => __("Password missmatch", THEME_DOMAIN)   
+                    "password_missmatch" => __("Password missmatch", THEME_DOMAIN)
                 ],
                 "change_password" => [
                     "incorrect_password" => __("Incorrect wachtwoord", THEME_DOMAIN),
                     "new_password_missmatch" => __("nieuw wachtwoord komt niet overeen", THEME_DOMAIN),
                     "success" => __("Succes, wachtwoord is gewijzigd", THEME_DOMAIN),
                 ],
+                "account" => [
+                    "still_active" => __("Gebruiker nog steeds actief.", THEME_DOMAIN),
+                    "reactive_success" => __("Gebruiker reactiveert success.", THEME_DOMAIN),
+                    "reactive_failed" => __("Opnieuw activeren van gebruiker mislukt.", THEME_DOMAIN),
+                    "delete_success" => __("Gebruiker succesvol verwijderd.", THEME_DOMAIN)
+                ]
             ],
             'input' => [
                 'invalid_input'   => __("Input is incorrect.", THEME_DOMAIN),
@@ -201,6 +207,11 @@ class Message
                         'success' => __("succes, bedrijfskrediet toegevoegd.", THEME_DOMAIN),
                     ],
                     'insufficient_credit' => __("Uw krediet is onvoldoende.", THEME_DOMAIN)
+                ],
+                'vacancy' => [
+                    'repost_success' => __("Vacature succesvol opnieuw geplaatst.", THEME_DOMAIN),
+                    'repost_can_not' => __("U kunt een vacature niet opnieuw plaatsen.", THEME_DOMAIN),
+                    'repost_no_permission' => __("Gebruiker heeft geen toestemming om deze vacature opnieuw te plaatsen.", THEME_DOMAIN)
                 ]
             ],
             'package' => [
@@ -212,7 +223,16 @@ class Message
                     "trx_not_found" => __("Transactie niet gevonden", THEME_DOMAIN),
                     "success_grant" => __("Succes met het verlenen van krediet", THEME_DOMAIN),
                     "payment_fail" => __("betaling mislukt", THEME_DOMAIN),
-                    "success_get_receipt" => __("Succes ontvang ontvangstbewijs", THEME_DOMAIN),
+                    "success_get_receipt" => __("Success ontvang ontvangstbewijs", THEME_DOMAIN),
+                ],
+                "payment" => [
+                    "trigger_payment_fail" => __("betalingsfout geactiveerd", THEME_DOMAIN),
+                    "payment_fail" => __("Betaling mislukt", THEME_DOMAIN),
+                    "granting_credit_success" => __("Succes met het verlenen van krediet", THEME_DOMAIN),
+                    "granting_credit_already" => __("Deze transactie verleent al krediet", THEME_DOMAIN),
+                ],
+                "webhook" => [
+                    "event_not_registered" => __("evenement is niet geregistreerd", THEME_DOMAIN)
                 ]
             ],
             'system' => [
@@ -242,8 +262,11 @@ class Message
                 "show_companies_failed" => __("Failed get companies sitemap", THEME_DOMAIN)
             ],
             'job_alert' => [
-                "email_alert_success" => __( "Bedankt voor het versturen van de job alert aanmaken!", THEME_DOMAIN ),
-                "email_alert_failed" => __( "Kan zich niet aanmelden voor jobwaarschuwing of e-mail verzenden.", THEME_DOMAIN ),
+                "email_alert_success" => __("Bedankt voor het versturen van de job alert aanmaken!", THEME_DOMAIN),
+                "email_alert_failed" => __("Kan zich niet aanmelden voor jobwaarschuwing of e-mail verzenden.", THEME_DOMAIN),
+            ],
+            'other' => [
+                'invalid_post' => __("ongeldig bericht", THEME_DOMAIN),
             ]
         ];
     }

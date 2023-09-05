@@ -116,7 +116,7 @@ class VacancyCrudService
         $params = $request->get_params();
         $params["user_id"] = $request["user_id"];
 
-        if (get_post_status($params['vacancy_id']) === false) return ResponseHelper::build(['status' => 400, 'message' => 'invalid post']);
+        if (get_post_status($params['vacancy_id']) === false) return ResponseHelper::build(['status' => 400, 'message' => $this->_message->get('other.invalid_post')]);
 
         $response = $this->vacancyCrudController->update($params);
         return ResponseHelper::build($response);
@@ -127,7 +127,7 @@ class VacancyCrudService
         $params = $request->get_params();
         $params["user_id"] = $request["user_id"];
 
-        if (get_post_status($params['vacancy_id']) === false) return ResponseHelper::build(['status' => 400, 'message' => 'invalid post']);
+        if (get_post_status($params['vacancy_id']) === false) return ResponseHelper::build(['status' => 400, 'message' => $this->_message->get('other.invalid_post')]);
 
         /** Changes start here */
         $validator = new ValidationHelper('vacancyUpdateFree', $request->get_params());
@@ -158,7 +158,7 @@ class VacancyCrudService
         $params = $request->get_params();
         $params["user_id"] = $request["user_id"];
 
-        if (get_post_status($params['vacancy_id']) === false) return ResponseHelper::build(['status' => 400, 'message' => 'invalid post']);
+        if (get_post_status($params['vacancy_id']) === false) return ResponseHelper::build(['status' => 400, 'message' => $this->_message->get('other.invalid_post')]);
 
         /** Changes start here */
         $validator = new ValidationHelper('vacancyUpdatePaid', $request->get_params());

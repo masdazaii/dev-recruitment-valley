@@ -296,7 +296,7 @@ class PackageController
             default:
                 return [
                     "status" => 400,
-                    "message" => "event not registered"
+                    "message" => $this->_message->get("package.webhook.event_not_registered")
                 ];
         }
     }
@@ -318,7 +318,7 @@ class PackageController
             if (!$transaction->isGranted()) {
                 return [
                     "status" => 400,
-                    "message" => "This transaction already granting credit"
+                    "message" => $this->_message->get("package.payment.granting_credit_already")
                 ];
             }
 
@@ -371,13 +371,13 @@ class PackageController
 
             return [
                 "status" => 200,
-                "message" => "Success granting credit"
+                "message" => $this->_message->get("package.payment.granting_credit_success")
             ];
         }
 
         return [
             "status" => 400,
-            "message" => "payment fail"
+            "message" => $this->_message->get("package.payment.payment_fail")
         ];
     }
 
@@ -393,7 +393,7 @@ class PackageController
 
         return [
             "status" => 400,
-            "message" => "payment fail triggerred"
+            "message" => $this->_message->get("package.payment.trigger_fail")
         ];
     }
 
@@ -431,7 +431,7 @@ class PackageController
 
         return [
             "status" => 200,
-            "message" => "Success get receipt"
+            "message" => $this->_message->get("package.package.success_get_receipt")
         ];
     }
 

@@ -66,71 +66,64 @@ class UserController
         $request = $request->get_params();
         $userPassword = $request["password"];
 
-        $user = get_user_by( "id", $userId );
-        if(!$user)
-        {
+        $user = get_user_by("id", $userId);
+        if (!$user) {
             return [
-                "status" => 400, 
+                "status" => 400,
                 "message" => $this->_message->get("profile.delete.user_not_found"),
             ];
         }
 
-        if(UserHelper::is_deleted($user->ID))
-        {
+        if (UserHelper::is_deleted($user->ID)) {
             return [
-                "status" => 400, 
+                "status" => 400,
                 "message" => $this->_message->get("profile.user_deleted"),
             ];
         }
 
-        $samePassword = wp_check_password( $userPassword, $user->user_pass, $user->ID );
-        if(!$samePassword)
-        {
+        $samePassword = wp_check_password($userPassword, $user->user_pass, $user->ID);
+        if (!$samePassword) {
             return [
-                "status" => 400, 
+                "status" => 400,
                 "message" => $this->_message->get("profile.delete.password_missmatch"),
             ];
         }
 
-        
-        require_once(ABSPATH.'wp-admin/includes/user.php');
+
+        require_once(ABSPATH . 'wp-admin/includes/user.php');
         wp_delete_user($userId);
 
         return [
-            "status" => 200, 
-            "message" => "Successfully delete user with",
+            "status" => 200,
+            "message" => $this->_message->get("profile.acount.delete_success"),
         ];
-
     }
 
-    public function deleteAccount( WP_REST_Request $request )
+    public function deleteAccount(WP_REST_Request $request)
     {
         $userId = $request->user_id;
         $request = $request->get_params();
         $userPassword = $request["password"];
 
-        $user = get_user_by( "id", $userId );
-        if(!$user)
-        {
+        $user = get_user_by("id", $userId);
+        if (!$user) {
             return [
-                "status" => 400, 
+                "status" => 400,
                 "message" => $this->_message->get("profile.delete.user_not_found"),
             ];
         }
 
-        if(UserHelper::is_deleted($user->ID))
-        {
+        if (UserHelper::is_deleted($user->ID)) {
             return [
-                "status" => 400, 
+                "status" => 400,
                 "message" => $this->_message->get("profile.user_deleted"),
             ];
         }
 
-        $samePassword = wp_check_password( $userPassword, $user->user_pass, $user->ID );
-        if(!$samePassword)
-        {
+        $samePassword = wp_check_password($userPassword, $user->user_pass, $user->ID);
+        if (!$samePassword) {
             return [
-                "status" => 400, 
+                "status" => 400,
                 "message" => $this->_message->get("profile.delete.password_missmatch"),
             ];
         }
@@ -143,58 +136,56 @@ class UserController
             // {
             //     update_user_meta($user->ID, "ucaa_is_full_registered", false);
             // }else{
-            //     update_user_meta($user->ID, "ucma_is_full_registered", false);    
+            //     update_user_meta($user->ID, "ucma_is_full_registered", false);
             // }
-    
+
             update_user_meta($user->ID, 'is_deleted', true);
-            
+
             $this->wpdb->query("COMMIT");
             return [
                 "status" => 201,
-                "message" => $this->_message->get("profile.delete.success") 
+                "message" => $this->_message->get("profile.delete.success")
             ];
         } catch (\Throwable $th) {
             $this->wpdb->query("ROLLBACK");
             return [
                 "status" => 201,
-                "message" => $this->_message->get("profile.delete.fail") 
+                "message" => $this->_message->get("profile.delete.fail")
             ];
         }
     }
 
-    public function reactivate( WP_REST_Request $request )
+    public function reactivate(WP_REST_Request $request)
     {
         $request = $request->get_params();
 
         $token = $request["token"];
 
-        $checkedToken = JWTHelper::check( $token );
+        $checkedToken = JWTHelper::check($token);
 
-        if(is_array($checkedToken))
-        {
+        if (is_array($checkedToken)) {
             return $checkedToken;
         }
 
         $userId = $checkedToken->user_id;
 
         $isUserDeleted = get_user_meta($userId, "is_deleted", true);
-        if(!$isUserDeleted)
-        {
+        if (!$isUserDeleted) {
             return [
                 "status" => 400,
-                "message" => "User still active"
+                "message" => $this->_message->get("profile.account.still_active")
             ];
         }
 
         $this->wpdb->query("START TRANSACTION");
         try {
             update_user_meta($userId, "is_deleted", false);
-            
+
             $this->wpdb->query("COMMIT");
 
             return [
                 "status" => 200,
-                "message" => "User reactivate successfully"
+                "message" => $this->_message->get("profile.account.reactive_success")
             ];
         } catch (\Throwable $th) {
             //throw $th;
@@ -202,7 +193,7 @@ class UserController
             error_log($th->getMessage());
             return [
                 "status" => 400,
-                "message" => "User reactivate failed"
+                "message" => $this->_message->get("profile.account.reactive_failed")
             ];
         }
     }
