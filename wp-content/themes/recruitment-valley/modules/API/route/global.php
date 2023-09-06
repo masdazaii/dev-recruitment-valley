@@ -13,6 +13,7 @@ use Global\PackageService;
 use JobAlert\JobAlertService;
 use Global\User\UserService;
 use Sitemap\SitemapService;
+use Service\ParserService;
 
 class GlobalEndpoint
 {
@@ -39,6 +40,7 @@ class GlobalEndpoint
         $jobAlertService = new JobAlertService;
         $userService = new UserService;
         $sitemapService = new SitemapService;
+        $parserService = new ParserService;
 
         $endpoint = [
             'path' => '',
@@ -81,13 +83,13 @@ class GlobalEndpoint
                     'callback'              => [$favoriteVacancyService, 'addFavoriteVacancy'],
                 ],
                 'check_if_favorite' => [
-                    'url'                   => '/vacancies/check-favorite/(?P<vacancy_slug>[a-zA-Z0-9-]+)',
+                    'url'                   => '/vacancies/check-favorite/(?P<vacancy_slug>[a-zA-Z0-9-_]+)',
                     'methods'               => 'GET',
                     'permission_callback'   => [$authMiddleware, 'authorize_candidate'],
                     'callback'              => [$favoriteVacancyService, 'check']
                 ],
                 'vacancies_single' => [
-                    'url'                   => 'vacancies/(?P<vacancy_slug>[a-zA-Z0-9-]+)',
+                    'url'                   => 'vacancies/(?P<vacancy_slug>[a-zA-Z0-9-_]+)',
                     'methods'               => 'GET',
                     'permission_callback'   => '__return_true',
                     'callback'              => [$crudVacancyService, 'get']
@@ -187,12 +189,24 @@ class GlobalEndpoint
                     'permission_callback'   => '__return_true',
                     'callback'              => [$jobAlertService, 'jobAlert']
                 ],
+                'Job_alert_unsubscribe' => [
+                    'url'                   => 'job-alert/unsubscribe',
+                    'methods'               => 'DELETE',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$jobAlertService, 'unsubscribe']
+                ],
                 'root_sitemap' => [
                     'url'                   => '/sitemap',
                     'methods'               => 'GET',
                     'permission_callback'   => '__return_true',
                     'callback'              => [$sitemapService, 'get']
-                ]
+                ],
+                // 'test_xml' => [
+                //     'url'                   => '/parse',
+                //     'methods'               => 'GET',
+                //     'permission_callback'   => '__return_true',
+                //     'callback'              => [$parserService, 'testParse']
+                // ]
             ]
 
         ];

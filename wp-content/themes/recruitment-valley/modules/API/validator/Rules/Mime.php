@@ -28,6 +28,7 @@ class MimeRule implements Rule
 
     public function getErrorMessage($field, $parameters): string
     {
-        return "{$field} mime-type is not allowed. Allowed mime : " . implode(',', $parameters) . ".";
+        // return "{$field} mime-type is not allowed. Allowed mime : " . implode(',', $parameters) . ".";
+        return "Het veld: {$field} bestandstype is niet toegestaan. Toegestaan bestandstype: " . implode(',', $parameters) . ".";
     }
 }

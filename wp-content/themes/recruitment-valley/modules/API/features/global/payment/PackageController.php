@@ -108,7 +108,7 @@ class PackageController
         if (is_wp_error($transactionId) || !$transactionId) {
             return [
                 "status" => 500,
-                "message" => "something error when creating payment"
+                "message" => "er is een fout opgetreden bij het aanmaken van de betaling"
             ];
         }
 
@@ -171,7 +171,7 @@ class PackageController
 
         $transaction->setTransactionStripeId($session->id);
 
-        // EmailHelper::sendPaymentConfirmation($transactionId); //temporary disable 
+        // EmailHelper::sendPaymentConfirmation($transactionId); //temporary disable
 
         return [
             "status" => 200,
@@ -195,7 +195,7 @@ class PackageController
         if ($request["user_id"] != $decodedToken->user_id) {
             return [
                 "status" => 400,
-                "message" => "user not match"
+                "message" => "gebruiker komt niet overeen"
             ];
         }
 
@@ -203,7 +203,7 @@ class PackageController
         if ($transaction instanceof Exception) {
             return [
                 "status" => 400,
-                "message" => "Transaction not found"
+                "message" => "Transactie niet gevonden"
             ];
         }
 
@@ -296,7 +296,7 @@ class PackageController
             default:
                 return [
                     "status" => 400,
-                    "message" => "event not registered"
+                    "message" => $this->_message->get("package.webhook.event_not_registered")
                 ];
         }
     }
@@ -318,7 +318,7 @@ class PackageController
             if (!$transaction->isGranted()) {
                 return [
                     "status" => 400,
-                    "message" => "This transaction already granting credit"
+                    "message" => $this->_message->get("package.payment.granting_credit_already")
                 ];
             }
 
@@ -371,13 +371,13 @@ class PackageController
 
             return [
                 "status" => 200,
-                "message" => "Success granting credit"
+                "message" => $this->_message->get("package.payment.granting_credit_success")
             ];
         }
 
         return [
             "status" => 400,
-            "message" => "payment fail"
+            "message" => $this->_message->get("package.payment.payment_fail")
         ];
     }
 
@@ -393,7 +393,7 @@ class PackageController
 
         return [
             "status" => 400,
-            "message" => "payment fail triggerred"
+            "message" => $this->_message->get("package.payment.trigger_fail")
         ];
     }
 
@@ -431,7 +431,7 @@ class PackageController
 
         return [
             "status" => 200,
-            "message" => "Success get receipt"
+            "message" => $this->_message->get("package.package.success_get_receipt")
         ];
     }
 

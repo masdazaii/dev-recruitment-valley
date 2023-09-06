@@ -37,6 +37,7 @@ class VacancyResponse
                 "id" => $vacancy->ID,
                 "slug" => $vacancy->post_name,
                 "name" => $vacancy->post_title,
+                "country" => $vacancyModel->getCountry(),
                 "city" => $vacancyModel->getCity(),
                 "placementAddress" => $vacancyModel->getPlacementAddress(),
                 "education" => $vacancyTaxonomy["education"]  ?? null,
@@ -84,11 +85,10 @@ class VacancyResponse
 
         $jobVideo = $vacancyModel->getVideoUrl();
         $videoUrl = "";
-        if($jobVideo != "")
-        {
-            $videoUrl = strpos($vacancyModel->getVideoUrl(), "youtu") ? StringHelper::getYoutubeID($vacancyModel->getVideoUrl()) : $vacancyModel->getVideoUrl(); // Added Line
-        }else{
-            $videoUrl = strpos($company->getVideoUrl(), "youtu") ? StringHelper::getYoutubeID($company->getVideoUrl()) : $company->getVideoUrl(); // Added Line
+        if ($jobVideo != "") {
+            $videoUrl = strpos($vacancyModel->getVideoUrl(), "youtu") ? ["type" => "url", "url" => StringHelper::getYoutubeID($vacancyModel->getVideoUrl())] : ["type" => "file", "url" => $vacancyModel->getVideoUrl()]; // Added Line
+        } else {
+            $videoUrl = strpos($company->getVideoUrl(), "youtu") ? ["type" => "url", "url" => StringHelper::getYoutubeID($company->getVideoUrl())] : ["type" => "file", "url" => $company->getVideoUrl()]; // Added Line
         }
 
         $formattedResponse = [
@@ -127,6 +127,7 @@ class VacancyResponse
                 "description" => $vacancyModel->getDescription(),
                 "term" => $vacancyModel->getTerm(),
             ],
+            "country" => $vacancyModel->getCountry(), // Added Line
             "city" => $vacancyModel->getCity(),
             "externalUrl" => $vacancyModel->getExternalUrl(),
             "placementAddress" => $vacancyModel->getPlacementAddress(),
@@ -213,6 +214,17 @@ class VacancyResponse
             $socialMediaResponse[$socmed] = $vacancyModel->getSocialMedia($socmed);
         }
 
+        $jobVideo = $vacancyModel->getVideoUrl();
+        $videoUrl = "";
+        if ($jobVideo != "") {
+            if (is_array($vacancyModel->getVideoUrl())) {
+            } else {
+                $videoUrl = strpos($vacancyModel->getVideoUrl(), "youtu") ? ["type" => "url", "url" => $vacancyModel->getVideoUrl()] : ["type" => "file", "url" => $vacancyModel->getVideoUrl()]; // Added Line
+            }
+        } else {
+            $videoUrl = strpos($company->getVideoUrl(), "youtu") ? ["type" => "url", "url" => $company->getVideoUrl()] : ["type" => "file", "url" => $company->getVideoUrl()]; // Added Line
+        }
+
         $formattedResponse = [
             "id" => $this->vacancyCollection->ID,
             "isPaid" => $vacancyModel->getIsPaid(),
@@ -222,9 +234,10 @@ class VacancyResponse
                 "description" => $vacancyModel->getDescription(),
                 "term" => $vacancyModel->getTerm(),
             ],
+            "country" => [$vacancyModel->getCountry('object')], // Added Line
             "city" => [$vacancyModel->getCity('object')],
             "placementAddress" => $vacancyModel->getPlacementAddress(),
-            "videoId" =>  $vacancyModel->getVideoUrl() == "" || $vacancyModel->getVideoUrl() == null  ? $company->getVideoUrl() : $vacancyModel->getVideoUrl() , // Added Line
+            "videoId" => $videoUrl,
             "gallery" => $vacancyModel->getGallery(),
             "reviews" => $vacancyModel->getReviews(),
             "salaryStart" => $vacancyModel->getSalaryStart(),

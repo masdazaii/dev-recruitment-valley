@@ -67,6 +67,7 @@ class NotExistsRule implements Rule
 
     public function getErrorMessage($field, $parameters): string
     {
-        return "The {$field} not found.";
+        // return "The {$field} not found.";
+        return "Het veld: {$field} niet gevonden.";
     }
 }

@@ -4,11 +4,16 @@ namespace JobAlert;
 
 use Constant\Message;
 use Helper\ValidationHelper;
+use JWTHelper;
+use WP_Error;
 use WP_Query;
+use WP_REST_Request;
 
 class JobAlertController
 {
     private $message = null;
+
+    private $wpdb;
 
     private $_fields = [
         'emailFrequency'    => 'email_frequency_ja',
@@ -29,7 +34,10 @@ class JobAlertController
 
     public function __construct()
     {
+        global $wpdb;
+
         $this->message = new Message;
+        $this->wpdb = $wpdb;
     }
 
     public function jobAlert($request)
@@ -80,6 +88,60 @@ class JobAlertController
             "status"    => 500,
             "message"   => $this->message->get('job_alert.email_alert_failed')
         ];
+    }
+
+    public function unsubscribe( WP_REST_Request $request )
+    {
+        $checkedToken = JWTHelper::check( $request["token"] );
+
+        // mean error to pass into response helper
+        if (is_array($checkedToken)) {
+            return $checkedToken;
+        }
+
+        $jobAlertId = $checkedToken->job_alert_id;
+
+        $jobAlert = get_post($jobAlertId);
+
+        if(!$jobAlert)
+        {
+            return [
+                "status" => 404,
+                "message" => "Job alert niet gevonden"
+            ];
+        }
+
+        try {
+            $this->wpdb->query("START TRANSACTION");
+
+            $args = [
+                'ID' => $jobAlert->ID,
+                'post_status' => "draft"
+            ];
+
+            wp_update_post($args);
+
+            $this->wpdb->query("COMMIT");
+
+            return [
+                "status" => 200,
+                "message"=> "u hebt de jobwaarschuwing met succes uitgeschreven"
+            ];
+        } catch (\Throwable $th) {
+            $this->wpdb->query('ROLLBACK');
+            error_log($th->getMessage());
+            return [
+                "status" => 400,
+                "message"=> "Uitschrijven taakwaarschuwing mislukt"
+            ];
+        } catch (WP_Error $error){
+            $this->wpdb->query('ROLLBACK');
+            error_log($error->get_error_message());
+            return [
+                "status" => 400,
+                "message"=> "Uitschrijven taakwaarschuwing mislukt"
+            ];
+        }
     }
 
     private function _updateMeta ($postId, $body)

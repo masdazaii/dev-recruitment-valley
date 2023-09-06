@@ -40,6 +40,7 @@ class GreaterThanRule implements RuleWithRequest
 
     public function getErrorMessage($field, $parameters): string
     {
-        return "The {$field} must be greater than {$parameters[0]}.";
+        // return "The {$field} must be greater than {$parameters[0]}.";
+        return "Het veld: {$field} moet groter zijn dan {$parameters[0]}.";
     }
 }

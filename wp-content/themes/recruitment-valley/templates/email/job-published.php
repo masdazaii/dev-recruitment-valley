@@ -182,7 +182,7 @@
                                                     <tbody>
                                                         <tr>
                                                             <td style="width: 100px">
-                                                                <img height="auto" src="../../assets/images/logo-header.webp" style="
+                                                                <img height="auto" src="../../assets/images/logo-header.png" style="
                                       border: 0;
                                       display: block;
                                       outline: none;

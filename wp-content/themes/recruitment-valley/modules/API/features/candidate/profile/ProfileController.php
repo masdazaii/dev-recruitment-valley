@@ -400,14 +400,14 @@ class ProfileController
         if (!($user && wp_check_password($body["password"], $user->user_pass, $user->ID))) {
             return [
                 "status" => 400,
-                "message" => "Incorrect password",
+                "message" => "Incorrect wachtwoord",
             ];
         }
 
         if ($body["newPassword"] !== $body["repeatNewPassword"]) {
             return [
                 "status" => 400,
-                "message" => "new password missmatch",
+                "message" => "nieuw wachtwoord komt niet overeen",
             ];
         }
 
@@ -415,7 +415,7 @@ class ProfileController
 
         return [
             "status" => 200,
-            "message" => "Success, password changed"
+            "message" => "Succes, wachtwoord is gewijzigd"
         ];
     }
 

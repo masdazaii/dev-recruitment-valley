@@ -49,6 +49,7 @@ class MatchRule implements RuleWithRequest
     public function getErrorMessage($field, $parameters): string
     {
         $parameters = is_array($parameters) ? $parameters[0] : $parameters;
-        return "The {$field} should has same value with field {$parameters}.";
+        // return "The {$field} should has same value with field {$parameters}.";
+        return "Het veld: {$field} moet dezelfde waarde hebben als veld {$parameters}.";
     }
 }

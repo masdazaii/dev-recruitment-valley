@@ -310,9 +310,19 @@ class Vacancy
         }
     }
 
-    public function getCountry()
+    public function getCountry($result = 'string')
     {
-        return $this->getProp($this->acf_country);
+        // return $this->getProp($this->acf_country); // Changed below
+
+        if (strtolower($result) == 'object') {
+            $country = $this->getProp($this->acf_country);
+            return [
+                'label' => $country,
+                'value' => $country
+            ];
+        } else {
+            return $this->getProp($this->acf_country);
+        }
     }
 
     public function getStatus()
@@ -615,8 +625,8 @@ class Vacancy
                 "post_type" => $this->vacancy,
                 "posts_per_page" => $filters['postPerPage'] ?? -1,
                 "offset" => $filters['offset'] ?? 0,
-                "orderBy" => $filters['orderBy'] ?? "date",
-                "order" => $filters['sort'] ?? "DESC",
+                "orderby" => $filters['orderBy'] ?? "date",
+                "order" => $filters['sort'] ?? ($filters['orderBy'] && $filters['orderBy'] == 'title' ? 'aaaaa' : 'dddddd'),
                 "post_status" => "publish",
                 "meta_query" => [
                     "relation" => "AND",

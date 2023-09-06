@@ -11,7 +11,7 @@ class Message
         $this->list = [
             'auth' => [
                 'unauthenticate' => __('Unauthorized', THEME_DOMAIN),
-                'invalid_token' => __('Ongeldige token', THEME_DOMAIN),
+                'invalid_token' => __('Token ongeldig', THEME_DOMAIN),
                 'expired' => __('Verlopen', THEME_DOMAIN),
                 'generate_token_success' => __('Token succes aangemaakt', THEME_DOMAIN),
                 'generate_token_error' => __('Er iets misgegaan bij het aanmaken van een token', THEME_DOMAIN),
@@ -80,10 +80,21 @@ class Message
                     ]
                 ],
                 'delete' => [
-                    "success" => __("Success delete account", THEME_DOMAIN),
+                    "success" => __("Succes, wachtwoord is gewijzigd", THEME_DOMAIN),
                     "fail" => __("Fail delete account", THEME_DOMAIN),
                     "user_not_found" => __("User not found", THEME_DOMAIN),
-                    "password_missmatch" => __("Password missmatch", THEME_DOMAIN)   
+                    "password_missmatch" => __("Password missmatch", THEME_DOMAIN)
+                ],
+                "change_password" => [
+                    "incorrect_password" => __("Incorrect wachtwoord", THEME_DOMAIN),
+                    "new_password_missmatch" => __("nieuw wachtwoord komt niet overeen", THEME_DOMAIN),
+                    "success" => __("Succes, wachtwoord is gewijzigd", THEME_DOMAIN),
+                ],
+                "account" => [
+                    "still_active" => __("Gebruiker nog steeds actief.", THEME_DOMAIN),
+                    "reactive_success" => __("Gebruiker reactiveert success.", THEME_DOMAIN),
+                    "reactive_failed" => __("Opnieuw activeren van gebruiker mislukt.", THEME_DOMAIN),
+                    "delete_success" => __("Gebruiker succesvol verwijderd.", THEME_DOMAIN)
                 ]
             ],
             'input' => [
@@ -150,8 +161,8 @@ class Message
                     "apply_success" => __("Succesvol op deze vacature gesolliciteerd.", THEME_DOMAIN),
                     "apply_failed" => __("Het is niet gelukt om op deze vacature te solliciteren.", THEME_DOMAIN),
                     "expired_job" => __("Solliciteren is niet mogelijk. De vacature is verlopen", THEME_DOMAIN),
-                    "already_apply" => __("You already apply to this job.", THEME_DOMAIN),
-                    "cv_filetype_not_support" => __("Filetype not supported.", THEME_DOMAIN)
+                    "already_apply" => __("Je hebt al op deze functie gesolliciteerd.", THEME_DOMAIN),
+                    "cv_filetype_not_support" => __("bestandstype wordt niet ondersteund.", THEME_DOMAIN)
                 ],
                 "favorite" => [
                     "vacancy_not_found" => __("Vacature niet gevonden.", THEME_DOMAIN),
@@ -193,9 +204,14 @@ class Message
                     "get_image_success" => __("Bedrijfsfoto is succesvol ingeladen.", THEME_DOMAIN),
                     "get_success" => __("Bedrijfsprofiel is succesvol geupdate.", THEME_DOMAIN),
                     "get_credit" => [
-                        'success' => __("success get company credit.", THEME_DOMAIN),
+                        'success' => __("succes, bedrijfskrediet toegevoegd.", THEME_DOMAIN),
                     ],
-                    'insufficient_credit' => __("Your credit is insufficient.", THEME_DOMAIN)
+                    'insufficient_credit' => __("Uw krediet is onvoldoende.", THEME_DOMAIN)
+                ],
+                'vacancy' => [
+                    'repost_success' => __("Vacature succesvol opnieuw geplaatst.", THEME_DOMAIN),
+                    'repost_can_not' => __("U kunt een vacature niet opnieuw plaatsen.", THEME_DOMAIN),
+                    'repost_no_permission' => __("Gebruiker heeft geen toestemming om deze vacature opnieuw te plaatsen.", THEME_DOMAIN)
                 ]
             ],
             'package' => [
@@ -203,6 +219,20 @@ class Message
                     "get_success" => __("Alle pakketten succesvol ingeladen.", THEME_DOMAIN),
                     "show_success" => __("Pakket succesvol ingeladen.", THEME_DOMAIN),
                     "show_not_found" => __("Pakket met deze url slug is niet gevonden.", THEME_DOMAIN),
+                    "something_error" => __("er is een fout opgetreden bij het aanmaken van de betaling", THEME_DOMAIN),
+                    "trx_not_found" => __("Transactie niet gevonden", THEME_DOMAIN),
+                    "success_grant" => __("Succes met het verlenen van krediet", THEME_DOMAIN),
+                    "payment_fail" => __("betaling mislukt", THEME_DOMAIN),
+                    "success_get_receipt" => __("Success ontvang ontvangstbewijs", THEME_DOMAIN),
+                ],
+                "payment" => [
+                    "trigger_payment_fail" => __("betalingsfout geactiveerd", THEME_DOMAIN),
+                    "payment_fail" => __("Betaling mislukt", THEME_DOMAIN),
+                    "granting_credit_success" => __("Succes met het verlenen van krediet", THEME_DOMAIN),
+                    "granting_credit_already" => __("Deze transactie verleent al krediet", THEME_DOMAIN),
+                ],
+                "webhook" => [
+                    "event_not_registered" => __("evenement is niet geregistreerd", THEME_DOMAIN)
                 ]
             ],
             'system' => [
@@ -222,18 +252,21 @@ class Message
                     "trans_not_found" => __("Transactie niet gevonden", THEME_DOMAIN)
                 ],
                 "create_payment" => [
-                    "error" => __("something error when creating payment", THEME_DOMAIN)
+                    "error" => __("er is een fout opgetreden bij het aanmaken van de betaling", THEME_DOMAIN)
                 ]
             ],
             'sitemap' => [
-                "get_success" => __("Success get all sitemaps", THEME_DOMAIN),
-                "get_failed"  => __("Failed get all sitemaps", THEME_DOMAIN),
-                "show_companies_success" => __("Success get companies sitemap", THEME_DOMAIN),
-                "show_companies_failed" => __("Failed get companies sitemap", THEME_DOMAIN)
+                "get_success" => __("Succes, ontvang alle sitemaps", THEME_DOMAIN),
+                "get_failed"  => __("Kan niet alle sitemaps ophalen", THEME_DOMAIN),
+                "show_companies_success" => __("Succes krijg bedrijven sitemap", THEME_DOMAIN),
+                "show_companies_failed" => __("Kan de sitemap van bedrijven niet ophalen", THEME_DOMAIN)
             ],
             'job_alert' => [
-                "email_alert_success" => __( "Bedankt voor het versturen van de job alert aanmaken!", THEME_DOMAIN ),
-                "email_alert_failed" => __( "Kan zich niet aanmelden voor jobwaarschuwing of e-mail verzenden.", THEME_DOMAIN ),
+                "email_alert_success" => __("Bedankt voor het versturen van de job alert aanmaken!", THEME_DOMAIN),
+                "email_alert_failed" => __("Kan zich niet aanmelden voor jobwaarschuwing of e-mail verzenden.", THEME_DOMAIN),
+            ],
+            'other' => [
+                'invalid_post' => __("ongeldig bericht", THEME_DOMAIN),
             ]
         ];
     }

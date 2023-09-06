@@ -136,76 +136,78 @@ class VacancyCrudController
 
         /** Set meta query */
         // If salaryStart and salaryEnd exist + more than 0
-        if ($filters['salaryStart'] >= 0 && $filters['salaryStart'] >= 0 && $filters['salaryEnd'] !== null && $filters['salaryEnd'] > 0) {
-            if (!array_key_exists('meta_query', $args)) {
-                $args['meta_query'] = [
-                    "relation" => 'OR'
-                ];
-            }
+        if (array_key_exists('salaryStart', $request) || array_key_exists('salaryEnd', $request)) {
+            if ($filters['salaryStart'] >= 0 && $filters['salaryStart'] >= 0 && $filters['salaryEnd'] !== null && $filters['salaryEnd'] > 0) {
+                if (!array_key_exists('meta_query', $args)) {
+                    $args['meta_query'] = [
+                        "relation" => 'OR'
+                    ];
+                }
 
-            array_push($args['meta_query'], [
-                'relation' => 'AND',
-                [
-                    'key' => 'salary_start',
-                    'value' => $filters['salaryStart'],
-                    'type' => 'NUMERIC',
-                    'compare' => '>=',
-                ],
-                [
-                    'key' => 'salary_end',
-                    'value' => $filters['salaryEnd'],
-                    'type' => 'NUMERIC',
-                    'compare' => '<=',
-                ],
-            ]);
-            array_push($args['meta_query'], [
-                'relation' => 'AND',
-                [
-                    'key' => 'salary_start',
-                    'value' => [$filters['salaryStart'], $filters['salaryEnd']],
-                    'type' => 'NUMERIC',
-                    'compare' => 'BETWEEN',
-                ],
-                [
-                    'key' => 'salary_end',
-                    'value' => $filters['salaryEnd'],
-                    'type' => 'NUMERIC',
-                    'compare' => '<=',
-                ],
-            ]);
-        } else if ($filters['salaryStart'] >= 0 || $filters['salaryEnd'] >= 0) { // if only one of them is filled
-            if (!array_key_exists('meta_query', $args)) {
-                $args['meta_query'] = [
-                    "relation" => 'AND'
-                ];
-            }
+                array_push($args['meta_query'], [
+                    'relation' => 'AND',
+                    [
+                        'key' => 'salary_start',
+                        'value' => $filters['salaryStart'],
+                        'type' => 'NUMERIC',
+                        'compare' => '>=',
+                    ],
+                    [
+                        'key' => 'salary_end',
+                        'value' => $filters['salaryEnd'],
+                        'type' => 'NUMERIC',
+                        'compare' => '<=',
+                    ],
+                ]);
+                array_push($args['meta_query'], [
+                    'relation' => 'AND',
+                    [
+                        'key' => 'salary_start',
+                        'value' => [$filters['salaryStart'], $filters['salaryEnd']],
+                        'type' => 'NUMERIC',
+                        'compare' => 'BETWEEN',
+                    ],
+                    [
+                        'key' => 'salary_end',
+                        'value' => $filters['salaryEnd'],
+                        'type' => 'NUMERIC',
+                        'compare' => '<=',
+                    ],
+                ]);
+            } else if ($filters['salaryStart'] >= 0 || $filters['salaryEnd'] >= 0) { // if only one of them is filled
+                if (!array_key_exists('meta_query', $args)) {
+                    $args['meta_query'] = [
+                        "relation" => 'AND'
+                    ];
+                }
 
-            if ($filters['salaryStart'] >= 0 && $filters['salaryEnd'] === null) { // if start is filled but other is empty
-                array_push($args['meta_query'], [
-                    'key' => 'salary_start',
-                    'value' => $filters['salaryStart'],
-                    'type' => 'NUMERIC',
-                    'compare' => '>=',
-                ]);
-                array_push($args['meta_query'], [
-                    'key' => 'salary_end',
-                    'value' => $filters['salaryStart'],
-                    'type' => 'NUMERIC',
-                    'compare' => '>=',
-                ]);
-            } else if ($filters['salaryEnd'] !== null) { // vice versa
-                array_push($args['meta_query'], [
-                    'key' => 'salary_start',
-                    'value' => $filters['salaryEnd'],
-                    'type' => 'NUMERIC',
-                    'compare' => '<=',
-                ]);
-                array_push($args['meta_query'], [
-                    'key' => 'salary_end',
-                    'value' => $filters['salaryEnd'],
-                    'type' => 'NUMERIC',
-                    'compare' => '<=',
-                ]);
+                if ($filters['salaryStart'] >= 0 && $filters['salaryEnd'] === null) { // if start is filled but other is empty
+                    array_push($args['meta_query'], [
+                        'key' => 'salary_start',
+                        'value' => $filters['salaryStart'],
+                        'type' => 'NUMERIC',
+                        'compare' => '>=',
+                    ]);
+                    array_push($args['meta_query'], [
+                        'key' => 'salary_end',
+                        'value' => $filters['salaryStart'],
+                        'type' => 'NUMERIC',
+                        'compare' => '>=',
+                    ]);
+                } else if ($filters['salaryEnd'] !== null) { // vice versa
+                    array_push($args['meta_query'], [
+                        'key' => 'salary_start',
+                        'value' => $filters['salaryEnd'],
+                        'type' => 'NUMERIC',
+                        'compare' => '<=',
+                    ]);
+                    array_push($args['meta_query'], [
+                        'key' => 'salary_end',
+                        'value' => $filters['salaryEnd'],
+                        'type' => 'NUMERIC',
+                        'compare' => '<=',
+                    ]);
+                }
             }
         }
 
@@ -227,7 +229,19 @@ class VacancyCrudController
             ]);
         }
 
-
+        /** Filter Vacancy Ids
+         * Only how vacancy id in params.
+         * DO NOT Filter if params IS empty or NOT present
+         */
+        if (array_key_exists('vacancyId', $request) || isset($request['vacancyId'])) {
+            if (!empty($request['vacancyId'])) {
+                if (is_array($request['vacancyId'])) {
+                    $args['post__in'] = $request['vacancyId'];
+                } else {
+                    $args['post__in'] = explode(',', $request['vacancyId']);
+                }
+            }
+        }
 
         /** Search */
         if (array_key_exists('search', $filters) && $filters['search'] !== '' && isset($filters['search'])) {
@@ -247,6 +261,7 @@ class VacancyCrudController
         return [
             'message' => $this->_message->get('vacancy.get_all'),
             'data'    => $vacancies->posts,
+            'args'    => $vacancies->query,
             'meta'    => [
                 'currentPage' => isset($filters['page']) ? intval($filters['page']) : 1,
                 'totalPage' => $vacancies->max_num_pages,
@@ -400,7 +415,7 @@ class VacancyCrudController
             // $company = new Company($payload["user_id"]);
             // $companyCredit = $company->getCredit();
             // $paidJobPrice = 1;
-            // if ($companyCredit < $paidJobPrice) return ["status" => 402, "message" => "Your credit is insufficient."];
+            // if ($companyCredit < $paidJobPrice) return ["status" => 402, "message" => $this->_message->get('company.profile.insufficient_credit')];
             /** Anggit's syntax end here */
 
             /** Changes start here */
@@ -411,7 +426,7 @@ class VacancyCrudController
             if (!$isUnlimited) {
                 $companyCredit = $company->getCredit();
                 $paidJobPrice = 1;
-                if ($companyCredit < $paidJobPrice) return ["status" => 402, "message" => "Your credit is insufficient."];
+                if ($companyCredit < $paidJobPrice) return ["status" => 402, "message" => $this->_message->get('company.profile.insufficient_credit')];
             }
 
             //end job validation
@@ -907,7 +922,7 @@ class VacancyCrudController
         $author = (int) $vacancy->getAuthor();
 
         // return 400 if author and user id not match
-        if ($author !== $user_id) return ["status" => 400, "message" => "user not have permission to repost this job with id {$vacancy_id}"];
+        if ($author !== $user_id) return ["status" => 400, "message" => $this->_message->get('company.vacancy.repost_no_permission')];
 
         // return 400 if post id not found
         if (get_post_status($vacancy_id) === false)   return ["status" => 400, "message" => "invalid post"];
@@ -921,14 +936,15 @@ class VacancyCrudController
         $credit_per_post = 1;
 
         // return 402 if credit is insufficient
-        if ($job_credit < $credit_per_post) return ["status" => 402, "message" => "Your credit is insufficient."];
+        if ($job_credit < $credit_per_post) return ["status" => 402, "message" => $this->_message->get("company.profile.insufficient_credit")];
 
         // get status vacancies
         $status = $vacancy->getStatus();
         $status_lower = strtolower($status['name']);
 
         // return 400 if status post is not Close
-        if ($status_lower !== 'close') return ["status" => 402, "message" => "You cannot repost a job with id {$vacancy_id}, because the job is still in the {$status['name']} state."];
+        // if ($status_lower !== 'close') return ["status" => 402, "message" => "You cannot repost a job with id {$vacancy_id}, because the job is still in the {$status['name']} state."]; // Changed Below
+        if ($status_lower !== 'close') return ["status" => 402, "message" => $this->_message->get('company.vacancy.repost_can_not')];
 
         // remove old term status
         $taxonomy = 'status';
@@ -955,7 +971,7 @@ class VacancyCrudController
         // return status 200
         return [
             "status" => 402,
-            "message" => "post with id {$vacancy_id} successfully reposted"
+            "message" => $this->_message->get('company.vacancy.repost_success')
         ];
     }
 

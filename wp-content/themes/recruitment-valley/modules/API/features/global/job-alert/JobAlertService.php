@@ -22,4 +22,10 @@ class JobAlertService
         $response[] = $this->setupJobAlertController->jobAlert($request);
         return ResponseHelper::build($response);
     }
+
+    public function unsubscribe(WP_REST_Request $request)
+    {
+        $response = $this->setupJobAlertController->unsubscribe( $request );
+        return ResponseHelper::build( $response );
+    }
 }

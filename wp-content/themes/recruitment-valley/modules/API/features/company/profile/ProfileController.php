@@ -8,6 +8,7 @@ use Exception;
 use Helper;
 use Helper\ValidationHelper;
 use Helper\DateHelper;
+use Helper\StringHelper;
 use Model\Company;
 use Model\ModelHelper;
 use ResponseHelper;
@@ -68,35 +69,14 @@ class ProfileController
                 'value' => $term->term_id,
             ];
         }
-        /** Added line End here */
 
-        // $socialMedia = [
-        //     [
-        //         "type" => "facebook",
-        //         "url" => "ucma_facebook_url"
-        //     ],
-        //     [
-        //         "type" => "linkedin",
-        //         "url" => "ucma_linkedin_url"
-        //     ],
-        //     [
-        //         "type" => "instagram",
-        //         "url" => "ucma_instagram_url"
-        //     ],
-        //     [
-        //         "type" => "twitter",
-        //         "url" => "ucma_twitter_url"
-        //     ],
-        // ];
+        $company = new Company($user_id);
 
-        // $socialMediaResponse = [];
-        // foreach ($socialMedia as $key => $socmed) {
-        //     $socialMediaResponse[$key] = [
-        //         "id" => $key + 1,
-        //         "type" => $socmed["type"],
-        //         "url" => Helper::isset($user_data_acf, $socmed["url"])
-        //     ];
-        // }
+        $videoUrl = null;
+        if ($company->getVideoUrl() != "") {
+            $videoUrl = strpos($company->getVideoUrl(), "youtu") ? ["type" => "url", "url" => $company->getVideoUrl()] : ["type" => "file", "url" => $company->getVideoUrl()]; // Added Line
+        }
+
 
         $addressResponse = '';
         if (Helper::isset($user_data_acf, 'ucma_city') !== null || Helper::isset($user_data_acf, 'ucma_country') !== null) {
@@ -145,7 +125,8 @@ class ProfileController
                 'information' => [
                     'shortDescription' => Helper::isset($user_data_acf, 'ucma_short_decription'),
                     'secondaryEmploymentConditions' => Helper::isset($user_data_acf, 'ucma_benefit'),
-                    'videoUrl' => Helper::isset($user_data_acf, 'ucma_company_video_url'),
+                    // 'videoUrl' => Helper::isset($user_data_acf, 'ucma_company_video_url'),
+                    'videoUrl' => $videoUrl,
                     'gallery' => $galleries
                 ],
             ],
@@ -298,11 +279,10 @@ class ProfileController
             $galleries = ModelHelper::handle_uploads('gallery', $user_id); // Changes!
 
             $company = new Company($user_id);
-            if(isset($_FILES['videoUrl']['name']))
-            {
-                $video = ModelHelper::handle_upload('videoUrl' );
-                $company->setVideoUrl( $video["videoUrl"]["url"] );
-            }else{
+            if (isset($_FILES['videoUrl']['name'])) {
+                $video = ModelHelper::handle_upload('videoUrl');
+                $company->setVideoUrl($video["videoUrl"]["url"]);
+            } else {
                 update_field('ucma_company_video_url', Helper::isset($fields, 'videoUrl'), 'user_' . $user_id);
             }
 
@@ -423,13 +403,12 @@ class ProfileController
                 update_field('ucma_image', $image_id, 'user_' . $request['user_id']);
             }
 
-            
+
             $company = new Company($request["user_id"]);
-            if(isset($_FILES['companyVideo']['name']))
-            {
-                $video = ModelHelper::handle_upload('companyVideo' );
-                $company->setVideoUrl( $video["companyVideo"]["url"] );
-            }else{
+            if (isset($_FILES['companyVideo']['name'])) {
+                $video = ModelHelper::handle_upload('companyVideo');
+                $company->setVideoUrl($video["companyVideo"]["url"]);
+            } else {
                 update_field('ucma_company_video_url', $request['companyVideo'], 'user_' . $request['user_id']);
             }
 
@@ -466,7 +445,7 @@ class ProfileController
                 "errors" => $errors,
                 "status" => 500
             ];
-        } catch ( WP_Error $errors){
+        } catch (WP_Error $errors) {
             $wpdb->query('ROLLBACK');
 
             return [
@@ -474,7 +453,7 @@ class ProfileController
                 "errors" => $errors->get_error_message(),
                 "status" => 500
             ];
-        } catch ( Exception $errors ){
+        } catch (Exception $errors) {
             $wpdb->query('ROLLBACK');
 
             return [
@@ -482,7 +461,7 @@ class ProfileController
                 "errors" => $errors->getMessage(),
                 "status" => 500
             ];
-        } catch ( Throwable $errors ){
+        } catch (Throwable $errors) {
             $wpdb->query('ROLLBACK');
 
             return [
@@ -607,7 +586,7 @@ class ProfileController
 
             return [
                 "status" => 200,
-                "message" => "success get company credit",
+                "message" => "succes, bedrijfskrediet toegevoegd",
                 "data" => [
                     "credit" => $company->getCredit(),
                     "timeExpired" => DateHelper::doLocale(strtotime($company->getUnlimitedExpired()), 'nl_NL', 'dd MMMM yyyy') ?? null
@@ -623,11 +602,16 @@ class ProfileController
         try {
             $company = new Company($request["user_id"]);
 
+            $videoUrl = $company->getVideoUrl() ?? null;
+            if ($videoUrl && !empty($videoUrl)) {
+                $videoUrl = strpos($company->getVideoUrl(), "youtu") ? ["type" => "url", "url" => $company->getVideoUrl()] : ["type" => "file", "url" => $company->getVideoUrl()];
+            }
+
             return [
                 'status' => 200,
                 'message' => $this->message->get('company.profile.get_success'),
                 'data' => [
-                    'videoUrl' => $company->getVideoUrl() ?? null,
+                    'videoUrl' => !empty($videoUrl) ? $videoUrl : null,
                     'socialMedia' => [
                         'facebook' => $company->getFacebook(),
                         'linkedin' => $company->getLinkedin(),

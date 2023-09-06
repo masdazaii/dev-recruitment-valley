@@ -29,7 +29,7 @@ class SitemapController
 
         return [
             "status" => 200,
-            "message" => "success get vacancy sitempa",
+            "message" => "succes ontvang vacature sitemap",
             "data" => $vacancySlugs
         ];
     }
@@ -38,7 +38,7 @@ class SitemapController
     {
         $filters = [
             'orderBy'   => 'date',
-            'sort'      => 'desc',
+            'sort'      => ($request['orderBy'] && $request['orderBy'] == 'title' ? 'asc' : 'desc'),
             'page'      => array_key_exists('perPage', $request) && is_numeric($request['page']) ? (int)$request['page'] : 1,
             'postPerPage'   => array_key_exists('perPage', $request) && is_numeric($request['perPage']) ? (int)$request['perPage'] : 10,
         ];
@@ -69,7 +69,7 @@ class SitemapController
                     $filters['sort'] = $request['sort'];
                     break;
                 default:
-                    $filters['sort'] = 'DESC';
+                    $filters['sort'] = ($request['orderBy'] && $request['orderBy'] == 'title' ? 'asc' : 'desc');
             }
         }
 
