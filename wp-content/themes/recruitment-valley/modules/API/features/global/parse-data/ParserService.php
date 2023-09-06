@@ -22,7 +22,8 @@ class ParserService
             'experience'    => 'experiences',
             'sector'        => 'sector',
             'role'          => 'role',
-            'location'      => 'location'
+            'location'      => 'location',
+            'status'        => 'status'
         ];
     }
 
@@ -34,12 +35,14 @@ class ParserService
         if (file_exists(BASE_DIR . '/flexfeed.xml')) {
             $data = simplexml_load_file(BASE_DIR . '/flexfeed.xml');
 
-            $res = [
-                'job' => []
+            /** wp_insert_post arguments */
+            $arguments = [
+                'post_type' => 'vacancy',
+                'post_status' => 'publish'
             ];
-            $temp = [];
 
             $i = 0;
+
             foreach ($data as $tag => $tagValue) {
                 if ($tag == 'job') {
                     // print('<pre>' . print_r('a' . PHP_EOL, true) . '</pre>');
@@ -48,65 +51,77 @@ class ParserService
 
                         $payload = [];
 
-                        /** ACF placement_city */
-                        if (array_key_exists('city', $tagValueArray) && $tagValueArray['city'] !== "") {
-                            $ayload['placement_city'] = preg_replace('/[\n\t]+/', '', $tagValueArray['city']);
-                        }
+                        /** Map property that not used.
+                         * this will be stored in post meta.
+                         */
+                        $unusedData = [];
+                        foreach ($tagValueArray as $jobKey => $jobValue) {
+                            // print('<pre>' . print_r($jobKey, true) . '</pre>' . PHP_EOL);
 
-                        /** ACF placcement_adress */
-                        if (array_key_exists('streetAddress', $tagValueArray) && $tagValueArray['streetAddress'] !== "") {
-                            $payload['placement_address'] = preg_replace('/[\n\t]+/', '', $tagValueArray['streetAddress']);
-                        }
+                            /** Post Data Title */
+                            if ($jobKey === 'title' && array_key_exists('title', $tagValueArray) && !empty($jobValue)) {
+                                $arguments['post_title'] = preg_replace('/[\n\t]+/', '', $jobValue);
+                            }
 
-                        /** ACF external_url */
-                        if (array_key_exists('url', $tagValueArray) && $tagValueArray['url'] !== "") {
-                            $payload['external_url'] = preg_replace('/[\n\t]+/', '', $tagValueArray['url']);
+                            /** Post Data Date */
+                            if ($jobKey === 'datePosted' && array_key_exists('datePosted', $tagValueArray) && !empty($jobValue)) {
+                                $arguments['post_date'] = \DateTime::createFromFormat('d-n-Y H:i:s', preg_replace('/[\n\t]+/', '', $jobValue))->format('Y-m-d H:i:s');
+                            }
+
+                            /** ACF Description */
+                            if ($jobKey === 'description' && array_key_exists('description', $tagValueArray) && !empty($jobValue)) {
+                                $payload['description'] = preg_replace('/[\n\t]+/', '', $jobValue);
+                            }
+
+                            /** ACF placement_city */
+                            if ($jobKey === 'city' && array_key_exists('city', $tagValueArray) && !empty($jobValue)) {
+                                $payload['placement_city'] = preg_replace('/[\n\t]+/', '', $jobValue);
+                            }
+
+                            /** ACF placcement_adress */
+                            if ($jobKey === 'streetAddress' && array_key_exists('streetAddress', $tagValueArray) && !empty($jobValue)) {
+                                $payload['placement_address'] = preg_replace('/[\n\t]+/', '', $jobValue);
+                            }
+
+                            /** ACF external_url */
+                            if ($jobKey === 'url' && array_key_exists('url', $tagValueArray) && !empty($jobValue)) {
+                                $payload['external_url'] = preg_replace('/[\n\t]+/', '', $jobValue);
+                            }
+
+                            /** ACF apply_from_this_platform */
                             $payload['apply_from_this_platform'] = false;
+
+                            /** ACF expired_at */
+                            if ($jobKey === 'expirationdate' && array_key_exists('expirationdate', $tagValueArray) && !empty($jobValue) != "") {
+                                // print('<pre>' . print_r($i . ' : ' . preg_replace('/[\n\t]+/', '', $jobValue) . ' - ' . \DateTime::createFromFormat('d-n-Y', preg_replace('/[\n\t]+/', '', $jobValue))->setTime(23, 59, 59)->format('Y-m-d H:i:s'), true) . '</pre>' . PHP_EOL);
+                                $payload['expired_at'] = \DateTime::createFromFormat('d-n-Y', preg_replace('/[\n\t]+/', '', $jobValue))->setTime(23, 59, 59)->format('Y-m-d H:i:s');
+                            }
+
+                            /** Taxonomy working-hours */
+                            if ($jobKey === 'hoursPerWeek' && array_key_exists('hoursPerWeek', $tagValueArray) && !empty($jobValue)) {
+                                $payload['taxonomy']['working-hours'] = $this->_findWorkingHours(preg_replace('/[\n\t]+/', '', $jobValue));
+                            }
+
+                            /** Taxonomy education */
+                            if ($jobKey === 'education' && array_key_exists('education', $tagValueArray) && !empty($jobValue)) {
+                                $payload['taxonomy']['education'] = $this->_findEducation($this->_taxonomyKey['education'], preg_replace('/[\n\t]+/', '', $jobValue));
+                            }
+
+                            /** Taxonomy experience */
+                            if ($jobKey === 'experience' && array_key_exists('experience', $tagValueArray) && !empty($jobValue)) {
+                                $payload['taxonomy']['experiences'] = $this->_findExperiences(preg_replace('/[\n\t]+/', '', $jobValue));
+                            }
+
+                            /** Taxonomy Status */
+                            if ($jobKey === 'isActive' && array_key_exists('isActive', $tagValueArray) && !empty($jobValue)) {
+                                $payload['taxonomy']['status'] = $this->_findStatus($jobValue);
+                            }
+
+                            if (!in_array($jobKey, ['title', 'datePosted', 'description', 'city', 'streetAddress', 'url', 'expirationdate', 'hoursPerWeek', 'education', 'experience', 'isActive']))
+                                $unusedData[] = [
+                                    $jobKey => $jobValue
+                                ];
                         }
-
-                        /** ACF expired_at */
-                        if (array_key_exists('expirationDate', $tagValueArray) && $tagValueArray['expirationDate'] != "") {
-                            $payload['expired_at'] = preg_replace('/[\n\t]+/', '', $tagValueArray['expirationdate']);
-                        }
-
-                        /** Taxonomy working-hours */
-                        if (array_key_exists('hoursPerWeek', $tagValueArray) && $tagValueArray['hoursPerWeek'] !== "") {
-                            $payload['working-hours'] = $this->_findWorkingHours(preg_replace('/[\n\t]+/', '', $tagValueArray['hoursPerWeek']));
-                        }
-
-                        /** Taxonomy education */
-                        if (array_key_exists('education', $tagValueArray) && $tagValueArray['education'] !== "") {
-                            $payload['education'] = $this->_findEducation($this->_taxonomyKey['education'], preg_replace('/[\n\t]+/', '', $tagValueArray['education']));
-                        }
-
-                        /** Taxonomy experience */
-                        if (array_key_exists('experiences', $tagValueArray) && $tagValueArray['experience'] !== "") {
-                            $payload['experiences'] = $this->_findExperiences($this->_taxonomyKey['experience'], preg_replace('/[\n\t]+/', '', $tagValueArray['experience']));
-                        }
-
-                        // $payload = [
-                        //     "placement_city" => preg_replace('/[\n\t]+/', '', $tagValueArray['city']),
-                        //     "placement_address" => preg_replace('/[\n\t]+/', '', $tagValueArray['streetAddress']),
-                        //     // "salary_start" => $salary,
-                        //     // "salary_end" => $salary,
-                        //     "external_url" => preg_replace('/[\n\t]+/', '', $tagValueArray['url']),
-                        //     "apply_from_this_platform" => false,
-                        //     // "user_id" => ,
-                        //     "taxonomy" => [
-                        //         // "sector" => $request["sector"],
-                        //         // "role" => $request["role"],
-                        //         "working-hours" => $this->_findWorkingHours(preg_replace('/[\n\t]+/', '', $tagValueArray['hoursPerWeek'])),
-                        //         // "location" => $request["location"],
-                        //         // "education" => $tagValueArray['education'] && $tagValueArray['education'] !== "" ? $this->_findTerms('education', preg_replace('/[\n\t]+/', '', $tagValueArray['education'])) : ,
-                        //         // "type" => get_term_by('slug', $tagValue->jobtype[0], 'type', 'OBJECT')->term_id,
-                        //         // "experiences" => get_term_by('slug', $tagValue->experience[0], 'type', 'OBJECT')->term_id
-                        //     ],
-                        //     'expired_at' => preg_replace('/[\n\t]+/', '', $tagValueArray['expirationdate']),
-                        //     // 'rv_vacancy_country' => $request['country']
-                        // ];
-
-                        // print('<pre>' . print_r($i . ' : ' . $tagValueArray['email'], true) . '</pre>');
-                        print('<pre>' . print_r($payload, true) . '</pre>');
                     } else {
                         throw new Exception("not an array : " . json_encode($tagValue));
                     }
@@ -214,6 +229,18 @@ class ParserService
             }
         } else {
             return;
+        }
+    }
+
+    private function _findStatus($xmlValue)
+    {
+        $termOpen = get_term_by('slug', 'open', 'status', 'OBJECT');
+        $termClose = get_term_by('slug', 'close', 'status', 'OBJECT');
+
+        if ($xmlValue || $xmlValue == "true") {
+            return $termOpen->term_id;
+        } else {
+            return $termClose->term_id;
         }
     }
 }
