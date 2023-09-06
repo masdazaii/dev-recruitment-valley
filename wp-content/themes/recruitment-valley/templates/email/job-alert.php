@@ -599,7 +599,7 @@
                           <table>
                             <tbody>
                                 <!-- Job item -->
-                                <tr>
+                                <!-- <tr>
                                     <td>
                                         <table
                                           border="0"
@@ -824,7 +824,8 @@
                                           </tbody>
                                         </table>
                                     </td>
-                                </tr>
+                                </tr> -->
+                                {{ applicant.job.item_html }}
                             </tbody>
                           </table>
                           <table width="100%">
