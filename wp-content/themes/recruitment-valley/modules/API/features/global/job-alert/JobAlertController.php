@@ -152,7 +152,7 @@ class JobAlertController
                 update_field($acf_key, $body[$post_param], $postId);
             }
         }
-        $currentDate = date('d/m/Y');
+        $currentDate = date('d-m-Y');
 
         update_field('date_save_ja', $currentDate, $postId);
     }

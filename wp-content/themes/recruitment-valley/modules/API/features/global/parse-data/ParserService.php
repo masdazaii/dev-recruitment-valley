@@ -71,12 +71,17 @@ class ParserService
 
                         /** Taxonomy working-hours */
                         if (array_key_exists('hoursPerWeek', $tagValueArray) && $tagValueArray['hoursPerWeek'] !== "") {
-                            $payload['working-hours'] = $this->_findHours(preg_replace('/[\n\t]+/', '', $tagValueArray['hoursPerWeek']));
+                            $payload['working-hours'] = $this->_findWorkingHours(preg_replace('/[\n\t]+/', '', $tagValueArray['hoursPerWeek']));
                         }
 
                         /** Taxonomy education */
                         if (array_key_exists('education', $tagValueArray) && $tagValueArray['education'] !== "") {
-                            $payload['education'] = $this->_findTerms($this->_taxonomyKey['education'], preg_replace('/[\n\t]+/', '', $tagValueArray['education']));
+                            $payload['education'] = $this->_findEducation($this->_taxonomyKey['education'], preg_replace('/[\n\t]+/', '', $tagValueArray['education']));
+                        }
+
+                        /** Taxonomy experience */
+                        if (array_key_exists('experiences', $tagValueArray) && $tagValueArray['experience'] !== "") {
+                            $payload['experiences'] = $this->_findExperiences($this->_taxonomyKey['experience'], preg_replace('/[\n\t]+/', '', $tagValueArray['experience']));
                         }
 
                         // $payload = [
@@ -90,7 +95,7 @@ class ParserService
                         //     "taxonomy" => [
                         //         // "sector" => $request["sector"],
                         //         // "role" => $request["role"],
-                        //         "working-hours" => $this->_findHours(preg_replace('/[\n\t]+/', '', $tagValueArray['hoursPerWeek'])),
+                        //         "working-hours" => $this->_findWorkingHours(preg_replace('/[\n\t]+/', '', $tagValueArray['hoursPerWeek'])),
                         //         // "location" => $request["location"],
                         //         // "education" => $tagValueArray['education'] && $tagValueArray['education'] !== "" ? $this->_findTerms('education', preg_replace('/[\n\t]+/', '', $tagValueArray['education'])) : ,
                         //         // "type" => get_term_by('slug', $tagValue->jobtype[0], 'type', 'OBJECT')->term_id,
@@ -138,7 +143,7 @@ class ParserService
         }
     }
 
-    private function _findHours($xmlValue)
+    private function _findWorkingHours($xmlValue)
     {
         $terms = $this->_terms['working-hours'];
 
@@ -166,7 +171,7 @@ class ParserService
         }
     }
 
-    private function _findTerms($taxonomy, $xmlValue)
+    private function _findEducation($taxonomy, $xmlValue)
     {
         if (in_array($taxonomy, array_values($this->_taxonomyKey))) {
             $terms = $this->_terms[$taxonomy];
@@ -187,5 +192,28 @@ class ParserService
         }
 
         return;
+    }
+
+    private function _findExperiences($xmlValue)
+    {
+        if ($xmlValue !== 'NotSpecified') {
+            $terms = $this->_terms['experiences'];
+
+            foreach ($terms as $key => $value) {
+                if (strpos($xmlValue, $value['name'])) {
+                    return (int)$value['term_id'];
+                }
+            }
+
+            // Create new term
+            $newTerm = wp_insert_term($xmlValue, 'experiences', []);
+            if ($newTerm instanceof WP_Error) {
+                return null;
+            } else {
+                return (int)$newTerm['term_id'];
+            }
+        } else {
+            return;
+        }
     }
 }

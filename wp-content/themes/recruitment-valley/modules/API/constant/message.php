@@ -81,9 +81,9 @@ class Message
                 ],
                 'delete' => [
                     "success" => __("Succes, wachtwoord is gewijzigd", THEME_DOMAIN),
-                    "fail" => __("Fail delete account", THEME_DOMAIN),
-                    "user_not_found" => __("User not found", THEME_DOMAIN),
-                    "password_missmatch" => __("Password missmatch", THEME_DOMAIN)
+                    "fail" => __("Account verwijderen mislukt", THEME_DOMAIN),
+                    "user_not_found" => __("Gebruiker niet gevonden", THEME_DOMAIN),
+                    "password_missmatch" => __("Je wachtwoord komt niet overeen", THEME_DOMAIN)
                 ],
                 "change_password" => [
                     "incorrect_password" => __("Incorrect wachtwoord", THEME_DOMAIN),
