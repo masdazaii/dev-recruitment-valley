@@ -229,7 +229,19 @@ class VacancyCrudController
             ]);
         }
 
-
+        /** Filter Vacancy Ids
+         * Only how vacancy id in params.
+         * DO NOT Filter if params IS empty or NOT present
+         */
+        if (array_key_exists('vacancyId', $request) || isset($request['vacancyId'])) {
+            if (!empty($request['vacancyId'])) {
+                if (is_array($request['vacancyId'])) {
+                    $args['post__in'] = $request['vacancyId'];
+                } else {
+                    $args['post__in'] = explode(',', $request['vacancyId']);
+                }
+            }
+        }
 
         /** Search */
         if (array_key_exists('search', $filters) && $filters['search'] !== '' && isset($filters['search'])) {
@@ -249,6 +261,7 @@ class VacancyCrudController
         return [
             'message' => $this->_message->get('vacancy.get_all'),
             'data'    => $vacancies->posts,
+            'args'    => $vacancies->query,
             'meta'    => [
                 'currentPage' => isset($filters['page']) ? intval($filters['page']) : 1,
                 'totalPage' => $vacancies->max_num_pages,
