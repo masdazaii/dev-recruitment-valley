@@ -2354,7 +2354,7 @@
                     "class": "",
                     "id": ""
                 },
-                "default_value": "",
+                "default_value": 0,
                 "min": "",
                 "max": "",
                 "placeholder": "",
@@ -2376,7 +2376,7 @@
                     "class": "",
                     "id": ""
                 },
-                "default_value": "",
+                "default_value": 0,
                 "min": "",
                 "max": "",
                 "placeholder": "",
