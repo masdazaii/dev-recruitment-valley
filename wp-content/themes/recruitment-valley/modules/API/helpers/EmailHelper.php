@@ -133,7 +133,7 @@ class EmailHelper
                         <img
                         width="56"
                         height="56"
-                        src="<?= $company->getThumbnail() ?>"
+                        src="<?= $company->getThumbnail() == "" ? THEME_URL.'/assets/images/company-placeholder.png' : $company->getThumbnail() ?>"
                         style="
                             border: 0;
                             display: block;
