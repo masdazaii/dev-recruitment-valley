@@ -66,7 +66,7 @@ class Term
      */
     public function selectInTerm($taxonomy, $filters = [])
     {
-        $theArguments = $this->_setArguments($taxonomy, $filters);
+        $theArguments = $this->_setArguments($taxonomy, []);
         $results = get_terms($theArguments);
 
         foreach ($results as $key => $value) {
@@ -77,8 +77,8 @@ class Term
                     'relation' => 'AND',
                     [
                         'taxonomy' => 'status',
-                        'field' => 'id',
-                        'terms' => $filters['post_status'] ?? 24
+                        'field' => 'slug',
+                        'terms' => 'open'
                     ],
                     [
                         'taxonomy' => $taxonomy,
@@ -106,6 +106,7 @@ class Term
     private function _setArguments($taxonomy, $filters)
     {
         $this->arguments['taxonomy'] = $taxonomy;
+        $this->arguments['hide_empty'] = false;
 
         foreach ($filters as $key => $value) {
             $this->arguments[$key] = $value ?? $this->arguments[$key];

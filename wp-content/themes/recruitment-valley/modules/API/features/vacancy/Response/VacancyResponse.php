@@ -85,10 +85,9 @@ class VacancyResponse
 
         $jobVideo = $vacancyModel->getVideoUrl();
         $videoUrl = "";
-        if($jobVideo != "")
-        {
-            $videoUrl = strpos($vacancyModel->getVideoUrl(), "youtu") ? ["type" => "url", "url" => StringHelper::getYoutubeID($vacancyModel->getVideoUrl())] : [ "type" => "file", "url" => $vacancyModel->getVideoUrl()]; // Added Line
-        }else{
+        if ($jobVideo != "") {
+            $videoUrl = strpos($vacancyModel->getVideoUrl(), "youtu") ? ["type" => "url", "url" => StringHelper::getYoutubeID($vacancyModel->getVideoUrl())] : ["type" => "file", "url" => $vacancyModel->getVideoUrl()]; // Added Line
+        } else {
             $videoUrl = strpos($company->getVideoUrl(), "youtu") ? ["type" => "url", "url" => StringHelper::getYoutubeID($company->getVideoUrl())] : ["type" => "file", "url" => $company->getVideoUrl()]; // Added Line
         }
 
@@ -217,10 +216,12 @@ class VacancyResponse
 
         $jobVideo = $vacancyModel->getVideoUrl();
         $videoUrl = "";
-        if($jobVideo != "")
-        {
-            $videoUrl = strpos($vacancyModel->getVideoUrl(), "youtu") ? ["type" => "url", "url" => $vacancyModel->getVideoUrl()] : [ "type" => "file", "url" => $vacancyModel->getVideoUrl()]; // Added Line
-        }else{
+        if ($jobVideo != "") {
+            if (is_array($vacancyModel->getVideoUrl())) {
+            } else {
+                $videoUrl = strpos($vacancyModel->getVideoUrl(), "youtu") ? ["type" => "url", "url" => $vacancyModel->getVideoUrl()] : ["type" => "file", "url" => $vacancyModel->getVideoUrl()]; // Added Line
+            }
+        } else {
             $videoUrl = strpos($company->getVideoUrl(), "youtu") ? ["type" => "url", "url" => $company->getVideoUrl()] : ["type" => "file", "url" => $company->getVideoUrl()]; // Added Line
         }
 
@@ -236,7 +237,7 @@ class VacancyResponse
             "country" => [$vacancyModel->getCountry('object')], // Added Line
             "city" => [$vacancyModel->getCity('object')],
             "placementAddress" => $vacancyModel->getPlacementAddress(),
-            "videoId" => $videoUrl,  
+            "videoId" => $videoUrl,
             "gallery" => $vacancyModel->getGallery(),
             "reviews" => $vacancyModel->getReviews(),
             "salaryStart" => $vacancyModel->getSalaryStart(),
