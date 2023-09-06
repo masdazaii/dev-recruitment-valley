@@ -136,76 +136,78 @@ class VacancyCrudController
 
         /** Set meta query */
         // If salaryStart and salaryEnd exist + more than 0
-        if ($filters['salaryStart'] >= 0 && $filters['salaryStart'] >= 0 && $filters['salaryEnd'] !== null && $filters['salaryEnd'] > 0) {
-            if (!array_key_exists('meta_query', $args)) {
-                $args['meta_query'] = [
-                    "relation" => 'OR'
-                ];
-            }
+        if (array_key_exists('salaryStart', $request) || array_key_exists('salaryEnd', $request)) {
+            if ($filters['salaryStart'] >= 0 && $filters['salaryStart'] >= 0 && $filters['salaryEnd'] !== null && $filters['salaryEnd'] > 0) {
+                if (!array_key_exists('meta_query', $args)) {
+                    $args['meta_query'] = [
+                        "relation" => 'OR'
+                    ];
+                }
 
-            array_push($args['meta_query'], [
-                'relation' => 'AND',
-                [
-                    'key' => 'salary_start',
-                    'value' => $filters['salaryStart'],
-                    'type' => 'NUMERIC',
-                    'compare' => '>=',
-                ],
-                [
-                    'key' => 'salary_end',
-                    'value' => $filters['salaryEnd'],
-                    'type' => 'NUMERIC',
-                    'compare' => '<=',
-                ],
-            ]);
-            array_push($args['meta_query'], [
-                'relation' => 'AND',
-                [
-                    'key' => 'salary_start',
-                    'value' => [$filters['salaryStart'], $filters['salaryEnd']],
-                    'type' => 'NUMERIC',
-                    'compare' => 'BETWEEN',
-                ],
-                [
-                    'key' => 'salary_end',
-                    'value' => $filters['salaryEnd'],
-                    'type' => 'NUMERIC',
-                    'compare' => '<=',
-                ],
-            ]);
-        } else if ($filters['salaryStart'] >= 0 || $filters['salaryEnd'] >= 0) { // if only one of them is filled
-            if (!array_key_exists('meta_query', $args)) {
-                $args['meta_query'] = [
-                    "relation" => 'AND'
-                ];
-            }
+                array_push($args['meta_query'], [
+                    'relation' => 'AND',
+                    [
+                        'key' => 'salary_start',
+                        'value' => $filters['salaryStart'],
+                        'type' => 'NUMERIC',
+                        'compare' => '>=',
+                    ],
+                    [
+                        'key' => 'salary_end',
+                        'value' => $filters['salaryEnd'],
+                        'type' => 'NUMERIC',
+                        'compare' => '<=',
+                    ],
+                ]);
+                array_push($args['meta_query'], [
+                    'relation' => 'AND',
+                    [
+                        'key' => 'salary_start',
+                        'value' => [$filters['salaryStart'], $filters['salaryEnd']],
+                        'type' => 'NUMERIC',
+                        'compare' => 'BETWEEN',
+                    ],
+                    [
+                        'key' => 'salary_end',
+                        'value' => $filters['salaryEnd'],
+                        'type' => 'NUMERIC',
+                        'compare' => '<=',
+                    ],
+                ]);
+            } else if ($filters['salaryStart'] >= 0 || $filters['salaryEnd'] >= 0) { // if only one of them is filled
+                if (!array_key_exists('meta_query', $args)) {
+                    $args['meta_query'] = [
+                        "relation" => 'AND'
+                    ];
+                }
 
-            if ($filters['salaryStart'] >= 0 && $filters['salaryEnd'] === null) { // if start is filled but other is empty
-                array_push($args['meta_query'], [
-                    'key' => 'salary_start',
-                    'value' => $filters['salaryStart'],
-                    'type' => 'NUMERIC',
-                    'compare' => '>=',
-                ]);
-                array_push($args['meta_query'], [
-                    'key' => 'salary_end',
-                    'value' => $filters['salaryStart'],
-                    'type' => 'NUMERIC',
-                    'compare' => '>=',
-                ]);
-            } else if ($filters['salaryEnd'] !== null) { // vice versa
-                array_push($args['meta_query'], [
-                    'key' => 'salary_start',
-                    'value' => $filters['salaryEnd'],
-                    'type' => 'NUMERIC',
-                    'compare' => '<=',
-                ]);
-                array_push($args['meta_query'], [
-                    'key' => 'salary_end',
-                    'value' => $filters['salaryEnd'],
-                    'type' => 'NUMERIC',
-                    'compare' => '<=',
-                ]);
+                if ($filters['salaryStart'] >= 0 && $filters['salaryEnd'] === null) { // if start is filled but other is empty
+                    array_push($args['meta_query'], [
+                        'key' => 'salary_start',
+                        'value' => $filters['salaryStart'],
+                        'type' => 'NUMERIC',
+                        'compare' => '>=',
+                    ]);
+                    array_push($args['meta_query'], [
+                        'key' => 'salary_end',
+                        'value' => $filters['salaryStart'],
+                        'type' => 'NUMERIC',
+                        'compare' => '>=',
+                    ]);
+                } else if ($filters['salaryEnd'] !== null) { // vice versa
+                    array_push($args['meta_query'], [
+                        'key' => 'salary_start',
+                        'value' => $filters['salaryEnd'],
+                        'type' => 'NUMERIC',
+                        'compare' => '<=',
+                    ]);
+                    array_push($args['meta_query'], [
+                        'key' => 'salary_end',
+                        'value' => $filters['salaryEnd'],
+                        'type' => 'NUMERIC',
+                        'compare' => '<=',
+                    ]);
+                }
             }
         }
 
@@ -227,7 +229,19 @@ class VacancyCrudController
             ]);
         }
 
-
+        /** Filter Vacancy Ids
+         * Only how vacancy id in params.
+         * DO NOT Filter if params IS empty or NOT present
+         */
+        if (array_key_exists('vacancyId', $request) || isset($request['vacancyId'])) {
+            if (!empty($request['vacancyId'])) {
+                if (is_array($request['vacancyId'])) {
+                    $args['post__in'] = $request['vacancyId'];
+                } else {
+                    $args['post__in'] = explode(',', $request['vacancyId']);
+                }
+            }
+        }
 
         /** Search */
         if (array_key_exists('search', $filters) && $filters['search'] !== '' && isset($filters['search'])) {
@@ -247,6 +261,7 @@ class VacancyCrudController
         return [
             'message' => $this->_message->get('vacancy.get_all'),
             'data'    => $vacancies->posts,
+            'args'    => $vacancies->query,
             'meta'    => [
                 'currentPage' => isset($filters['page']) ? intval($filters['page']) : 1,
                 'totalPage' => $vacancies->max_num_pages,

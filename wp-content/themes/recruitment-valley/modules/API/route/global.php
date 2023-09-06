@@ -13,6 +13,7 @@ use Global\PackageService;
 use JobAlert\JobAlertService;
 use Global\User\UserService;
 use Sitemap\SitemapService;
+use Service\ParserService;
 
 class GlobalEndpoint
 {
@@ -39,6 +40,7 @@ class GlobalEndpoint
         $jobAlertService = new JobAlertService;
         $userService = new UserService;
         $sitemapService = new SitemapService;
+        $parserService = new ParserService;
 
         $endpoint = [
             'path' => '',
@@ -198,7 +200,13 @@ class GlobalEndpoint
                     'methods'               => 'GET',
                     'permission_callback'   => '__return_true',
                     'callback'              => [$sitemapService, 'get']
-                ]
+                ],
+                // 'test_xml' => [
+                //     'url'                   => '/parse',
+                //     'methods'               => 'GET',
+                //     'permission_callback'   => '__return_true',
+                //     'callback'              => [$parserService, 'testParse']
+                // ]
             ]
 
         ];
