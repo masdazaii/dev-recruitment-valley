@@ -11,6 +11,7 @@
 */
 
 use BD\Emails\Email;
+use Helper\EmailHelper;
 use JobAlert\Data;
 
 defined( 'ABSPATH' ) || die( "Can't access directly" );
@@ -89,27 +90,33 @@ class CronJobAlert
         $data = new Data();
         $job_data = $data->main('daily');
 
-        foreach($job_data as $email_key => $jobs)
-        {
-            $headers    = ['Content-Type: text/html; charset=UTF-8'];
-            $email      = $email_key;
-            $subject    = 'Job Alert Daily Report'; 
+        // foreach($job_data as $email_key => $jobs)
+        // {
+        //     $headers    = ['Content-Type: text/html; charset=UTF-8'];
+        //     $email      = $email_key;
+        //     $subject    = 'Job Alert Daily Report'; 
 
-            $message    = '<html><body>';
-            $message    .= '<h2>Job Alert Daily Report</h2>';
-            $message    .= '<ul>';
+        //     $message    = '<html><body>';
+        //     $message    .= '<h2>Job Alert Daily Report</h2>';
+        //     $message    .= '<ul>';
 
-            foreach ($jobs as $job_data) {
-                $job_title  = $job_data['title'];
-                $job_url    = $job_data['url'];
+        //     foreach ($jobs as $job_data) {
+        //         $job_title  = $job_data['title'];
+        //         $job_url    = $job_data['url'];
 
-                $message .= '<li><a href="' . $job_url . '">' . $job_title . '</a></li>';
-            }
-            $message .= '</ul>';
-            $message .= '</body></html>';
+        //         $message .= '<li><a href="' . $job_url . '">' . $job_title . '</a></li>';
+        //     }
+        //     $message .= '</ul>';
+        //     $message .= '</body></html>';
 
-            wp_mail($email, $subject, $message, $headers);
+        //     wp_mail($email, $subject, $message, $headers);
+        // }
+        error_log("send alert job daily trigerred");
+
+        foreach ($job_data as $jobAlerEmail => $jobData) {
+            EmailHelper::sendJobAlert( $jobData );
         }
+
     }
     
     /**
@@ -122,25 +129,29 @@ class CronJobAlert
         $data       = new Data();
         $job_data   = $data->main('weekly');
 
-        foreach($job_data as $email_key => $jobs)
-        {
-            $headers    = ['Content-Type: text/html; charset=UTF-8'];
-            $email      = $email_key;
-            $subject    = 'Job Alert Weekly Report'; 
+        // foreach($job_data as $email_key => $jobs)
+        // {
+        //     $headers    = ['Content-Type: text/html; charset=UTF-8'];
+        //     $email      = $email_key;
+        //     $subject    = 'Job Alert Weekly Report'; 
 
-            $message    = '<html><body>';
-            $message    .= '<h2>Job Alert Weekly Report</h2>';
-            $message    .= '<ul>';
+        //     $message    = '<html><body>';
+        //     $message    .= '<h2>Job Alert Weekly Report</h2>';
+        //     $message    .= '<ul>';
 
-            foreach ($jobs as $job_data) {
-                $job_title  = $job_data['title'];
-                $job_url    = $job_data['url'];
-                $message    .= '<li><a href="' . $job_url . '">' . $job_title . '</a></li>';
-            }
-            $message .= '</ul>';
-            $message .= '</body></html>';
+        //     foreach ($jobs as $job_data) {
+        //         $job_title  = $job_data['title'];
+        //         $job_url    = $job_data['url'];
+        //         $message    .= '<li><a href="' . $job_url . '">' . $job_title . '</a></li>';
+        //     }
+        //     $message .= '</ul>';
+        //     $message .= '</body></html>';
 
-            wp_mail($email, $subject, $message, $headers);
+        //     wp_mail($email, $subject, $message, $headers);
+        // }
+        error_log("send alert job weekly triggered");
+        foreach ($job_data as $jobAlerEmail => $jobData) {
+            EmailHelper::sendJobAlert( $jobData );
         }
     }
     
@@ -154,26 +165,32 @@ class CronJobAlert
         $data = new Data();
         $job_data = $data->main('monthly');
 
-        foreach($job_data as $email_key => $jobs)
-        {
-            $headers = ['Content-Type: text/html; charset=UTF-8'];
-            $email = $email_key;
-            $subject = 'Job Alert Monthly Report'; 
+        // foreach($job_data as $email_key => $jobs)
+        // {
+        //     $headers = ['Content-Type: text/html; charset=UTF-8'];
+        //     $email = $email_key;
+        //     $subject = 'Job Alert Monthly Report'; 
 
-            $message = '<html><body>';
-            $message .= '<h2>Job Alert Monthly Report</h2>';
-            $message .= '<ul>';
+        //     $message = '<html><body>';
+        //     $message .= '<h2>Job Alert Monthly Report</h2>';
+        //     $message .= '<ul>';
 
-            foreach ($jobs as $job_data) {
-                $job_title = $job_data['title'];
-                $job_url = $job_data['url'];
+        //     foreach ($jobs as $job_data) {
+        //         $job_title = $job_data['title'];
+        //         $job_url = $job_data['url'];
 
-                $message .= '<li><a href="' . $job_url . '">' . $job_title . '</a></li>';
-            }
-            $message .= '</ul>';
-            $message .= '</body></html>';
+        //         $message .= '<li><a href="' . $job_url . '">' . $job_title . '</a></li>';
+        //     }
+        //     $message .= '</ul>';
+        //     $message .= '</body></html>';
 
-            wp_mail($email, $subject, $message, $headers);
+        //     wp_mail($email, $subject, $message, $headers);
+        // }
+        
+        
+        error_log("send alert job monthly triggered");
+        foreach ($job_data as $jobAlerEmail => $jobData) {
+            EmailHelper::sendJobAlert( $jobData );
         }
     }
 }
