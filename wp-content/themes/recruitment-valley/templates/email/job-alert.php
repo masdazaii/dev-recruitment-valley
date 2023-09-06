@@ -615,120 +615,7 @@
                                                 <img
                                                   width="56"
                                                   height="56"
-                                                  src="<?= THEME_URL; ?>company-img"
-                                                  style="
-                                                    border: 0;
-                                                    display: block;
-                                                    outline: none;
-                                                    text-decoration: none;
-                                                    width: 56px;
-                                                    height: 56px;
-                                                    font-size: 13px;
-                                                    border-radius: 8px;
-                                                    overflow: hidden;
-                                                  "
-                                                />
-                                              </td>
-                                              <td>
-                                                <p
-                                                  align="left"
-                                                  style="
-                                                    font-family: Neue Montreal Regular,
-                                                      Helvetica;
-                                                    font-size: 22px;
-                                                    font-style: normal;
-                                                    font-weight: 500;
-                                                    line-height: 28px;
-                                                    color: #1f1f1f;
-                                                    padding-left: 10px;
-                                                  "
-                                                >
-                                                  {{ applicant.job.title }}
-                                                </p>
-                                              </td>
-                                            </tr>
-                                          </tbody>
-                                        </table>
-                                        <table
-                                          border="0"
-                                          cellpadding="0"
-                                          cellspacing="0"
-                                          role="presentation"
-                                          width="100%"
-                                        >
-                                          <tbody>
-                                            <tr>
-                                              <tr>
-                                                  <td>
-                                                    <p
-                                                      align="left"
-                                                      style="
-                                                          font-family: Neue Montreal Regular,
-                                                          Helvetica;
-                                                          font-size: 14px;
-                                                          font-style: normal;
-                                                          font-weight: 400;
-                                                          line-height: 20px;
-                                                          letter-spacing: 0.25px;
-                                                          color: #B7B7B7;
-                                                          padding-top: 10px;
-                                                          padding-bottom: 10px;
-                                                      "
-                                                    >
-                                                      Berkel en Rodenrijs <span style="padding-right: 4px;">•</span>
-                                                    </p>
-                                                    <table>
-                                                      <tbody>
-                                                          <tr>
-                                                              <td>
-                                                                  <p
-                                                                      align="left"
-                                                                      style="
-                                                                          font-family: Neue Montreal Regular,
-                                                                          Helvetica;
-                                                                          font-size: 11px;
-                                                                          font-style: normal;
-                                                                          font-weight: 500;
-                                                                          line-height: 16px;
-                                                                          letter-spacing: 0.5px;
-                                                                          color: #878787;
-                                                                          background-color: #E9E9E9;
-                                                                          padding-left: 8px;
-                                                                          padding-right: 8px;
-                                                                          border-radius: 20px;
-                                                                      "
-                                                                  >
-                                                                      21 juli 2023, 4.12 uur 's middags
-                                                                  </p>
-                                                                  <div style="padding-bottom: 34px;"></div>
-                                                              </td>
-                                                          </tr>
-                                                      </tbody>
-                                                    </table>
-                                                  </td>
-                                                </tr>
-                                            </tr>
-                                          </tbody>
-                                        </table>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <table
-                                          border="0"
-                                          cellpadding="0"
-                                          cellspacing="0"
-                                          role="presentation"
-                                          style="padding-top: 34px;"
-                                          width="100%"
-                                        >
-                                          <tbody>
-                                            <tr>
-                                              <td width="56">
-                                                <img
-                                                  width="56"
-                                                  height="56"
-                                                  src="<?= THEME_URL; ?>company-img"
+                                                  src="<?= THEME_URL; ?>/assets/images/logo-header.png"
                                                   style="
                                                     border: 0;
                                                     display: block;
@@ -825,6 +712,7 @@
                                         </table>
                                     </td>
                                 </tr> -->
+                                <!-- <?= THEME_URL; ?>/assets/images/logo-header.png -->
                                 {{ applicant.job.item_html }}
                             </tbody>
                           </table>
@@ -836,7 +724,7 @@
                                             <img
                                                 align="center"
                                                 height="auto"
-                                                src="<?= THEME_URL; ?>/button-img"
+                                                src="<?= THEME_URL; ?>/assets/images/button-email-jobalert.png"
                                                 style="
                                                   border: 0;
                                                   display: block;
