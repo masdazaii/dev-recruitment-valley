@@ -64,4 +64,9 @@ class EmailHelper
             error_log($e->getMessage());
         }
     }
+
+    public static function sendJobAlert()
+    {
+        
+    }
 }
