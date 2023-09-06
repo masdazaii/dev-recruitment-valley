@@ -5,7 +5,7 @@ namespace JobAlert;
 use WP_Query;
 
 
-class Data
+class DataOld
 {    
 
     /**
@@ -121,7 +121,6 @@ class Data
             'post_type'         => 'vacancy',
             'post_status'       => 'publish',
             'posts_per_page'    => -1,
-            'orderBy'           => 'date',
             'date_query'        => [
                 [
                     'after' => date('Y-m-d', $one_month_ago),
@@ -133,13 +132,13 @@ class Data
 
         $job = [];
         foreach ($query->posts as $post) {
+  
             $entry                  = [];
             $entry['id']            = $post->ID;
             $entry['post_date_gmt'] = $post->post_date_gmt;
             $entry['url']           = get_permalink($post->ID);
 
             $entry['name']          = $post->post_title;
-            $entry['slug']          = $post->post_name;
             $salary_start           = get_field('salary_start', $post->ID);
             $salary_end             = get_field('salary_end', $post->ID);
             foreach($this->_job_taxonomy as $taxonomy) {
@@ -182,31 +181,11 @@ class Data
                     $vacancie_id    = $vacancie[$key]['term_id'];
                     $intersection   = array_intersect($vacancie_id, $id);
 
-                    if ($intersection) {
-                        $email = $filter['email'];
-                        $jobId = $vacancie['id'];
-        
-                        if (!isset($result[$email])) {
-                            $result[$email] = [
-                                'email'     => $email,
-                                'jobs'      => [],
-                                'jobIds'    => [],
-                            ];
-                        }
-        
-                        $job = [
-                            'slug'      => isset($vacancie['slug']) ? $vacancie['slug'] : '',
-                            'title'     => isset($vacancie['name']) ? $vacancie['name'] : '',
-                            'post_date' => isset($vacancie['post_date_gmt']) ? $vacancie['post_date_gmt'] : '',
+                    if($intersection) {
+                        $result[$filter['email']][$vacancie['id']] = [
+                            'url'   => $vacancie['url'],
+                            'title' => $vacancie['name']
                         ];
-        
-                        $result[$email]['jobs'][$jobId] = $job;
-
-                        if (!in_array($vacancie['id'], $result[$email]['jobIds'])) {
-                            $result[$email]['jobIds'][] = $vacancie['id'];
-                        }
-
-                        $result[$email]['jobIds'] = array_unique($result[$email]['jobIds']);
                     }
                 }
             }
@@ -229,6 +208,7 @@ class Data
         $Vmonth = [];
 
         foreach($vacancies as $vacancie) {
+
             $inputDate      = $vacancie['post_date_gmt'];
             $currentDate    = date('Y-m-d'); 
 
