@@ -16,7 +16,7 @@ class LoginController
 {
     private $_message;
 
-    private $reset_password_url = "https://dev-recruitment-valley.vercel.app/autorisatie/nieuw-wachtwoord";
+    private $reset_password_url = FRONTEND_URL ."/autorisatie/nieuw-wachtwoord";
 
     public function __construct()
     {
@@ -44,7 +44,7 @@ class LoginController
                 $expired = $date->modify("+2 hours")->getTimestamp();
 
                 $args = [
-                    "reactivation_link" => "dev-recruitment-valley.vercel.app/autorisatie/heractiveer-account?token=". JWTHelper::generate(["user_id" => $user->ID, "exp" => $expired ]),
+                    "reactivation_link" => FRONTEND_URL. "/autorisatie/heractiveer-account?token=". JWTHelper::generate(["user_id" => $user->ID, "exp" => $expired ]),
                     "user_name" => $user->user_nicename
                 ];
 

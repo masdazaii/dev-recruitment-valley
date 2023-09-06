@@ -314,7 +314,7 @@ class ProfileController
         $subject = __("NEW CHANGE EMAIL REQUEST");
 
         // $chang_email_url = get_site_url() . "/changeEmail?token=" . $token; // Changed below
-        $chang_email_url = get_site_url() . "/autorisatie/verander-email?token=" . $token;
+        $chang_email_url = FRONTEND_URL . "/autorisatie/verander-email?token=" . $token;
 
         $message = "new change email request, if this is not by you just skip it <br>";
         $message .= "<br>";

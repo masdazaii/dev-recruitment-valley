@@ -4,9 +4,11 @@ namespace Helper;
 
 use BD\Emails\Email;
 use Exception;
+use IntlDateFormatter;
 use Model\Company;
 use Package;
 use Transaction;
+use Vacancy\Vacancy;
 
 class EmailHelper
 {
@@ -63,5 +65,175 @@ class EmailHelper
         } catch (Exception $e) {
             error_log($e->getMessage());
         }
+    }
+
+    public static function sendJobAlert( $jobAlertData )
+    {
+        try {
+            $email = $jobAlertData["email"];
+            $jobs = array_values($jobAlertData["jobs"]);
+            $jobIds = $jobAlertData["jobIds"];
+            $jobCount = count($jobs);
+            $jobListUrl = FRONTEND_URL . '/vacatures?perPage=10&vacancyId='. implode(",", $jobIds) . '&orderBy=date&sort=DESC';
+
+            $jobHtml = '';
+            foreach ($jobIds as $key => $jobId) {
+                $jobHtml .= self::generateJobItemHtml( $jobId );
+            }
+
+            error_log($jobHtml);
+
+            $args = [
+                "application.job.url" => $jobListUrl,
+                "applicant.email" => $email,
+                "applicant.job.count" => $jobCount,
+                "applicant.job.item_html" => $jobHtml 
+            ];
+
+            $content = Email::render_html_email('job-alert.php', $args);
+
+            $headers = array(
+                'Content-Type: text/html; charset=UTF-8',
+            );
+
+            $site_title = get_bloginfo('name');
+
+            wp_mail($email, "Kennisgeving JobAlert - $site_title", $content, $headers);
+        } catch (\Throwable $th) {
+            error_log( "error sending email because ". $th->getMessage() . " with payload ". json_encode($jobAlertData));
+        }
+    }
+
+    private static function generateJobItemHtml( $jobId )
+    {
+        error_log($jobId);
+
+        $vacancy = new Vacancy( $jobId );
+
+        $postedDate = DateHelper::doLocale($vacancy->getPublishDate(), 'nl_NL','d MMMM yyy');
+        
+        $vacancyAuthor = $vacancy->getAuthor();
+        $company = new Company($vacancyAuthor);
+        
+        ob_start();
+        ?>
+        <tr>
+            <td>
+                <table
+                border="0"
+                cellpadding="0"
+                cellspacing="0"
+                role="presentation"
+                style="padding-top: 34px;"
+                width="100%"
+                >
+                <tbody>
+                    <tr>
+                    <td width="56">
+                        <img
+                        width="56"
+                        height="56"
+                        src="<?= $company->getThumbnail() == "" ? THEME_URL.'/assets/images/company-placeholder.png' : $company->getThumbnail() ?>"
+                        style="
+                            border: 0;
+                            display: block;
+                            outline: none;
+                            text-decoration: none;
+                            width: 56px;
+                            height: 56px;
+                            font-size: 13px;
+                            border-radius: 8px;
+                            overflow: hidden;
+                        "
+                        />
+                    </td>
+                    <td>
+                        <p
+                        align="left"
+                        style="
+                            font-family: Neue Montreal Regular,
+                            Helvetica;
+                            font-size: 22px;
+                            font-style: normal;
+                            font-weight: 500;
+                            line-height: 28px;
+                            color: #1f1f1f;
+                            padding-left: 10px;
+                        "
+                        >
+                        <?= $vacancy->getTitle() ?>
+                        </p>
+                    </td>
+                    </tr>
+                </tbody>
+                </table>
+                <table
+                border="0"
+                cellpadding="0"
+                cellspacing="0"
+                role="presentation"
+                width="100%"
+                >
+                <tbody>
+                    <tr>
+                    <tr>
+                        <td>
+                            <p
+                            align="left"
+                            style="
+                                font-family: Neue Montreal Regular,
+                                Helvetica;
+                                font-size: 14px;
+                                font-style: normal;
+                                font-weight: 400;
+                                line-height: 20px;
+                                letter-spacing: 0.25px;
+                                color: #B7B7B7;
+                                padding-top: 10px;
+                                padding-bottom: 10px;
+                            "
+                            >
+                            Berkel en Rodenrijs <span style="padding-right: 4px;">•</span>
+                            </p>
+                            <table>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <p
+                                            align="left"
+                                            style="
+                                                font-family: Neue Montreal Regular,
+                                                Helvetica;
+                                                font-size: 11px;
+                                                font-style: normal;
+                                                font-weight: 500;
+                                                line-height: 16px;
+                                                letter-spacing: 0.5px;
+                                                color: #878787;
+                                                background-color: #E9E9E9;
+                                                padding-left: 8px;
+                                                padding-right: 8px;
+                                                border-radius: 20px;
+                                            "
+                                        >
+                                            <?= $postedDate ?>
+                                        </p>
+                                        <div style="padding-bottom: 34px;"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            </table>
+                        </td>
+                        </tr>
+                    </tr>
+                </tbody>
+                </table>
+            </td>
+        </tr>
+        <?php
+        $jobItem = ob_get_contents();
+        ob_end_clean();
+
+        return $jobItem;
     }
 }
