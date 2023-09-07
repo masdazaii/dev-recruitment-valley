@@ -712,7 +712,6 @@
                                         </table>
                                     </td>
                                 </tr> -->
-                                <!-- <?= THEME_URL; ?>/assets/images/logo-header.png -->
                                 {{ applicant.job.item_html }}
                             </tbody>
                           </table>
