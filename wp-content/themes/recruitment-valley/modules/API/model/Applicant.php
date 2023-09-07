@@ -10,7 +10,7 @@ class Applicant
     public $phone_number = "phone_number";
     public $phone_number_code = "phone_code_area";
 
-    public function __construct( $applicant_id = false )
+    public function __construct($applicant_id = false)
     {
         $this->applicant_id = $applicant_id;
     }

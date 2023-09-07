@@ -327,6 +327,10 @@
                                         color: #000;
                                       ">
                                     Beste,
+                                    <span style="
+                                          font-family: Neue Montreal Medium, Helvetica;
+                                        ">
+                                      {{ applicant.name }}</span>
                                     <!-- <span
                                         style="
                                           font-family: Neue Montreal Medium;
@@ -395,7 +399,7 @@
                                         font-size: 16px;
                                         font-style: normal;
                                         font-weight: 600;
-                                        line-height: 24px; 
+                                        line-height: 24px;
                                         letter-spacing: 0.5px;
                                         padding-block: 10px;
                                     ">Telefonummer</td>
@@ -416,7 +420,7 @@
                                     font-size: 16px;
                                     font-style: normal;
                                     font-weight: 600;
-                                    line-height: 24px; 
+                                    line-height: 24px;
                                     letter-spacing: 0.5px;
                                     padding-block: 10px;
                                 ">Cover letter</td>

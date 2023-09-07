@@ -45,107 +45,111 @@ class ParserService
 
             $i = 0;
 
+            // print('<pre>' . print_r($data, true) . '</pre>');
+
             foreach ($data as $tag => $tagValue) {
-                if ($tag == 'job') {
-                    // print('<pre>' . print_r('a' . PHP_EOL, true) . '</pre>');
-                    if (is_array($tagValue) || $tagValue instanceof \SimpleXMLElement) {
-                        $tagValueArray = get_object_vars($tagValue);
+                print($i . ' - ' . print_r($tag, true) . PHP_EOL);
+                // if ($tag == 'job') {
+                //     // print('<pre>' . print_r('a' . PHP_EOL, true) . '</pre>');
+                //     if (is_array($tagValue) || $tagValue instanceof \SimpleXMLElement) {
+                //         $tagValueArray = get_object_vars($tagValue);
 
-                        $payload = [];
+                //         $payload = [];
 
-                        /** Map property that not used.
-                         * this will be stored in post meta.
-                         */
-                        $unusedData = [];
-                        foreach ($tagValueArray as $jobKey => $jobValue) {
-                            // print('<pre>' . print_r($jobKey, true) . '</pre>' . PHP_EOL);
+                //         /** Map property that not used.
+                //          * this will be stored in post meta.
+                //          */
+                //         $unusedData = [];
+                //         foreach ($tagValueArray as $jobKey => $jobValue) {
+                //             // print('<pre>' . print_r($jobKey, true) . '</pre>' . PHP_EOL);
 
-                            /** Post Data Title */
-                            if ($jobKey === 'title' && array_key_exists('title', $tagValueArray) && !empty($jobValue)) {
-                                $arguments['post_title'] = preg_replace('/[\n\t]+/', '', $jobValue);
-                            }
+                //             /** Post Data Title */
+                //             if ($jobKey === 'title' && array_key_exists('title', $tagValueArray) && !empty($jobValue)) {
+                //                 $arguments['post_title'] = preg_replace('/[\n\t]+/', '', $jobValue);
+                //             }
 
-                            /** Post Data Date */
-                            if ($jobKey === 'datePosted' && array_key_exists('datePosted', $tagValueArray) && !empty($jobValue)) {
-                                $arguments['post_date'] = \DateTime::createFromFormat('d-n-Y H:i:s', preg_replace('/[\n\t]+/', '', $jobValue))->format('Y-m-d H:i:s');
-                            }
+                //             /** Post Data Date */
+                //             if ($jobKey === 'datePosted' && array_key_exists('datePosted', $tagValueArray) && !empty($jobValue)) {
+                //                 $arguments['post_date'] = \DateTime::createFromFormat('d-n-Y H:i:s', preg_replace('/[\n\t]+/', '', $jobValue))->format('Y-m-d H:i:s');
+                //             }
 
-                            /** ACF Description */
-                            if ($jobKey === 'description' && array_key_exists('description', $tagValueArray) && !empty($jobValue)) {
-                                $payload['description'] = preg_replace('/[\n\t]+/', '', $jobValue);
-                            }
+                //             /** ACF Description */
+                //             if ($jobKey === 'description' && array_key_exists('description', $tagValueArray) && !empty($jobValue)) {
+                //                 $payload['description'] = preg_replace('/[\n\t]+/', '', $jobValue);
+                //             }
 
-                            /** ACF placement_city */
-                            if ($jobKey === 'city' && array_key_exists('city', $tagValueArray) && !empty($jobValue)) {
-                                $payload['placement_city'] = preg_replace('/[\n\t]+/', '', $jobValue);
-                            }
+                //             /** ACF placement_city */
+                //             if ($jobKey === 'city' && array_key_exists('city', $tagValueArray) && !empty($jobValue)) {
+                //                 $payload['placement_city'] = preg_replace('/[\n\t]+/', '', $jobValue);
+                //             }
 
-                            /** ACF placcement_adress */
-                            if ($jobKey === 'streetAddress' && array_key_exists('streetAddress', $tagValueArray) && !empty($jobValue)) {
-                                $payload['placement_address'] = preg_replace('/[\n\t]+/', '', $jobValue);
-                            }
+                //             /** ACF placcement_adress */
+                //             if ($jobKey === 'streetAddress' && array_key_exists('streetAddress', $tagValueArray) && !empty($jobValue)) {
+                //                 $payload['placement_address'] = preg_replace('/[\n\t]+/', '', $jobValue);
+                //             }
 
-                            /** ACF external_url */
-                            if ($jobKey === 'url' && array_key_exists('url', $tagValueArray) && !empty($jobValue)) {
-                                $payload['external_url'] = preg_replace('/[\n\t]+/', '', $jobValue);
-                            }
+                //             /** ACF external_url */
+                //             if ($jobKey === 'url' && array_key_exists('url', $tagValueArray) && !empty($jobValue)) {
+                //                 $payload['external_url'] = preg_replace('/[\n\t]+/', '', $jobValue);
+                //             }
 
-                            /** ACF apply_from_this_platform */
-                            $payload['apply_from_this_platform'] = false;
+                //             /** ACF apply_from_this_platform */
+                //             $payload['apply_from_this_platform'] = false;
 
-                            /** ACF expired_at */
-                            if ($jobKey === 'expirationdate' && array_key_exists('expirationdate', $tagValueArray) && !empty($jobValue) != "") {
-                                // print('<pre>' . print_r($i . ' : ' . preg_replace('/[\n\t]+/', '', $jobValue) . ' - ' . \DateTime::createFromFormat('d-n-Y', preg_replace('/[\n\t]+/', '', $jobValue))->setTime(23, 59, 59)->format('Y-m-d H:i:s'), true) . '</pre>' . PHP_EOL);
-                                $payload['expired_at'] = \DateTime::createFromFormat('d-n-Y', preg_replace('/[\n\t]+/', '', $jobValue))->setTime(23, 59, 59)->format('Y-m-d H:i:s');
-                            }
+                //             /** ACF expired_at */
+                //             if ($jobKey === 'expirationdate' && array_key_exists('expirationdate', $tagValueArray) && !empty($jobValue) != "") {
+                //                 // print('<pre>' . print_r($i . ' : ' . preg_replace('/[\n\t]+/', '', $jobValue) . ' - ' . \DateTime::createFromFormat('d-n-Y', preg_replace('/[\n\t]+/', '', $jobValue))->setTime(23, 59, 59)->format('Y-m-d H:i:s'), true) . '</pre>' . PHP_EOL);
+                //                 $payload['expired_at'] = \DateTime::createFromFormat('d-n-Y', preg_replace('/[\n\t]+/', '', $jobValue))->setTime(23, 59, 59)->format('Y-m-d H:i:s');
+                //             }
 
-                            /** Taxonomy working-hours */
-                            if ($jobKey === 'hoursPerWeek' && array_key_exists('hoursPerWeek', $tagValueArray) && !empty($jobValue)) {
-                                $taxonomy['working-hours'] = $this->_findWorkingHours(preg_replace('/[\n\t]+/', '', $jobValue));
-                            }
+                //             /** Taxonomy working-hours */
+                //             if ($jobKey === 'hoursPerWeek' && array_key_exists('hoursPerWeek', $tagValueArray) && !empty($jobValue)) {
+                //                 $taxonomy['working-hours'] = $this->_findWorkingHours(preg_replace('/[\n\t]+/', '', $jobValue));
+                //             }
 
-                            /** Taxonomy education */
-                            if ($jobKey === 'education' && array_key_exists('education', $tagValueArray) && !empty($jobValue)) {
-                                $taxonomy['education'] = $this->_findEducation($this->_taxonomyKey['education'], preg_replace('/[\n\t]+/', '', $jobValue));
-                            }
+                //             /** Taxonomy education */
+                //             if ($jobKey === 'education' && array_key_exists('education', $tagValueArray) && !empty($jobValue)) {
+                //                 $taxonomy['education'] = $this->_findEducation($this->_taxonomyKey['education'], preg_replace('/[\n\t]+/', '', $jobValue));
+                //             }
 
-                            /** Taxonomy experience */
-                            if ($jobKey === 'experience' && array_key_exists('experience', $tagValueArray) && !empty($jobValue)) {
-                                $taxonomy['experiences'] = $this->_findExperiences(preg_replace('/[\n\t]+/', '', $jobValue));
-                            }
+                //             /** Taxonomy experience */
+                //             if ($jobKey === 'experience' && array_key_exists('experience', $tagValueArray) && !empty($jobValue)) {
+                //                 $taxonomy['experiences'] = $this->_findExperiences(preg_replace('/[\n\t]+/', '', $jobValue));
+                //             }
 
-                            /** Taxonomy Status */
-                            if ($jobKey === 'isActive' && array_key_exists('isActive', $tagValueArray) && !empty($jobValue)) {
-                                $taxonomy['status'] = $this->_findStatus($jobValue);
-                            }
+                //             /** Taxonomy Status */
+                //             if ($jobKey === 'isActive' && array_key_exists('isActive', $tagValueArray) && !empty($jobValue)) {
+                //                 $taxonomy['status'] = $this->_findStatus($jobValue);
+                //             }
 
-                            if (!in_array($jobKey, ['title', 'datePosted', 'description', 'city', 'streetAddress', 'url', 'expirationdate', 'hoursPerWeek', 'education', 'experience', 'isActive'])) {
-                                $unusedData[] = [
-                                    $jobKey => $jobValue
-                                ];
-                            }
-                        }
+                //             if (!in_array($jobKey, ['title', 'datePosted', 'description', 'city', 'streetAddress', 'url', 'expirationdate', 'hoursPerWeek', 'education', 'experience', 'isActive'])) {
+                //                 $unusedData[] = [
+                //                     $jobKey => $jobValue
+                //                 ];
+                //             }
+                //         }
 
-                        $post = wp_insert_post($arguments);
-                        $vacancy = new Vacancy($post->ID);
+                //         $post = wp_insert_post($arguments);
+                //         $vacancy = new Vacancy($post->ID);
 
-                        foreach ($payload as $key => $value) {
-                            // $vacancy->setProp
-                        }
-                    } else {
-                        throw new Exception("not an array : " . json_encode($tagValue));
-                    }
+                //         foreach ($payload as $key => $value) {
+                //             // $vacancy->setProp
+                //         }
+                //     } else {
+                //         throw new Exception("not an array : " . json_encode($tagValue));
+                //     }
 
-                    $i++;
-                } else {
-                    $res[$tag] = $tagValue;
-                }
+                //     $i++;
+                // } else {
+                //     $res[$tag] = $tagValue;
+                // }
+                $i++;
             }
 
             // print('<pre>'.print_r($res, true).'</pre>');
             return \ResponseHelper::build([
                 'status' => 200,
-                'data' => $res
+                // 'data' => $res
             ]);
         } else {
             print('<pre>' . print_r('a', true) . '</pre>');

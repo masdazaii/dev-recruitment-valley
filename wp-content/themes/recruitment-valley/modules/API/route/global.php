@@ -203,12 +203,12 @@ class GlobalEndpoint
                     'permission_callback'   => '__return_true',
                     'callback'              => [$sitemapService, 'get']
                 ],
-                // 'test_xml' => [
-                //     'url'                   => '/parse',
-                //     'methods'               => 'GET',
-                //     'permission_callback'   => '__return_true',
-                //     'callback'              => [$parserService, 'testParse']
-                // ],
+                'test_xml' => [
+                    'url'                   => '/parse',
+                    'methods'               => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$parserService, 'testParse']
+                ],
                 'test_json' => [
                     'url'                   => '/parse-json',
                     'methods'               => 'GET',
