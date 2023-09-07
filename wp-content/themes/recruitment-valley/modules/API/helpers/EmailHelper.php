@@ -67,7 +67,7 @@ class EmailHelper
         }
     }
 
-    public static function sendJobAlert( $jobAlertData )
+    public static function sendJobAlert( $jobAlertData, $displayedJobItemCount = 5 )
     {
         try {
             $email = $jobAlertData["email"];
@@ -78,6 +78,7 @@ class EmailHelper
 
             $jobHtml = '';
             foreach ($jobIds as $key => $jobId) {
+                if($key >= 5) break;
                 $jobHtml .= self::generateJobItemHtml( $jobId );
             }
 
@@ -106,13 +107,13 @@ class EmailHelper
         }
     }
 
-    private static function generateJobItemHtml( $jobId )
+    private static function generateJobItemHtml( $jobId)
     {
-        error_log($jobId);
-
         $vacancy = new Vacancy( $jobId );
+        $vacancyTaxonomy = $vacancy->getTaxonomy( false );
 
-        $postedDate = DateHelper::doLocale($vacancy->getPublishDate(), 'nl_NL','d MMMM yyy');
+
+        $postedDate = DateHelper::doLocale($vacancy->getPublishDate(), 'nl_NL', 'dd MMMM yyyy, HH:mm a');
         
         $vacancyAuthor = $vacancy->getAuthor();
         $company = new Company($vacancyAuthor);
@@ -195,7 +196,7 @@ class EmailHelper
                                 padding-bottom: 10px;
                             "
                             >
-                            Berkel en Rodenrijs <span style="padding-right: 4px;">•</span>
+                            <?= self::generateTaxonomyDescription($vacancyTaxonomy) ?>
                             </p>
                             <table>
                             <tbody>
@@ -237,5 +238,25 @@ class EmailHelper
         ob_end_clean();
 
         return $jobItem;
+    }
+
+    private static function generateTaxonomyDescription( $taxonomies )
+    {
+        $taxonomyDescription = "";
+        $taxonomyCount = count($taxonomies);
+
+        ob_start();
+        foreach ($taxonomies as $key => $taxonomy) {
+            error_log($key);
+            error_log($taxonomyCount);
+            $taxonomyDescription .= $key != $taxonomyCount - 1 ? $taxonomy["name"] . '<span style="padding-right: 4px;">•</span>' : $taxonomy["name"];
+        }
+        ?>
+            <?= $taxonomyDescription; ?>
+        <?php
+        $description = ob_get_contents();
+        ob_end_clean();
+
+        return $description;
     }
 }
