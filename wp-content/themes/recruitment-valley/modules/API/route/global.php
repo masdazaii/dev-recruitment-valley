@@ -14,6 +14,7 @@ use JobAlert\JobAlertService;
 use Global\User\UserService;
 use Sitemap\SitemapService;
 use Service\ParserService;
+use Vacancy\Import\ImportService;
 
 class GlobalEndpoint
 {
@@ -41,6 +42,7 @@ class GlobalEndpoint
         $userService = new UserService;
         $sitemapService = new SitemapService;
         $parserService = new ParserService;
+        $importService = new ImportService;
 
         $endpoint = [
             'path' => '',
@@ -207,6 +209,14 @@ class GlobalEndpoint
                 //     'permission_callback'   => '__return_true',
                 //     'callback'              => [$parserService, 'testParse']
                 // ]
+
+                // import endpoint test start here,
+                'flexfeed_import' => [
+                    'url'                   => 'import/flexfeed',
+                    'methods'               => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$importService, 'flexFeed']
+                ]
             ]
 
         ];
