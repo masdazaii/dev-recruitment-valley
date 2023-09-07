@@ -81,7 +81,7 @@ class EmailHelper
                 $jobHtml .= self::generateJobItemHtml( $jobId );
             }
 
-            error_log($jobHtml);
+            // error_log($jobHtml);
 
             $args = [
                 "application.job.url" => $jobListUrl,
@@ -89,6 +89,8 @@ class EmailHelper
                 "applicant.job.count" => $jobCount,
                 "applicant.job.item_html" => $jobHtml 
             ];
+
+            error_log(json_encode($args));
 
             $content = Email::render_html_email('job-alert.php', $args);
 
