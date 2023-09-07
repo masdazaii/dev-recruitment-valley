@@ -9,6 +9,7 @@ use Vacancy\Vacancy;
 use Constant\Message;
 use Helper\ValidationHelper;
 use Model\Applicant;
+use Model\Company;
 
 class VacancyAppliedService
 {
@@ -91,14 +92,16 @@ class VacancyAppliedService
     {
         $vacancy = new Vacancy($params["vacancy"]);
         $user = get_user_by('id', $vacancy->getAuthor());
+        $company = new Company($user->ID);
         $applicant = new Applicant($response["applicant"]);
 
         $attachment = get_attached_file($response['cv']);
 
         $args = [
+            'applicant.name' => $company->getName(),
             'applicant.vacancy.title' => $vacancy->getTitle(),
-            'applicant.phoneNumber'=> $applicant->getPhoneNumberCode() . $applicant->getPhoneNumber(),
-            'applicant.cover_letter'=> $applicant->getCoverLetter()
+            'applicant.phoneNumber' => $applicant->getPhoneNumberCode() . $applicant->getPhoneNumber(),
+            'applicant.cover_letter' => $applicant->getCoverLetter()
         ];
 
         $headers = array(
