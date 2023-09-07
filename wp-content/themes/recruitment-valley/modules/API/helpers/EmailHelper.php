@@ -162,6 +162,7 @@ class EmailHelper
                             line-height: 28px;
                             color: #1f1f1f;
                             padding-left: 10px;
+                            margin: 0;
                         "
                         >
                         <?= $vacancy->getTitle() ?>
@@ -194,6 +195,7 @@ class EmailHelper
                                 color: #B7B7B7;
                                 padding-top: 10px;
                                 padding-bottom: 10px;
+                                margin: 0;
                             "
                             >
                             <?= self::generateTaxonomyDescription($vacancyTaxonomy) ?>
@@ -217,6 +219,7 @@ class EmailHelper
                                                 padding-left: 8px;
                                                 padding-right: 8px;
                                                 border-radius: 20px;
+                                                margin: 0;
                                             "
                                         >
                                             <?= $postedDate ?>
