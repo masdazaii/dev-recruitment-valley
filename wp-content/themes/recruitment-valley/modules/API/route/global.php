@@ -203,19 +203,30 @@ class GlobalEndpoint
                     'permission_callback'   => '__return_true',
                     'callback'              => [$sitemapService, 'get']
                 ],
-                // 'test_xml' => [
-                //     'url'                   => '/parse',
-                //     'methods'               => 'GET',
-                //     'permission_callback'   => '__return_true',
-                //     'callback'              => [$parserService, 'testParse']
-                // ]
-
+                'test_xml' => [
+                    'url'                   => '/parse',
+                    'methods'               => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$parserService, 'testParse']
+                ],
+                'test_json' => [
+                    'url'                   => '/parse-json',
+                    'methods'               => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$parserService, 'parseJsonl']
+                ],
                 // import endpoint test start here,
                 'flexfeed_import' => [
                     'url'                   => 'import/flexfeed',
                     'methods'               => 'GET',
                     'permission_callback'   => '__return_true',
                     'callback'              => [$importService, 'flexFeed']
+                ],
+                'nationale_vacature_bank_import' => [
+                    'url'                   => 'import/nationale-vacature-bank',
+                    'methods'               => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$importService, 'nationaleVacatureBank']
                 ]
             ]
 

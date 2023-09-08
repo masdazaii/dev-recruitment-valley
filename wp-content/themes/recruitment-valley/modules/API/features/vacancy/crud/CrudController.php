@@ -261,7 +261,6 @@ class VacancyCrudController
         return [
             'message' => $this->_message->get('vacancy.get_all'),
             'data'    => $vacancies->posts,
-            'args'    => $vacancies->query,
             'meta'    => [
                 'currentPage' => isset($filters['page']) ? intval($filters['page']) : 1,
                 'totalPage' => $vacancies->max_num_pages,
