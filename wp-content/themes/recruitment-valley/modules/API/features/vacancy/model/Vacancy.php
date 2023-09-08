@@ -762,4 +762,12 @@ class Vacancy
 
         return $args;
     }
+
+    /** set distance acf Function */
+    public function setCoordinateDistance($cityCoordinate, $placementAddressCoordinate)
+    {
+        $distance = Maphelper::calculateDistance($cityCoordinate, $placementAddressCoordinate);
+
+        return $this->setProp($this->acf_distance_from_city, $distance);
+    }
 }
