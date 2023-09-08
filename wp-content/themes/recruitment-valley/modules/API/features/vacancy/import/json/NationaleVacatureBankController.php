@@ -209,6 +209,11 @@ class NationaleVacatureBankController
                     unset($data[$i]['location_coordinates']);
                 }
 
+                /** ACF Paid
+                 * set all import to paid
+                 */
+                $payload["is_paid"] = true;
+
                 /** Taxonomy Working-hours */
                 if (array_key_exists('hours_per_week_from', $data[$i]) && !empty($data[$i]['hours_per_week_from'])) {
                     if (array_key_exists('hours_per_week_to', $data[$i]) && !empty($data[$i]['hours_per_week_to'])) {

@@ -202,6 +202,11 @@ class FlexFeedController
                             $payload['expired_at'] = \DateTime::createFromFormat('d-n-Y', preg_replace('/[\n\t]+/', '', $jobValue))->setTime(23, 59, 59)->format('Y-m-d H:i:s');
                         }
 
+                        /** ACF Paid
+                         * set all import to paid
+                         */
+                        $payload["is_paid"] = true;
+
                         /** Taxonomy working-hours */
                         if ($jobKey === 'hoursPerWeek' && array_key_exists('hoursPerWeek', $tagValueArray) && !empty($jobValue)) {
                             $taxonomy['working-hours'] = $this->_findWorkingHours(preg_replace('/[\n\t]+/', '', $jobValue));
