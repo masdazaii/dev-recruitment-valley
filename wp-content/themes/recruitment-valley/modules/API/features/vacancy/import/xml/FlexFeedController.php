@@ -115,7 +115,7 @@ class FlexFeedController
         $arguments = [
             'post_type' => 'vacancy',
             'post_status' => 'publish',
-            'post_author' => get_user_by('email', 'admin.jobRV@local.com')->ID
+            'post_author' => get_user_by('email', 'adminjob@recruitmentvalley.com')->ID
         ];
 
         $payload = [];

@@ -64,7 +64,7 @@ class NationaleVacatureBankController
         $arguments = [
             'post_type' => 'vacancy',
             'post_status' => 'publish',
-            'post_author' => get_user_by('email', 'admin.jobRV@local.com')->ID
+            'post_author' => get_user_by('email', '	adminjob@recruitmentvalley.com')->ID
         ];
 
         $payload = [];
@@ -91,7 +91,7 @@ class NationaleVacatureBankController
                     continue;
                 }
 
-                if (!$this->_validate($data[$i]['url'])) {
+                if (!$this->_validate($data[$i]['apply_url'])) {
                     // throw new Error('Vacancy already exists.');
                     error_log('[NationaleVacatureBank] - Vacancy already exists. Title : ' . (array_key_exists('title', $data[$i]) ? $data[$i]['job_title'] : '"NoTitleFound"') . ' - index : ' . $i);
                     trigger_error('[NationaleVacatureBank] - Vacancy already exists.', E_USER_WARNING);
@@ -186,7 +186,7 @@ class NationaleVacatureBankController
                  * sometimes, there is property "location_remote_possible"
                  * if this property value is false, set placement with organization address
                  */
-                if (array_key_exists('location_remote_possible', $data[$i]) && !empty($data[$i]['location_remote_possible']) && $data[$i]['location_remote_possible'] == 'false') {
+                if (array_key_exists('location_remote_possible', $data[$i]) && (!empty($data[$i]['location_remote_possible']) || $data[$i]['location_remote_possible'] == false)) {
                     /** Set Placement Address */
                     if (array_key_exists('organization_address', $data[$i]) && !empty($data[$i]['organization_address'])) {
                         $payload['placement_address'] = preg_replace('/[\n\t]+/', '', $data[$i]['organization_address']);
@@ -195,7 +195,8 @@ class NationaleVacatureBankController
                         unset($data[$i]['organization_address']);
                     }
 
-                    /** Set Taxonomy  */
+                    /** Set Taxonomy Location to remote */
+                    $taxonomy['location'] = $this->_findLocation('on-site');
                 }
 
                 /** ACF City Coordinate */
@@ -319,6 +320,34 @@ class NationaleVacatureBankController
 
                     /** store unused to post meta */
                     update_post_meta($post, 'nvb_unused_data', $unusedData);
+
+                    /** Calc coordinate */
+                    if (isset($payload["placement_city"]) || isset($payload["placement_address"])) {
+                        if ($payload['city_latitude'] == "" && $payload["city_longitude"] == "") {
+                            $vacancy->setCityLongLat($payload["placement_city"]);
+                        }
+
+                        if (isset($payload["placement_address"])) {
+                            $vacancy->setAddressLongLat($payload["placement_address"]);
+                        }
+
+                        if ($payload['city_latitude'] == "" && $payload["city_longitude"] == "" && isset($payload["placement_address"])) {
+                            $vacancy->setDistance($payload["placement_city"], $payload["placement_city"] . " " . $payload["placement_address"]);
+                        } else if ($payload['city_latitude'] !== "" && $payload["city_longitude"] !== "" && isset($payload["placement_address"])) {
+                            $cityCoordinate = [
+                                'lat' => $payload['city_latitude'],
+                                'long' => $payload['city_longitude']
+                            ];
+
+                            $vacancy->setAddressLongLat($payload['placement_address']);
+                            $placementCoordinate = [
+                                'lat' => $vacancy->getProp('placement_address_latitude', true),
+                                'long' => $vacancy->getProp('placement_address_longitude', true),
+                            ];
+
+                            $vacancy->setCoordinateDistance($cityCoordinate, $placementCoordinate);
+                        }
+                    }
                 } catch (\Exception $error) {
                     error_log($error);
                 }
@@ -442,6 +471,29 @@ class NationaleVacatureBankController
         }
 
         $newTerm = wp_insert_term($jsonValue, 'role', []);
+        if ($newTerm instanceof WP_Error) {
+            return null;
+        } else {
+            return $newTerm['term_id'];
+        }
+    }
+
+    private function _findLocation($jsonValue)
+    {
+        $terms = $this->_terms['location'];
+        $alternative = strtolower(preg_replace('/\s+/', '-', $jsonValue));
+
+        foreach ($terms as $key => $value) {
+            switch ($value) {
+                case $value['name'] == strtolower($jsonValue):
+                case $value['slug'] == strtolower($jsonValue):
+                case $value['name'] == strtolower($alternative):
+                case $value['slug'] == strtolower($alternative):
+                    return $value['term_id'];
+            }
+        }
+
+        $newTerm = wp_insert_term($jsonValue, 'location', []);
         if ($newTerm instanceof WP_Error) {
             return null;
         } else {
