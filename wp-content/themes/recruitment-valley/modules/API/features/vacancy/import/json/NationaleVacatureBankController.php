@@ -81,6 +81,24 @@ class NationaleVacatureBankController
          */
         for ($i = $start; $i < $limit; $i++) {
             if ($i <= count($data) - 1) {
+
+                /** Validate - check if data is exists or not */
+                if (!array_key_exists('apply_url', $data[$i]) || empty($data[$i]['apply_url'])) {
+                    // throw new Error('URL is empty, failed to store vacancy.');
+                    error_log('[NationaleVacatureBank] - URL is empty, failed to store vacancy. Title : ' . array_key_exists('title', $data[$i]) ? $data[$i]['job_title'] : '"NoTitleFound" - index : ' . $i);
+                    trigger_error('[NationaleVacatureBank] - URL is empty, failed to store vacancy.', E_USER_WARNING);
+                    $i++;
+                    continue;
+                }
+
+                if (!$this->_validate($data[$i]['url'])) {
+                    // throw new Error('Vacancy already exists.');
+                    error_log('[NationaleVacatureBank] - Vacancy already exists. Title : ' . (array_key_exists('title', $data[$i]) ? $data[$i]['job_title'] : '"NoTitleFound"') . ' - index : ' . $i);
+                    trigger_error('[NationaleVacatureBank] - Vacancy already exists.', E_USER_WARNING);
+                    $i++;
+                    continue;
+                }
+
                 /** Post Data Title */
                 if (array_key_exists('job_title', $data[$i]) && !empty($data[$i]['job_title'])) {
                     $arguments['post_title'] = preg_replace('/[\n\t]+/', '', $data[$i]['job_title']);
@@ -162,6 +180,22 @@ class NationaleVacatureBankController
 
                     /** Unset used key */
                     unset($data[$i]['location_name']);
+                }
+
+                /** ACF Placement Address
+                 * sometimes, there is property "location_remote_possible"
+                 * if this property value is false, set placement with organization address
+                 */
+                if (array_key_exists('location_remote_possible', $data[$i]) && !empty($data[$i]['location_remote_possible']) && $data[$i]['location_remote_possible'] == 'false') {
+                    /** Set Placement Address */
+                    if (array_key_exists('organization_address', $data[$i]) && !empty($data[$i]['organization_address'])) {
+                        $payload['placement_address'] = preg_replace('/[\n\t]+/', '', $data[$i]['organization_address']);
+
+                        /** Unset used key */
+                        unset($data[$i]['organization_address']);
+                    }
+
+                    /** Set Taxonomy  */
                 }
 
                 /** ACF City Coordinate */
@@ -256,7 +290,7 @@ class NationaleVacatureBankController
                 }
 
                 foreach ($data[$i] as $propKey => $propValue) {
-                    $unusedData[$i][$propKey] = $propValue;
+                    $unusedData[$propKey] = $propValue;
                 }
 
                 /** Insert data */
@@ -279,14 +313,36 @@ class NationaleVacatureBankController
                     $expiredAt = $expiredAt->modify("+30 days")->format("Y-m-d H:i:s");
                     $vacancy->setProp("expired_at", $expiredAt);
 
-                    foreach ($payload as $acf_field => $data[$i]) {
-                        $vacancy->setProp($acf_field, $data[$i], is_array($data[$i]));
+                    foreach ($payload as $acf_field => $acfValue) {
+                        $vacancy->setProp($acf_field, $acfValue, is_array($acfValue));
                     }
+
+                    /** store unused to post meta */
+                    update_post_meta($post, 'nvb_unused_data', $unusedData);
                 } catch (\Exception $error) {
                     error_log($error);
                 }
             }
         }
+    }
+
+    private function _validate($jsonValue)
+    {
+        $args = [
+            'post_type' => 'vacancy',
+            'meta_query' => [
+                [
+                    'key' => 'external_url',
+                    'value' => $jsonValue,
+                    'compare' => '=',
+                ]
+            ]
+        ];
+        $query = new \WP_Query($args);
+
+        // print('<pre>' . print_r($query, true) . '</pre>');
+
+        return $query->post_count > 0 ? false : true;
     }
 
     private function _getTerms()

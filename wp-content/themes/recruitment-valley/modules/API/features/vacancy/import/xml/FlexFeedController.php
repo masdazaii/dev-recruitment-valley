@@ -2,6 +2,7 @@
 
 namespace Vacancy\Import\Xml;
 
+use Error;
 use Exception;
 use Vacancy\Vacancy;
 use WP_Error;
@@ -130,8 +131,30 @@ class FlexFeedController
 
         foreach ($data as $tag => $tagValue) {
             if ($tag == 'job') {
+                /** Stop the loop if index more than limit */
+                if ($i >= $limit) {
+                    break;
+                }
+
                 if (is_array($tagValue) || $tagValue instanceof \SimpleXMLElement) {
                     $tagValueArray = get_object_vars($tagValue);
+
+                    /** Validate - check if data is exists or not */
+                    if (!array_key_exists('url', $tagValueArray) || empty($tagValueArray['url'])) {
+                        // throw new Error('URL is empty, failed to store vacancy.');
+                        error_log('[Flexfeed] - URL is empty, failed to store vacancy. Title : ' . array_key_exists('title', $tagValueArray) ? $tagValueArray['title'] : '"NoTitleFound" - index : ' . $i);
+                        trigger_error('[Flexfeed] - URL is empty, failed to store vacancy.', E_USER_WARNING);
+                        $i++;
+                        continue;
+                    }
+
+                    if (!$this->_validate($tagValueArray['url'])) {
+                        // throw new Error('Vacancy already exists.');
+                        error_log('[Flexfeed] - Vacancy already exists. Title : ' . (array_key_exists('title', $tagValueArray) ? $tagValueArray['title'] : '"NoTitleFound"') . ' - index : ' . $i);
+                        trigger_error('[Flexfeed] - Vacancy already exists.', E_USER_WARNING);
+                        $i++;
+                        continue;
+                    }
 
                     $payload = [];
 
@@ -209,15 +232,67 @@ class FlexFeedController
                         }
                     }
 
-                    // print('<pre>' . print_r($arguments, true) . '</pre>');
+                    /** Insert data */
                     // print('<pre>' . print_r($payload, true) . '</pre>');
-                    print('<pre>' . print_r($taxonomy, true) . '</pre>');
-                    // print('<pre>'.print_r($unusedData, true).'</pre>');
+                    try {
+                        $post = wp_insert_post($arguments, true);
+
+                        if (is_wp_error($post)) {
+                            error_log(json_encode($post->get_error_messages()));
+                        }
+
+                        $vacancy = new Vacancy($post);
+
+                        $vacancy->setTaxonomy($taxonomy);
+
+                        /** Taxonomy Status */
+                        $vacancy->setStatus('open');
+
+                        /** Set expired date 30 days from this data inputed */
+                        $expiredAt = new \DateTimeImmutable();
+                        $expiredAt = $expiredAt->modify("+30 days")->format("Y-m-d H:i:s");
+                        $vacancy->setProp("expired_at", $expiredAt);
+
+                        foreach ($payload as $acf_field => $acfValue) {
+                            $vacancy->setProp($acf_field, $acfValue, is_array($acfValue));
+                        }
+
+                        /** Calc coordinate */
+                        if (isset($payload["placement_city"]) && isset($payload["placement_address"])) {
+                            $vacancy->setCityLongLat($payload["placement_city"]);
+                            $vacancy->setAddressLongLat($payload["placement_address"]);
+                            $vacancy->setDistance($payload["placement_city"], $payload["placement_city"] . " " . $payload["placement_address"]);
+                        }
+
+                        /** store unused to post meta */
+                        update_post_meta($post, 'ff_unused_data', $unusedData);
+                    } catch (\Exception $error) {
+                        error_log($error);
+                    }
                 }
 
                 $i++;
             }
         }
+    }
+
+    private function _validate($xmlValue)
+    {
+        $args = [
+            'post_type' => 'vacancy',
+            'meta_query' => [
+                [
+                    'key' => 'external_url',
+                    'value' => $xmlValue,
+                    'compare' => '=',
+                ]
+            ]
+        ];
+        $query = new \WP_Query($args);
+
+        // print('<pre>' . print_r($query, true) . '</pre>');
+
+        return $query->post_count > 0 ? false : true;
     }
 
     private function _getTerms()

@@ -5,6 +5,7 @@ namespace Candidate\Vacancy;
 use ResponseHelper;
 use WP_REST_Request;
 use BD\Emails\Email;
+use Candidate\Profile\Candidate;
 use Vacancy\Vacancy;
 use Constant\Message;
 use Helper\ValidationHelper;
@@ -93,12 +94,14 @@ class VacancyAppliedService
         $vacancy = new Vacancy($params["vacancy"]);
         $user = get_user_by('id', $vacancy->getAuthor());
         $company = new Company($user->ID);
+        $candidate = new Candidate($params['user_id']);
         $applicant = new Applicant($response["applicant"]);
 
         $attachment = get_attached_file($response['cv']);
 
         $args = [
-            'applicant.name' => $company->getName(),
+            'applicant.company' => $company->getName(),
+            'applicant.candidate_name' => $candidate->getFirstName() . ' ' . $candidate->getLastName(),
             'applicant.vacancy.title' => $vacancy->getTitle(),
             'applicant.phoneNumber' => $applicant->getPhoneNumberCode() . $applicant->getPhoneNumber(),
             'applicant.cover_letter' => $applicant->getCoverLetter()
