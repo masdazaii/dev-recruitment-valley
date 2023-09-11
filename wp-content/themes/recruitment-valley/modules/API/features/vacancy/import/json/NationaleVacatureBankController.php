@@ -3,6 +3,7 @@
 namespace Vacancy\Import\JSON;
 
 use Exception;
+use Helper\Maphelper;
 use Vacancy\Vacancy;
 use WP_Error;
 
@@ -132,41 +133,41 @@ class NationaleVacatureBankController
                 /** ACF Salary */
                 if (array_key_exists('salary', $data[$i]) && !empty($data[$i]['salary'])) {
                     // Salary Start
-                    if (array_key_exists('salary_start', $data[$i]) && !empty($data[$i]['salary_start'])) {
-                        $payload['salary_start'] = (int)$data[$i]['salary_start'];
+                    if (array_key_exists('salary_from', $data[$i]) && !empty($data[$i]['salary_from'])) {
+                        $payload['salary_start'] = (int)$data[$i]['salary_from'];
 
                         /** Unset used key */
-                        unset($data[$i]['salary_start']);
+                        unset($data[$i]['salary_from']);
                     } else {
                         $payload['salary_start'] = (int)$data[$i]['salary'];
                     }
 
                     // Salary End
-                    if (array_key_exists('salary_end', $data[$i]) && !empty($data[$i]['salary_end'])) {
-                        $payload['salary_end'] = (int)$data[$i]['salary_end'];
+                    if (array_key_exists('salary_to', $data[$i]) && !empty($data[$i]['salary_to'])) {
+                        $payload['salary_end'] = (int)$data[$i]['salary_to'];
 
                         /** Unset used key */
-                        unset($data[$i]['salary_end']);
+                        unset($data[$i]['salary_to']);
                     } else {
                         $payload['salary_end'] = (int)$data[$i]['salary'];
                     }
 
                     /** Unset used key */
-                    unset($data[$i]['salary']);
+                    // unset($data[$i]['salary']);
                 }
 
-                if (array_key_exists('salary_start', $data[$i]) && !empty($data[$i]['salary_start'])) {
-                    $payload['salaryStart'] = (int)$data[$i]['salary_start'];
+                if (array_key_exists('salary_from', $data[$i]) && !empty($data[$i]['salary_from'])) {
+                    $payload['salaryStart'] = (int)$data[$i]['salary_from'];
 
                     /** Unset used key */
                     unset($data[$i]['salary_start']);
                 }
 
-                if (array_key_exists('salary_end', $data[$i]) && !empty($data[$i]['salary_end'])) {
-                    $payload['salary_end'] = (int)$data[$i]['salary_end'];
+                if (array_key_exists('salary_to', $data[$i]) && !empty($data[$i]['salary_to'])) {
+                    $payload['salary_end'] = (int)$data[$i]['salary_to'];
 
                     /** Unset used key */
-                    unset($data[$i]['salary_end']);
+                    unset($data[$i]['salary_to']);
                 }
 
                 /** ACF External url */
@@ -269,6 +270,18 @@ class NationaleVacatureBankController
                     $payload["rv_vacancy_imported_company_name"] = $rvAdmin->first_name . ' ' . $rvAdmin->last_name;
                 }
 
+                /** ACF Imported Country */
+                if (array_key_exists('rv_vacancy_imported_company_city', $payload) && !empty($payload['rv_vacancy_imported_company_city'])) {
+
+                    if (array_key_exists('organization_address', $data[$i]) && !empty($data[$i]['organization_address'])) {
+                        $mapAddress = preg_replace('/[\n\t]+/', '', $data[$i]['organization_address']);
+                    } else {
+                        $mapAddress = $payload['rv_vacancy_imported_company_city'];
+                    }
+
+                    $payload['rv_vacancy_imported_company_country'] = Maphelper::reverseGeoData('address', 'nl', 'country', [], $mapAddress)['long_name'];
+                }
+
                 /** Taxonomy Working-hours */
                 if (array_key_exists('hours_per_week_from', $data[$i]) && !empty($data[$i]['hours_per_week_from'])) {
                     if (array_key_exists('hours_per_week_to', $data[$i]) && !empty($data[$i]['hours_per_week_to'])) {
@@ -309,16 +322,16 @@ class NationaleVacatureBankController
                 }
 
                 /** Taxonomy Job Type */
-                // if (array_key_exists('employment_type', $data[$i]) && !empty($data[$i]['employment_type'])) {
-                //     if (is_array($data[$i]['employment_type'])) {
-                //         if (array_key_exists('label', $data[$i]['employment_type'])) {
-                //             $taxonomy['type'] = $data[$i]['employment_type']['label'];
+                if (array_key_exists('employment_type', $data[$i]) && !empty($data[$i]['employment_type'])) {
+                    if (is_array($data[$i]['employment_type'])) {
+                        if (array_key_exists('label', $data[$i]['employment_type'])) {
+                            $taxonomy['type'] = $this->_findEmploymentType($data[$i]['employment_type']['label']);
 
-                //             /** Unset used key */
-                //             unset($data[$i]['employment_type']);
-                //         }
-                //     }
-                // }
+                            /** Unset used key */
+                            unset($data[$i]['employment_type']);
+                        }
+                    }
+                }
 
                 /** Taxonomy Role */
                 if (array_key_exists('profession', $data[$i]) && !empty($data[$i]['profession'])) {
@@ -560,6 +573,29 @@ class NationaleVacatureBankController
         }
 
         $newTerm = wp_insert_term($jsonValue, 'location', []);
+        if ($newTerm instanceof WP_Error) {
+            return null;
+        } else {
+            return $newTerm['term_id'];
+        }
+    }
+
+    private function _findEmploymentType($jsonValue)
+    {
+        $terms = $this->_terms['type'];
+        $alternative = strtolower(preg_replace('/\s+/', '-', $jsonValue));
+
+        foreach ($terms as $key => $value) {
+            switch ($value) {
+                case $value['name'] == strtolower($jsonValue):
+                case $value['slug'] == strtolower($jsonValue):
+                case $value['name'] == strtolower($alternative):
+                case $value['slug'] == strtolower($alternative):
+                    return $value['term_id'];
+            }
+        }
+
+        $newTerm = wp_insert_term($jsonValue, 'type', []);
         if ($newTerm instanceof WP_Error) {
             return null;
         } else {
