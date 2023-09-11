@@ -120,11 +120,40 @@ class NationaleVacatureBankController
                 }
 
                 /** ACF Description */
-                if (array_key_exists('job_description', $data[$i]) && !empty($data[$i]['job_description'])) {
-                    $payload['description'] = $data[$i]['job_description'];
+                if (array_key_exists('full_text', $data[$i]) && !empty($data[$i]['full_text'])) {
+                    $payload['description'] = $data[$i]['full_text'];
 
                     /** Unset used key */
-                    unset($data[$i]['job_description']);
+                    unset($data[$i]['full_text']);
+                } else {
+                    $payload['description'] = '';
+                    if (array_key_exists('employer_description', $data[$i]) && !empty($data[$i]['employer_description'])) {
+                        $payload['description'] .= $data[$i]['employer_description'];
+
+                        /** Unser used key */
+                        unset($data[$i]['employer_description']);
+                    }
+
+                    if (array_key_exists('conditions_description', $data[$i]) && !empty($data[$i]['conditions_description'])) {
+                        $payload['description'] .= $data[$i]['conditions_description'];
+
+                        /** Unset used key */
+                        unset($data[$i]['conditions_description']);
+                    }
+
+                    if (array_key_exists('candidate_description', $data[$i]) && !empty($data[$i]['candidate_description'])) {
+                        $payload['description'] .= $data[$i]['candidate_description'];
+
+                        /** Unset used key */
+                        unset($data[$i]['candidate_description']);
+                    }
+
+                    if (array_key_exists('job_description', $data[$i]) && !empty($data[$i]['job_description'])) {
+                        $payload['description'] .= $data[$i]['job_description'];
+
+                        /** Unset used key */
+                        unset($data[$i]['job_description']);
+                    }
                 }
 
                 $payload['salary_start'] = 0;
