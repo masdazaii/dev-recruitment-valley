@@ -597,8 +597,8 @@ class Vacancy
         $this->setProp($this->acf_city_longitude, $coordinat["long"]);
 
         if ($withCompanyAsWell) {
-            $this->setProp($this->_acf_imported_company_city_longitude, $coordinat["lat"]);
-            $this->setProp($this->_acf_imported_company_city_latitude, $coordinat["long"]);
+            $this->setProp($this->_acf_imported_company_city_latitude, $coordinat["lat"]);
+            $this->setProp($this->_acf_imported_company_city_longitude, $coordinat["long"]);
         }
     }
 
@@ -792,8 +792,8 @@ class Vacancy
     public function setImportedCompanyCityLongLat(string $city)
     {
         $coordinat = Maphelper::generateLongLat($city);
-        $this->setProp($this->_acf_imported_company_city_longitude, $coordinat["lat"]);
-        $this->setProp($this->_acf_imported_company_city_latitude, $coordinat["long"]);
+        $this->setProp($this->_acf_imported_company_city_longitude, $coordinat["long"]);
+        $this->setProp($this->_acf_imported_company_city_latitude, $coordinat["lat"]);
     }
 
     public function checkImported()
