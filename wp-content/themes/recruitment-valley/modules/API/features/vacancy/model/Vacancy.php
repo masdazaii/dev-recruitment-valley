@@ -68,6 +68,15 @@ class Vacancy
     public $acf_placement_address_longitude = "placement_address_longitude";
     public $acf_distance_from_city = "distance_from_city";
 
+    /** ACF for imported vacancy */
+    private $_acf_is_imported = "rv_vacancy_is_imported";
+    private $_acf_imported_company_name = "rv_vacancy_imported_company_name";
+    private $_acf_imported_company_city = "rv_vacancy_imported_company_city";
+    private $_acf_imported_company_country = "rv_vacancy_imported_company_country";
+    private $_acf_imported_company_email = "rv_vacancy_imported_company_email";
+    private $_acf_imported_company_city_longitude = "rv_vacancy_imported_company_city_longitude";
+    private $_acf_imported_company_city_latitude = "rv_vacancy_imported_company_city_latitude";
+
     public function __construct($vacancy_id = false)
     {
         if ($vacancy_id) {
@@ -285,13 +294,15 @@ class Vacancy
         $galleries = $this->getProp($this->acf_gallery);
         $result = [];
 
-        foreach ($galleries as $key => $gallery) {
-            $single = [];
-            foreach ($properties as $key => $property) {
-                $single[$property] = $gallery[$property];
-            }
+        if ($galleries && is_array($galleries)) {
+            foreach ($galleries as $key => $gallery) {
+                $single = [];
+                foreach ($properties as $key => $property) {
+                    $single[$property] = $gallery[$property];
+                }
 
-            array_push($result, $single);
+                array_push($result, $single);
+            }
         }
 
         return $result;
@@ -578,11 +589,17 @@ class Vacancy
         return get_page_by_path($slug, OBJECT, 'vacancy');
     }
 
-    public function setCityLongLat(string $city)
+    // public function setCityLongLat(string $city) // Changed Below
+    public function setCityLongLat(string $city, Bool $withCompanyAsWell = false)
     {
         $coordinat = Maphelper::generateLongLat($city);
         $this->setProp($this->acf_city_latitude, $coordinat["lat"]);
         $this->setProp($this->acf_city_longitude, $coordinat["long"]);
+
+        if ($withCompanyAsWell) {
+            $this->setProp($this->_acf_imported_company_city_longitude, $coordinat["lat"]);
+            $this->setProp($this->_acf_imported_company_city_latitude, $coordinat["long"]);
+        }
     }
 
     public function setAddressLongLat(string $address)
@@ -770,4 +787,48 @@ class Vacancy
 
         return $this->setProp($this->acf_distance_from_city, $distance);
     }
+
+    /** Method for related to imported vacancy start here */
+    public function setImportedCompanyCityLongLat(string $city)
+    {
+        $coordinat = Maphelper::generateLongLat($city);
+        $this->setProp($this->_acf_imported_company_city_longitude, $coordinat["lat"]);
+        $this->setProp($this->_acf_imported_company_city_latitude, $coordinat["long"]);
+    }
+
+    public function checkImported()
+    {
+        return $this->getProp($this->_acf_is_imported) == 1 ? true : false;
+    }
+
+    public function getImportedCompanyName()
+    {
+        return $this->getProp($this->_acf_imported_company_name);
+    }
+
+    public function getImportedCompanyCity()
+    {
+        return $this->getProp($this->_acf_imported_company_city);
+    }
+
+    public function getImportedCompanyCountry()
+    {
+        return $this->getProp($this->_acf_imported_company_country);
+    }
+
+    public function getImportedCompanyEmail()
+    {
+        return $this->getProp($this->_acf_imported_company_email);
+    }
+
+    public function getImportedCompanyLongitude()
+    {
+        return $this->getProp($this->_acf_imported_company_city_longitude);
+    }
+
+    public function getImportedCompanyLatitude()
+    {
+        return $this->getProp($this->_acf_imported_company_city_latitude);
+    }
+    /** Method for related to imported vacancy start here */
 }

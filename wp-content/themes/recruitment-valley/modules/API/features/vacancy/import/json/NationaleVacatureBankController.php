@@ -60,11 +60,14 @@ class NationaleVacatureBankController
 
         $limit = $start + $limit;
 
+        /** Get RV Administrator User data */
+        $rvAdmin = get_user_by('email', 'adminjob@recruitmentvalley.com');
+
         /** wp_insert_post arguments */
         $arguments = [
             'post_type' => 'vacancy',
             'post_status' => 'publish',
-            'post_author' => get_user_by('email', '	adminjob@recruitmentvalley.com')->ID
+            'post_author' => $rvAdmin->ID
         ];
 
         $payload = [];
@@ -214,6 +217,58 @@ class NationaleVacatureBankController
                  */
                 $payload["is_paid"] = true;
 
+                /** ACF Imported
+                 * set all is_imported acf data to "true"
+                 */
+                $payload["rv_vacancy_is_imported"] = "1";
+
+                /** ACF Imported rv_vacancy_imported_company_name */
+                if (array_key_exists('organization_name', $data[$i]) && !empty($data[$i]['organization_name']) !== "") {
+                    $payload["rv_vacancy_imported_company_name"] = preg_replace('/[\n\t]+/', '', $data[$i]['organization_name']);
+
+                    /** Unset data key */
+                    unset($data[$i]['organization_name']);
+
+                    /** ACF Imported rv_vacancy_imported_company_email */
+                    if (array_key_exists('organization_email', $data[$i]) && !empty($data[$i]['organization_email'])) {
+                        $payload["rv_vacancy_imported_company_email"] = preg_replace('/[\n\t]+/', '', $data[$i]['organization_email']);
+
+                        /** Unset data key */
+                        unset($data[$i]['organization_email']);
+                    }
+
+                    /** ACF Imported company_city */
+                    if (array_key_exists('organization_location_name', $data[$i]) && !empty($data[$i]['organization_location_name']) !== "") {
+                        $payload["rv_vacancy_imported_company_city"] = preg_replace('/[\n\t]+/', '', $data[$i]['organization_location_name']);
+
+                        /** Unset data key */
+                        unset($data[$i]['organization_location_name']);
+                    }
+                } else if (array_key_exists('advertiser_name', $data[$i]) && !empty($data[$i]['advertiser_name']) !== "") {
+                    $payload["rv_vacancy_imported_company_name"] = preg_replace('/[\n\t]+/', '', $data[$i]['advertiser_name']);
+
+                    /** Unset data key */
+                    unset($data[$i]['advertiser_name']);
+
+                    /** ACF Imported rv_vacancy_imported_company_email */
+                    if (array_key_exists('advertiser_email', $data[$i]) && !empty($data[$i]['advertiser_email'])) {
+                        $payload["rv_vacancy_imported_company_email"] = preg_replace('/[\n\t]+/', '', $data[$i]['advertiser_email']);
+
+                        /** Unset data key */
+                        unset($data[$i]['advertiser_email']);
+                    }
+
+                    /** ACF Imported company_city */
+                    if (array_key_exists('advertiser_location', $data[$i]) && !empty($data[$i]['advertiser_location']) !== "") {
+                        $payload["rv_vacancy_imported_company_city"] = preg_replace('/[\n\t]+/', '', $data[$i]['advertiser_location']);
+
+                        /** Unset data key */
+                        unset($data[$i]['advertiser_location']);
+                    }
+                } else {
+                    $payload["rv_vacancy_imported_company_name"] = $rvAdmin->first_name . ' ' . $rvAdmin->last_name;
+                }
+
                 /** Taxonomy Working-hours */
                 if (array_key_exists('hours_per_week_from', $data[$i]) && !empty($data[$i]['hours_per_week_from'])) {
                     if (array_key_exists('hours_per_week_to', $data[$i]) && !empty($data[$i]['hours_per_week_to'])) {
@@ -324,9 +379,10 @@ class NationaleVacatureBankController
                     }
 
                     /** store unused to post meta */
-                    update_post_meta($post, 'nvb_unused_data', $unusedData);
+                    update_post_meta($post, 'rv_vacancy_unused_data', $unusedData);
+                    update_post_meta($post, 'rv_vacancy_source', 'nationalvacaturebank');
 
-                    /** Calc coordinate */
+                    /** Calc coordinate placement City*/
                     if (isset($payload["placement_city"]) || isset($payload["placement_address"])) {
                         if ($payload['city_latitude'] == "" && $payload["city_longitude"] == "") {
                             $vacancy->setCityLongLat($payload["placement_city"]);
@@ -352,6 +408,11 @@ class NationaleVacatureBankController
 
                             $vacancy->setCoordinateDistance($cityCoordinate, $placementCoordinate);
                         }
+                    }
+
+                    /** Calc coordinate company city */
+                    if (isset($payload["rv_vacancy_imported_company_city"]) && $payload["rv_vacancy_imported_company_city"] !== "") {
+                        $vacancy->setImportedCompanyCityLongLat($payload["rv_vacancy_imported_company_city"]);
                     }
                 } catch (\Exception $error) {
                     error_log($error);

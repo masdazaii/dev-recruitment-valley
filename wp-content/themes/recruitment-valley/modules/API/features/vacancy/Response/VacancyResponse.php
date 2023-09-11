@@ -91,64 +91,120 @@ class VacancyResponse
             $videoUrl = strpos($company->getVideoUrl(), "youtu") ? ["type" => "url", "url" => StringHelper::getYoutubeID($company->getVideoUrl())] : ["type" => "file", "url" => $company->getVideoUrl()]; // Added Line
         }
 
-        $formattedResponse = [
-            "id" => $this->vacancyCollection->ID,
-            "isPaid" => $vacancyModel->getIsPaid(),
-            "shortDescription" => $vacancyTaxonomy,
-            "title" => $this->vacancyCollection->post_title,
-            // "isFavorite" => $candidate ? $candidate->isFavorite($this->vacancyCollection->post_author) : false, // Changed below
-            "isFavorite" => $candidate ? $candidate->isFavorite($this->vacancyCollection->ID) : false,
-            "company" =>  [
-                "company_id" => $company->user_id,
-                "logo" => $company->getThumbnail(),
-                "name" => $company->getName(),
-                "about" => $company->getDescription(),
-                "sector" => $company->getTerms('sector'),
-                "totalEmployee" => $company->getTotalEmployees(),
-                "tel" => $company->getPhoneCode() . $company->getPhone(),
-                "email" => $company->getEmail(),
-                "gallery" => $company->getGallery(true),
-                // "socialMedia" => [
-                //     "facebook" => $company->getFacebook(),
-                //     "twitter" => $company->getTwitter(),
-                //     "linkedin" => $company->getLinkedin(),
-                //     "instagram" => $company->getInstagram(),
-                // ],
-                // "socialMedia" => $socialMediaResponse,
-                "website" => $company->getWebsite(),
-                // "maps" => "", // not needed - esa feedback 29-08-2023
-                "city" => $company->getCity(),
-                "country" => $company->getCountry(),
-                "longitude" => $company->getLongitude(),
-                "latitude" => $company->getLatitude(),
-            ], // later get company here
-            "socialMedia" => $socialMediaResponse,
-            "contents" => [
-                "description" => $vacancyModel->getDescription(),
-                "term" => $vacancyModel->getTerm(),
-            ],
-            "country" => $vacancyModel->getCountry(), // Added Line
-            "city" => $vacancyModel->getCity(),
-            "externalUrl" => $vacancyModel->getExternalUrl(),
-            "placementAddress" => $vacancyModel->getPlacementAddress(),
-            // "videoId" => $company->getVideoUrl(), // Changed below
-            "videoId" => $videoUrl,
-            "gallery" => $vacancyModel->getGallery(),
-            "reviews" => $vacancyModel->getReviews(),
-            "applicationProcessTitle" => $vacancyModel->getApplicationProcessTitle(),
-            "applicationProcessDescription" => $vacancyModel->getApplicationProcessDescription(),
-            "steps" => $vacancyModel->getApplicationProcessStep(),
-            "salaryStart" => $vacancyModel->getSalaryStart(),
-            "salaryEnd" => $vacancyModel->getSalaryEnd(),
-            // "postedDate" => $vacancyModel->getPublishDate("Y-m-d H:i A"),
-            "postedDate" => $vacancyModel->getPublishDate("d-m-Y H:i"),
-            "expiredDate" => $vacancyModel->getExpiredAt("d-m-Y H:i"),
-            "applicationProcedure" => [
-                "title" => $vacancyModel->getApplicationProcessTitle(),
-                "text" => $vacancyModel->getApplicationProcessDescription(),
-                "steps" => $vacancyModel->getApplicationProcessStep()
-            ]
-        ];
+        /** Changes start here */
+        $isImported = $vacancyModel->checkImported();
+        if ($isImported) {
+            /** Get RV Administrator User data */
+            $rvAdmin = get_user_by('email', 'adminjob@recruitmentvalley.com');
+
+            $formattedResponse = [
+                "id" => $this->vacancyCollection->ID,
+                "isPaid" => $vacancyModel->getIsPaid(),
+                "shortDescription" => $vacancyTaxonomy,
+                "title" => $this->vacancyCollection->post_title,
+                "isFavorite" => $candidate ? $candidate->isFavorite($this->vacancyCollection->ID) : false,
+                "company" =>  [
+                    "company_id" => $rvAdmin->ID,
+                    "logo" => $company->getThumbnail(),
+                    "name" => $vacancyModel->getImportedCompanyName() ?? $company->getName(),
+                    "about" => $company->getDescription(),
+                    "sector" => $company->getTerms('sector'),
+                    "totalEmployee" => $company->getTotalEmployees(),
+                    "tel" => $company->getPhoneCode() . $company->getPhone(),
+                    "email" => $vacancyModel->getImportedCompanyEmail() ?? $company->getEmail(),
+                    "gallery" => $company->getGallery(true),
+                    "website" => $company->getWebsite(),
+                    "city" => $vacancyModel->getImportedCompanyCity() ?? $company->getCity(),
+                    "country" => $vacancyModel->getImportedCompanyCountry() ?? $company->getCountry(),
+                    "longitude" => $vacancyModel->getImportedCompanyLongitude() ?? $company->getLongitude(),
+                    "latitude" => $vacancyModel->getImportedCompanyLatitude() ?? $company->getLatitude(),
+                ],
+                "socialMedia" => $socialMediaResponse,
+                "contents" => [
+                    "description" => $vacancyModel->getDescription(),
+                    "term" => $vacancyModel->getTerm(),
+                ],
+                "country" => $vacancyModel->getCountry(),
+                "city" => $vacancyModel->getCity(),
+                "externalUrl" => $vacancyModel->getExternalUrl(),
+                "placementAddress" => $vacancyModel->getPlacementAddress(),
+                "videoId" => $videoUrl,
+                "gallery" => $vacancyModel->getGallery(),
+                "reviews" => $vacancyModel->getReviews(),
+                "applicationProcessTitle" => $vacancyModel->getApplicationProcessTitle(),
+                "applicationProcessDescription" => $vacancyModel->getApplicationProcessDescription(),
+                "steps" => $vacancyModel->getApplicationProcessStep(),
+                "salaryStart" => $vacancyModel->getSalaryStart(),
+                "salaryEnd" => $vacancyModel->getSalaryEnd(),
+                "postedDate" => $vacancyModel->getPublishDate("d-m-Y H:i"),
+                "expiredDate" => $vacancyModel->getExpiredAt("d-m-Y H:i"),
+                "applicationProcedure" => [
+                    "title" => $vacancyModel->getApplicationProcessTitle(),
+                    "text" => $vacancyModel->getApplicationProcessDescription(),
+                    "steps" => $vacancyModel->getApplicationProcessStep()
+                ]
+            ];
+        } else {
+            /** Anggit's original response (unchanged) */
+            $formattedResponse = [
+                "id" => $this->vacancyCollection->ID,
+                "isPaid" => $vacancyModel->getIsPaid(),
+                "shortDescription" => $vacancyTaxonomy,
+                "title" => $this->vacancyCollection->post_title,
+                // "isFavorite" => $candidate ? $candidate->isFavorite($this->vacancyCollection->post_author) : false, // Changed below
+                "isFavorite" => $candidate ? $candidate->isFavorite($this->vacancyCollection->ID) : false,
+                "company" =>  [
+                    "company_id" => $company->user_id,
+                    "logo" => $company->getThumbnail(),
+                    "name" => $company->getName(),
+                    "about" => $company->getDescription(),
+                    "sector" => $company->getTerms('sector'),
+                    "totalEmployee" => $company->getTotalEmployees(),
+                    "tel" => $company->getPhoneCode() . $company->getPhone(),
+                    "email" => $company->getEmail(),
+                    "gallery" => $company->getGallery(true),
+                    // "socialMedia" => [
+                    //     "facebook" => $company->getFacebook(),
+                    //     "twitter" => $company->getTwitter(),
+                    //     "linkedin" => $company->getLinkedin(),
+                    //     "instagram" => $company->getInstagram(),
+                    // ],
+                    // "socialMedia" => $socialMediaResponse,
+                    "website" => $company->getWebsite(),
+                    // "maps" => "", // not needed - esa feedback 29-08-2023
+                    "city" => $company->getCity(),
+                    "country" => $company->getCountry(),
+                    "longitude" => $company->getLongitude(),
+                    "latitude" => $company->getLatitude(),
+                ], // later get company here
+                "socialMedia" => $socialMediaResponse,
+                "contents" => [
+                    "description" => $vacancyModel->getDescription(),
+                    "term" => $vacancyModel->getTerm(),
+                ],
+                "country" => $vacancyModel->getCountry(), // Added Line
+                "city" => $vacancyModel->getCity(),
+                "externalUrl" => $vacancyModel->getExternalUrl(),
+                "placementAddress" => $vacancyModel->getPlacementAddress(),
+                // "videoId" => $company->getVideoUrl(), // Changed below
+                "videoId" => $videoUrl,
+                "gallery" => $vacancyModel->getGallery(),
+                "reviews" => $vacancyModel->getReviews(),
+                "applicationProcessTitle" => $vacancyModel->getApplicationProcessTitle(),
+                "applicationProcessDescription" => $vacancyModel->getApplicationProcessDescription(),
+                "steps" => $vacancyModel->getApplicationProcessStep(),
+                "salaryStart" => $vacancyModel->getSalaryStart(),
+                "salaryEnd" => $vacancyModel->getSalaryEnd(),
+                // "postedDate" => $vacancyModel->getPublishDate("Y-m-d H:i A"),
+                "postedDate" => $vacancyModel->getPublishDate("d-m-Y H:i"),
+                "expiredDate" => $vacancyModel->getExpiredAt("d-m-Y H:i"),
+                "applicationProcedure" => [
+                    "title" => $vacancyModel->getApplicationProcessTitle(),
+                    "text" => $vacancyModel->getApplicationProcessDescription(),
+                    "steps" => $vacancyModel->getApplicationProcessStep()
+                ]
+            ];
+        }
 
         // $formattedResponse = get_field($vacancyModel->acf_application_process_step,$this->vacancyCollection->ID);
 

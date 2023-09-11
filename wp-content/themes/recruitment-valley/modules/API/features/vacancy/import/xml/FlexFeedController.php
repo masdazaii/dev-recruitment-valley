@@ -111,11 +111,14 @@ class FlexFeedController
 
         $limit = $start + $limit;
 
+        /** Get RV Administrator User data */
+        $rvAdmin = get_user_by('email', 'adminjob@recruitmentvalley.com');
+
         /** wp_insert_post arguments */
         $arguments = [
             'post_type' => 'vacancy',
             'post_status' => 'publish',
-            'post_author' => get_user_by('email', 'adminjob@recruitmentvalley.com')->ID
+            'post_author' => $rvAdmin->ID
         ];
 
         $payload = [];
@@ -157,11 +160,18 @@ class FlexFeedController
                     }
 
                     $payload = [];
+                    /** ACF Imported company_name */
+                    if (array_key_exists('company', $tagValueArray) && !empty($tagValueArray['company']) !== "") {
+                        $payload["rv_vacancy_imported_company_name"] = preg_replace('/[\n\t]+/', '', $tagValueArray['company']);
+                    } else {
+                        $payload["rv_vacancy_imported_company_name"] = $rvAdmin->first_name . ' ' . $rvAdmin->last_name;
+                    }
 
                     /** Map property that not used.
                      * this will be stored in post meta.
                      */
                     $unusedData = [];
+
                     foreach ($tagValueArray as $jobKey => $jobValue) {
                         /** Post Data Title */
                         if ($jobKey === 'title' && array_key_exists('title', $tagValueArray) && !empty($jobValue)) {
@@ -181,11 +191,21 @@ class FlexFeedController
                         /** ACF placement_city */
                         if ($jobKey === 'city' && array_key_exists('city', $tagValueArray) && !empty($jobValue)) {
                             $payload['placement_city'] = preg_replace('/[\n\t]+/', '', $jobValue);
+
+                            /** ACF Imported company_city */
+                            $payload["rv_vacancy_imported_company_city"] = preg_replace('/[\n\t]+/', '', $jobValue);
                         }
 
                         /** ACF placcement_adress */
                         if ($jobKey === 'streetAddress' && array_key_exists('streetAddress', $tagValueArray) && !empty($jobValue)) {
                             $payload['placement_address'] = preg_replace('/[\n\t]+/', '', $jobValue);
+
+                            /** ACF Imported company_country
+                             * FOR NOW, all streetAddress value always have country name as last word
+                             * so i only get last part of value
+                             */
+                            $companyCountry = explode(',', preg_replace('/[\n\t]+/', '', $jobValue));
+                            $payload["rv_vacancy_imported_company_country"] = preg_replace('/[\n\t\s+]+/', '', end($companyCountry));
                         }
 
                         /** ACF external_url */
@@ -206,6 +226,16 @@ class FlexFeedController
                          * set all import to paid
                          */
                         $payload["is_paid"] = true;
+
+                        /** ACF Imported
+                         * set all is_imported acf data to "true"
+                         */
+                        $payload["rv_vacancy_is_imported"] = "1";
+
+                        /** ACF Imported company_email */
+                        if ($jobKey === 'email' && array_key_exists('email', $tagValueArray) && !empty($jobValue)) {
+                            $payload["rv_vacancy_imported_company_email"] = preg_replace('/[\n\t]+/', '', $jobValue);
+                        }
 
                         /** Taxonomy working-hours */
                         if ($jobKey === 'hoursPerWeek' && array_key_exists('hoursPerWeek', $tagValueArray) && !empty($jobValue)) {
@@ -232,7 +262,7 @@ class FlexFeedController
                             $taxonomy['role'] = $this->_findRole(preg_replace('/[\n\t]+/', '', $jobValue));
                         }
 
-                        if (!in_array($jobKey, ['title', 'datePosted', 'description', 'city', 'streetAddress', 'url', 'expirationdate', 'hoursPerWeek', 'education', 'experience', 'isActive'])) {
+                        if (!in_array($jobKey, ['title', 'datePosted', 'description', 'city', 'streetAddress', 'url', 'expirationdate', 'hoursPerWeek', 'education', 'experience', 'isActive', 'category', 'company', 'email'])) {
                             $unusedData[$i][$jobKey] = $jobValue;
                         }
                     }
@@ -264,13 +294,14 @@ class FlexFeedController
 
                         /** Calc coordinate */
                         if (isset($payload["placement_city"]) && isset($payload["placement_address"])) {
-                            $vacancy->setCityLongLat($payload["placement_city"]);
+                            $vacancy->setCityLongLat($payload["placement_city"], true);
                             $vacancy->setAddressLongLat($payload["placement_address"]);
                             $vacancy->setDistance($payload["placement_city"], $payload["placement_city"] . " " . $payload["placement_address"]);
                         }
 
                         /** store unused to post meta */
-                        update_post_meta($post, 'ff_unused_data', $unusedData);
+                        update_post_meta($post, 'rv_vacancy_unused_data', $unusedData);
+                        update_post_meta($post, 'rv_vacancy_source', 'flexfeed');
                     } catch (\Exception $error) {
                         error_log($error);
                     }
