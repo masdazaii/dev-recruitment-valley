@@ -6,6 +6,7 @@ use Error;
 use Exception;
 use Vacancy\Vacancy;
 use WP_Error;
+use Helper\StringHelper;
 
 class FlexFeedController
 {
@@ -143,21 +144,21 @@ class FlexFeedController
                     $tagValueArray = get_object_vars($tagValue);
 
                     /** Validate - check if data is exists or not */
-                    if (!array_key_exists('url', $tagValueArray) || empty($tagValueArray['url'])) {
-                        // throw new Error('URL is empty, failed to store vacancy.');
-                        error_log('[Flexfeed] - URL is empty, failed to store vacancy. Title : ' . array_key_exists('title', $tagValueArray) ? $tagValueArray['title'] : '"NoTitleFound" - index : ' . $i);
-                        trigger_error('[Flexfeed] - URL is empty, failed to store vacancy.', E_USER_WARNING);
-                        $i++;
-                        continue;
-                    }
+                    // if (!array_key_exists('url', $tagValueArray) || empty($tagValueArray['url'])) {
+                    //     // throw new Error('URL is empty, failed to store vacancy.');
+                    //     error_log('[Flexfeed] - URL is empty, failed to store vacancy. Title : ' . array_key_exists('title', $tagValueArray) ? $tagValueArray['title'] : '"NoTitleFound" - index : ' . $i);
+                    //     trigger_error('[Flexfeed] - URL is empty, failed to store vacancy.', E_USER_WARNING);
+                    //     $i++;
+                    //     continue;
+                    // }
 
-                    if (!$this->_validate($tagValueArray['url'])) {
-                        // throw new Error('Vacancy already exists.');
-                        error_log('[Flexfeed] - Vacancy already exists. Title : ' . (array_key_exists('title', $tagValueArray) ? $tagValueArray['title'] : '"NoTitleFound"') . ' - index : ' . $i);
-                        trigger_error('[Flexfeed] - Vacancy already exists.', E_USER_WARNING);
-                        $i++;
-                        continue;
-                    }
+                    // if (!$this->_validate($tagValueArray['url'])) {
+                    //     // throw new Error('Vacancy already exists.');
+                    //     error_log('[Flexfeed] - Vacancy already exists. Title : ' . (array_key_exists('title', $tagValueArray) ? $tagValueArray['title'] : '"NoTitleFound"') . ' - index : ' . $i);
+                    //     trigger_error('[Flexfeed] - Vacancy already exists.', E_USER_WARNING);
+                    //     $i++;
+                    //     continue;
+                    // }
 
                     $payload = [];
                     /** ACF Imported company_name */
@@ -176,6 +177,10 @@ class FlexFeedController
                         /** Post Data Title */
                         if ($jobKey === 'title' && array_key_exists('title', $tagValueArray) && !empty($jobValue)) {
                             $arguments['post_title'] = preg_replace('/[\n\t]+/', '', $jobValue);
+
+                            /** Post Data post_name */
+                            $slug = StringHelper::makeSlug(preg_replace('/[\n\t]+/', '', $jobValue), '-', 'lower');
+                            $arguments['post_name'] = 'flexfeed-' . $slug;
                         }
 
                         /** Post Data Date */
@@ -218,7 +223,6 @@ class FlexFeedController
 
                         /** ACF expired_at */
                         if ($jobKey === 'expirationdate' && array_key_exists('expirationdate', $tagValueArray) && !empty($jobValue) != "") {
-                            // print('<pre>' . print_r($i . ' : ' . preg_replace('/[\n\t]+/', '', $jobValue) . ' - ' . \DateTime::createFromFormat('d-n-Y', preg_replace('/[\n\t]+/', '', $jobValue))->setTime(23, 59, 59)->format('Y-m-d H:i:s'), true) . '</pre>' . PHP_EOL);
                             $payload['expired_at'] = \DateTime::createFromFormat('d-n-Y', preg_replace('/[\n\t]+/', '', $jobValue))->setTime(23, 59, 59)->format('Y-m-d H:i:s');
                         }
 
@@ -268,7 +272,6 @@ class FlexFeedController
                     }
 
                     /** Insert data */
-                    // print('<pre>' . print_r($payload, true) . '</pre>');
                     try {
                         $post = wp_insert_post($arguments, true);
 
@@ -326,8 +329,6 @@ class FlexFeedController
         ];
         $query = new \WP_Query($args);
 
-        // print('<pre>' . print_r($query, true) . '</pre>');
-
         return $query->post_count > 0 ? false : true;
     }
 
@@ -367,11 +368,24 @@ class FlexFeedController
             }
         }
 
-        $newTerm = wp_insert_term($xmlValue, 'working-hours', []);
-        if ($newTerm instanceof WP_Error) {
-            return null;
+        /** Check using term_exists query */
+        $termExists = term_exists(strtolower(preg_replace('/\s+/', '-', $xmlValue)), 'working-hours');
+        if ($termExists) {
+            if (is_array($termExists)) {
+                return $termExists['term_id'];
+            }
+            return $termExists;
         } else {
-            return $newTerm['term_id'];
+            $newTerm = wp_insert_term($xmlValue, 'working-hours', []);
+
+            if ($newTerm instanceof WP_Error) {
+                if (array_key_exists('term_exists', $newTerm->error_data)) {
+                    return $newTerm->error_data['term_exists'];
+                }
+                return null;
+            } else {
+                return $newTerm['term_id'];
+            }
         }
     }
 
@@ -384,12 +398,24 @@ class FlexFeedController
                 if (strpos($xmlValue, $value['name'])) {
                     return (int)$value['term_id'];
                 } else {
-                    // Create new term
-                    $newTerm = wp_insert_term($xmlValue, $taxonomy, []);
-                    if ($newTerm instanceof WP_Error) {
-                        return null;
+                    /** Check using term_exists query */
+                    $termExists = term_exists(strtolower(preg_replace('/\s+/', '-', $xmlValue)), $taxonomy);
+                    if ($termExists) {
+                        if (is_array($termExists)) {
+                            return $termExists['term_id'];
+                        }
+                        return $termExists;
                     } else {
-                        return (int)$newTerm['term_id'];
+                        $newTerm = wp_insert_term($xmlValue, $taxonomy, []);
+
+                        if ($newTerm instanceof WP_Error) {
+                            if (array_key_exists('term_exists', $newTerm->error_data)) {
+                                return $newTerm->error_data['term_exists'];
+                            }
+                            return null;
+                        } else {
+                            return $newTerm['term_id'];
+                        }
                     }
                 }
             }
@@ -414,12 +440,24 @@ class FlexFeedController
                 }
             }
 
-            // Create new term
-            $newTerm = wp_insert_term($xmlValue, 'experiences', []);
-            if ($newTerm instanceof WP_Error) {
-                return null;
+            /** Check using term_exists query */
+            $termExists = term_exists(strtolower(preg_replace('/\s+/', '-', $xmlValue)), 'experiences');
+            if ($termExists) {
+                if (is_array($termExists)) {
+                    return $termExists['term_id'];
+                }
+                return $termExists;
             } else {
-                return (int)$newTerm['term_id'];
+                $newTerm = wp_insert_term($xmlValue, 'experiences', []);
+
+                if ($newTerm instanceof WP_Error) {
+                    if (array_key_exists('term_exists', $newTerm->error_data)) {
+                        return $newTerm->error_data['term_exists'];
+                    }
+                    return null;
+                } else {
+                    return $newTerm['term_id'];
+                }
             }
         } else {
             return;
@@ -453,11 +491,24 @@ class FlexFeedController
             }
         }
 
-        $newTerm = wp_insert_term($xmlValue, 'role', []);
-        if ($newTerm instanceof WP_Error) {
-            return null;
+        /** Check using term_exists query */
+        $termExists = term_exists(strtolower(preg_replace('/\s+/', '-', $xmlValue)), 'role');
+        if ($termExists) {
+            if (is_array($termExists)) {
+                return $termExists['term_id'];
+            }
+            return $termExists;
         } else {
-            return $newTerm['term_id'];
+            $newTerm = wp_insert_term($xmlValue, 'role', []);
+
+            if ($newTerm instanceof WP_Error) {
+                if (array_key_exists('term_exists', $newTerm->error_data)) {
+                    return $newTerm->error_data['term_exists'];
+                }
+                return null;
+            } else {
+                return $newTerm['term_id'];
+            }
         }
     }
 }

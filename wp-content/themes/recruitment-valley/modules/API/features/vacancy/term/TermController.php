@@ -133,7 +133,7 @@ class VacancyTermController
 
         foreach ($terms as $key => $value) {
             $term = [
-                'label' => $value->name,
+                'label' => html_entity_decode($value->name),
                 'value' => (int)$value->term_id,
                 'total' => (int)$value->count
             ];

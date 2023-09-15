@@ -70,4 +70,27 @@ class StringHelper
             return implode('', $splitStr);
         }
     }
+
+    public static function makeSlug(String $str, String $separator = '-', String $style = 'lower')
+    {
+        if ($str) {
+            $string = preg_replace('/<\/?[^>]+|>/', ' ', $str); // Replace tag with whitespace
+            $string = preg_replace('/(&[\w#]+;)+/', ' ', $string); // Trim html special char
+            $string = preg_replace('/[\n\t]+/', ' ', $string); // Trim new line and tab char
+            $string = preg_replace('/\s+/', ' ', $string); // Trim multiple whitespace
+            $string = preg_replace('/\s+/', $separator, $string); // replace whitespace with dash
+
+            switch ($style) {
+                case 'upper':
+                    return strtoupper($string);
+                case 'upper':
+                    return ucfirst($string);
+                case 'lower':
+                default:
+                    return strtolower($string);
+            }
+        } else {
+            return '';
+        }
+    }
 }

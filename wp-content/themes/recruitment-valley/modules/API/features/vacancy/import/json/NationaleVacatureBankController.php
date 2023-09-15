@@ -4,6 +4,7 @@ namespace Vacancy\Import\JSON;
 
 use Exception;
 use Helper\Maphelper;
+use Helper\StringHelper;
 use Vacancy\Vacancy;
 use WP_Error;
 
@@ -103,9 +104,13 @@ class NationaleVacatureBankController
                     continue;
                 }
 
-                /** Post Data Title */
+                /** Post Data Title & name */
                 if (array_key_exists('job_title', $data[$i]) && !empty($data[$i]['job_title'])) {
                     $arguments['post_title'] = preg_replace('/[\n\t]+/', '', $data[$i]['job_title']);
+
+                    /** Post Data post_name */
+                    $slug = StringHelper::makeSlug(preg_replace('/[\n\t]+/', '', $data[$i]['job_title']), '-', 'lower');
+                    $arguments['post_name'] = 'nvb-' . $slug;
 
                     /** Unset used key */
                     unset($data[$i]['job_title']);
@@ -118,6 +123,7 @@ class NationaleVacatureBankController
                     /** Unset used key */
                     unset($data[$i]['date']);
                 }
+
 
                 /** ACF Description */
                 if (array_key_exists('full_text', $data[$i]) && !empty($data[$i]['full_text'])) {
@@ -477,8 +483,6 @@ class NationaleVacatureBankController
         ];
         $query = new \WP_Query($args);
 
-        // print('<pre>' . print_r($query, true) . '</pre>');
-
         return $query->post_count > 0 ? false : true;
     }
 
@@ -509,11 +513,24 @@ class NationaleVacatureBankController
             }
         }
 
-        $newTerm = wp_insert_term($jsonValue, 'working-hours', []);
-        if ($newTerm instanceof WP_Error) {
-            return null;
+        /** Check using term_exists query */
+        $termExists = term_exists(strtolower(preg_replace('/\s+/', '-', $jsonValue)), 'working-hours');
+        if ($termExists) {
+            if (is_array($termExists)) {
+                return $termExists['term_id'];
+            }
+            return $termExists;;
         } else {
-            return $newTerm['term_id'];
+            $newTerm = wp_insert_term($jsonValue, 'working-hours', []);
+
+            if ($newTerm instanceof WP_Error) {
+                if (array_key_exists('term_exists', $newTerm->error_data)) {
+                    return $newTerm->error_data['term_exists'];
+                }
+                return null;
+            } else {
+                return $newTerm['term_id'];
+            }
         }
     }
 
@@ -532,11 +549,24 @@ class NationaleVacatureBankController
             }
         }
 
-        $newTerm = wp_insert_term($jsonValue, 'education', []);
-        if ($newTerm instanceof WP_Error) {
-            return null;
+        /** Check using term_exists query */
+        $termExists = term_exists(strtolower(preg_replace('/\s+/', '-', $jsonValue)), 'education');
+        if ($termExists) {
+            if (is_array($termExists)) {
+                return $termExists['term_id'];
+            }
+            return $termExists;;
         } else {
-            return $newTerm['term_id'];
+            $newTerm = wp_insert_term($jsonValue, 'education', []);
+
+            if ($newTerm instanceof WP_Error) {
+                if (array_key_exists('term_exists', $newTerm->error_data)) {
+                    return $newTerm->error_data['term_exists'];
+                }
+                return null;
+            } else {
+                return $newTerm['term_id'];
+            }
         }
     }
 
@@ -555,11 +585,24 @@ class NationaleVacatureBankController
             }
         }
 
-        $newTerm = wp_insert_term($jsonValue, 'experiences', []);
-        if ($newTerm instanceof WP_Error) {
-            return null;
+        /** Check using term_exists query */
+        $termExists = term_exists(strtolower(preg_replace('/\s+/', '-', $jsonValue)), 'experiences');
+        if ($termExists) {
+            if (is_array($termExists)) {
+                return $termExists['term_id'];
+            }
+            return $termExists;;
         } else {
-            return $newTerm['term_id'];
+            $newTerm = wp_insert_term($jsonValue, 'experiences', []);
+
+            if ($newTerm instanceof WP_Error) {
+                if (array_key_exists('term_exists', $newTerm->error_data)) {
+                    return $newTerm->error_data['term_exists'];
+                }
+                return null;
+            } else {
+                return $newTerm['term_id'];
+            }
         }
     }
 
@@ -578,11 +621,24 @@ class NationaleVacatureBankController
             }
         }
 
-        $newTerm = wp_insert_term($jsonValue, 'role', []);
-        if ($newTerm instanceof WP_Error) {
-            return null;
+        /** Check using term_exists query */
+        $termExists = term_exists(strtolower(preg_replace('/\s+/', '-', $jsonValue)), 'role');
+        if ($termExists) {
+            if (is_array($termExists)) {
+                return $termExists['term_id'];
+            }
+            return $termExists;;
         } else {
-            return $newTerm['term_id'];
+            $newTerm = wp_insert_term($jsonValue, 'role', []);
+
+            if ($newTerm instanceof WP_Error) {
+                if (array_key_exists('term_exists', $newTerm->error_data)) {
+                    return $newTerm->error_data['term_exists'];
+                }
+                return null;
+            } else {
+                return $newTerm['term_id'];
+            }
         }
     }
 
@@ -601,16 +657,30 @@ class NationaleVacatureBankController
             }
         }
 
-        $newTerm = wp_insert_term($jsonValue, 'location', []);
-        if ($newTerm instanceof WP_Error) {
-            return null;
+        /** Check using term_exists query */
+        $termExists = term_exists(strtolower(preg_replace('/\s+/', '-', $jsonValue)), 'location');
+        if ($termExists) {
+            if (is_array($termExists)) {
+                return $termExists['term_id'];
+            }
+            return $termExists;;
         } else {
-            return $newTerm['term_id'];
+            $newTerm = wp_insert_term($jsonValue, 'location', []);
+
+            if ($newTerm instanceof WP_Error) {
+                if (array_key_exists('term_exists', $newTerm->error_data)) {
+                    return $newTerm->error_data['term_exists'];
+                }
+                return null;
+            } else {
+                return $newTerm['term_id'];
+            }
         }
     }
 
     private function _findEmploymentType($jsonValue)
     {
+        /** Manual */
         $terms = $this->_terms['type'];
         $alternative = strtolower(preg_replace('/\s+/', '-', $jsonValue));
 
@@ -624,11 +694,24 @@ class NationaleVacatureBankController
             }
         }
 
-        $newTerm = wp_insert_term($jsonValue, 'type', []);
-        if ($newTerm instanceof WP_Error) {
-            return null;
+        /** Check using term_exists query */
+        $termExists = term_exists(strtolower(preg_replace('/\s+/', '-', $jsonValue)), 'type');
+        if ($termExists) {
+            if (is_array($termExists)) {
+                return $termExists['term_id'];
+            }
+            return $termExists;;
         } else {
-            return $newTerm['term_id'];
+            $newTerm = wp_insert_term($jsonValue, 'type', []);
+
+            if ($newTerm instanceof WP_Error) {
+                if (array_key_exists('term_exists', $newTerm->error_data)) {
+                    return $newTerm->error_data['term_exists'];
+                }
+                return null;
+            } else {
+                return $newTerm['term_id'];
+            }
         }
     }
 }

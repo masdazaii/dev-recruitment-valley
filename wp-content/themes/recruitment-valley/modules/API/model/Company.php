@@ -272,7 +272,7 @@ class Company
 
             foreach ($terms as $term) {
                 $termsResponse[] = [
-                    'label' => $term->name,
+                    'label' => htmlspecialchars_decode($term->name),
                     'value' => $term->term_id,
                 ];
             }
