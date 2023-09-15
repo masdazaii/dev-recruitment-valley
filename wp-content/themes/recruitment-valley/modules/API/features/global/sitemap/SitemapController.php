@@ -7,6 +7,7 @@ use Vacancy\Vacancy;
 use Constant\Message;
 use Model\Company;
 use Helper\DateHelper;
+use Helper\StringHelper;
 use WP_User_Query;
 
 class SitemapController
@@ -38,7 +39,7 @@ class SitemapController
     {
         $filters = [
             'orderBy'   => 'date',
-            'sort'      => ($request['orderBy'] && $request['orderBy'] == 'title' ? 'asc' : 'desc'),
+            'sort'      => (array_key_exists('orderBy', $request) && $request['orderBy'] && $request['orderBy'] == 'title' ? 'asc' : 'desc'),
             'page'      => array_key_exists('perPage', $request) && is_numeric($request['page']) ? (int)$request['page'] : 1,
             'postPerPage'   => array_key_exists('perPage', $request) && is_numeric($request['perPage']) ? (int)$request['perPage'] : 10,
         ];
@@ -85,7 +86,7 @@ class SitemapController
                 $vacancy    = new vacancy($values->ID);
                 $response[] = [
                     "title"         => $vacancy->getTitle(),
-                    "description"   => $vacancy->getDescription(),
+                    "description"   => StringHelper::shortenString($vacancy->getDescription(), 0, -1),
                     "url"           => '/vacatures/' . $values->post_name,
                 ];
             }
@@ -186,7 +187,7 @@ class SitemapController
             $company    = new Company($values->ID);
             $response[] = [
                 "title"         => $company->getName(),
-                "description"   => $company->getDescription(),
+                "description"   => StringHelper::shortenString($company->getDescription(), 0, -1),
                 "url"           => null,
             ];
         }

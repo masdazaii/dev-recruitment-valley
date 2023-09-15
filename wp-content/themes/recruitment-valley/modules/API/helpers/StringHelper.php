@@ -10,7 +10,9 @@ class StringHelper
         $string = preg_replace('/(&[\w#]+;)+/', ' ', $string); // Trim html special char
         $string = preg_replace('/\s+/', ' ', $string); // Trim multiple whitespace
 
-        $string = substr($string, $offset, $length);
+        if ($length !== -1) {
+            $string = substr($string, $offset, $length);
+        }
         return trim($string, " ") . $suffix;
     }
 
