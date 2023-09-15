@@ -81,8 +81,6 @@ class Maphelper
         $data = json_decode($output, true);
         curl_close($curl_handle);
 
-        // print('<pre>' . print_r($data, true) . '</pre>');
-
         if ($data['status'] === 'OK') {
             $data = $data['results'][0];
             $remapData = [];
