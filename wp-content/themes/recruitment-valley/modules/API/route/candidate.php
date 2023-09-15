@@ -66,7 +66,7 @@ class CandidateEndpoint
                 'get_candidate' => [
                     'url'                   => 'profile',
                     'methods'               => 'GET',
-                    'permission_callback'   => [$authMiddleware, 'check_token'],
+                    'permission_callback'   => [$authMiddleware, 'check_token_candidate'],
                     'callback'              => [$profileService, 'get'],
                 ],
                 'profile-setup' => [
