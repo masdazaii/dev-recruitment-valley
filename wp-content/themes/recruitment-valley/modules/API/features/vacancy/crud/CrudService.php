@@ -108,6 +108,9 @@ class VacancyCrudService
         $params = $createPaidJobRequest->getData();
         $params["user_id"] = $request["user_id"];
         $response = $this->vacancyCrudController->createPaid($params);
+
+        $this->_send_mail_when_make_vacancy($response, $params);
+
         return ResponseHelper::build($response);
     }
 

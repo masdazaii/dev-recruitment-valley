@@ -2,9 +2,11 @@
 
 namespace Vacancy\Import\Xml;
 
+use Error;
 use Exception;
 use Vacancy\Vacancy;
 use WP_Error;
+use Helper\StringHelper;
 
 class FlexFeedController
 {
@@ -110,11 +112,14 @@ class FlexFeedController
 
         $limit = $start + $limit;
 
+        /** Get RV Administrator User data */
+        $rvAdmin = get_user_by('email', 'adminjob@recruitmentvalley.com');
+
         /** wp_insert_post arguments */
         $arguments = [
             'post_type' => 'vacancy',
             'post_status' => 'publish',
-            'post_author' => get_user_by('email', 'admin.jobRV@local.com')->ID
+            'post_author' => $rvAdmin->ID
         ];
 
         $payload = [];
@@ -130,19 +135,52 @@ class FlexFeedController
 
         foreach ($data as $tag => $tagValue) {
             if ($tag == 'job') {
+                /** Stop the loop if index more than limit */
+                if ($i >= $limit) {
+                    break;
+                }
+
                 if (is_array($tagValue) || $tagValue instanceof \SimpleXMLElement) {
                     $tagValueArray = get_object_vars($tagValue);
 
+                    /** Validate - check if data is exists or not */
+                    // if (!array_key_exists('url', $tagValueArray) || empty($tagValueArray['url'])) {
+                    //     // throw new Error('URL is empty, failed to store vacancy.');
+                    //     error_log('[Flexfeed] - URL is empty, failed to store vacancy. Title : ' . array_key_exists('title', $tagValueArray) ? $tagValueArray['title'] : '"NoTitleFound" - index : ' . $i);
+                    //     trigger_error('[Flexfeed] - URL is empty, failed to store vacancy.', E_USER_WARNING);
+                    //     $i++;
+                    //     continue;
+                    // }
+
+                    // if (!$this->_validate($tagValueArray['url'])) {
+                    //     // throw new Error('Vacancy already exists.');
+                    //     error_log('[Flexfeed] - Vacancy already exists. Title : ' . (array_key_exists('title', $tagValueArray) ? $tagValueArray['title'] : '"NoTitleFound"') . ' - index : ' . $i);
+                    //     trigger_error('[Flexfeed] - Vacancy already exists.', E_USER_WARNING);
+                    //     $i++;
+                    //     continue;
+                    // }
+
                     $payload = [];
+                    /** ACF Imported company_name */
+                    if (array_key_exists('company', $tagValueArray) && !empty($tagValueArray['company']) !== "") {
+                        $payload["rv_vacancy_imported_company_name"] = preg_replace('/[\n\t]+/', '', $tagValueArray['company']);
+                    } else {
+                        $payload["rv_vacancy_imported_company_name"] = $rvAdmin->first_name . ' ' . $rvAdmin->last_name;
+                    }
 
                     /** Map property that not used.
                      * this will be stored in post meta.
                      */
                     $unusedData = [];
+
                     foreach ($tagValueArray as $jobKey => $jobValue) {
                         /** Post Data Title */
                         if ($jobKey === 'title' && array_key_exists('title', $tagValueArray) && !empty($jobValue)) {
                             $arguments['post_title'] = preg_replace('/[\n\t]+/', '', $jobValue);
+
+                            /** Post Data post_name */
+                            $slug = StringHelper::makeSlug(preg_replace('/[\n\t]+/', '', $jobValue), '-', 'lower');
+                            $arguments['post_name'] = 'flexfeed-' . $slug;
                         }
 
                         /** Post Data Date */
@@ -158,11 +196,21 @@ class FlexFeedController
                         /** ACF placement_city */
                         if ($jobKey === 'city' && array_key_exists('city', $tagValueArray) && !empty($jobValue)) {
                             $payload['placement_city'] = preg_replace('/[\n\t]+/', '', $jobValue);
+
+                            /** ACF Imported company_city */
+                            $payload["rv_vacancy_imported_company_city"] = preg_replace('/[\n\t]+/', '', $jobValue);
                         }
 
                         /** ACF placcement_adress */
                         if ($jobKey === 'streetAddress' && array_key_exists('streetAddress', $tagValueArray) && !empty($jobValue)) {
                             $payload['placement_address'] = preg_replace('/[\n\t]+/', '', $jobValue);
+
+                            /** ACF Imported company_country
+                             * FOR NOW, all streetAddress value always have country name as last word
+                             * so i only get last part of value
+                             */
+                            $companyCountry = explode(',', preg_replace('/[\n\t]+/', '', $jobValue));
+                            $payload["rv_vacancy_imported_company_country"] = preg_replace('/[\n\t\s+]+/', '', end($companyCountry));
                         }
 
                         /** ACF external_url */
@@ -175,8 +223,22 @@ class FlexFeedController
 
                         /** ACF expired_at */
                         if ($jobKey === 'expirationdate' && array_key_exists('expirationdate', $tagValueArray) && !empty($jobValue) != "") {
-                            // print('<pre>' . print_r($i . ' : ' . preg_replace('/[\n\t]+/', '', $jobValue) . ' - ' . \DateTime::createFromFormat('d-n-Y', preg_replace('/[\n\t]+/', '', $jobValue))->setTime(23, 59, 59)->format('Y-m-d H:i:s'), true) . '</pre>' . PHP_EOL);
                             $payload['expired_at'] = \DateTime::createFromFormat('d-n-Y', preg_replace('/[\n\t]+/', '', $jobValue))->setTime(23, 59, 59)->format('Y-m-d H:i:s');
+                        }
+
+                        /** ACF Paid
+                         * set all import to paid
+                         */
+                        $payload["is_paid"] = true;
+
+                        /** ACF Imported
+                         * set all is_imported acf data to "true"
+                         */
+                        $payload["rv_vacancy_is_imported"] = "1";
+
+                        /** ACF Imported company_email */
+                        if ($jobKey === 'email' && array_key_exists('email', $tagValueArray) && !empty($jobValue)) {
+                            $payload["rv_vacancy_imported_company_email"] = preg_replace('/[\n\t]+/', '', $jobValue);
                         }
 
                         /** Taxonomy working-hours */
@@ -204,20 +266,70 @@ class FlexFeedController
                             $taxonomy['role'] = $this->_findRole(preg_replace('/[\n\t]+/', '', $jobValue));
                         }
 
-                        if (!in_array($jobKey, ['title', 'datePosted', 'description', 'city', 'streetAddress', 'url', 'expirationdate', 'hoursPerWeek', 'education', 'experience', 'isActive'])) {
+                        if (!in_array($jobKey, ['title', 'datePosted', 'description', 'city', 'streetAddress', 'url', 'expirationdate', 'hoursPerWeek', 'education', 'experience', 'isActive', 'category', 'company', 'email'])) {
                             $unusedData[$i][$jobKey] = $jobValue;
                         }
                     }
 
-                    // print('<pre>' . print_r($arguments, true) . '</pre>');
-                    // print('<pre>' . print_r($payload, true) . '</pre>');
-                    print('<pre>' . print_r($taxonomy, true) . '</pre>');
-                    // print('<pre>'.print_r($unusedData, true).'</pre>');
+                    /** Insert data */
+                    try {
+                        $post = wp_insert_post($arguments, true);
+
+                        if (is_wp_error($post)) {
+                            error_log(json_encode($post->get_error_messages()));
+                        }
+
+                        $vacancy = new Vacancy($post);
+
+                        $vacancy->setTaxonomy($taxonomy);
+
+                        /** Taxonomy Status */
+                        $vacancy->setStatus('open');
+
+                        /** Set expired date 30 days from this data inputed */
+                        $expiredAt = new \DateTimeImmutable();
+                        $expiredAt = $expiredAt->modify("+30 days")->format("Y-m-d H:i:s");
+                        $vacancy->setProp("expired_at", $expiredAt);
+
+                        foreach ($payload as $acf_field => $acfValue) {
+                            $vacancy->setProp($acf_field, $acfValue, is_array($acfValue));
+                        }
+
+                        /** Calc coordinate */
+                        if (isset($payload["placement_city"]) && isset($payload["placement_address"])) {
+                            $vacancy->setCityLongLat($payload["placement_city"], true);
+                            $vacancy->setAddressLongLat($payload["placement_address"]);
+                            $vacancy->setDistance($payload["placement_city"], $payload["placement_city"] . " " . $payload["placement_address"]);
+                        }
+
+                        /** store unused to post meta */
+                        update_post_meta($post, 'rv_vacancy_unused_data', $unusedData);
+                        update_post_meta($post, 'rv_vacancy_source', 'flexfeed');
+                    } catch (\Exception $error) {
+                        error_log($error);
+                    }
                 }
 
                 $i++;
             }
         }
+    }
+
+    private function _validate($xmlValue)
+    {
+        $args = [
+            'post_type' => 'vacancy',
+            'meta_query' => [
+                [
+                    'key' => 'external_url',
+                    'value' => $xmlValue,
+                    'compare' => '=',
+                ]
+            ]
+        ];
+        $query = new \WP_Query($args);
+
+        return $query->post_count > 0 ? false : true;
     }
 
     private function _getTerms()
@@ -256,11 +368,24 @@ class FlexFeedController
             }
         }
 
-        $newTerm = wp_insert_term($xmlValue, 'working-hours', []);
-        if ($newTerm instanceof WP_Error) {
-            return null;
+        /** Check using term_exists query */
+        $termExists = term_exists(strtolower(preg_replace('/\s+/', '-', $xmlValue)), 'working-hours');
+        if ($termExists) {
+            if (is_array($termExists)) {
+                return $termExists['term_id'];
+            }
+            return $termExists;
         } else {
-            return $newTerm['term_id'];
+            $newTerm = wp_insert_term($xmlValue, 'working-hours', []);
+
+            if ($newTerm instanceof WP_Error) {
+                if (array_key_exists('term_exists', $newTerm->error_data)) {
+                    return $newTerm->error_data['term_exists'];
+                }
+                return null;
+            } else {
+                return $newTerm['term_id'];
+            }
         }
     }
 
@@ -273,12 +398,24 @@ class FlexFeedController
                 if (strpos($xmlValue, $value['name'])) {
                     return (int)$value['term_id'];
                 } else {
-                    // Create new term
-                    $newTerm = wp_insert_term($xmlValue, $taxonomy, []);
-                    if ($newTerm instanceof WP_Error) {
-                        return null;
+                    /** Check using term_exists query */
+                    $termExists = term_exists(strtolower(preg_replace('/\s+/', '-', $xmlValue)), $taxonomy);
+                    if ($termExists) {
+                        if (is_array($termExists)) {
+                            return $termExists['term_id'];
+                        }
+                        return $termExists;
                     } else {
-                        return (int)$newTerm['term_id'];
+                        $newTerm = wp_insert_term($xmlValue, $taxonomy, []);
+
+                        if ($newTerm instanceof WP_Error) {
+                            if (array_key_exists('term_exists', $newTerm->error_data)) {
+                                return $newTerm->error_data['term_exists'];
+                            }
+                            return null;
+                        } else {
+                            return $newTerm['term_id'];
+                        }
                     }
                 }
             }
@@ -303,12 +440,24 @@ class FlexFeedController
                 }
             }
 
-            // Create new term
-            $newTerm = wp_insert_term($xmlValue, 'experiences', []);
-            if ($newTerm instanceof WP_Error) {
-                return null;
+            /** Check using term_exists query */
+            $termExists = term_exists(strtolower(preg_replace('/\s+/', '-', $xmlValue)), 'experiences');
+            if ($termExists) {
+                if (is_array($termExists)) {
+                    return $termExists['term_id'];
+                }
+                return $termExists;
             } else {
-                return (int)$newTerm['term_id'];
+                $newTerm = wp_insert_term($xmlValue, 'experiences', []);
+
+                if ($newTerm instanceof WP_Error) {
+                    if (array_key_exists('term_exists', $newTerm->error_data)) {
+                        return $newTerm->error_data['term_exists'];
+                    }
+                    return null;
+                } else {
+                    return $newTerm['term_id'];
+                }
             }
         } else {
             return;
@@ -342,11 +491,24 @@ class FlexFeedController
             }
         }
 
-        $newTerm = wp_insert_term($xmlValue, 'role', []);
-        if ($newTerm instanceof WP_Error) {
-            return null;
+        /** Check using term_exists query */
+        $termExists = term_exists(strtolower(preg_replace('/\s+/', '-', $xmlValue)), 'role');
+        if ($termExists) {
+            if (is_array($termExists)) {
+                return $termExists['term_id'];
+            }
+            return $termExists;
         } else {
-            return $newTerm['term_id'];
+            $newTerm = wp_insert_term($xmlValue, 'role', []);
+
+            if ($newTerm instanceof WP_Error) {
+                if (array_key_exists('term_exists', $newTerm->error_data)) {
+                    return $newTerm->error_data['term_exists'];
+                }
+                return null;
+            } else {
+                return $newTerm['term_id'];
+            }
         }
     }
 }

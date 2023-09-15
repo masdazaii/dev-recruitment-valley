@@ -256,27 +256,32 @@ class Company
     {
         switch ($taxonomy) {
             case ('sector'):
-                $acf = $this->_acfSector;
+                $acf = $this->getProp($this->_acfSector) ?? [];
                 break;
             default:
-                return [];
+                $acf = [];
         }
 
-        $terms = get_terms([
-            'taxonomy' => $taxonomy,
-            'include' => $this->getProp($acf) ?? []
-        ]);
+        if (!empty($acf)) {
+            $terms = get_terms([
+                'taxonomy' => $taxonomy,
+                'include' => $acf
+            ]);
 
-        $termsResponse = [];
+            $termsResponse = [];
 
-        foreach ($terms as $term) {
-            $termsResponse[] = [
-                'label' => $term->name,
-                'value' => $term->term_id,
-            ];
+            foreach ($terms as $term) {
+                $termsResponse[] = [
+                    'label' => htmlspecialchars_decode($term->name),
+                    'value' => $term->term_id,
+                ];
+            }
+
+            return $termsResponse;
+        } else {
+            return [];
         }
-
-        return $termsResponse;
+        return [];
     }
 
     public function getCity()

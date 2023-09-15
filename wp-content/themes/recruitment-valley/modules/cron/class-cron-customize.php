@@ -70,6 +70,9 @@ class CronCustomize
             $post = get_post($the_post['post_id']);
             $user = get_user_by('id', $post->post_author);
 
+            $vacancy = new Vacancy($post);
+            $vacancy->setStatus("close");
+
             $args = [
                 'vacancy_title' => $post->post_title,
             ];
