@@ -9,6 +9,7 @@ use Model\Company;
 use Package;
 use Transaction;
 use Vacancy\Vacancy;
+use JWTHelper;
 
 class EmailHelper
 {
@@ -67,28 +68,32 @@ class EmailHelper
         }
     }
 
-    public static function sendJobAlert( $jobAlertData, $displayedJobItemCount = 5 )
+    public static function sendJobAlert($jobAlertData, $displayedJobItemCount = 5)
     {
         try {
             $email = $jobAlertData["email"];
             $jobs = array_values($jobAlertData["jobs"]);
             $jobIds = $jobAlertData["jobIds"];
             $jobCount = count($jobs);
-            $jobListUrl = FRONTEND_URL . '/vacatures?perPage=10&vacancyId='. implode(",", $jobIds) . '&orderBy=date&sort=DESC';
+            $jobListUrl = FRONTEND_URL . '/vacatures?perPage=10&vacancyId=' . implode(",", $jobIds) . '&orderBy=date&sort=DESC';
 
             $jobHtml = '';
             foreach ($jobIds as $key => $jobId) {
-                if($key >= 5) break;
-                $jobHtml .= self::generateJobItemHtml( $jobId );
+                if ($key >= 5) break;
+                $jobHtml .= self::generateJobItemHtml($jobId);
             }
+
+            /** create unsubs token */
+            $token = JWTHelper::generate(['job_alert_id' => $jobIds]);
 
             // error_log($jobHtml);
 
             $args = [
                 "application.job.url" => $jobListUrl,
+                "application.unsubscribe.url" => FRONTEND_URL . '/job-alert/uitschrijven?token=' . $token,
                 "applicant.email" => $email,
                 "applicant.job.count" => $jobCount,
-                "applicant.job.item_html" => $jobHtml 
+                "applicant.job.item_html" => $jobHtml
             ];
 
             error_log(json_encode($args));
@@ -103,41 +108,30 @@ class EmailHelper
 
             wp_mail($email, "Kennisgeving JobAlert - $site_title", $content, $headers);
         } catch (\Throwable $th) {
-            error_log( "error sending email because ". $th->getMessage() . " with payload ". json_encode($jobAlertData));
+            error_log("error sending email because " . $th->getMessage() . " with payload " . json_encode($jobAlertData));
         }
     }
 
-    private static function generateJobItemHtml( $jobId)
+    private static function generateJobItemHtml($jobId)
     {
-        $vacancy = new Vacancy( $jobId );
-        $vacancyTaxonomy = $vacancy->getTaxonomy( false );
+        $vacancy = new Vacancy($jobId);
+        $vacancyTaxonomy = $vacancy->getTaxonomy(false);
 
 
         $postedDate = DateHelper::doLocale($vacancy->getPublishDate(), 'nl_NL', 'dd MMMM yyyy, HH:mm a');
-        
+
         $vacancyAuthor = $vacancy->getAuthor();
         $company = new Company($vacancyAuthor);
-        
+
         ob_start();
-        ?>
+?>
         <tr>
             <td>
-                <table
-                border="0"
-                cellpadding="0"
-                cellspacing="0"
-                role="presentation"
-                style="padding-top: 34px;"
-                width="100%"
-                >
-                <tbody>
-                    <tr>
-                    <td width="56">
-                        <img
-                        width="56"
-                        height="56"
-                        src="<?= $company->getThumbnail() == "" ? THEME_URL.'/assets/images/company-placeholder.png' : $company->getThumbnail() ?>"
-                        style="
+                <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="padding-top: 34px;" width="100%">
+                    <tbody>
+                        <tr>
+                            <td width="56">
+                                <img width="56" height="56" src="<?= $company->getThumbnail() == "" ? THEME_URL . '/assets/images/company-placeholder.png' : $company->getThumbnail() ?>" style="
                             border: 0;
                             display: block;
                             outline: none;
@@ -147,13 +141,10 @@ class EmailHelper
                             font-size: 13px;
                             border-radius: 8px;
                             overflow: hidden;
-                        "
-                        />
-                    </td>
-                    <td>
-                        <p
-                        align="left"
-                        style="
+                        " />
+                            </td>
+                            <td>
+                                <p align="left" style="
                             font-family: Neue Montreal Regular,
                             Helvetica;
                             font-size: 22px;
@@ -163,28 +154,19 @@ class EmailHelper
                             color: #1f1f1f;
                             padding-left: 10px;
                             margin: 0;
-                        "
-                        >
-                        <?= $vacancy->getTitle() ?>
-                        </p>
-                    </td>
-                    </tr>
-                </tbody>
+                        ">
+                                    <?= $vacancy->getTitle() ?>
+                                </p>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
-                <table
-                border="0"
-                cellpadding="0"
-                cellspacing="0"
-                role="presentation"
-                width="100%"
-                >
-                <tbody>
-                    <tr>
-                    <tr>
-                        <td>
-                            <p
-                            align="left"
-                            style="
+                <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%">
+                    <tbody>
+                        <tr>
+                        <tr>
+                            <td>
+                                <p align="left" style="
                                 font-family: Neue Montreal Regular,
                                 Helvetica;
                                 font-size: 14px;
@@ -196,17 +178,14 @@ class EmailHelper
                                 padding-top: 10px;
                                 padding-bottom: 10px;
                                 margin: 0;
-                            "
-                            >
-                            <?= self::generateTaxonomyDescription($vacancyTaxonomy) ?>
-                            </p>
-                            <table>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <p
-                                            align="left"
-                                            style="
+                            ">
+                                    <?= self::generateTaxonomyDescription($vacancyTaxonomy) ?>
+                                </p>
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <p align="left" style="
                                                 font-family: Neue Montreal Regular,
                                                 Helvetica;
                                                 font-size: 11px;
@@ -220,30 +199,29 @@ class EmailHelper
                                                 padding-right: 8px;
                                                 border-radius: 20px;
                                                 margin: 0;
-                                            "
-                                        >
-                                            <?= $postedDate ?>
-                                        </p>
-                                        <div style="padding-bottom: 34px;"></div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                            </table>
-                        </td>
+                                            ">
+                                                    <?= $postedDate ?>
+                                                </p>
+                                                <div style="padding-bottom: 34px;"></div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
                         </tr>
-                    </tr>
-                </tbody>
-                </table>
-            </td>
         </tr>
-        <?php
+        </tbody>
+        </table>
+        </td>
+        </tr>
+    <?php
         $jobItem = ob_get_contents();
         ob_end_clean();
 
         return $jobItem;
     }
 
-    private static function generateTaxonomyDescription( $taxonomies )
+    private static function generateTaxonomyDescription($taxonomies)
     {
         $taxonomyDescription = "";
         $taxonomyCount = count($taxonomies);
@@ -254,9 +232,9 @@ class EmailHelper
             error_log($taxonomyCount);
             $taxonomyDescription .= $key != $taxonomyCount - 1 ? $taxonomy["name"] . '<span style="padding-right: 4px;">•</span>' : $taxonomy["name"];
         }
-        ?>
-            <?= $taxonomyDescription; ?>
-        <?php
+    ?>
+        <?= $taxonomyDescription; ?>
+<?php
         $description = ob_get_contents();
         ob_end_clean();
 

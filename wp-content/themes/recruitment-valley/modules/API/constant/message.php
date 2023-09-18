@@ -130,7 +130,9 @@ class Message
                     "paid" => [
                         "success" => __("We hebben je vacature ontvangen", THEME_DOMAIN),
                         "fail" => __("Er is iets misgegaan bij het aanmaken van een premium vacature", THEME_DOMAIN),
-
+                    ],
+                    "notification" => [
+                        "submitted" => __("Vacature ingediend!", THEME_DOMAIN)
                     ]
                 ],
                 "update" => [
