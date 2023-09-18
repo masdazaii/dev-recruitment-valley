@@ -555,18 +555,32 @@
                           <tbody align="center">
                             <tr>
                               <td>
-                                <a href="{{ application.job.url }}">
-                                  <img align="center" height="auto" src="<?= THEME_URL; ?>/assets/images/button-email-jobalert.png" style="
-                                                  border: 0;
-                                                  display: block;
-                                                  outline: none;
-                                                  text-decoration: none;
-                                                  height: 48px;
-                                                  width: 189px;
-                                                  font-size: 13px;
-                                                " width="100" />
-                                </a>
-                                <a href="{{ application.unsubscribe.url }}">Uitschrijven</a>
+                                <p style="margin: 0;">
+                                  <a href="{{ application.job.url }}">
+                                    <img align="center" height="auto" src="<?= THEME_URL; ?>/assets/images/button-email-jobalert.png" style="
+                                                    border: 0;
+                                                    display: block;
+                                                    outline: none;
+                                                    text-decoration: none;
+                                                    height: 48px;
+                                                    width: 189px;
+                                                    font-size: 13px;
+                                                  " width="100" />
+                                  </a>
+                                </p>
+                                <p style="margin: 0; padding-top: 12px;">
+                                  <a href="{{ application.unsubscribe.url }}" style="
+                                      font-family: Neue Montreal Regular,
+                                      Helvetica;
+                                      font-size: 14px;
+                                      font-style: normal;
+                                      font-weight: 500;
+                                      line-height: 20px;
+                                      text-decoration: none;
+                                      color: #1F1F1F;
+                                      margin: 0;
+                                  ">Uitschrijven</a>
+                                </p>
                               </td>
                             </tr>
                           </tbody>

@@ -6,7 +6,7 @@ use WP_Query;
 
 
 class Data
-{    
+{
 
     /**
      * _mapping_obj_filter
@@ -24,7 +24,7 @@ class Data
         'salaryEnd'         => 'salary_end_ja',
         'workingHours'      => 'working_hours_ja',
     ];
-    
+
     /**
      * _mapping_field_nonOBJ
      *
@@ -37,7 +37,7 @@ class Data
         'email'             => 'email_ja',
         'dateSave'          => 'date_save_ja',
     ];
-    
+
     /**
      * _job_taxonomy
      *
@@ -52,21 +52,21 @@ class Data
         'location',
         'experiences',
     ];
-        
-    
+
+
     /**
      * _getJobAlert
      *
      * @return array
      */
-    private function _getJobAlert() : array
+    private function _getJobAlert(): array
     {
         $args = array(
             'post_type'         => 'jobalert',
             'post_status'       => 'publish',
             'posts_per_page'    => -1,
         );
-        
+
         $jobAlertQuery = new WP_Query($args);
 
         $meta = [];
@@ -74,40 +74,39 @@ class Data
         $idx = 0;
         foreach ($jobAlertQuery->posts as $post) {
             $jobAlertId     = $post->ID;
-            $field_value    = get_fields($jobAlertId);     
-            
+            $field_value    = get_fields($jobAlertId);
+            $meta[$idx]['job_alert_id'] = $post->ID; // Added Line
+
             // non object data
-            foreach($this->_mapping_field_nonOBJ as $kMeta => $kAcf) {
+            foreach ($this->_mapping_field_nonOBJ as $kMeta => $kAcf) {
                 $meta[$idx][$kMeta] = $field_value[$kAcf];
             }
-            
+
             // filter
-            foreach($this->_mapping_obj_filter as $kMeta => $kAcf) {
+            foreach ($this->_mapping_obj_filter as $kMeta => $kAcf) {
                 $tmp = $field_value[$kAcf];
 
-                if(!is_array($tmp)) {
+                if (!is_array($tmp)) {
                     $meta[$idx]['filter'][$kMeta] = $tmp;
                     continue;
                 }
 
-                $tmp = array_map(function($dt){
-                  return [
-                    'id'    => isset($dt->term_id) ? $dt->term_id : 0,
-                    'name'  => isset($dt->name) ? $dt->name : "",
-                  ];
-
+                $tmp = array_map(function ($dt) {
+                    return [
+                        'id'    => isset($dt->term_id) ? $dt->term_id : 0,
+                        'name'  => isset($dt->name) ? $dt->name : "",
+                    ];
                 }, $tmp);
 
                 $meta[$idx]['filter'][$kMeta] = $tmp;
             }
 
             $idx++;
-
         }
 
         return $meta;
     }
-        
+
     /**
      * _getVacanciesOneMonth
      *
@@ -142,9 +141,9 @@ class Data
             $entry['slug']          = $post->post_name;
             $salary_start           = get_field('salary_start', $post->ID);
             $salary_end             = get_field('salary_end', $post->ID);
-            foreach($this->_job_taxonomy as $taxonomy) {
-                $terms = wp_get_object_terms( $post->ID, $taxonomy);
-                
+            foreach ($this->_job_taxonomy as $taxonomy) {
+                $terms = wp_get_object_terms($post->ID, $taxonomy);
+
                 foreach ($terms as $key => $value) {
                     $entry[$taxonomy]['term_id'][]  = isset($value->term_id) ? $value->term_id : 0;
                     $entry[$taxonomy]['name'][]     = isset($value->name) ? $value->name : '';
@@ -156,7 +155,7 @@ class Data
         }
         return $job;
     }
-    
+
     /**
      * _getContentEmail
      *
@@ -167,17 +166,16 @@ class Data
     private function _getContentEmail($vacancies, $jobAllert)
     {
         $result = [];
-        foreach($vacancies as $vacancie) {
+        foreach ($vacancies as $vacancie) {
             foreach ($jobAllert as $filter) {
-                foreach($filter['filter'] as $key => $ftl) {
+                foreach ($filter['filter'] as $key => $ftl) {
+                    if (!is_array($ftl)) continue;
 
-                    if(!is_array($ftl)) continue;
-                    
-                    $id = array_map(function($data){
+                    $id = array_map(function ($data) {
                         return $data['id'];
                     }, $ftl);
 
-                    if(!isset($vacancie[$key]['term_id'])) continue;
+                    if (!isset($vacancie[$key]['term_id'])) continue;
 
                     $vacancie_id    = $vacancie[$key]['term_id'];
                     $intersection   = array_intersect($vacancie_id, $id);
@@ -185,21 +183,24 @@ class Data
                     if ($intersection) {
                         $email = $filter['email'];
                         $jobId = $vacancie['id'];
-        
+
                         if (!isset($result[$email])) {
                             $result[$email] = [
                                 'email'     => $email,
                                 'jobs'      => [],
                                 'jobIds'    => [],
+
+                                /** Added Line, add job_alert_id */
+                                'jobAlertId' => $filter['job_alert_id']
                             ];
                         }
-        
+
                         $job = [
                             'slug'      => isset($vacancie['slug']) ? $vacancie['slug'] : '',
                             'title'     => isset($vacancie['name']) ? $vacancie['name'] : '',
                             'post_date' => isset($vacancie['post_date_gmt']) ? $vacancie['post_date_gmt'] : '',
                         ];
-        
+
                         $result[$email]['jobs'][$jobId] = $job;
 
                         if (!in_array($vacancie['id'], $result[$email]['jobIds'])) {
@@ -214,7 +215,7 @@ class Data
 
         return $result;
     }
-    
+
     /**
      * _mappingVacanciesPerSchedule
      *
@@ -228,9 +229,9 @@ class Data
         $Vweek  = [];
         $Vmonth = [];
 
-        foreach($vacancies as $vacancie) {
+        foreach ($vacancies as $vacancie) {
             $inputDate      = $vacancie['post_date_gmt'];
-            $currentDate    = date('Y-m-d'); 
+            $currentDate    = date('Y-m-d');
 
             $inputDateTime      = new \DateTime($inputDate);
             $currentDateTime    = new \DateTime($currentDate);
@@ -253,7 +254,7 @@ class Data
             'monthly'   => $Vmonth,
         ];
     }
-    
+
     /**
      * mappingJobPerSchedule
      *
@@ -265,12 +266,12 @@ class Data
         $Jday   = [];
         $Jweek  = [];
         $Jmonth = [];
-        foreach($job_alert as $persons) {
-            if($persons['emailFrequency'] === 'daily') {
+        foreach ($job_alert as $persons) {
+            if ($persons['emailFrequency'] === 'daily') {
                 $Jday[]   = $persons;
-            } elseif($persons['emailFrequency'] === 'weekly') {
+            } elseif ($persons['emailFrequency'] === 'weekly') {
                 $Jweek[]  = $persons;
-            } elseif($persons['emailFrequency'] === 'monthly') {
+            } elseif ($persons['emailFrequency'] === 'monthly') {
                 $Jmonth[] = $persons;
             }
         }
@@ -281,7 +282,7 @@ class Data
             'monthly'   => $Jmonth,
         ];
     }
-    
+
     /**
      * main
      *
