@@ -353,14 +353,15 @@ class VacancyCrudController
             /** Create notification */
             // $current = new \DateTime("now", new DateTimeZone('UTC'));
             // $notification = [
-            //     'title' => 'Vacancy submitted!',
-            //     'body'  => $this->_message->get("vacancy.create.free.success"),
+            //     'notification_title' => $this->_message->get("vacancy.notification.submitted"),
+            //     'notification_body'  => $this->_message->get("vacancy.create.free.success"),
             //     'read_status'   => 'false',
             //     'recipient_id'  => $request['user_id'],
             //     'recipient_role'    => 'user',
             //     'created_at'        => date('Y-m-d H:i:s'),
             //     'created_at_utc'    => $current->format('Y-m-d H:i:s')
             // ];
+            // $this->wpdb->insert('rv_notifications', $notification);
 
             return [
                 "status" => 201,
@@ -515,6 +516,19 @@ class VacancyCrudController
             /** Changes End Here */
 
             $wpdb->query('COMMIT');
+
+            /** Create notification */
+            // $current = new \DateTime("now", new DateTimeZone('UTC'));
+            // $notification = [
+            //     'notification_title' => $this->_message->get("vacancy.notification.submitted"),
+            //     'notification_body'  => $this->_message->get("vacancy.create.paid.success"),
+            //     'read_status'   => 'false',
+            //     'recipient_id'  => $request['user_id'],
+            //     'recipient_role'    => 'user',
+            //     'created_at'        => date('Y-m-d H:i:s'),
+            //     'created_at_utc'    => $current->format('Y-m-d H:i:s')
+            // ];
+            // $this->wpdb->insert('rv_notifications', $notification);
 
             return [
                 "status" => 201,
