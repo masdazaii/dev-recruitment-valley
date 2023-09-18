@@ -796,6 +796,7 @@ class Vacancy
         $this->setProp($this->_acf_imported_company_city_latitude, $coordinat["lat"]);
     }
 
+    /** Method for related to imported vacancy start here */
     public function checkImported()
     {
         return $this->getProp($this->_acf_is_imported) == 1 ? true : false;
@@ -830,5 +831,4 @@ class Vacancy
     {
         return $this->getProp($this->_acf_imported_company_city_latitude);
     }
-    /** Method for related to imported vacancy start here */
 }
