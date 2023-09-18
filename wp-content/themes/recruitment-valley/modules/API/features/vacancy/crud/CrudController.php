@@ -4,6 +4,7 @@ namespace Vacancy;
 
 use Constant\Message;
 use DateTimeImmutable;
+use DateTimeZone;
 use Exception;
 use JWTHelper;
 use Model\Company;
@@ -348,6 +349,19 @@ class VacancyCrudController
             $vacancyModel->setStatus('processing');
             // $vacancyModel->setProp("expired_at", $expiredAt);
             $this->wpdb->query("COMMIT");
+
+            /** Create notification */
+            // $current = new \DateTime("now", new DateTimeZone('UTC'));
+            // $notification = [
+            //     'title' => 'Vacancy submitted!',
+            //     'body'  => $this->_message->get("vacancy.create.free.success"),
+            //     'read_status'   => 'false',
+            //     'recipient_id'  => $request['user_id'],
+            //     'recipient_role'    => 'user',
+            //     'created_at'        => date('Y-m-d H:i:s'),
+            //     'created_at_utc'    => $current->format('Y-m-d H:i:s')
+            // ];
+
             return [
                 "status" => 201,
                 "message" => $this->_message->get("vacancy.create.free.success"),

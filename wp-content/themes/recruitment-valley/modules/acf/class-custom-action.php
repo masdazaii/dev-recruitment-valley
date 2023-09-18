@@ -23,14 +23,22 @@ class AcfCustomAction
             $expired_at = get_field('expired_at', $post_id);
             $expired_dates = maybe_unserialize(get_option("job_expires"));
 
+            $postFound = false;
             $new_expired_dates = array_map(function ($expired_date) use ($vacancy, $expired_at) {
                 if ($expired_date["post_id"] == $vacancy->vacancy_id) {
                     $expired_date["expired_at"] = $expired_at;
+                    $postFound = true;
                 }
 
                 return $expired_date;
             }, $expired_dates);
 
+            if (!$postFound) {
+                array_push($new_expired_dates, ["post_id" => $post_id, "expired_at" => $expired_at]);
+            }
+
+            error_log('post : ' . $post_id . ' - ' . $expired_at);
+            error_log(json_encode($new_expired_dates));
             update_option("job_expires", $new_expired_dates);
 
             $this->wpdb->query("COMMIT");
