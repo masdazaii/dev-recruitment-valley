@@ -1915,6 +1915,26 @@
                 "placeholder": "",
                 "prepend": "",
                 "append": ""
+            },
+            {
+                "key": "field_6508151051579",
+                "label": "Company Country Code",
+                "name": "ucma_company_country_code",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
             }
         ],
         "location": [
@@ -2546,6 +2566,26 @@
                 "key": "field_64f55417533da",
                 "label": "Country",
                 "name": "rv_vacancy_country",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_6508120ebe96b",
+                "label": "Vacancy Country Code",
+                "name": "rv_vacancy_country_code",
                 "aria-label": "",
                 "type": "text",
                 "instructions": "",

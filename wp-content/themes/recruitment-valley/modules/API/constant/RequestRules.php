@@ -48,7 +48,8 @@ class RequestRules
                 "gallery" => [],
                 "image" => [],
                 "longitude" => [],
-                "latitude" => []
+                "latitude" => [],
+                "countryCode" => []
             ],
             'companyUpdateDetail' => [
                 "companyName" => ["required"],
@@ -107,7 +108,9 @@ class RequestRules
                 "education.*" => ["required", "numeric"],
                 "employmentType.*" => ["required", "numeric"],
                 "externalUrl" => ["url"],
-                "experiences.*" => ["numeric"]
+                "experiences.*" => ["numeric"],
+                "country" => [],
+                "countryCode" => []
             ],
             'vacancyCreatePaid' => [
                 "name" => ['required'],
@@ -133,7 +136,8 @@ class RequestRules
                 "instagram" => ["url"],
                 "twitter" => ["url"],
                 "review" => [],
-                "experiences.*" => ["numeric"] // Added Line
+                "experiences.*" => ["numeric"], // Added Line
+                "countryCode" => []
             ],
             'vacancyUpdateFree' => [
                 "description" => ["required"],
@@ -149,7 +153,8 @@ class RequestRules
                 "education.*" => ["required", "numeric", "exists:term/education/term_id/single"],
                 "employmentType.*" => ["required", "numeric", "exists:term/type/term_id/single"],
                 "externalUrl" => ["url"],
-                "experiences.*" => ["numeric", "exists:term/experiences/term_id/single"] // Added Line
+                "experiences.*" => ["numeric", "exists:term/experiences/term_id/single"], // Added Line
+                "countryCode" => []
             ],
             'vacancyUpdatePaid' => [
                 "city"              => ["required"],
@@ -175,7 +180,8 @@ class RequestRules
                 "applicationProcedureTitle" => [],
                 "applicationProcedureText"  => [],
                 "review"                    => [],
-                "country" => ["required"],
+                "country"                   => ["required"],
+                "countryCode"               => []
             ],
             'addFavorite' => [
                 /**
@@ -245,7 +251,8 @@ class RequestRules
                 "gallery" => "",
                 "image" => "",
                 "longitude" => "",
-                "latitude" => ""
+                "latitude" => "",
+                "countryCode" => "text"
             ],
             'companyUpdateDetail' => [
                 "companyName" => "text",
@@ -301,6 +308,8 @@ class RequestRules
                 "employmentType.*" => "text",
                 "externalUrl" => "",
                 "experience.*" => "text",
+                "country" => "text",
+                "countryCode" => "text"
             ],
             'vacancyCreatePaid' => [
                 "name" => "text",
@@ -326,7 +335,8 @@ class RequestRules
                 "instagram" => "",
                 "twitter" => "",
                 "review" => "",
-                "experience.*" => "text"
+                "experience.*" => "text",
+                "countryCode" => "text"
             ],
             'vacancyUpdateFree' => [
                 "description"       => "ksespost",
@@ -342,6 +352,7 @@ class RequestRules
                 "employmentType.*"  => "text",
                 "externalUrl"       => "",
                 "experience.*"      => "text",
+                "countryCode"       => "text"
             ],
             'vacancyUpdatePaid' => [
                 "city"              => "text",
@@ -370,6 +381,7 @@ class RequestRules
                 "galleryJob"                => "",
                 "galleryCompany"            => "",
                 "country"                   => "text",
+                "countryCode"               => "text"
             ],
             "userChangeEmail" => [
                 'newEmail' => "email"

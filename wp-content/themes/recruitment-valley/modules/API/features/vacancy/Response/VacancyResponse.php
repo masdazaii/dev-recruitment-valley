@@ -38,6 +38,7 @@ class VacancyResponse
                 "slug" => $vacancy->post_name,
                 "name" => $vacancy->post_title,
                 "country" => $vacancyModel->getCountry(),
+                "countryCode" => $vacancyModel->getCountryCode(), // Added Line
                 "city" => $vacancyModel->getCity(),
                 "placementAddress" => $vacancyModel->getPlacementAddress(),
                 "education" => $vacancyTaxonomy["education"]  ?? null,
@@ -176,6 +177,7 @@ class VacancyResponse
                     // "maps" => "", // not needed - esa feedback 29-08-2023
                     "city" => $company->getCity(),
                     "country" => $company->getCountry(),
+                    "countryCode" => $company->getCountryCode(), // Added Line
                     "longitude" => $company->getLongitude(),
                     "latitude" => $company->getLatitude(),
                 ], // later get company here
@@ -185,6 +187,7 @@ class VacancyResponse
                     "term" => $vacancyModel->getTerm(),
                 ],
                 "country" => $vacancyModel->getCountry(), // Added Line
+                "countryCode" => $vacancyModel->getCountryCode(), // Added Line
                 "city" => $vacancyModel->getCity(),
                 "externalUrl" => $vacancyModel->getExternalUrl(),
                 "placementAddress" => $vacancyModel->getPlacementAddress(),

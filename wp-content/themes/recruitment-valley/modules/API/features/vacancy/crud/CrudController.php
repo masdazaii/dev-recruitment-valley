@@ -317,6 +317,7 @@ class VacancyCrudController
                 "experiences" => $request["experiences"] ?? [], // Added Line
                 "status" => [31] // set free job become pending category
             ],
+            "countryCode" => $request["countryCode"]
         ];
 
         $this->wpdb->query("START TRANSACTION");
@@ -332,6 +333,7 @@ class VacancyCrudController
             $vacancyModel->setProp($vacancyModel->acf_apply_from_this_platform, $payload["apply_from_this_platform"]);
             // $vacancyModel->setProp($vacancyModel->acf_expired_at, date("Y-m-d H:i:s"));
             $vacancyModel->setProp($vacancyModel->acf_placement_address, $payload["placementAddress"]);
+            $vacancyModel->setProp($vacancyModel->acf_country_code, $payload["countryCode"]);
 
             $vacancyModel->setProp($vacancyModel->acf_country, $payload['country']); // Added line
 
@@ -359,7 +361,8 @@ class VacancyCrudController
             //     'recipient_id'  => $request['user_id'],
             //     'recipient_role'    => 'user',
             //     'created_at'        => date('Y-m-d H:i:s'),
-            //     'created_at_utc'    => $current->format('Y-m-d H:i:s')
+            //     'created_at_utc'    => $current->format('Y-m-d H:i:s'),
+            //     'notification_post_id' => $vacancyModel->vacancy_id
             // ];
             // $this->wpdb->insert('rv_notifications', $notification);
 
@@ -415,7 +418,8 @@ class VacancyCrudController
                 "status" => [32] // set free job become pending category
             ],
             "application_process_step" => $request["applicationProcedureSteps"],
-            'rv_vacancy_country' => $request['country'] // Added Line
+            'rv_vacancy_country' => $request['country'], // Added Line
+            'rv_vacancy_country_code' => $request['countryCode'] // Added Line
         ];
 
         global $wpdb;
@@ -526,7 +530,8 @@ class VacancyCrudController
             //     'recipient_id'  => $request['user_id'],
             //     'recipient_role'    => 'user',
             //     'created_at'        => date('Y-m-d H:i:s'),
-            //     'created_at_utc'    => $current->format('Y-m-d H:i:s')
+            //     'created_at_utc'    => $current->format('Y-m-d H:i:s'),
+            //     'notification_post_id' => $vacancyModel->vacancy_id
             // ];
             // $this->wpdb->insert('rv_notifications', $notification);
 
@@ -834,6 +839,7 @@ class VacancyCrudController
                     "status" => [32] // set free job become pending category
                 ],
                 "application_process_step" => $request["applicationProcedureSteps"],
+                'rv_vacancy_country_code' => $request['countryCode'] // Added Line
             ];
         }
 
@@ -884,7 +890,8 @@ class VacancyCrudController
                 "type" => $request["employmentType"],
                 "experiences" => $request["experiences"] ?? [], // Added Line
             ],
-            'rv_vacancy_country' => $request['country']
+            'rv_vacancy_country' => $request['country'],
+            'rv_vacancy_country_code' => $request['countryCode'] // Added Line
         ];
 
         return $payload;
@@ -922,7 +929,8 @@ class VacancyCrudController
                 "experiences" => $request["experiences"] ?? [], // Added Line
             ],
             "application_process_step" => $request["applicationProcedureSteps"],
-            'rv_vacancy_country' => $request['country']
+            'rv_vacancy_country' => $request['country'],
+            'rv_vacancy_country_code' => $request['countryCode'] // Added Line
         ];
 
         return $payload;

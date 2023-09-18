@@ -15,6 +15,7 @@ use Global\User\UserService;
 use Sitemap\SitemapService;
 use Service\ParserService;
 use Vacancy\Import\ImportService;
+use Global\Notification\NotificationService;
 
 class GlobalEndpoint
 {
@@ -43,6 +44,7 @@ class GlobalEndpoint
         $sitemapService = new SitemapService;
         $parserService = new ParserService;
         $importService = new ImportService;
+        $notificationService = new NotificationService;
 
         $endpoint = [
             'path' => '',
@@ -203,17 +205,11 @@ class GlobalEndpoint
                     'permission_callback'   => '__return_true',
                     'callback'              => [$sitemapService, 'get']
                 ],
-                'test_xml' => [
-                    'url'                   => '/parse',
+                'list_notifications' => [
+                    'url'                   => '/my-notifications',
                     'methods'               => 'GET',
                     'permission_callback'   => '__return_true',
-                    'callback'              => [$parserService, 'testParse']
-                ],
-                'test_json' => [
-                    'url'                   => '/parse-json',
-                    'methods'               => 'GET',
-                    'permission_callback'   => '__return_true',
-                    'callback'              => [$parserService, 'parseJsonl']
+                    'callback'              => [$notificationService, 'list']
                 ],
                 // import endpoint test start here,
                 'flexfeed_import' => [

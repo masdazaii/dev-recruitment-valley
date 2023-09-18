@@ -120,7 +120,8 @@ class ProfileController
                     'city' => Helper::isset($user_data_acf, 'ucma_city'),
                     'postcode' => Helper::isset($user_data_acf, 'ucma_postcode'),
                     'longitude' => Helper::isset($user_data_acf, 'ucma_company_longitude'),
-                    'latitude' => Helper::isset($user_data_acf, 'ucma_company_latitude')
+                    'latitude' => Helper::isset($user_data_acf, 'ucma_company_latitude'),
+                    'countryCode' => Helper::isset($user_data_acf, 'ucma_company_country_code')
                 ],
                 'information' => [
                     'shortDescription' => Helper::isset($user_data_acf, 'ucma_short_decription'),
@@ -148,6 +149,7 @@ class ProfileController
             "postcode" => "required",
             "latitude" => "required", // Added Line
             "longitude" => "required", // Added Line
+            "countryCode" => "" // Added Line
         ]);
         if (!$validate['is_valid']) wp_send_json_error(['validation' => $validate['fields'], 'status' => 400], 400);
 
@@ -162,6 +164,7 @@ class ProfileController
             // Added Line
             update_field('ucma_company_latitude', array_key_exists('latitude', $fields) ? sanitize_text_field($fields['latitude']) : null, 'user_' . $user_id);
             update_field('ucma_company_longitude', array_key_exists('longitude', $fields) ? sanitize_text_field($fields['longitude']) : null, 'user_' . $user_id);
+            update_field('ucma_company_country_code', array_key_exists('countryCode', $fields) ? sanitize_text_field($fields['countryCode']) : null, 'user_' . $user_id);
 
             $wpdb->query('COMMIT');
         } catch (Error $e) {
@@ -435,6 +438,7 @@ class ProfileController
             update_field('ucma_is_full_registered', 1, 'user_' . $request['user_id']);
             update_field('ucma_company_longitude', $request['longitude'], 'user_' . $request['user_id']);
             update_field('ucma_company_latitude', $request['latitude'], 'user_' . $request['user_id']);
+            update_field('ucma_company_country_code', $request['countryCode'], 'user_' . $request['user_id']);
 
             $wpdb->query('COMMIT');
         } catch (Error $errors) {

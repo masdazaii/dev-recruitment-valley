@@ -36,7 +36,8 @@ class CreateFreeJobRequest implements MiRequest
             "education.*" => ["required", "numeric"],
             "employmentType.*" => ["required", "numeric"],
             "externalUrl" => ["url"],
-            "experiences.*" => ["numeric"] // Added Line
+            "experiences.*" => ["numeric"], // Added Line,
+            "countryCode" => [] // Added Line
         ];
     }
 
@@ -57,7 +58,8 @@ class CreateFreeJobRequest implements MiRequest
             "education.*" => "text",
             "employmentType.*" => "text",
             "externalUrl" => "url",
-            "experiences.*" => "text"
+            "experiences.*" => "text",
+            "countryCode" => "text"
         ];
     }
 
