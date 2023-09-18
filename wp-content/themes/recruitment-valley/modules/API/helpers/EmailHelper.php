@@ -84,7 +84,8 @@ class EmailHelper
             }
 
             /** create unsubs token */
-            $token = JWTHelper::generate(['job_alert_id' => $jobIds]);
+            $token = JWTHelper::generate(['job_alert_id' => $jobAlertData['jobAlertId']]);
+            // error_log($token);
 
             // error_log($jobHtml);
 

@@ -1,23 +1,24 @@
 <?php
+
 /**
-* Cron Job Alert
-*
-* Author: Zulfan
-* 
-* Note : 
-* 
-*
-* @package HelloElementor
-*/
+ * Cron Job Alert
+ *
+ * Author: Zulfan
+ *
+ * Note :
+ *
+ *
+ * @package HelloElementor
+ */
 
 use BD\Emails\Email;
 use Helper\EmailHelper;
 use JobAlert\Data;
 
-defined( 'ABSPATH' ) || die( "Can't access directly" );
+defined('ABSPATH') || die("Can't access directly");
 
 class CronJobAlert
-{    
+{
     /**
      * __construct
      *
@@ -31,7 +32,7 @@ class CronJobAlert
         add_action('send_job_alert_per_7_day', [$this, 'send_job_alert_weekly']);
         add_action('send_job_alert_per_30_day', [$this, 'send_job_alert_monthly']);
     }
-    
+
     /**
      * set_schedule
      *
@@ -49,7 +50,7 @@ class CronJobAlert
             'interval' => 30 * DAY_IN_SECONDS,
             'display'  => __('Every 30 day (Send Job Alert)')
         ];
-        
+
         $schedules['per_one_week'] = [
             'interval' => 7 * DAY_IN_SECONDS,
             'display'  => __('Every 7 day (Send Job Alert)')
@@ -57,7 +58,7 @@ class CronJobAlert
 
         return $schedules;
     }
-    
+
     /**
      * scheduling
      *
@@ -76,16 +77,15 @@ class CronJobAlert
         if (!wp_next_scheduled('send_job_alert_per_30_day')) {
             wp_schedule_event(time(), 'per_one_month', 'send_job_alert_per_30_day');
         }
-
     }
 
-        
+
     /**
      * send_job_alert_daily
      *
      * @return void
      */
-    public function send_job_alert_daily() 
+    public function send_job_alert_daily()
     {
         $data = new Data();
         $job_data = $data->main('daily');
@@ -94,7 +94,7 @@ class CronJobAlert
         // {
         //     $headers    = ['Content-Type: text/html; charset=UTF-8'];
         //     $email      = $email_key;
-        //     $subject    = 'Job Alert Daily Report'; 
+        //     $subject    = 'Job Alert Daily Report';
 
         //     $message    = '<html><body>';
         //     $message    .= '<h2>Job Alert Daily Report</h2>';
@@ -114,17 +114,16 @@ class CronJobAlert
         error_log("send alert job daily trigerred");
 
         foreach ($job_data as $jobAlerEmail => $jobData) {
-            EmailHelper::sendJobAlert( $jobData );
+            EmailHelper::sendJobAlert($jobData);
         }
-
     }
-    
+
     /**
      * send_job_alert_weekly
      *
      * @return void
      */
-    public function send_job_alert_weekly() 
+    public function send_job_alert_weekly()
     {
         $data       = new Data();
         $job_data   = $data->main('weekly');
@@ -133,7 +132,7 @@ class CronJobAlert
         // {
         //     $headers    = ['Content-Type: text/html; charset=UTF-8'];
         //     $email      = $email_key;
-        //     $subject    = 'Job Alert Weekly Report'; 
+        //     $subject    = 'Job Alert Weekly Report';
 
         //     $message    = '<html><body>';
         //     $message    .= '<h2>Job Alert Weekly Report</h2>';
@@ -151,16 +150,16 @@ class CronJobAlert
         // }
         error_log("send alert job weekly triggered");
         foreach ($job_data as $jobAlerEmail => $jobData) {
-            EmailHelper::sendJobAlert( $jobData );
+            EmailHelper::sendJobAlert($jobData);
         }
     }
-    
+
     /**
      * send_job_alert_monthly
      *
      * @return void
      */
-    public function send_job_alert_monthly() 
+    public function send_job_alert_monthly()
     {
         $data = new Data();
         $job_data = $data->main('monthly');
@@ -169,7 +168,7 @@ class CronJobAlert
         // {
         //     $headers = ['Content-Type: text/html; charset=UTF-8'];
         //     $email = $email_key;
-        //     $subject = 'Job Alert Monthly Report'; 
+        //     $subject = 'Job Alert Monthly Report';
 
         //     $message = '<html><body>';
         //     $message .= '<h2>Job Alert Monthly Report</h2>';
@@ -186,15 +185,13 @@ class CronJobAlert
 
         //     wp_mail($email, $subject, $message, $headers);
         // }
-        
-        
+
+
         error_log("send alert job monthly triggered");
         foreach ($job_data as $jobAlerEmail => $jobData) {
-            EmailHelper::sendJobAlert( $jobData );
+            EmailHelper::sendJobAlert($jobData);
         }
     }
 }
 
 new CronJobAlert();
-
-
