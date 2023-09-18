@@ -48,7 +48,8 @@ class CreatePaidJobRequest implements MiRequest
             "experiences.*" => ["numeric"], // Added Line
             "galleryJob.*" => [], // Added Line
             "galleryCompany.*" => [], // Added Line
-            "country" => ["required"] // Added Line
+            "country" => ["required"], // Added Line
+            "countryCode" => [] // Added Line
         ];
     }
 
@@ -79,7 +80,8 @@ class CreatePaidJobRequest implements MiRequest
             "twitter" => "",
             "review" => "",
             "experiences.*" => "text",
-            "country" => "text"
+            "country" => "text",
+            "countryCode" => "text"
         ];
     }
 

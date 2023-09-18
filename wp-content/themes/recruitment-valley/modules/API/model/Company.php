@@ -45,6 +45,7 @@ class Company
 
     /** Added Line */
     private $_acfSector = "ucma_sector";
+    private $_acfCountryCode = "ucma_company_country_code";
 
     public function __construct($userId = false)
     {
@@ -343,5 +344,10 @@ class Company
     public function setProp($acf_field, $value, $repeater = false)
     {
         return update_field($acf_field, $value, "user_" . $this->user_id);
+    }
+
+    public function getCountryCode()
+    {
+        return $this->getProp($this->_acfCountryCode, true);
     }
 }

@@ -132,7 +132,9 @@ class Message
                         "fail" => __("Er is iets misgegaan bij het aanmaken van een premium vacature", THEME_DOMAIN),
                     ],
                     "notification" => [
-                        "submitted" => __("Vacature ingediend!", THEME_DOMAIN)
+                        "submitted" => __("Vacature ingediend!", THEME_DOMAIN),
+                        "approved"  => __("De vacature is goedgekeurd!", THEME_DOMAIN),
+                        "approved_body" => __("Congratulations! your post has been published successfully.", THEME_DOMAIN)
                     ]
                 ],
                 "update" => [

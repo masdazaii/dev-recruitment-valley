@@ -67,6 +67,7 @@ class Vacancy
     public $acf_placement_address_latitude = "placement_address_latitude";
     public $acf_placement_address_longitude = "placement_address_longitude";
     public $acf_distance_from_city = "distance_from_city";
+    public $acf_country_code = "rv_vacancy_country_code";
 
     /** ACF for imported vacancy */
     private $_acf_is_imported = "rv_vacancy_is_imported";
@@ -788,6 +789,12 @@ class Vacancy
         return $this->setProp($this->acf_distance_from_city, $distance);
     }
 
+
+    public function getCountryCode()
+    {
+        return $this->getProp($this->acf_country_code, true);
+    }
+
     /** Method for related to imported vacancy start here */
     public function setImportedCompanyCityLongLat(string $city)
     {
@@ -796,7 +803,6 @@ class Vacancy
         $this->setProp($this->_acf_imported_company_city_latitude, $coordinat["lat"]);
     }
 
-    /** Method for related to imported vacancy start here */
     public function checkImported()
     {
         return $this->getProp($this->_acf_is_imported) == 1 ? true : false;
@@ -831,4 +837,5 @@ class Vacancy
     {
         return $this->getProp($this->_acf_imported_company_city_latitude);
     }
+    /** Method for related to imported vacancy end here */
 }
