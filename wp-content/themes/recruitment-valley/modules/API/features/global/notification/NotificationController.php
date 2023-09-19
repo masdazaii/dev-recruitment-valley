@@ -8,7 +8,6 @@ use Throwable;
 use WP_Error;
 use WP_REST_Request;
 use constant\NotificationConstant;
-use Throwable;
 
 class NotificationController
 {
@@ -30,13 +29,13 @@ class NotificationController
             'status'    => $request['status'],
             'page'      => isset($request['page']) ? intval($request['page']) : 1,
             'perPage'   => isset($request['perPage']) ? intval($request['perPage']) : 7,
-            'isRead'    => $request['isRead'] ? ($request['isRead'] ? 1 : 0 ) : 0 
+            'isRead'    => $request['isRead'] ? ($request['isRead'] ? 1 : 0) : 0
         ];
 
         $filters['offset'] = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['perPage']));
 
-        $query = "SELECT rvn.id, rvn.notification_body, rvn.read_status, rvn.notification_type, rvn.created_at FROM rv_notifications as rvn WHERE  rvn.recipient_id = {$userId} LIMIT {$filters["perPage"]} OFFSET {$filters["offset"] }";
-        
+        $query = "SELECT rvn.id, rvn.notification_body, rvn.read_status, rvn.notification_type, rvn.created_at FROM rv_notifications as rvn WHERE  rvn.recipient_id = {$userId} LIMIT {$filters["perPage"]} OFFSET {$filters["offset"]}";
+
         $countQuery = "select COUNT(id) as count  FROM rv_notifications where recipient_id = {$userId}";
 
         $results = $this->wpdb->get_results($query);
@@ -44,7 +43,7 @@ class NotificationController
 
         $notificationCount = 0;
 
-        $notifications = array_map(function ($notification){
+        $notifications = array_map(function ($notification) {
             return [
                 "id" => (int) $notification->id,
                 "message" => $notification->notification_body,
@@ -53,11 +52,11 @@ class NotificationController
             ];
         }, $results);
 
-        if(count($results) <= 0)
-        {
+        if (count($results) <= 0) {
             return [
-                "status" => 404,
-                "message" => "Notification not found"
+                "status"    => 204,
+                "message"   => "Notification not found",
+                "data"      => []
             ];
         }
 
@@ -66,8 +65,8 @@ class NotificationController
             "message" => "success get notification!",
             "data" => $notifications,
             "meta" => [
-                "currentPage" => intval($filters['page']) == 0 ? 1 : intval($filters['page']) ,
-                "totalPage" => floor($resultCount/intval($filters['perPage'])) == 0 ? 1 : floor($resultCount/intval($filters['perPage']))  ,
+                "currentPage" => intval($filters['page']) == 0 ? 1 : intval($filters['page']),
+                "totalPage" => floor($resultCount / intval($filters['perPage'])) == 0 ? 1 : floor($resultCount / intval($filters['perPage'])),
                 "total" => (int) $resultCount
             ]
             // "data" => [
@@ -105,15 +104,13 @@ class NotificationController
         $notifId = $request->get_param("notif_id");
 
         try {
-            $notification = new Notification( $notifId );
+            $notification = new Notification($notifId);
 
-            if($notification->getRecipientId() != $userId)
-            {
+            if ($notification->getRecipientId() != $userId) {
                 throw new Exception(__("You doesnt have authorization to this notification", THEME_DOMAIN), 401);
             }
 
-            if($notification->getReadStatus())
-            {
+            if ($notification->getReadStatus()) {
                 throw new Exception(__("Message already read", THEME_DOMAIN), 200);
             }
 
@@ -123,21 +120,20 @@ class NotificationController
                 "status" => 200,
                 "message" => "Message has been readed"
             ];
-
         } catch (WP_Error $wpe) {
-            error_log( $wpe->get_error_message());
+            error_log($wpe->get_error_message());
             return [
                 "status" => 400,
                 "message" => "Something error when reading notification"
             ];
         } catch (Exception $e) {
-            error_log( $e->getMessage());
+            error_log($e->getMessage());
             return [
                 "status" => $e->getCode(),
                 "message" => $e->getMessage()
             ];
         } catch (Throwable $th) {
-            error_log( $th->getMessage());
+            error_log($th->getMessage());
             return [
                 "status" => 400,
                 "message" => "Something error when reading notification"
