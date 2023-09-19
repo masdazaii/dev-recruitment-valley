@@ -296,6 +296,7 @@ class VacancyResponse
                 "term" => $vacancyModel->getTerm(),
             ],
             "country" => [$vacancyModel->getCountry('object')], // Added Line
+            "countryCode" => $vacancyModel->getCountryCode(), // Added Line
             "city" => [$vacancyModel->getCity('object')],
             "placementAddress" => $vacancyModel->getPlacementAddress(),
             "videoId" => $videoUrl,

@@ -66,4 +66,37 @@ class NotificationController
     {
 
     }
+
+    public function read($request)
+    {
+        $request['user_id'] = 19;
+
+        if ($this->wpdb->update('rv_notifications', ['read_status' => 'true'], ['id' => $request['notif_id']])) {
+            return [
+                'status' => 200,
+                'message' => "Notification is readed."
+            ];
+        } else {
+            return [
+                'status' => 500,
+                'message' => "Failed notification is readed."
+            ];
+        }
+    }
+
+    public function write($request)
+    {
+        // $current = new \DateTime("now", new \DateTimeZone('UTC'));
+        // $notification = [
+        //     'notification_title' => $this->_message->get("vacancy.notification.submitted"),
+        //     'notification_body'  => $this->_message->get("vacancy.create.free.success"),
+        //     'read_status'   => 'false',
+        //     'recipient_id'  => $request['user_id'],
+        //     'recipient_role'    => 'user',
+        //     'created_at'        => date('Y-m-d H:i:s'),
+        //     'created_at_utc'    => $current->format('Y-m-d H:i:s'),
+        //     'notification_post_id' => $vacancyModel->vacancy_id
+        // ];
+        // $this->wpdb->insert('rv_notifications', $notification);
+    }
 }
