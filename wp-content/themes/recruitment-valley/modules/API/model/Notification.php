@@ -33,7 +33,7 @@ class Notification
         }
     }
 
-    public function getRecipient()
+    public function getRecipientId()
     {
         return $this->notification->recipient_id;
     }
@@ -74,8 +74,8 @@ class Notification
      * @param  mixed $payload
      * @return void
      */
-    public function set( $payload )
+    public function set( $payload, $where = [] )
     {
-        $this->wpdb->update($this->table, $payload, $this->notification->ID);
+        $this->wpdb->update($this->table, $payload, $where);
     }
 }

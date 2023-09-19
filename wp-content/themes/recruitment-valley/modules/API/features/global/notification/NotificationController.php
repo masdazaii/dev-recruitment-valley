@@ -2,6 +2,9 @@
 
 namespace Global\Notification;
 
+use Exception;
+use Model\Notification;
+use Throwable;
 use WP_Error;
 use WP_REST_Request;
 
@@ -96,17 +99,46 @@ class NotificationController
 
     public function read($request)
     {
-        $request['user_id'] = 19;
+        $userId = $request->user_id;
+        $notifId = $request->get_param("notif_id");
 
-        if ($this->wpdb->update('rv_notifications', ['read_status' => 'true'], ['id' => $request['notif_id']])) {
+        try {
+            $notification = new Notification( $notifId );
+
+            if($notification->getRecipientId() != $userId)
+            {
+                throw new Exception(__("You doesnt have authorization to this notification", THEME_DOMAIN), 401);
+            }
+
+            if($notification->getReadStatus())
+            {
+                throw new Exception(__("Message already read", THEME_DOMAIN), 200);
+            }
+
+            $notification->set(["read_status" => 1], ["id" => $notifId]);
+
             return [
-                'status' => 200,
-                'message' => "Notification is readed."
+                "status" => 200,
+                "message" => "Message has been readed"
             ];
-        } else {
+
+        } catch (WP_Error $wpe) {
+            error_log( $wpe->get_error_message());
             return [
-                'status' => 500,
-                'message' => "Failed notification is readed."
+                "status" => 400,
+                "message" => "Something error when reading notification"
+            ];
+        } catch (Exception $e) {
+            error_log( $e->getMessage());
+            return [
+                "status" => $e->getCode(),
+                "message" => $e->getMessage()
+            ];
+        } catch (Throwable $th) {
+            error_log( $th->getMessage());
+            return [
+                "status" => 400,
+                "message" => "Something error when reading notification"
             ];
         }
     }

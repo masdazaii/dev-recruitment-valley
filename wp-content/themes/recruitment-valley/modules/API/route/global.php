@@ -212,9 +212,9 @@ class GlobalEndpoint
                     'callback'              => [$notificationService, 'list']
                 ],
                 'read_notification' => [
-                    'url'                   => '/my-notifications/(?P<notif_id>[-\w]+)',
+                    'url'                   => '/notification/read/(?P<notif_id>[-\w]+)',
                     'methods'               => 'PUT',
-                    'permission_callback'   => '__return_true',
+                    'permission_callback'   => [$authMiddleware, 'check_token'],
                     'callback'              => [$notificationService, 'read']
                 ],
                 // import endpoint test start here,
