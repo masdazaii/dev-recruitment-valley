@@ -220,7 +220,8 @@ class Vacancy
 
     public function getIsPaid(): bool
     {
-        return $this->getProp($this->acf_is_paid);
+        // return $this->getProp($this->acf_is_paid); // changed below due to error when returning null
+        return $this->getProp($this->acf_is_paid) ?? false;
     }
 
     public function getPlacementAddress()

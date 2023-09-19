@@ -19,4 +19,10 @@ class NotificationService
         $response = $this->_notificationController->list($request);
         return ResponseHelper::build($response);
     }
+
+    public function read(WP_REST_Request $request)
+    {
+        $response = $this->_notificationController->read($request);
+        return ResponseHelper::build($response);
+    }
 }
