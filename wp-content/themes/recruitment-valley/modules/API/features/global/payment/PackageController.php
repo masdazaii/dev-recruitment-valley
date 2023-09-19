@@ -18,7 +18,7 @@ use Stripe\Webhook;
 use Transaction;
 use WP_REST_Request;
 use constant\NotificationConstant;
-use Global\Notification\NotificationService;
+use Global\NotificationService;
 
 require_once(get_template_directory() . '/vendor/autoload.php');
 

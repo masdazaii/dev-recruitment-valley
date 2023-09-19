@@ -11,14 +11,20 @@ use Model\ModelHelper;
 use Helper\DateHelper;
 use ResponseHelper;
 use WP_REST_Request;
+use constant\NotificationConstant;
+use Global\NotificationService;
 
 class ProfileController
 {
     private $message = null;
+    private $_notification;
+    private $_notificationConstant;
 
     public function __construct()
     {
         $this->message = new Message;
+        $this->_notification = new NotificationService();
+        $this->_notificationConstant = new NotificationConstant();
     }
 
     public function get(WP_REST_Request $request)
@@ -412,6 +418,12 @@ class ProfileController
         }
 
         wp_set_password($body["newPassword"], $user->ID);
+
+        /** Create notification : payment success */
+        $this->_notification->write($this->_notificationConstant::ACCOUNT_PASSWORD_CHANGE, $user_id, [
+            'id' => $user_id,
+            'roles' => $user->roles[0]
+        ]);
 
         return [
             "status" => 200,

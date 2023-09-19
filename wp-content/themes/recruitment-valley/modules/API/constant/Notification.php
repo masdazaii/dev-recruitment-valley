@@ -19,6 +19,7 @@ class NotificationConstant
     const ACCOUNT_CREATED = "account.created";
     const ACCOUNT_PASSWORD_RESET = "account.password_reset";
     const ACCOUNT_PASSWORD_CHANGE = "account.password_change";
+    const ACCOUNT_PASSWORD_FORGOT = "account.password_forgot";
 
     const PAYMENT_SUCCESSFULL = "payment.successfull";
     const PAYMENT_CONFIRMATION = "payment.confirmation";
@@ -42,9 +43,10 @@ class NotificationConstant
                 "confirmation" => __("Payment confirmation.", THEME_DOMAIN),
             ],
             "account" => [
-                "created" => __("Congratulations! your account is created.", THEME_DOMAIN),
-                "password_reset" => __("Your password is changed!.", THEME_DOMAIN),
-                "password_change" => __("Your password is changed!.", THEME_DOMAIN),
+                "created" => __("Congratulations, you have finished registering your account! Your account is now ready to use.", THEME_DOMAIN),
+                "password_reset" => __("Your password is reseted!", THEME_DOMAIN),
+                "password_change" => __("Your password is changed!", THEME_DOMAIN),
+                "password_forgot" => __("There is a request to reset you account's password.")
             ],
         ];
     }

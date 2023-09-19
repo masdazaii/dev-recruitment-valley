@@ -1,6 +1,6 @@
 <?php
 
-namespace Global\Notification;
+namespace Global;
 
 use WP_Error;
 use WP_REST_Request;

@@ -14,7 +14,7 @@
 use BD\Emails\Email;
 use Vacancy\Vacancy;
 use constant\NotificationConstant;
-use Global\Notification\NotificationService;
+use Global\NotificationService;
 
 defined('ABSPATH') || die("Can't access directly");
 

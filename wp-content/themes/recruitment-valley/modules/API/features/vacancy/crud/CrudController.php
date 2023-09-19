@@ -11,7 +11,7 @@ use Model\Company;
 use Model\ModelHelper;
 use WP_Post;
 use WP_Query;
-use Global\Notification\NotificationService;
+use Global\NotificationService;
 use constant\NotificationConstant;
 
 class VacancyCrudController

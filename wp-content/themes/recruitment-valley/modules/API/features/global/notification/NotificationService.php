@@ -1,6 +1,6 @@
 <?php
 
-namespace Global\Notification;
+namespace Global;
 
 use ResponseHelper;
 use WP_REST_Request;

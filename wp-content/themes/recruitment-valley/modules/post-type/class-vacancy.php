@@ -6,7 +6,7 @@ use Constant\Message;
 use DateTimeImmutable;
 use Vacancy\Vacancy as VacancyModel;
 use constant\NotificationConstant;
-use Global\Notification\NotificationService;
+use Global\NotificationService;
 
 class Vacancy extends RegisterCPT
 {

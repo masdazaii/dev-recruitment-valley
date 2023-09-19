@@ -7,7 +7,7 @@ use DateTime;
 use Model\ModelHelper;
 use Vacancy\Vacancy;
 use constant\NotificationConstant;
-use Global\Notification\NotificationService;
+use Global\NotificationService;
 
 class VacancyAppliedController
 {
