@@ -6,11 +6,15 @@ use Constant\Message;
 use DateTime;
 use Model\ModelHelper;
 use Vacancy\Vacancy;
+use constant\NotificationConstant;
+use Global\NotificationService;
 
 class VacancyAppliedController
 {
     private $_message;
     private $wpdb;
+    private $_notification;
+    private $_notificationConstant;
 
     public function __construct()
     {
@@ -18,6 +22,8 @@ class VacancyAppliedController
 
         $this->_message = new Message;
         $this->wpdb = $wpdb;
+        $this->_notification = new NotificationService();
+        $this->_notificationConstant = new NotificationConstant();
     }
 
     public function applyVacancy($request)
@@ -50,9 +56,8 @@ class VacancyAppliedController
         ];
 
         $applicants = get_posts($applicantArgs);
-        
-        if(count($applicants) > 0)
-        {
+
+        if (count($applicants) > 0) {
             return [
                 "status" => 400,
                 "message" => "Je hebt al op deze functie gesolliciteerd"
@@ -84,16 +89,16 @@ class VacancyAppliedController
                 'post_parent' => 0,
                 'page_template' => 'default'
             ];
-    
+
             $doApply = wp_insert_post($arguments, false, true);
-    
+
             if (is_wp_error($doApply)) {
                 return [
                     "message"   => $this->_message->get('candidate.apply_vacancy.apply_failed'),
                     "status"    => 400
                 ];
             }
-    
+
             $cv_id = 0;
 
             if (isset($_FILES['cv']) && $_FILES['cv']['error'] === UPLOAD_ERR_OK) {
@@ -104,7 +109,7 @@ class VacancyAppliedController
                         "message" => "bestandstype wordt niet ondersteund",
                     ];
                 }
-                
+
                 $cv = ModelHelper::handle_upload('cv');
                 if ($cv) {
                     $cv_id = wp_insert_attachment($cv['cv']['attachment'], $cv['cv']['file']);
@@ -112,13 +117,12 @@ class VacancyAppliedController
                 }
             }
 
-            $attachment = get_post( $request["cv"] );
-            if($attachment)
-            {
+            $attachment = get_post($request["cv"]);
+            if ($attachment) {
                 $cv_id = $attachment->ID;
                 update_field('apply_cv', $attachment->ID, $doApply);
             }
-    
+
             update_field('apply_date', date('Y-m-d H:i:s', time()), $doApply);
             update_field('phone_code_area', $request['phoneNumberCode'], $doApply);
             update_field('phone_number', $request['phoneNumber'], $doApply);
@@ -126,13 +130,20 @@ class VacancyAppliedController
             update_field('applicant_candidate', $request["user_id"], $doApply);
             update_field('applicant_company', $company, $doApply);
             update_field('applicant_vacancy', $request["vacancy"], $doApply);
-    
+
             // add one time data that not affected by update
             update_post_meta($doApply, 'applicant_data', get_fields('user_' . $request["user_id"]));
             update_post_meta($doApply, 'vacancy_data', get_fields($request["vacancy"]));
-            update_post_meta($doApply, 'company_data', get_fields("user_" . $company));    
+            update_post_meta($doApply, 'company_data', get_fields("user_" . $company));
 
             $this->wpdb->query('COMMIT');
+
+            /** Create notification : candidate applied */
+            $this->_notification->write($this->_notificationConstant::VACANCY_APPLIED, $company, [
+                'id'    => $request["vacancy"],
+                'slug'  => $vacancy->getSlug(),
+                'candidate_id' => $request["user_id"]
+            ]);
 
             return [
                 "message"   => $this->_message->get('candidate.apply_vacancy.apply_success'),

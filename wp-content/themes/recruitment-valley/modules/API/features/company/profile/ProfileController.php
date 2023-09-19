@@ -16,14 +16,20 @@ use Throwable;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
+use constant\NotificationConstant;
+use Global\NotificationService;
 
 class ProfileController
 {
     private $message = null;
+    private $_notification;
+    private $_notificationConstant;
 
     public function __construct()
     {
         $this->message = new Message;
+        $this->_notification = new NotificationService();
+        $this->_notificationConstant = new NotificationConstant();
     }
 
     public function get(WP_REST_Request $request)
@@ -441,6 +447,11 @@ class ProfileController
             update_field('ucma_company_country_code', $request['countryCode'], 'user_' . $request['user_id']);
 
             $wpdb->query('COMMIT');
+
+            /** Create notification : payment success */
+            $this->_notification->write($this->_notificationConstant::ACCOUNT_CREATED, $company->getId(), [
+                'id' => $company->getId()
+            ]);
         } catch (Error $errors) {
             $wpdb->query('ROLLBACK');
 

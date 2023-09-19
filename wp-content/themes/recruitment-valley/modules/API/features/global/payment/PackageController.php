@@ -17,16 +17,22 @@ use Stripe\StripeClient;
 use Stripe\Webhook;
 use Transaction;
 use WP_REST_Request;
+use constant\NotificationConstant;
+use Global\NotificationService;
 
 require_once(get_template_directory() . '/vendor/autoload.php');
 
 class PackageController
 {
     protected $_message;
+    private $_notification;
+    private $_notificationConstant;
 
     public function __construct()
     {
         $this->_message = new Message();
+        $this->_notification = new NotificationService();
+        $this->_notificationConstant = new NotificationConstant();
     }
 
     public function get($request)
@@ -172,6 +178,11 @@ class PackageController
         $transaction->setTransactionStripeId($session->id);
 
         // EmailHelper::sendPaymentConfirmation($transactionId); //temporary disable
+
+        /** Create notification : payment confirmation */
+        $this->_notification->write($this->_notificationConstant::PAYMENT_CONFIRMATION, $company->getId(), [
+            'id' => $company->getId()
+        ]);
 
         return [
             "status" => 200,
@@ -368,6 +379,11 @@ class PackageController
                 $args,
                 'payment-package-success.php'
             );
+
+            /** Create notification : payment success */
+            $this->_notification->write($this->_notificationConstant::PAYMENT_SUCCESSFULL, $company->getId(), [
+                'id' => $company->getId()
+            ]);
 
             return [
                 "status" => 200,

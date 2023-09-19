@@ -15,7 +15,7 @@ use Global\User\UserService;
 use Sitemap\SitemapService;
 use Service\ParserService;
 use Vacancy\Import\ImportService;
-use Global\Notification\NotificationService;
+use Global\NotificationService;
 
 class GlobalEndpoint
 {
