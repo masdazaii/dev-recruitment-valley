@@ -211,6 +211,12 @@ class GlobalEndpoint
                     'permission_callback'   => '__return_true',
                     'callback'              => [$notificationService, 'list']
                 ],
+                'read_notification' => [
+                    'url'                   => '/my-notifications/(?P<notif_id>[-\w]+)',
+                    'methods'               => 'PUT',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$notificationService, 'read']
+                ],
                 // import endpoint test start here,
                 'flexfeed_import' => [
                     'url'                   => 'import/flexfeed',
