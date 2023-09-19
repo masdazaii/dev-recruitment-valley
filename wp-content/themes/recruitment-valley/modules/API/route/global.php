@@ -206,9 +206,9 @@ class GlobalEndpoint
                     'callback'              => [$sitemapService, 'get']
                 ],
                 'list_notifications' => [
-                    'url'                   => '/my-notifications',
+                    'url'                   => '/notifications',
                     'methods'               => 'GET',
-                    'permission_callback'   => '__return_true',
+                    'permission_callback'   => [$authMiddleware, 'check_token'],
                     'callback'              => [$notificationService, 'list']
                 ],
                 'read_notification' => [

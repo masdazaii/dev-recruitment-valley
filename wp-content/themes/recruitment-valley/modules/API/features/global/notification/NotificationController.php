@@ -18,42 +18,69 @@ class NotificationController
 
     public function list($request)
     {
-        $request['user_id'] = 19;
+        $userId = $request->user_id;
         $filters = [
             'status'    => $request['status'],
             'page'      => isset($request['page']) ? intval($request['page']) : 1,
-            'perPage'   => isset($request['page']) ? intval($request['page']) : 7,
+            'perPage'   => isset($request['perPage']) ? intval($request['perPage']) : 7,
+            'isRead'    => $request['isRead'] ? ($request['isRead'] ? 1 : 0 ) : 0 
         ];
 
-        $filters['offset'] = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['postPerPage']));
+        $filters['offset'] = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['perPage']));
 
-        $results = $this->wpdb->get_results("SELECT COUNT(rvn.id) as count_notif, rvn.id, rvn.notification_title, rvn.notification_body, rvn.read_status FROM rv_notifications as rvn WHERE rvn.recipient_role = \'user\' AND rvn.recipient_id = \'{$request['user_id']}\'");
+        $query = "SELECT rvn.id, rvn.notification_body, rvn.read_status, rvn.notification_type, rvn.created_at FROM rv_notifications as rvn WHERE  rvn.recipient_id = {$userId} LIMIT {$filters["perPage"]} OFFSET {$filters["offset"] }";
+        
+        $countQuery = "select COUNT(id) as count  FROM rv_notifications where recipient_id = {$userId}";
 
-        print('<pre>' . print_r($results, true) . '</pre>');
+        $results = $this->wpdb->get_results($query);
+        $resultCount = $this->wpdb->get_results($countQuery, OBJECT)[0]->count;
 
-        // foreach ()
+        $notificationCount = 0;
+
+        $notifications = array_map(function ($notification){
+            return [
+                "id" => (int) $notification->id,
+                "message" => $notification->notification_body,
+                "type" => $notification->notification_type,
+                "isRead" => $notification->read_status == "0" ? false : true,
+            ];
+        }, $results);
+
+        if(count($results) <= 0)
+        {
+            return [
+                "status" => 404,
+                "message" => "Notification not found"
+            ];
+        }
 
         return [
             "status" => 200,
             "message" => "success get notification!",
-            "data" => [
-                [
-                    "id"    => 1,
-                    "title" => "Notification title.",
-                    "message"   => "Notification body message, Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit, perspiciatis.",
-                    "isRead"    => false,
-                    "time"      => '2023-12-13 23:59:59',
-                    "timeUTC"   => '2023-12-13 16:59:59'
-                ],
-                [
-                    "id"    => 2,
-                    "title" => "Notification title.",
-                    "message"   => "Notification body message, Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit, perspiciatis.",
-                    "isRead"    => false,
-                    "time"      => '2023-12-13 23:59:59',
-                    "timeUTC"   => '2023-12-13 16:59:59'
-                ]
+            "data" => $notifications,
+            "meta" => [
+                "currentPage" => intval($filters['page']) == 0 ? 1 : intval($filters['page']) ,
+                "totalPage" => floor($resultCount/intval($filters['perPage'])) == 0 ? 1 : floor($resultCount/intval($filters['perPage']))  ,
+                "total" => (int) $resultCount
             ]
+            // "data" => [
+            //     [
+            //         "id"    => 1,
+            //         "title" => "Notification title.",
+            //         "message"   => "Notification body message, Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit, perspiciatis.",
+            //         "isRead"    => false,
+            //         "time"      => '2023-12-13 23:59:59',
+            //         "timeUTC"   => '2023-12-13 16:59:59'
+            //     ],
+            //     [
+            //         "id"    => 2,
+            //         "title" => "Notification title.",
+            //         "message"   => "Notification body message, Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit, perspiciatis.",
+            //         "isRead"    => false,
+            //         "time"      => '2023-12-13 23:59:59',
+            //         "timeUTC"   => '2023-12-13 16:59:59'
+            //     ]
+            // ]
         ];
     }
 
