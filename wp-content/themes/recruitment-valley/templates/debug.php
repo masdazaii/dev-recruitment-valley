@@ -1,16 +1,16 @@
 <?php
+
+use Model\Notification;
+
 defined( 'ABSPATH' ) || die( "Can't access directly" );
 
 /**
  * Template Name: Debugging
  */
 
-use JobAlert\Data;
 
-$data = new Data();
-$monthly = $data->main('monthly');
-
+$notification = new Notification(1);
 echo '<pre>';
-var_dump($monthly);
+var_dump($notification->getReadStatus());
 echo '</pre>';die;
 ?>
