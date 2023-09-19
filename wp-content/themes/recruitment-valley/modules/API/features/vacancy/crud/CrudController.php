@@ -307,6 +307,8 @@ class VacancyCrudController
             "apply_from_this_platform" => isset($request["externalUrl"]) ? true : false,
             "is_paid" => false,
             "user_id" => $request["user_id"],
+            "placementAddressLongitude" => $request["longitude"],
+            "placementAddressLatitude" => $request["latitude"],
             "taxonomy" => [
                 "sector" => $request["sector"],
                 "role" => $request["role"],
@@ -345,7 +347,9 @@ class VacancyCrudController
             // $expiredAt = $expiredAt->modify("+30 days")->format("Y-m-d H:i:s");
 
             $vacancyModel->setCityLongLat($payload["city"]);
-            $vacancyModel->setAddressLongLat($payload["placementAddress"]);
+            $vacancyModel->setPlacementAddressLatitude($payload["placementAddressLatitude"]);
+            $vacancyModel->setPlacementAddressLongitude($payload["placementAddressLongitude"]);
+            // $vacancyModel->setAddressLongLat($payload["placementAddress"]);
             $vacancyModel->setDistance($payload["city"], $payload["city"] . " " . $payload["placementAddress"]);
 
             $vacancyModel->setStatus('processing');
@@ -407,6 +411,8 @@ class VacancyCrudController
             "instagram_url" => $request["instagram"],
             "twitter_url" => $request["twitter"],
             "reviews" => $request["review"],
+            "placementAddressLongitude" => $request["longitude"],
+            "placementAddressLatitude" => $request["latitude"],
             "taxonomy" => [
                 "sector" => $request["sector"],
                 "role" => $request["role"],
@@ -495,7 +501,9 @@ class VacancyCrudController
             $vacancyModel->setProp($vacancyModel->acf_gallery, $vacancyGallery, false);
 
             $vacancyModel->setCityLongLat($payload["city"]);
-            $vacancyModel->setAddressLongLat($payload["placementAddress"]);
+            // $vacancyModel->setAddressLongLat($payload["placementAddress"]);
+            $vacancyModel->setPlacementAddressLatitude($payload["placementAddressLatitude"]);
+            $vacancyModel->setPlacementAddressLongitude($payload["placementAddressLongitude"]);
             $vacancyModel->setDistance($payload["city"], $payload["city"] . " " . $payload["placementAddress"]);
 
             $this->add_expired_date_to_option([
@@ -663,7 +671,9 @@ class VacancyCrudController
 
             /** Changes start here */
             $vacancyModel->setCityLongLat($payload["placement_city"]);
-            $vacancyModel->setAddressLongLat($payload["placement_address"]);
+            // $vacancyModel->setAddressLongLat($payload["placement_address"]);
+            $vacancyModel->setPlacementAddressLatitude($payload["placementAddressLatitude"]);
+            $vacancyModel->setPlacementAddressLongitude($payload["placementAddressLongitude"]);
             $vacancyModel->setDistance($payload["placement_city"], $payload["placement_city"] . " " . $payload["placement_address"]);
 
             $wpdb->query('COMMIT');
@@ -745,7 +755,9 @@ class VacancyCrudController
 
             /** Changes start here */
             $vacancyModel->setCityLongLat($payload["placement_city"]);
-            $vacancyModel->setAddressLongLat($payload["placement_address"]);
+            // $vacancyModel->setAddressLongLat($payload["placement_address"]);
+            $vacancyModel->setPlacementAddressLatitude($payload["placementAddressLatitude"]);
+            $vacancyModel->setPlacementAddressLongitude($payload["placementAddressLongitude"]);
             $vacancyModel->setDistance($payload["placement_city"], $payload["placement_city"] . " " . $payload["placement_address"]);
 
             $wpdb->query('COMMIT');
@@ -839,7 +851,9 @@ class VacancyCrudController
                     "status" => [32] // set free job become pending category
                 ],
                 "application_process_step" => $request["applicationProcedureSteps"],
-                'rv_vacancy_country_code' => $request['countryCode'] // Added Line
+                'rv_vacancy_country_code' => $request['countryCode'], // Added Line    
+                "placementAddressLongitude" => $request["longitude"],
+                "placementAddressLatitude" => $request["latitude"],
             ];
         }
 
@@ -851,7 +865,9 @@ class VacancyCrudController
                 "salary_end" => $request["salaryEnd"],
                 "external_url" => $request["externalUrl"],
                 "apply_from_this_platform" => isset($request["externalUrl"]) ? true : false,
-                "user_id" => $request["user_id"],
+                "user_id" => $request["user_id"],    
+                "placementAddressLongitude" => $request["longitude"],
+                "placementAddressLatitude" => $request["latitude"],
                 "taxonomy" => [
                     "sector" => $request["sector"],
                     "role" => $request["role"],
@@ -878,6 +894,8 @@ class VacancyCrudController
             "salary_start" => $request["salaryStart"],
             "salary_end" => $request["salaryEnd"],
             "external_url" => $request["externalUrl"],
+            "placementAddressLongitude" => $request["longitude"],
+            "placementAddressLatitude" => $request["latitude"],
             // "apply_from_this_platform" => isset($request["externalUrl"]) ? true : false, // Changed Below
             "apply_from_this_platform" => (isset($request["externalUrl"]) && $request["externalUrl"] !== '' ? false : true),
             "user_id" => $request["user_id"],
@@ -919,6 +937,8 @@ class VacancyCrudController
             "twitter_url" => $request["twitter"],
             "reviews" => $request["review"],
             "placement_address" => $request["placementAddress"],
+            "placementAddressLongitude" => $request["longitude"],
+            "placementAddressLatitude" => $request["latitude"],
             "taxonomy" => [
                 "sector" => $request["sector"],
                 "role" => $request["role"],

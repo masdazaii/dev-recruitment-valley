@@ -611,9 +611,29 @@ class Vacancy
         $this->setProp($this->acf_placement_address_longitude, $coordinat["long"]);
     }
 
+    public function setPlacementAddressLongitude( $latitude )
+    {
+        $this->setProp($this->acf_placement_address_latitude, $latitude );
+    }
+
+    public function setPlacementAddressLatitude( $longitude )
+    {
+        $this->setProp($this->acf_placement_address_longitude, $longitude);
+    }
+
+    public function getPlacementAddressLongitude()
+    {
+        return $this->getProp($this->acf_placement_address_longitude);
+    }
+
+    public function getPlacementAddressLatitude()
+    {
+        return $this->getProp($this->acf_placement_address_latitude);
+    }
+
     public function setDistance($city, $placementAddress)
     {
-        $cityCoordinat = $coordinat = Maphelper::generateLongLat($city);
+        $cityCoordinat = Maphelper::generateLongLat($city);
         $placementAddressCoordinat = Maphelper::generateLongLat($placementAddress);
 
         $distance = Maphelper::calculateDistance($cityCoordinat, $placementAddressCoordinat);
