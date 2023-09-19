@@ -102,7 +102,7 @@ class CronCustomize
         return $expired_posts;
     }
 
-    private function _expired_after_in_days($expired_posts, $in_days = 5)
+    private function _expired_after_in_days($expired_posts, $in_days = 5, $template = 'reminder-5days-expire-company.php')
     {
         $today = $this->time_today;
         $text_time = sprintf('+%s days', $in_days);
@@ -132,7 +132,7 @@ class CronCustomize
                 'Content-Type: text/html; charset=UTF-8',
             );
 
-            $content = Email::render_html_email('reminder-5days-expire-company.php', $args);
+            $content = Email::render_html_email($template, $args);
 
             $site_title = get_bloginfo('name');
             $is_success = wp_mail($user->user_email, "Reminder verlopen vacature - $site_title", $content, $headers);
