@@ -4,16 +4,20 @@ namespace Global\Notification;
 
 use WP_Error;
 use WP_REST_Request;
+use constant\NotificationConstant;
+use Throwable;
 
 class NotificationController
 {
     public $wpdb;
+    private $_body;
 
     public function __construct()
     {
         global $wpdb;
 
         $this->wpdb = $wpdb;
+        $this->_body = new NotificationConstant();
     }
 
     public function list($request)
@@ -57,14 +61,12 @@ class NotificationController
         ];
     }
 
-    public function store( WP_REST_Request $request )
+    public function store(WP_REST_Request $request)
     {
-
     }
 
-    public function delete( WP_REST_Request $request )
+    public function delete(WP_REST_Request $request)
     {
-
     }
 
     public function read($request)
@@ -84,19 +86,45 @@ class NotificationController
         }
     }
 
-    public function write($request)
+    public function write($type, $recipient, $data)
     {
-        // $current = new \DateTime("now", new \DateTimeZone('UTC'));
-        // $notification = [
-        //     'notification_title' => $this->_message->get("vacancy.notification.submitted"),
-        //     'notification_body'  => $this->_message->get("vacancy.create.free.success"),
-        //     'read_status'   => 'false',
-        //     'recipient_id'  => $request['user_id'],
-        //     'recipient_role'    => 'user',
-        //     'created_at'        => date('Y-m-d H:i:s'),
-        //     'created_at_utc'    => $current->format('Y-m-d H:i:s'),
-        //     'notification_post_id' => $vacancyModel->vacancy_id
-        // ];
-        // $this->wpdb->insert('rv_notifications', $notification);
+        error_log(json_encode($data));
+        try {
+            $current = new \DateTime("now", new \DateTimeZone('UTC'));
+
+            switch ($type) {
+                case "vacancy.expired_1":
+                case "vacancy.expired_3":
+                case "vacancy.expired_7":
+                case "vacancy.expired_5":
+                case "vacancy.expired":
+                    $message = $data['title'] . ' ' . $this->_body->get($type);
+                    break;
+                case "vacancy.applied":
+                    $message = $this->_body->get($type) . ' ' . $data['title'];
+                    break;
+                default:
+                    $message = $this->_body->get($type);
+            }
+
+            $notification = [
+                'notification_body' => $message,
+                'notification_type' => $type,
+                'recipient_id'      => $recipient,
+                'created_at'        => date('Y-m-d H:i:s'),
+                'created_at_utc'    => $current->format('Y-m-d H:i:s'),
+                'data'              => serialize($data)
+            ];
+
+            $result = $this->wpdb->insert('rv_notifications', $notification);
+
+            if (!$result) {
+                error_log(json_encode($notification));
+            }
+
+            return $result;
+        } catch (Throwable $th) {
+            error_log($th);
+        }
     }
 }

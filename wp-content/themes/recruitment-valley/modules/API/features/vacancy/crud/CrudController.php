@@ -11,11 +11,15 @@ use Model\Company;
 use Model\ModelHelper;
 use WP_Post;
 use WP_Query;
+use Global\Notification\NotificationService;
+use constant\NotificationConstant;
 
 class VacancyCrudController
 {
     private $_posttype = 'vacancy';
     private $_message;
+    private $_notification;
+    private $_notificationConstant;
     private $wpdb;
 
     public function __construct()
@@ -24,6 +28,8 @@ class VacancyCrudController
 
         $this->wpdb = $wpdb;
         $this->_message = new Message;
+        $this->_notification = new NotificationService();
+        $this->_notificationConstant = new NotificationConstant();
     }
 
     public function show()
@@ -353,18 +359,10 @@ class VacancyCrudController
             $this->wpdb->query("COMMIT");
 
             /** Create notification */
-            // $current = new \DateTime("now", new DateTimeZone('UTC'));
-            // $notification = [
-            //     'notification_title' => $this->_message->get("vacancy.notification.submitted"),
-            //     'notification_body'  => $this->_message->get("vacancy.create.free.success"),
-            //     'read_status'   => 'false',
-            //     'recipient_id'  => $request['user_id'],
-            //     'recipient_role'    => 'user',
-            //     'created_at'        => date('Y-m-d H:i:s'),
-            //     'created_at_utc'    => $current->format('Y-m-d H:i:s'),
-            //     'notification_post_id' => $vacancyModel->vacancy_id
-            // ];
-            // $this->wpdb->insert('rv_notifications', $notification);
+            $this->_notification->write($this->_notificationConstant::VACANCY_SUBMITTED, $request['user_id'], [
+                'id'    => $vacancyModel->vacancy_id,
+                'slug'  => $vacancyModel->getSlug()
+            ]);
 
             return [
                 "status" => 201,
@@ -522,18 +520,10 @@ class VacancyCrudController
             $wpdb->query('COMMIT');
 
             /** Create notification */
-            // $current = new \DateTime("now", new DateTimeZone('UTC'));
-            // $notification = [
-            //     'notification_title' => $this->_message->get("vacancy.notification.submitted"),
-            //     'notification_body'  => $this->_message->get("vacancy.create.paid.success"),
-            //     'read_status'   => 'false',
-            //     'recipient_id'  => $request['user_id'],
-            //     'recipient_role'    => 'user',
-            //     'created_at'        => date('Y-m-d H:i:s'),
-            //     'created_at_utc'    => $current->format('Y-m-d H:i:s'),
-            //     'notification_post_id' => $vacancyModel->vacancy_id
-            // ];
-            // $this->wpdb->insert('rv_notifications', $notification);
+            $this->_notification->write($this->_notificationConstant::VACANCY_PUBLISHED, $request['user_id'], [
+                'id'    => $vacancyModel->vacancy_id,
+                'slug'  => $vacancyModel->getSlug()
+            ]);
 
             return [
                 "status" => 201,
