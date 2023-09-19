@@ -50,7 +50,15 @@ class CronCustomize
         $expired_posts = maybe_unserialize(get_option('job_expires'));
 
         error_log('Start call');
-        $this->_expired_after_5_days($expired_posts);
+        // $this->_expired_after_5_days($expired_posts);
+        
+        // ? +7 days before
+        $this->_expired_after_in_days($expired_posts, 7);
+        // ? +5 days before
+        $this->_expired_after_in_days($expired_posts, 5);
+        // ? +3 days before
+        $this->_expired_after_in_days($expired_posts, 3);
+
         $this->_expired_posts_handle($expired_posts);
         error_log('end call');
 
@@ -108,23 +116,24 @@ class CronCustomize
         return $expired_posts;
     }
 
-    private function _expired_after_5_days($expired_posts)
+    private function _expired_after_in_days($expired_posts, $in_days = 5, $template = 'reminder-5days-expire-company.php')
     {
         $today = $this->time_today;
-        $fiveDaysAfter = strtotime('+5 days', $today);
+        $text_time = sprintf('+%s days', $in_days);
+        $fewDaysAfter = strtotime($text_time, $today);
         // 2023-08-11
-        $dateFiveAfter = date('Y-m-d', $fiveDaysAfter);
-        $expired_posts = array_filter($expired_posts, function ($el) use ($dateFiveAfter) {
+        $dateAfter = date('Y-m-d', $fewDaysAfter);
+        $expired_posts = array_filter($expired_posts, function ($el) use ($dateAfter) {
             $time = strtotime($el['expired_at']);
             $date = date('Y-m-d', $time);
-            return $date == $dateFiveAfter;
+            return $date == $dateAfter;
         });
 
         if (!$expired_posts) return;
-        error_log("[notify][expired +5 days] today is " . date('Y-m-d'));
-        error_log("[notify][expired +5 days] will expired at " . $dateFiveAfter);
+        error_log("[notify][expired '. $text_time .'] today is " . date('Y-m-d'));
+        error_log("[notify][expired '. $text_time .'] will expired at " . $dateAfter);
 
-        error_log('[notify][expired +5 days] posts: ' . json_encode($expired_posts, JSON_PRETTY_PRINT));
+        error_log('[notify][expired '. $text_time .'] posts: ' . json_encode($expired_posts, JSON_PRETTY_PRINT));
 
         foreach ($expired_posts as $in => $the_post) {
             $post = get_post($the_post['post_id']);
@@ -137,14 +146,14 @@ class CronCustomize
                 'Content-Type: text/html; charset=UTF-8',
             );
 
-            $content = Email::render_html_email('reminder-5days-expire-company.php', $args);
+            $content = Email::render_html_email($template, $args);
 
             $site_title = get_bloginfo('name');
             $is_success = wp_mail($user->user_email, "Reminder verlopen vacature - $site_title", $content, $headers);
 
-            error_log('[notify][expired +5 day] sending email to ' . $user->user_email);
-            error_log('[notify][expired +5 day] sending email status (' . ($is_success ? 'success' : 'failed') . ')');
-            error_log('[notify][expired +5 day] unset post_id: ' . $the_post['post_id']);
+            error_log('[notify][expired '. $text_time .'] sending email to ' . $user->user_email);
+            error_log('[notify][expired '. $text_time .'] sending email status (' . ($is_success ? 'success' : 'failed') . ')');
+            error_log('[notify][expired '. $text_time .'] unset post_id: ' . $the_post['post_id']);
 
             /** Create notification : vacancy is expired in 5 days */
             $this->_notification->write($this->_notificationConstant::VACANCY_EXPIRED_5, $post->post_author, [
