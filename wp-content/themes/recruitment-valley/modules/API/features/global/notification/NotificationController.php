@@ -3,6 +3,7 @@
 namespace Global\Notification;
 
 use WP_Error;
+use WP_REST_Request;
 
 class NotificationController
 {
@@ -54,6 +55,16 @@ class NotificationController
                 ]
             ]
         ];
+    }
+
+    public function store( WP_REST_Request $request )
+    {
+
+    }
+
+    public function delete( WP_REST_Request $request )
+    {
+
     }
 
     public function read($request)
