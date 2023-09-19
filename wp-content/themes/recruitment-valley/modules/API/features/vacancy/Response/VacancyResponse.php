@@ -145,7 +145,9 @@ class VacancyResponse
                     "title" => $vacancyModel->getApplicationProcessTitle(),
                     "text" => $vacancyModel->getApplicationProcessDescription(),
                     "steps" => $vacancyModel->getApplicationProcessStep()
-                ]
+                ],
+                "longitude" => $vacancyModel->getPlacementAddressLongitude(),
+                "latitude" => $vacancyModel->getPlacementAddressLatitude()
             ];
         } else {
             /** Anggit's original response (unchanged) */
@@ -203,6 +205,8 @@ class VacancyResponse
                 // "postedDate" => $vacancyModel->getPublishDate("Y-m-d H:i A"),
                 "postedDate" => $vacancyModel->getPublishDate("d-m-Y H:i"),
                 "expiredDate" => $vacancyModel->getExpiredAt("d-m-Y H:i"),
+                "longitude" => $vacancyModel->getPlacementAddressLongitude(),
+                "latitude" => $vacancyModel->getPlacementAddressLatitude(),
                 "applicationProcedure" => [
                     "title" => $vacancyModel->getApplicationProcessTitle(),
                     "text" => $vacancyModel->getApplicationProcessDescription(),

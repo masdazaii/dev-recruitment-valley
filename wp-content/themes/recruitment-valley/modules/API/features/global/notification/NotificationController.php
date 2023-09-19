@@ -54,7 +54,7 @@ class NotificationController
 
         if (count($results) <= 0) {
             return [
-                "status"    => 204,
+                "status"    => 200,
                 "message"   => "Notification not found",
                 "data"      => []
             ];
