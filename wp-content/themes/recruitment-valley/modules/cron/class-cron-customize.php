@@ -13,6 +13,8 @@
 
 use BD\Emails\Email;
 use Vacancy\Vacancy;
+use constant\NotificationConstant;
+use Global\NotificationService;
 
 defined('ABSPATH') || die("Can't access directly");
 
@@ -20,9 +22,14 @@ defined('ABSPATH') || die("Can't access directly");
 class CronCustomize
 {
     protected $time_today, $fiveDayAfter;
+    private $_notification;
+    private $_notificationConstant;
+
     public function __construct()
     {
         add_action('init', [$this, 'create_cron_job']);
+        $this->_notification = new NotificationService();
+        $this->_notificationConstant = new NotificationConstant();
     }
 
     public function create_cron_job()
@@ -97,6 +104,13 @@ class CronCustomize
             error_log('[notify][expired vacancy] sending email to ' . $user->user_email);
             error_log('[notify][expired vacancy] sending email status (' . ($is_success ? 'success' : 'failed') . ')');
             error_log('[notify][expired vacancy] unset post_id: ' . $the_post['post_id']);
+
+            /** Create notification : vacancy is expired */
+            $this->_notification->write($this->_notificationConstant::VACANCY_EXPIRED, $post->post_author, [
+                'id'    => $the_post['post_id'],
+                'title' => $post->post_title,
+                'slug'  => $post->post_name
+            ]);
         }
 
         return $expired_posts;
@@ -140,6 +154,13 @@ class CronCustomize
             error_log('[notify][expired '. $text_time .'] sending email to ' . $user->user_email);
             error_log('[notify][expired '. $text_time .'] sending email status (' . ($is_success ? 'success' : 'failed') . ')');
             error_log('[notify][expired '. $text_time .'] unset post_id: ' . $the_post['post_id']);
+
+            /** Create notification : vacancy is expired in 5 days */
+            $this->_notification->write($this->_notificationConstant::VACANCY_EXPIRED_5, $post->post_author, [
+                'id'    => $the_post['post_id'],
+                'title' => $post->post_title,
+                'slug'  => $post->post_name
+            ]);
 
             unset($expired_posts[$in]);
         }

@@ -2,6 +2,10 @@
 
 namespace Global;
 
+// require_once MODULES_DIR . "/API/features/global/notification/NotificationService.php";
+// require_once MODULES_URL . "/API/features/global/notification/NotificationService.php";
+// error_log(MODULES_URL . "/API/features/global/notification/NotificationService.php");
+// error_log(MODULES_DIR . "/API/features/global/notification/NotificationService.php");
 require_once get_stylesheet_directory() . "/vendor/firebase/php-jwt/src/JWT.php";
 
 use BD\Emails\Email;
@@ -11,16 +15,22 @@ use Firebase\JWT\Key;
 use DateTimeImmutable;
 use JWTHelper;
 use Model\Company;
+use constant\NotificationConstant;
+use Global\NotificationService;
 
 class LoginController
 {
     private $_message;
 
-    private $reset_password_url = FRONTEND_URL ."/autorisatie/nieuw-wachtwoord";
+    private $reset_password_url = FRONTEND_URL . "/autorisatie/nieuw-wachtwoord";
+    private $_notification;
+    private $_notificationConstant;
 
     public function __construct()
     {
         $this->_message = new Message;
+        $this->_notification = new NotificationService();
+        $this->_notificationConstant = new NotificationConstant();
     }
 
     public function login($request)
@@ -36,36 +46,35 @@ class LoginController
 
         $isDeleted = get_user_meta($user->ID, "is_deleted", true);
 
-        if($isDeleted)
-        {
+        if ($isDeleted) {
             // if(time() > get_user_meta( $user->ID, "reactivation_datetime", true ))
             // {
-                $date = new DateTimeImmutable();
-                $expired = $date->modify("+2 hours")->getTimestamp();
+            $date = new DateTimeImmutable();
+            $expired = $date->modify("+2 hours")->getTimestamp();
 
-                $args = [
-                    "reactivation_link" => FRONTEND_URL. "/autorisatie/heractiveer-account?token=". JWTHelper::generate(["user_id" => $user->ID, "exp" => $expired ]),
-                    "user_name" => $user->user_nicename
-                ];
+            $args = [
+                "reactivation_link" => FRONTEND_URL . "/autorisatie/heractiveer-account?token=" . JWTHelper::generate(["user_id" => $user->ID, "exp" => $expired]),
+                "user_name" => $user->user_nicename
+            ];
 
-                $content = Email::render_html_email('reactivation-email.php', $args);
+            $content = Email::render_html_email('reactivation-email.php', $args);
 
-                $headers = array(
-                    'Content-Type: text/html; charset=UTF-8',
-                );
+            $headers = array(
+                'Content-Type: text/html; charset=UTF-8',
+            );
 
-                wp_mail($user->user_email, "Reactivate Acccount Email",$content, $headers);
-    
-                update_user_meta(
-                    $user->ID, 
-                    "reactivation_datetime",
-                    $expired
-                );
+            wp_mail($user->user_email, "Reactivate Acccount Email", $content, $headers);
 
-                return [
-                    "message" => $this->_message->get('auth.reactivation_sent'),
-                    "status" => 400
-                ];
+            update_user_meta(
+                $user->ID,
+                "reactivation_datetime",
+                $expired
+            );
+
+            return [
+                "message" => $this->_message->get('auth.reactivation_sent'),
+                "status" => 400
+            ];
             // }
 
             return [
@@ -230,6 +239,11 @@ class LoginController
 
         $email_sent = Email::send($user->user_email, $subject, $args, 'reset-password.php');
 
+        /** Create notification : payment success */
+        $this->_notification->write($this->_notificationConstant::ACCOUNT_PASSWORD_FORGOT, $user->ID, [
+            'id' => $user->ID
+        ]);
+
         if ($email_sent) {
             return [
                 "status" => 200,
@@ -294,6 +308,11 @@ class LoginController
 
         reset_password($user, $newPassword);
         update_user_meta($user->ID, "reset_password_key", ''); // Added Line
+
+        /** Create notification : payment success */
+        $this->_notification->write($this->_notificationConstant::ACCOUNT_PASSWORD_RESET, $user->ID, [
+            'id' => $user->ID
+        ]);
 
         return [
             "status" => 200,

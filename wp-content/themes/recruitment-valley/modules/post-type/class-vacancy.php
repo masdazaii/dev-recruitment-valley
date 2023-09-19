@@ -5,10 +5,14 @@ namespace PostType;
 use Constant\Message;
 use DateTimeImmutable;
 use Vacancy\Vacancy as VacancyModel;
+use constant\NotificationConstant;
+use Global\NotificationService;
 
 class Vacancy extends RegisterCPT
 {
     private $_message;
+    private $_notification;
+    private $_notificationConstant;
     public $wpdb;
 
     public function __construct()
@@ -19,6 +23,8 @@ class Vacancy extends RegisterCPT
 
         global $wpdb;
         $this->wpdb = $wpdb;
+        $this->_notification = new NotificationService();
+        $this->_notificationConstant = new NotificationConstant();
     }
 
     public function RegisterVacancyCPT()
@@ -93,51 +99,29 @@ class Vacancy extends RegisterCPT
         $post = get_post($object_id, 'object');
         if ($post->post_type == 'vacancy') {
             $openTerm = get_term_by('slug', 'open', 'status', 'OBJECT');
+            $declineTerm = get_term_by('slug', 'declined', 'status', 'OBJECT');
+            $vacancyModel = new VacancyModel($object_id);
 
             if ($taxonomy === 'status' && in_array($openTerm->term_id, $terms)) {
+
                 if (!get_field('is_paid', $object_id, true)) {
-                    $vacancyModel = new VacancyModel($object_id);
                     $today = new DateTimeImmutable("now");
                     $vacancyModel->setProp($vacancyModel->acf_expired_at, $today->modify("+30 days")->format("Y-m-d H:i:s"));
+
+                    /** Create notification : vacancy is approved */
+                    $this->_notification->write($this->_notificationConstant::VACANCY_PUBLISHED, $vacancyModel->getAuthor(), [
+                        'id'    => $object_id,
+                        'slug'  => $vacancyModel->getSlug()
+                    ]);
                 }
+            }
 
+            if ($taxonomy === 'status' && in_array($declineTerm->term_id, $terms)) {
                 /** Create notification : vacancy is approved */
-                // $current = new \DateTime("now", new \DateTimeZone('UTC'));
-                // $notification = [
-                //     'notification_title' => $this->_message->get("De vacature is goedgekeurd"),
-                //     'notification_body'  => $this->_message->get("Congratulations! your post has been published successfully"),
-                //     'read_status'   => 'false',
-                //     'recipient_id'  => $post->post_author,
-                //     'recipient_role'    => 'user',
-                //     'created_at'        => date('Y-m-d H:i:s'),
-                //     'created_at_utc'    => $current->format('Y-m-d H:i:s'),
-                //     'notification_post_id' => $object_id
-                // ];
-
-                // $this->wpdb->query($this->wpdb->prepare("INSERT INTO `rv_notifications` (
-                //     `notification_title`,
-                //     `notification_body`,
-                //     `read_status`,
-                //     `recipient_id`,
-                //     `recipient_role`,
-                //     `created_at`,
-                //     `created_at_utc`,
-                //     `notification_post_id`) VALUES (
-                //        {$notification['notification_title']},
-                //        {$notification['notification_body']},
-                //        {$notification['read_status']},
-                //        {$notification['recipient_id']},
-                //        {$notification['recipient_role']},
-                //        {$notification['created_at']},
-                //        {$notification['created_at_utc']},
-                //        {$notification['notification_post_id']},
-                //     ) ON DUPLICATE KEY UPDATE
-                //     `notification_title` = VALUES(`notification_title`),
-                //     `notification_body` = VALUES(`notification_body`),
-                //     `read_status` = VALUES(`read_status`),
-                //     `created_at` = VALUES(`created_at`),
-                //     `created_at_utc` = VALUES(`created_at_utc`),
-                // "));
+                $this->_notification->write($this->_notificationConstant::VACANCY_REJECTED, $vacancyModel->getAuthor(), [
+                    'id'    => $object_id,
+                    'slug'  => $vacancyModel->getSlug()
+                ]);
             }
         }
     }
