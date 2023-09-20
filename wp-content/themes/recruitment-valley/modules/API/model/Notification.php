@@ -15,20 +15,18 @@ class Notification
     public $recipient;
     public $type;
 
-    public function __construct( $notificationId = false )
+    public function __construct($notificationId = false)
     {
         global $wpdb;
         $this->wpdb = $wpdb;
 
-        if($notificationId)
-        {
-            $query = "select * from rv_notifications where id = ". $notificationId .";";
+        if ($notificationId) {
+            $query = "select * from rv_notifications where id = " . $notificationId . ";";
             $notification = $this->wpdb->get_results($query);
-            if(count($notification) > 0)
-            {
+            if (count($notification) > 0) {
                 $this->notification = $notification[0];
-            }else{
-                throw new Exception(__("notification not found", "recruitment_valley"), 404 );
+            } else {
+                throw new Exception(__("notification not found", "recruitment_valley"), 404);
             }
         }
     }
@@ -53,29 +51,27 @@ class Notification
         return $this->notification->read_status == "0" ? false : true;
     }
 
-    public function setNotification( $notificationId )
+    public function setNotification($notificationId)
     {
-        if($notificationId)
-        {
-            $query = "select * from rv_notifications where id = ". $notificationId .";";
+        if ($notificationId) {
+            $query = "select * from rv_notifications where id = " . $notificationId . ";";
             $notification = $this->wpdb->get_results($query);
-            if(count($notification) > 0)
-            {
+            if (count($notification) > 0) {
                 $this->notification = $notification[0];
-            }else{
-                throw new Exception(__("notification not found", "recruitment_valley"), 404 );
+            } else {
+                throw new Exception(__("notification not found", "recruitment_valley"), 404);
             }
         }
     }
-    
+
     /**
-     * set (update) notification entry, make sure the notification id already set 
+     * set (update) notification entry, make sure the notification id already set
      *
      * @param  mixed $payload
      * @return void
      */
-    public function set( $payload, $where = [] )
+    public function set($payload, $where = [])
     {
-        $this->wpdb->update($this->table, $payload, $where);
+        return $this->wpdb->update($this->table, $payload, $where);
     }
 }

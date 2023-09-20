@@ -29,6 +29,12 @@ class NotificationService
         return ResponseHelper::build($response);
     }
 
+    public function readAll(WP_REST_Request $request)
+    {
+        $response = $this->_notificationController->readAll($request);
+        return ResponseHelper::build($response);
+    }
+
     /**
      * Write notification function
      *
@@ -48,6 +54,20 @@ class NotificationService
     public function countUnread(WP_REST_Request $request)
     {
         $response = $this->_notificationController->checkUnread($request);
+        return ResponseHelper::build($response);
+    }
+
+    /**
+     * Delete spesific or multiple function
+     *
+     * @param WP_REST_Request $request
+     * @return void
+     */
+    public function delete(WP_REST_Request $request)
+    {
+        $params = $request->get_params();
+
+        $response = $this->_notificationController->delete($params);
         return ResponseHelper::build($response);
     }
 }
