@@ -274,10 +274,10 @@ class Message
             ],
             'notification' => [
                 'get_success' => __("Succes ontvang meldingen!", THEME_DOMAIN),
-                'delete_success' => __("Notification deleted!", THEME_DOMAIN),
-                'delete_failed' => __("Failed to delete notification!", THEME_DOMAIN),
-                'read_all_success' => __("Success read all notification!", THEME_DOMAIN),
-                'read_all_failed' => __("Failed read all notification!", THEME_DOMAIN),
+                'delete_success' => __("Melding verwijderd!", THEME_DOMAIN),
+                'delete_failed' => __("Kennisgeving niet verwijderd!", THEME_DOMAIN),
+                'read_all_success' => __("Succes met het lezen van alle meldingen!", THEME_DOMAIN),
+                'read_all_failed' => __("Niet alle meldingen gelezen!", THEME_DOMAIN),
             ]
         ];
     }
