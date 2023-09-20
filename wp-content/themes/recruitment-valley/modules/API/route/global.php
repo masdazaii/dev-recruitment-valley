@@ -214,14 +214,26 @@ class GlobalEndpoint
                 'check_unread'  => [
                     'url'                   => '/notifications/check-unread',
                     'methods'               => 'GET',
-                    'permission_callback'   => [$authMiddleware, 'check_token'],
+                    'permission_callback'   => [$authMiddleware, 'authorize_both'],
                     'callback'              => [$notificationService, 'countUnread']
+                ],
+                'read_all_notifications' => [
+                    'url'                   => '/notifications/read-all',
+                    'methods'               => 'POST',
+                    'permission_callback'   => [$authMiddleware, 'authorize_both'],
+                    'callback'              => [$notificationService, 'readAll']
                 ],
                 'read_notification' => [
                     'url'                   => '/notification/read/(?P<notif_id>[-\w]+)',
                     'methods'               => 'PUT',
                     'permission_callback'   => [$authMiddleware, 'check_token'],
                     'callback'              => [$notificationService, 'read']
+                ],
+                'delete_notification' => [
+                    'url'                   => '/notifications/(?P<notif_id>[-\w]+)',
+                    'methods'               => 'DELETE',
+                    'permission_callback'   => [$authMiddleware, 'authorize_both'],
+                    'callback'              => [$notificationService, 'delete']
                 ],
                 // import endpoint test start here,
                 'flexfeed_import' => [

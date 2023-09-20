@@ -273,7 +273,11 @@ class Message
                 'invalid_post' => __("ongeldig bericht", THEME_DOMAIN),
             ],
             'notification' => [
-                'get_success' => __("Succes ontvang meldingen!", THEME_DOMAIN)
+                'get_success' => __("Succes ontvang meldingen!", THEME_DOMAIN),
+                'delete_success' => __("Notification deleted!", THEME_DOMAIN),
+                'delete_failed' => __("Failed to delete notification!", THEME_DOMAIN),
+                'read_all_success' => __("Success read all notification!", THEME_DOMAIN),
+                'read_all_failed' => __("Failed read all notification!", THEME_DOMAIN),
             ]
         ];
     }

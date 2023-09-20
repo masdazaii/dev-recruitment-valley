@@ -37,7 +37,11 @@ class NotificationController
 
         $filters['offset'] = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['perPage']));
 
-        $query = "SELECT rvn.id, rvn.notification_body, rvn.read_status, rvn.notification_type, rvn.created_at, rvn.data as notification_data FROM rv_notifications as rvn WHERE  rvn.recipient_id = {$userId} LIMIT {$filters["perPage"]} OFFSET {$filters["offset"]}";
+        /** Anggit's syntax */
+        // $query = "SELECT rvn.id, rvn.notification_body, rvn.read_status, rvn.notification_type, rvn.created_at, rvn.data as notification_data FROM rv_notifications as rvn WHERE  rvn.recipient_id = {$userId} LIMIT {$filters["perPage"]} OFFSET {$filters["offset"]}";
+
+        /** Changes start here */
+        $query = "SELECT rvn.id, rvn.notification_body, rvn.read_status, rvn.notification_type, rvn.created_at_utc, rvn.data as notification_data FROM rv_notifications as rvn WHERE rvn.recipient_id = {$userId} AND rvn.is_deleted <> 1 LIMIT {$filters["perPage"]} OFFSET {$filters["offset"]}";
 
         $countQuery = "select COUNT(id) as count  FROM rv_notifications where recipient_id = {$userId}";
 
@@ -72,7 +76,8 @@ class NotificationController
                 "message"    => $notification->notification_body,
                 "type"      => $notification->notification_type,
                 "isRead"    => $notification->read_status == "0" ? false : true,
-                "notificationData" => $notifData
+                "notificationData" => $notifData,
+                "createdAt" => strtotime($notification->created_at_utc) ?? null
             ];
 
             return $notif;
@@ -92,7 +97,8 @@ class NotificationController
             "data" => $notifications,
             "meta" => [
                 "currentPage" => intval($filters['page']) == 0 ? 1 : intval($filters['page']),
-                "totalPage" => floor($resultCount / intval($filters['perPage'])) == 0 ? 1 : floor($resultCount / intval($filters['perPage'])),
+                // "totalPage" => floor($resultCount / intval($filters['perPage'])) == 0 ? 1 : floor($resultCount / intval($filters['perPage'])), // anggit's syntax
+                "totalPage" => ceil($resultCount / intval($filters['perPage'])) == 0 ? 1 : ceil($resultCount / intval($filters['perPage'])), // changes started
                 "total" => (int) $resultCount
             ]
         ];
@@ -102,8 +108,43 @@ class NotificationController
     {
     }
 
-    public function delete(WP_REST_Request $request)
+    public function delete($request)
     {
+        $id = $request['notif_id'];
+        try {
+            $notification = new Notification($request['notif_id']);
+            $update = $notification->set(['is_deleted' => 1], ['id' => $request['notif_id']]);
+            if (!is_numeric($update) && !$update) {
+                error_log('failed to delete notification with id : ' . $request['notif_id'] . ' - error : ' . json_encode($update));
+                return [
+                    "status" => 400,
+                    "message" => $this->_message->get("notification.delete_failed")
+                ];
+            }
+
+            return [
+                "status"    => 200,
+                "message"   => $this->_message->get('notification.delete_success')
+            ];
+        } catch (WP_Error $wpe) {
+            error_log($wpe->get_error_message());
+            return [
+                "status" => 400,
+                "message" => $this->_message->get("notification.delete_failed")
+            ];
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return [
+                "status" => $e->getCode(),
+                "message" => $e->getMessage()
+            ];
+        } catch (Throwable $th) {
+            error_log($th->getMessage());
+            return [
+                "status" => 400,
+                "message" => $this->_message->get("notification.delete_failed")
+            ];
+        }
     }
 
     public function read($request)
@@ -149,9 +190,47 @@ class NotificationController
         }
     }
 
+    public function readAll($request)
+    {
+        try {
+            $notification = new Notification();
+            $update = $notification->set(['read_status' => 1], ['recipient_id' => $request['user_id']]);
+            if (!is_numeric($update) && !$update) {
+                error_log('failed to delete notification with id : ' . $request['notif_id'] . ' - error : ' . json_encode($update));
+                error_log('failed to read all notification - user : ' . $request['user_id']);
+                return [
+                    "status" => 400,
+                    "message" => $this->_message->get("notification.read_all_failed")
+                ];
+            }
+
+            return [
+                "status"    => 200,
+                "message"   => $this->_message->get('notification.read_all_success')
+            ];
+        } catch (WP_Error $wpe) {
+            error_log($wpe->get_error_message());
+            return [
+                "status" => 400,
+                "message" => $this->_message->get("notification.read_all_failed")
+            ];
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return [
+                "status" => $e->getCode(),
+                "message" => $e->getMessage()
+            ];
+        } catch (Throwable $th) {
+            error_log($th->getMessage());
+            return [
+                "status" => 400,
+                "message" => $this->_message->get("notification.read_all_failed")
+            ];
+        }
+    }
+
     public function write($type, $recipient, $data)
     {
-        error_log(json_encode($data));
         try {
             $current = new \DateTime("now", new \DateTimeZone('UTC'));
 
@@ -198,7 +277,7 @@ class NotificationController
 
     public function checkUnread($request)
     {
-        $userId = $request->user_id;
+        $userId = $request['user_id'];
         $queryCountUnread = "SELECT COUNT(id) as count_unread FROM rv_notifications where recipient_id = {$userId} AND read_status = '0'";
         $resultCount = $this->wpdb->get_results($queryCountUnread, OBJECT)[0]->count_unread;
 
