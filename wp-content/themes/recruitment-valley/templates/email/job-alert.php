@@ -568,8 +568,7 @@
                                                   " width="100" />
                                   </a>
                                 </p>
-                                <p style="margin: 0; padding-top: 12px;">
-                                  <a href="{{ application.unsubscribe.url }}" style="
+                                <p style="
                                       font-family: Neue Montreal Regular,
                                       Helvetica;
                                       font-size: 14px;
@@ -579,7 +578,11 @@
                                       text-decoration: none;
                                       color: #1F1F1F;
                                       margin: 0;
-                                  ">Uitschrijven</a>
+                                      padding-top: 12px;
+                                  ">
+                                  Wil je geen jobalerts meer ontvangen. Klik dan 
+                                  <a href="{{ application.unsubscribe.url }}">hier </a>
+                                  om je uit te schrijven
                                 </p>
                               </td>
                             </tr>
