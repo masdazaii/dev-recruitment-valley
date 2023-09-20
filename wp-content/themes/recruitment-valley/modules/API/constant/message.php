@@ -271,6 +271,9 @@ class Message
             ],
             'other' => [
                 'invalid_post' => __("ongeldig bericht", THEME_DOMAIN),
+            ],
+            'notification' => [
+                'get_success' => __("Succes ontvang meldingen!", THEME_DOMAIN)
             ]
         ];
     }
