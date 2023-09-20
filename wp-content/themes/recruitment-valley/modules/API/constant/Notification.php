@@ -28,25 +28,25 @@ class NotificationConstant
     {
         $this->list = [
             "vacancy" => [
-                "rejected"  => __("Unfortunately, your job post was rejected. Don\'t worry, you can repost them again by following our instruction.", THEME_DOMAIN),
-                "submitted" => __("Your job post has successfully sent, please wait a maximum of 2x24 hours for verifications from our admin.", THEME_DOMAIN),
-                "published" => __("Congratulations! your post has ben published successfully.", THEME_DOMAIN),
-                "expired_1" => __("will expire tommorow. Don't worry, you can extend with a premium post!", THEME_DOMAIN),
-                "expired_3" => __("will expire in 3 days.", THEME_DOMAIN),
-                "expired_7" => __("will expire in 7 days.", THEME_DOMAIN),
-                "expired_5" => __("will expire in 5 days.", THEME_DOMAIN),
-                "expired"   => __("has expired!", THEME_DOMAIN),
-                "applied"   => __("There is a candidate apply to your job :", THEME_DOMAIN)
+                "rejected"  => __("Helaas is je vacature afgewezen. Maak je geen zorgen, je kunt ze opnieuw plaatsen door onze instructies te volgen.", THEME_DOMAIN),
+                "submitted" => __("Uw vacature is succesvol verzonden. Wacht maximaal 2 x 24 uur op verificatie van onze beheerder.", THEME_DOMAIN),
+                "published" => __("Gefeliciteerd! Uw bericht is succesvol gepubliceerd.", THEME_DOMAIN),
+                "expired_1" => __("vervalt morgen. Maak je geen zorgen, je kunt verlengen met een premium post!", THEME_DOMAIN),
+                "expired_3" => __("vervalt over 3 dagen.", THEME_DOMAIN),
+                "expired_7" => __("vervalt over zeven dagen.", THEME_DOMAIN),
+                "expired_5" => __("vervalt over 5 dagen.", THEME_DOMAIN),
+                "expired"   => __("is verlopen!", THEME_DOMAIN),
+                "applied"   => __("Er is een kandidaat die op uw functie solliciteert: :", THEME_DOMAIN)
             ],
             "payment" => [
-                "successfull" => __("Payment success.", THEME_DOMAIN),
-                "confirmation" => __("Payment confirmation.", THEME_DOMAIN),
+                "successfull" => __("Gefeliciteerd! Uw betaling is succesvol verwerkt.", THEME_DOMAIN),
+                "confirmation" => __("Hierbij bevestigen wij uw aankoop Recruitment Valley. Bedankt voor uw vertrouwen. De factuur sturen wij u later per e-mail toe.", THEME_DOMAIN),
             ],
             "account" => [
-                "created" => __("Congratulations, you have finished registering your account! Your account is now ready to use.", THEME_DOMAIN),
-                "password_reset" => __("Your password is reseted!", THEME_DOMAIN),
-                "password_change" => __("Your password is changed!", THEME_DOMAIN),
-                "password_forgot" => __("There is a request to reset you account's password.")
+                "created" => __("Gefeliciteerd, u bent klaar met het registreren van uw account! Uw account is nu klaar voor gebruik.", THEME_DOMAIN),
+                "password_reset" => __("Uw wachtwoord is gereset!", THEME_DOMAIN),
+                "password_change" => __("Uw wachtwoord is gewijzigd!", THEME_DOMAIN),
+                "password_forgot" => __("Er is een verzoek om het wachtwoord van uw account opnieuw in te stellen.", THEME_DOMAIN)
             ],
         ];
     }
