@@ -2,6 +2,7 @@
 
 namespace Global;
 
+use Constant\Message;
 use Exception;
 use Model\Notification;
 use Throwable;
@@ -13,6 +14,7 @@ class NotificationController
 {
     public $wpdb;
     private $_body;
+    private $_message;
 
     public function __construct()
     {
@@ -20,6 +22,7 @@ class NotificationController
 
         $this->wpdb = $wpdb;
         $this->_body = new NotificationConstant();
+        $this->_message = new Message();
     }
 
     public function list($request)
@@ -34,7 +37,7 @@ class NotificationController
 
         $filters['offset'] = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['perPage']));
 
-        $query = "SELECT rvn.id, rvn.notification_body, rvn.read_status, rvn.notification_type, rvn.created_at FROM rv_notifications as rvn WHERE  rvn.recipient_id = {$userId} LIMIT {$filters["perPage"]} OFFSET {$filters["offset"]}";
+        $query = "SELECT rvn.id, rvn.notification_body, rvn.read_status, rvn.notification_type, rvn.created_at, rvn.data as notification_data FROM rv_notifications as rvn WHERE  rvn.recipient_id = {$userId} LIMIT {$filters["perPage"]} OFFSET {$filters["offset"]}";
 
         $countQuery = "select COUNT(id) as count  FROM rv_notifications where recipient_id = {$userId}";
 
@@ -44,12 +47,35 @@ class NotificationController
         $notificationCount = 0;
 
         $notifications = array_map(function ($notification) {
-            return [
-                "id" => (int) $notification->id,
-                "message" => $notification->notification_body,
-                "type" => $notification->notification_type,
-                "isRead" => $notification->read_status == "0" ? false : true,
+            /** Anggit's syntax start here */
+            // return [
+            //     "id" => (int) $notification->id,
+            //     "message" => $notification->notification_body,
+            //     "type" => $notification->notification_type,
+            //     "isRead" => $notification->read_status == "0" ? false : true,
+            // ];
+
+            /** Changes start here */
+            $notifData = NULL;
+            if (strpos($notification->notification_type, 'vacancy') !== false) {
+                if (!empty($notification->notification_data)) {
+                    $data = maybe_unserialize($notification->notification_data);
+                    $notifData = [
+                        'id'    => (!empty($data) && array_key_exists('id', $data) ? $data['id'] : null),
+                        'slug'  => (!empty($data) && array_key_exists('slug', $data) ? $data['slug'] : null)
+                    ];
+                }
+            }
+
+            $notif = [
+                "id"        => (int)$notification->id,
+                "message"    => $notification->notification_body,
+                "type"      => $notification->notification_type,
+                "isRead"    => $notification->read_status == "0" ? false : true,
+                "notificationData" => $notifData
             ];
+
+            return $notif;
         }, $results);
 
         if (count($results) <= 0) {
@@ -69,24 +95,6 @@ class NotificationController
                 "totalPage" => floor($resultCount / intval($filters['perPage'])) == 0 ? 1 : floor($resultCount / intval($filters['perPage'])),
                 "total" => (int) $resultCount
             ]
-            // "data" => [
-            //     [
-            //         "id"    => 1,
-            //         "title" => "Notification title.",
-            //         "message"   => "Notification body message, Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit, perspiciatis.",
-            //         "isRead"    => false,
-            //         "time"      => '2023-12-13 23:59:59',
-            //         "timeUTC"   => '2023-12-13 16:59:59'
-            //     ],
-            //     [
-            //         "id"    => 2,
-            //         "title" => "Notification title.",
-            //         "message"   => "Notification body message, Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit, perspiciatis.",
-            //         "isRead"    => false,
-            //         "time"      => '2023-12-13 23:59:59',
-            //         "timeUTC"   => '2023-12-13 16:59:59'
-            //     ]
-            // ]
         ];
     }
 
@@ -162,6 +170,11 @@ class NotificationController
                     $message = $this->_body->get($type);
             }
 
+            $message = $this->_body->get($type);
+            if (strpos($type, 'vacancy') !== false) {
+                $message = str_replace('{job_title}', '"' . $data['title'] . '"', $message);
+            }
+
             $notification = [
                 'notification_body' => $message,
                 'notification_type' => $type,
@@ -181,5 +194,20 @@ class NotificationController
         } catch (Throwable $th) {
             error_log($th);
         }
+    }
+
+    public function checkUnread($request)
+    {
+        $userId = $request->user_id;
+        $queryCountUnread = "SELECT COUNT(id) as count_unread FROM rv_notifications where recipient_id = {$userId} AND read_status = '0'";
+        $resultCount = $this->wpdb->get_results($queryCountUnread, OBJECT)[0]->count_unread;
+
+        return [
+            "status"    => 200,
+            "message"   => $this->_message->get('notification.get_success'),
+            "data"      => [
+                "unreadNotifications" => (int)$resultCount ?? 0
+            ]
+        ];
     }
 }

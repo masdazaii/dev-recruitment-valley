@@ -29,8 +29,25 @@ class NotificationService
         return ResponseHelper::build($response);
     }
 
+    /**
+     * Write notification function
+     *
+     * this function only meant to called from another controller,
+     * to store / insert new notification.
+     *
+     * @param String $type : value is from NotificationConstant class
+     * @param Mixed $recipient String | Int
+     * @param array $data : Data to store in field "data"
+     * @return void
+     */
     public function write(String $type, Mixed $recipient, array $data)
     {
         return $this->_notificationController->write($type, $recipient, $data);
+    }
+
+    public function countUnread(WP_REST_Request $request)
+    {
+        $response = $this->_notificationController->checkUnread($request);
+        return ResponseHelper::build($response);
     }
 }

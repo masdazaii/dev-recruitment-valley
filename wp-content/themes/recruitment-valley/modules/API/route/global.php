@@ -211,6 +211,12 @@ class GlobalEndpoint
                     'permission_callback'   => [$authMiddleware, 'check_token'],
                     'callback'              => [$notificationService, 'list']
                 ],
+                'check_unread'  => [
+                    'url'                   => '/notifications/check-unread',
+                    'methods'               => 'GET',
+                    'permission_callback'   => [$authMiddleware, 'check_token'],
+                    'callback'              => [$notificationService, 'countUnread']
+                ],
                 'read_notification' => [
                     'url'                   => '/notification/read/(?P<notif_id>[-\w]+)',
                     'methods'               => 'PUT',

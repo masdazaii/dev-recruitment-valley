@@ -28,15 +28,15 @@ class NotificationConstant
     {
         $this->list = [
             "vacancy" => [
-                "rejected"  => __("Helaas is je vacature afgewezen. Maak je geen zorgen, je kunt ze opnieuw plaatsen door onze instructies te volgen.", THEME_DOMAIN),
-                "submitted" => __("Uw vacature is succesvol verzonden. Wacht maximaal 2 x 24 uur op verificatie van onze beheerder.", THEME_DOMAIN),
-                "published" => __("Gefeliciteerd! Uw bericht is succesvol gepubliceerd.", THEME_DOMAIN),
-                "expired_1" => __("vervalt morgen. Maak je geen zorgen, je kunt verlengen met een premium post!", THEME_DOMAIN),
-                "expired_3" => __("vervalt over 3 dagen.", THEME_DOMAIN),
-                "expired_7" => __("vervalt over zeven dagen.", THEME_DOMAIN),
-                "expired_5" => __("vervalt over 5 dagen.", THEME_DOMAIN),
-                "expired"   => __("is verlopen!", THEME_DOMAIN),
-                "applied"   => __("Er is een kandidaat die op uw functie solliciteert: :", THEME_DOMAIN)
+                "rejected"  => __("Helaas is je vacature {job_title} afgewezen. Maak je geen zorgen, je kunt ze opnieuw plaatsen door onze instructies te volgen.", THEME_DOMAIN),
+                "submitted" => __("Uw vacature {job_title} is succesvol verzonden. Wacht maximaal 2 x 24 uur op verificatie van onze beheerder.", THEME_DOMAIN),
+                "published" => __("Gefeliciteerd! Uw vacature {job_title} is succesvol gepubliceerd.", THEME_DOMAIN),
+                "expired_1" => __("{job_title} vervalt morgen. Maak je geen zorgen, je kunt verlengen met een premium post!", THEME_DOMAIN),
+                "expired_3" => __("{job_title} vervalt over 3 dagen.", THEME_DOMAIN),
+                "expired_7" => __("{job_title} vervalt over zeven dagen.", THEME_DOMAIN),
+                "expired_5" => __("{job_title} vervalt over 5 dagen.", THEME_DOMAIN),
+                "expired"   => __("{job_title} is verlopen!", THEME_DOMAIN),
+                "applied"   => __("Er is een kandidaat die op uw functie solliciteert: {job_title}", THEME_DOMAIN)
             ],
             "payment" => [
                 "successfull" => __("Gefeliciteerd! Uw betaling is succesvol verwerkt.", THEME_DOMAIN),

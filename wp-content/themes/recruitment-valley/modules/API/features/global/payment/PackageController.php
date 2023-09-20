@@ -146,6 +146,7 @@ class PackageController
                         'currency' => 'EUR', //current currency used by birdles
                         'product_data' => [
                             'name' => 'Pacakge Credit for user ' . $userId, // Product name, after the data provided it will be change by user filter name
+                            'description' => $package->getBenefit() ?? ' '
                         ],
                         'unit_amount' => $amount, // divide by 2 zero example ; 2000 it will converted to 20
                         'tax_behavior' => "exclusive",

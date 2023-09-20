@@ -11,21 +11,21 @@ class Package
     private $credit = "rv_package_credit_quantity";
     private $favorite = "is_favorit";
 
-    public function __construct( $packageId = false )
+    private $_acfBenefit = "rv_package_benefit";
+
+    public function __construct($packageId = false)
     {
-        if($packageId)
-        {
+        if ($packageId) {
             $this->package_id = $packageId;
 
             $package = get_post($packageId);
-            if($package)
-            {
+            if ($package) {
                 $this->package = $package;
             }
         }
     }
 
-    public function setPackageId( $packageId )
+    public function setPackageId($packageId)
     {
         $this->package_id = $packageId;
     }
@@ -67,8 +67,7 @@ class Package
         $price = $this->getPrice();
         $credit = $this->getCredit();
 
-        if(!is_numeric($credit))
-        {
+        if (!is_numeric($credit)) {
             return "unlimited";
         }
 
@@ -77,8 +76,13 @@ class Package
         return number_format((float) $priceperVacany, 2, '.', '');
     }
 
-    public function getProp( $field )
+    public function getProp($field)
     {
         return get_field($field, $this->package_id);
+    }
+
+    public function getBenefit()
+    {
+        return $this->getProp($this->_acfBenefit);
     }
 }
