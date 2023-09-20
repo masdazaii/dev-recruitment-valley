@@ -170,6 +170,11 @@ class NotificationController
                     $message = $this->_body->get($type);
             }
 
+            $message = $this->_body->get($type);
+            if (strpos($type, 'vacancy') !== false) {
+                $message = str_replace('{job_title}', '"' . $data['title'] . '"', $message);
+            }
+
             $notification = [
                 'notification_body' => $message,
                 'notification_type' => $type,

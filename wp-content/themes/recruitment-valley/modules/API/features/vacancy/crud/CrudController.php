@@ -365,7 +365,8 @@ class VacancyCrudController
             /** Create notification */
             $this->_notification->write($this->_notificationConstant::VACANCY_SUBMITTED, $request['user_id'], [
                 'id'    => $vacancyModel->vacancy_id,
-                'slug'  => $vacancyModel->getSlug()
+                'slug'  => $vacancyModel->getSlug(),
+                'title' => $vacancyModel->getTitle()
             ]);
 
             return [
@@ -530,7 +531,8 @@ class VacancyCrudController
             /** Create notification */
             $this->_notification->write($this->_notificationConstant::VACANCY_PUBLISHED, $request['user_id'], [
                 'id'    => $vacancyModel->vacancy_id,
-                'slug'  => $vacancyModel->getSlug()
+                'slug'  => $vacancyModel->getSlug(),
+                'title' => $vacancyModel->getTitle()
             ]);
 
             return [
@@ -841,7 +843,7 @@ class VacancyCrudController
                     "status" => [32] // set free job become pending category
                 ],
                 "application_process_step" => $request["applicationProcedureSteps"],
-                'rv_vacancy_country_code' => $request['countryCode'], // Added Line    
+                'rv_vacancy_country_code' => $request['countryCode'], // Added Line
                 "placementAddressLongitude" => $request["longitude"],
                 "placementAddressLatitude" => $request["latitude"],
             ];
@@ -855,7 +857,7 @@ class VacancyCrudController
                 "salary_end" => $request["salaryEnd"],
                 "external_url" => $request["externalUrl"],
                 "apply_from_this_platform" => isset($request["externalUrl"]) ? true : false,
-                "user_id" => $request["user_id"],    
+                "user_id" => $request["user_id"],
                 "placementAddressLongitude" => $request["longitude"],
                 "placementAddressLatitude" => $request["latitude"],
                 "taxonomy" => [

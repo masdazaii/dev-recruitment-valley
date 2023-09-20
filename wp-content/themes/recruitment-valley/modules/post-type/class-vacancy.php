@@ -111,7 +111,8 @@ class Vacancy extends RegisterCPT
                     /** Create notification : vacancy is approved */
                     $this->_notification->write($this->_notificationConstant::VACANCY_PUBLISHED, $vacancyModel->getAuthor(), [
                         'id'    => $object_id,
-                        'slug'  => $vacancyModel->getSlug()
+                        'slug'  => $vacancyModel->getSlug(),
+                        'title' => $vacancyModel->getTitle()
                     ]);
                 }
             }
@@ -120,7 +121,8 @@ class Vacancy extends RegisterCPT
                 /** Create notification : vacancy is approved */
                 $this->_notification->write($this->_notificationConstant::VACANCY_REJECTED, $vacancyModel->getAuthor(), [
                     'id'    => $object_id,
-                    'slug'  => $vacancyModel->getSlug()
+                    'slug'  => $vacancyModel->getSlug(),
+                    'title' => $vacancyModel->getTitle()
                 ]);
             }
         }

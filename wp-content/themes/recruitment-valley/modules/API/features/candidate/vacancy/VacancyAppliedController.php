@@ -142,7 +142,8 @@ class VacancyAppliedController
             $this->_notification->write($this->_notificationConstant::VACANCY_APPLIED, $company, [
                 'id'    => $request["vacancy"],
                 'slug'  => $vacancy->getSlug(),
-                'candidate_id' => $request["user_id"]
+                'title' => $vacancy->getTitle(),
+                'candidate_id' => $request["user_id"],
             ]);
 
             return [
