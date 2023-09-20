@@ -69,7 +69,7 @@ class NotificationController
 
             $notif = [
                 "id"        => (int)$notification->id,
-                "mesage"    => $notification->notification_body,
+                "message"    => $notification->notification_body,
                 "type"      => $notification->notification_type,
                 "isRead"    => $notification->read_status == "0" ? false : true,
                 "notificationData" => $notifData
