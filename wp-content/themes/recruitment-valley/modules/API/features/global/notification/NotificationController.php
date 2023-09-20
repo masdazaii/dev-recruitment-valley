@@ -39,11 +39,12 @@ class NotificationController
 
         /** Anggit's syntax */
         // $query = "SELECT rvn.id, rvn.notification_body, rvn.read_status, rvn.notification_type, rvn.created_at, rvn.data as notification_data FROM rv_notifications as rvn WHERE  rvn.recipient_id = {$userId} LIMIT {$filters["perPage"]} OFFSET {$filters["offset"]}";
+        // $countQuery = "select COUNT(id) as count  FROM rv_notifications where recipient_id = {$userId}";
 
         /** Changes start here */
         $query = "SELECT rvn.id, rvn.notification_body, rvn.read_status, rvn.notification_type, rvn.created_at_utc, rvn.data as notification_data FROM rv_notifications as rvn WHERE rvn.recipient_id = {$userId} AND rvn.is_deleted <> 1 LIMIT {$filters["perPage"]} OFFSET {$filters["offset"]}";
 
-        $countQuery = "select COUNT(id) as count  FROM rv_notifications where recipient_id = {$userId}";
+        $countQuery = "SELECT COUNT(id) AS count FROM rv_notifications WHERE recipient_id = {$userId} AND is_deleted <> 1";
 
         $results = $this->wpdb->get_results($query);
         $resultCount = $this->wpdb->get_results($countQuery, OBJECT)[0]->count;
@@ -278,7 +279,7 @@ class NotificationController
     public function checkUnread($request)
     {
         $userId = $request['user_id'];
-        $queryCountUnread = "SELECT COUNT(id) as count_unread FROM rv_notifications where recipient_id = {$userId} AND read_status = '0'";
+        $queryCountUnread = "SELECT COUNT(id) as count_unread FROM rv_notifications where recipient_id = {$userId} AND read_status = '0' AND is_deleted <> 1";
         $resultCount = $this->wpdb->get_results($queryCountUnread, OBJECT)[0]->count_unread;
 
         return [
