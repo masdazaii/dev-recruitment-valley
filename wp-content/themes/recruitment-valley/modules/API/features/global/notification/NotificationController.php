@@ -94,7 +94,7 @@ class NotificationController
 
         return [
             "status" => 200,
-            "message" => "success get notification!",
+            "message" => $this->_message->get("notification.get_success"),
             "data" => $notifications,
             "meta" => [
                 "currentPage" => intval($filters['page']) == 0 ? 1 : intval($filters['page']),
