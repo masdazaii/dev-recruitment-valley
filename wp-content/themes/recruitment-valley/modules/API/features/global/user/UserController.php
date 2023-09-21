@@ -9,17 +9,24 @@ use WP_REST_Request;
 use Candidate\Profile\Candidate;
 use Helper\UserHelper;
 use Model\Company;
+// use Global\NotificationService;
+// use constant\NotificationConstant;
 
 class UserController
 {
     private $_message = null;
     private $wpdb;
+    private $_notification;
+    private $_notificationConstant;
 
     public function __construct()
     {
         global $wpdb;
         $this->_message = new Message;
         $this->wpdb = $wpdb;
+
+        // $this->_notification = new NotificationService();
+        // $this->_notificationConstant = new NotificationConstant();
     }
 
     public function getUserNav($request)
@@ -142,6 +149,12 @@ class UserController
             update_user_meta($user->ID, 'is_deleted', true);
 
             $this->wpdb->query("COMMIT");
+
+            /** Create Notification : account deactivated */
+            // $this->_notification->write($this->_notificationConstant::ACCOUNT_DEACTIVATE, $user->ID, [
+            //     'id' => $user->ID
+            // ]);
+
             return [
                 "status" => 201,
                 "message" => $this->_message->get("profile.delete.success")
@@ -182,6 +195,11 @@ class UserController
             update_user_meta($userId, "is_deleted", false);
 
             $this->wpdb->query("COMMIT");
+
+            /** Create Notification : account reactivated */
+            // $this->_notification->write($this->_notificationConstant::ACCOUNT_DEACTIVATE, $userId, [
+            //     'id' => $userId
+            // ]);
 
             return [
                 "status" => 200,

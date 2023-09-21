@@ -20,6 +20,8 @@ class NotificationConstant
     const ACCOUNT_PASSWORD_RESET = "account.password_reset";
     const ACCOUNT_PASSWORD_CHANGE = "account.password_change";
     const ACCOUNT_PASSWORD_FORGOT = "account.password_forgot";
+    const ACCOUNT_DEACTIVATE = "account.deactivate";
+    const ACCOUNT_REACTIVATE = "account.reactivate";
 
     const PAYMENT_SUCCESSFULL = "payment.successfull";
     const PAYMENT_CONFIRMATION = "payment.confirmation";
@@ -46,7 +48,9 @@ class NotificationConstant
                 "created" => __("Gefeliciteerd, u bent klaar met het registreren van uw account! Uw account is nu klaar voor gebruik.", THEME_DOMAIN),
                 "password_reset" => __("Uw wachtwoord is gereset!", THEME_DOMAIN),
                 "password_change" => __("Uw wachtwoord is gewijzigd!", THEME_DOMAIN),
-                "password_forgot" => __("Er is een verzoek om het wachtwoord van uw account opnieuw in te stellen.", THEME_DOMAIN)
+                "password_forgot" => __("Er is een verzoek om het wachtwoord van uw account opnieuw in te stellen.", THEME_DOMAIN),
+                "deactivate" => __("Your account is deactivated at : {current_time}", THEME_DOMAIN),
+                "reactivate" => __("Congratulation! Your account has been reactivated.", THEME_DOMAIN),
             ],
         ];
     }
