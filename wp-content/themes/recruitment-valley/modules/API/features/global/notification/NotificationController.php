@@ -32,17 +32,32 @@ class NotificationController
             'status'    => $request['status'],
             'page'      => isset($request['page']) ? intval($request['page']) : 1,
             'perPage'   => isset($request['perPage']) ? intval($request['perPage']) : 7,
-            'isRead'    => $request['isRead'] ? ($request['isRead'] ? 1 : 0) : 0
+            'isRead'    => $request['isRead'] ? ($request['isRead'] ? 1 : 0) : 0,
+            // 'orderBy'   => isset($request['orderBy']) ? isset($request['orderBy']) : 'created_at_utc',
+            'order'     => isset($request['sort']) ? $request['sort'] : 'desc',
         ];
 
         $filters['offset'] = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['perPage']));
+
+        /** Order by */
+        if (isset($request['orderBy'])) {
+            switch ($request['']) {
+                case 'date':
+                    $filters['orderBy'] = 'created_at_utc';
+                    break;
+                default:
+                    $filters['orderBy'] = 'desc';
+            }
+        } else {
+            $filters['orderBy'] = 'created_at_utc';
+        }
 
         /** Anggit's syntax */
         // $query = "SELECT rvn.id, rvn.notification_body, rvn.read_status, rvn.notification_type, rvn.created_at, rvn.data as notification_data FROM rv_notifications as rvn WHERE  rvn.recipient_id = {$userId} LIMIT {$filters["perPage"]} OFFSET {$filters["offset"]}";
         // $countQuery = "select COUNT(id) as count  FROM rv_notifications where recipient_id = {$userId}";
 
         /** Changes start here */
-        $query = "SELECT rvn.id, rvn.notification_body, rvn.read_status, rvn.notification_type, rvn.created_at_utc, rvn.data as notification_data FROM rv_notifications as rvn WHERE rvn.recipient_id = {$userId} AND rvn.is_deleted <> 1 LIMIT {$filters["perPage"]} OFFSET {$filters["offset"]}";
+        $query = "SELECT rvn.id, rvn.notification_body, rvn.read_status, rvn.notification_type, rvn.created_at_utc, rvn.data as notification_data FROM rv_notifications as rvn WHERE rvn.recipient_id = {$userId} AND rvn.is_deleted <> 1 ORDER BY rvn.{$filters['orderBy']} {$filters['order']} LIMIT {$filters["perPage"]} OFFSET {$filters["offset"]}";
 
         $countQuery = "SELECT COUNT(id) AS count FROM rv_notifications WHERE recipient_id = {$userId} AND is_deleted <> 1";
 
@@ -74,7 +89,7 @@ class NotificationController
 
             $notif = [
                 "id"        => (int)$notification->id,
-                "message"    => $notification->notification_body,
+                "message"   => $notification->notification_body,
                 "type"      => $notification->notification_type,
                 "isRead"    => $notification->read_status == "0" ? false : true,
                 "notificationData" => $notifData,
