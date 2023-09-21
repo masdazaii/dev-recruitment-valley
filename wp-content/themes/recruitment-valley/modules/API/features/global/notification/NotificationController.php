@@ -81,21 +81,20 @@ class NotificationController
                         'slug'  => (!empty($data) && array_key_exists('slug', $data) ? $data['slug'] : null)
                     ];
                 }
-            } 
-            
+            }
+
             if (
                 strpos(
                     $notification->notification_type,
-                    $this->_notification_constant::PAYMENT_CONFIRMATION
+                    NotificationConstant::PAYMENT_CONFIRMATION
                 ) !== false
-            )
-            {
+            ) {
                 if (!empty($notification->notification_data)) {
                     $data = maybe_unserialize($notification->notification_data);
                     $notifData = [
                         "id" => $data["id"],
                         "paymentUrl" => $data["payment_url"],
-                        'expiredtAt' => $data["expired_at"]
+                        'expiredAt' => $data["expired_at"]
                     ];
                 }
             }
