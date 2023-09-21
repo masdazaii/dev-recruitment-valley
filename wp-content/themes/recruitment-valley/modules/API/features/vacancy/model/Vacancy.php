@@ -611,12 +611,12 @@ class Vacancy
         $this->setProp($this->acf_placement_address_longitude, $coordinat["long"]);
     }
 
-    public function setPlacementAddressLongitude( $latitude )
+    public function setPlacementAddressLatitude( $latitude )
     {
         $this->setProp($this->acf_placement_address_latitude, $latitude );
     }
 
-    public function setPlacementAddressLatitude( $longitude )
+    public function setPlacementAddressLongitude( $longitude )
     {
         $this->setProp($this->acf_placement_address_longitude, $longitude);
     }

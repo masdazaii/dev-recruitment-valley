@@ -9,12 +9,14 @@ use Throwable;
 use WP_Error;
 use WP_REST_Request;
 use constant\NotificationConstant;
+use JWTHelper;
 
 class NotificationController
 {
     public $wpdb;
     private $_body;
     private $_message;
+    private $_notification_constant;
 
     public function __construct()
     {
@@ -23,6 +25,7 @@ class NotificationController
         $this->wpdb = $wpdb;
         $this->_body = new NotificationConstant();
         $this->_message = new Message();
+        $this->_notification_constant = new NotificationConstant();
     }
 
     public function list($request)
@@ -41,7 +44,7 @@ class NotificationController
 
         /** Order by */
         if (isset($request['orderBy'])) {
-            switch ($request['']) {
+            switch ($request['orderBy']) {
                 case 'date':
                     $filters['orderBy'] = 'created_at_utc';
                     break;
@@ -67,13 +70,6 @@ class NotificationController
         $notificationCount = 0;
 
         $notifications = array_map(function ($notification) {
-            /** Anggit's syntax start here */
-            // return [
-            //     "id" => (int) $notification->id,
-            //     "message" => $notification->notification_body,
-            //     "type" => $notification->notification_type,
-            //     "isRead" => $notification->read_status == "0" ? false : true,
-            // ];
 
             /** Changes start here */
             $notifData = NULL;
@@ -84,6 +80,34 @@ class NotificationController
                         'id'    => (!empty($data) && array_key_exists('id', $data) ? $data['id'] : null),
                         'slug'  => (!empty($data) && array_key_exists('slug', $data) ? $data['slug'] : null)
                     ];
+                }
+            }
+
+            if (
+                strpos(
+                    $notification->notification_type,
+                    NotificationConstant::PAYMENT_CONFIRMATION
+                ) !== false
+            ) {
+                if (!empty($notification->notification_data)) {
+                    $data = maybe_unserialize($notification->notification_data);
+                    $notifData = [
+                        "id" => $data["id"],
+                        "paymentUrl" => $data["payment_url"],
+                        'expiredAt' => $data["expired_at"]
+                    ];
+                }
+            }
+
+            if ($notification->notification_type == NotificationConstant::PAYMENT_SUCCESSFULL) {
+                if (!empty($notification->notification_data)) {
+                    $data = maybe_unserialize($notification->notification_data);
+
+                    if (isset($data['transaction_id']) && isset($data['company_id'])) {
+                        $notifData = [
+                            'transactionId' => JWTHelper::generate(["transaction_id" => $data['transaction_id'] ?? null, "user_id" => $data['company_id']] ?? null, "+1 day")
+                        ];
+                    }
                 }
             }
 

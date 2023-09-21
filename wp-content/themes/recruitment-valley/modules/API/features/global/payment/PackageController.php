@@ -178,11 +178,13 @@ class PackageController
 
         $transaction->setTransactionStripeId($session->id);
 
-        // EmailHelper::sendPaymentConfirmation($transactionId); //temporary disable
+        EmailHelper::sendPaymentConfirmation($transactionId); //temporary disable
 
         /** Create notification : payment confirmation */
         $this->_notification->write($this->_notificationConstant::PAYMENT_CONFIRMATION, $company->getId(), [
-            'id' => $company->getId()
+            'id' => $transactionId,
+            'payment_url' => $session->url,
+            'expired_at' => $session->expires_at
         ]);
 
         return [
@@ -259,10 +261,10 @@ class PackageController
         // $endpoint_secret = 'whsec_3Z07iu7314TUwmpuohrnAEuV6BwcgcoT';
 
         /** Local */
-        // $endpoint_secret = 'whsec_02c7938964b4c50fc49380728f70538105c68b52df5a50da93130db4e6023ebf';
+        $endpoint_secret = 'whsec_02c7938964b4c50fc49380728f70538105c68b52df5a50da93130db4e6023ebf';
 
         /** Staging */
-        $endpoint_secret = 'whsec_3Z07iu7314TUwmpuohrnAEuV6BwcgcoT';
+        // $endpoint_secret = 'whsec_3Z07iu7314TUwmpuohrnAEuV6BwcgcoT';
 
         $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
 
@@ -383,7 +385,8 @@ class PackageController
 
             /** Create notification : payment success */
             $this->_notification->write($this->_notificationConstant::PAYMENT_SUCCESSFULL, $company->getId(), [
-                'id' => $company->getId()
+                'company_id' => $company->getId(), // company id
+                'transaction_id' => $transaction->getTransactionId()
             ]);
 
             return [
