@@ -182,7 +182,9 @@ class PackageController
 
         /** Create notification : payment confirmation */
         $this->_notification->write($this->_notificationConstant::PAYMENT_CONFIRMATION, $company->getId(), [
-            'id' => $company->getId()
+            'id' => $transactionId,
+            'payment_url' => $session->url,
+            'expiredt_at' => $session->expires_at
         ]);
 
         return [

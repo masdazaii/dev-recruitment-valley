@@ -15,6 +15,7 @@ class NotificationController
     public $wpdb;
     private $_body;
     private $_message;
+    private $_notification_constant;
 
     public function __construct()
     {
@@ -23,6 +24,7 @@ class NotificationController
         $this->wpdb = $wpdb;
         $this->_body = new NotificationConstant();
         $this->_message = new Message();
+        $this->_notification_constant = new NotificationConstant();
     }
 
     public function list($request)
@@ -67,13 +69,6 @@ class NotificationController
         $notificationCount = 0;
 
         $notifications = array_map(function ($notification) {
-            /** Anggit's syntax start here */
-            // return [
-            //     "id" => (int) $notification->id,
-            //     "message" => $notification->notification_body,
-            //     "type" => $notification->notification_type,
-            //     "isRead" => $notification->read_status == "0" ? false : true,
-            // ];
 
             /** Changes start here */
             $notifData = NULL;
@@ -83,6 +78,23 @@ class NotificationController
                     $notifData = [
                         'id'    => (!empty($data) && array_key_exists('id', $data) ? $data['id'] : null),
                         'slug'  => (!empty($data) && array_key_exists('slug', $data) ? $data['slug'] : null)
+                    ];
+                }
+            } 
+            
+            if (
+                strpos(
+                    $notification->notification_type,
+                    $this->_notification_constant::PAYMENT_CONFIRMATION
+                ) !== false
+            )
+            {
+                if (!empty($notification->notification_data)) {
+                    $data = maybe_unserialize($notification->notification_data);
+                    $notifData = [
+                        "id" => $data["id"],
+                        "paymentUrl" => $data["payment_url"],
+                        'expiredtAt' => $data["expired_at"]
                     ];
                 }
             }
