@@ -662,6 +662,7 @@ class VacancyCrudController
             }
 
             /** Changes start here */
+            $vacancyModel->setStatus('processing');
             $vacancyModel->setCityLongLat($payload["placement_city"]);
             // $vacancyModel->setAddressLongLat($payload["placement_address"]);
             $vacancyModel->setPlacementAddressLatitude($payload["placementAddressLatitude"]);
