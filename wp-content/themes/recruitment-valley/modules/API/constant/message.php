@@ -141,6 +141,7 @@ class Message
                     "free" => [
                         "success" => __("Gratis vacature is geupdate", THEME_DOMAIN),
                         "fail" => __("Het is niet gelukt om een gratis vacature aan te maken", THEME_DOMAIN),
+                        "on_process" => __("Kan vacature niet updaten terwijl vacature nog in behandeling is.", THEME_DOMAIN)
                     ],
                     "paid" => [
                         "success" => __("Premium vacature is geupdate", THEME_DOMAIN),
