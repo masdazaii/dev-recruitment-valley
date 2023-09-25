@@ -509,7 +509,7 @@ class Vacancy
             $tempTax = $tax->taxonomy;
             $taxField = [
                 "id" => $tax->term_id,
-                "name" => $tax->name
+                "name" => html_entity_decode($tax->name)
             ];
 
             if ($formatted) {
