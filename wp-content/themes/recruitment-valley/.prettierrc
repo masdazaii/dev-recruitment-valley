@@ -1,0 +1,40 @@
+{
+    "overrides": [
+        {
+            "files": [
+                "./react/**.{js,jsx}",
+                "webpack.config.js",
+                "webpack.config.babel.js"
+            ],
+            "options": {
+                "trailingComma": "all",
+                "tabWidth": 2,
+                "useTabs": false
+            }
+        },
+        {
+            "files": ["/assets/**.js"],
+            "options": {
+                "trailingComma": "all",
+                "tabWidth": 4,
+                "useTabs": false
+            }
+        },
+        {
+            "files": [
+                ".vscode/**",
+                ".babelrc",
+                ".prettierrc",
+                "jsconfig.json",
+                "**.{css,scss}",
+                "gulpfile.js",
+                "compiler.options.js"
+            ],
+            "options": {
+                "useTabs": false,
+                "tabWidth": 4,
+                "trailingComma": "all"
+            }
+        }
+    ]
+}

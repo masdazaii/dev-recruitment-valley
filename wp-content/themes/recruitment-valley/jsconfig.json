@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "resolveJsonModule": true,
+        "paths": {
+            "@bd-core/*": ["./assets/js/src/themes/core/*"],
+            "@bd-core": ["./assets/js/src/themes/core/index.js"],
+            "@bd-pages/*": ["./assets/js/src/themes/pages/*"],
+            "@bd-pages": ["./assets/js/src/themes/pages/index.js"],
+            "@bd-rooms/*": ["./assets/js/src/themes/rooms/*"],
+            "@bd-rooms": ["./assets/js/src/themes/rooms/index.js"],
+            "@bd-utils/*": ["./assets/js/src/themes/utils/*"],
+            "@bd-utils": ["./assets/js/src/themes/utils/index.js"],
+            "@bd-stores/*": ["./assets/js/src/themes/stores/*"],
+            "@bd-stores": ["./assets/js/src/themes/stores/index.js"]
+        }
+    }
+}

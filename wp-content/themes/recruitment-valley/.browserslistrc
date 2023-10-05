@@ -1,0 +1,28 @@
+# Check settings -> https://browserl.ist
+
+# Chrome : 2013
+# https://en.wikipedia.org/wiki/Google_Chrome_version_history
+
+# Firefox: 2012
+# https://website-archive.mozilla.org/www.mozilla.org/firefox_releasenotes/en-us/firefox/10.0/releasenotes/
+
+# Safari : 2013
+# https://en.wikipedia.org/wiki/Safari_version_history
+
+
+# ---------------------------------------
+# Write your settings below ...
+# ---------------------------------------
+
+last 2 versions
+chrome > 20
+firefox > 10
+safari >= 7
+ie >= 8
+# opera >= 11
+
+# Browser that up to 5% worldwide usage
+> 0.5%
+
+# ---------------------------------------
+# ---------------------------------------
