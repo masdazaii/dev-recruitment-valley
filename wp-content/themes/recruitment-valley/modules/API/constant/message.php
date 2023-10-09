@@ -287,6 +287,10 @@ class Message
                 'expired'       => __("Coupon already expired!", THEME_DOMAIN),
                 'not_available' => __("Coupon is no longer available!", THEME_DOMAIN),
                 'run_out'       => __("Coupons have run out!", THEME_DOMAIN),
+                'read_single_success' => __("Bericht is al gelezen", THEME_DOMAIN),
+                'read_not_authorize' => __("Bericht is al gelezen", THEME_DOMAIN),
+                'read_already' => __("Bericht is al gelezen", THEME_DOMAIN),
+                'read_single_failed' => __("Er is iets misgegaan bij het lezen van de notificatie", THEME_DOMAIN),
             ]
         ];
     }

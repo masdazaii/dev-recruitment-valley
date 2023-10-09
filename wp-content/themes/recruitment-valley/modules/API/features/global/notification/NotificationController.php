@@ -196,36 +196,36 @@ class NotificationController
             $notification = new Notification($notifId);
 
             if ($notification->getRecipientId() != $userId) {
-                throw new Exception(__("You doesnt have authorization to this notification", THEME_DOMAIN), 401);
+                throw new Exception($this->_message->get("notification.read_not_authorize"), 401);
             }
 
             if ($notification->getReadStatus()) {
-                throw new Exception(__("Message already read", THEME_DOMAIN), 200);
+                throw new Exception($this->_message->get("notification.read_already"), 200);
             }
 
             $notification->set(["read_status" => 1], ["id" => $notifId]);
 
             return [
                 "status" => 200,
-                "message" => "Message has been readed"
+                "message" => $this->_message->get("notification.read_already"),
             ];
         } catch (WP_Error $wpe) {
             error_log($wpe->get_error_message());
             return [
                 "status" => 400,
-                "message" => "Something error when reading notification"
+                "message" => $this->_message->get("read_single_failed"),
             ];
         } catch (Exception $e) {
             error_log($e->getMessage());
             return [
                 "status" => $e->getCode(),
-                "message" => $e->getMessage()
+                "message" => $this->_message->get("read_single_failed"),
             ];
         } catch (Throwable $th) {
             error_log($th->getMessage());
             return [
                 "status" => 400,
-                "message" => "Something error when reading notification"
+                "message" => $this->_message->get("read_single_failed")
             ];
         }
     }
@@ -311,7 +311,7 @@ class NotificationController
 
             return $result;
         } catch (Throwable $th) {
-            error_log($th);
+            error_log($th->getMessage());
         }
     }
 
