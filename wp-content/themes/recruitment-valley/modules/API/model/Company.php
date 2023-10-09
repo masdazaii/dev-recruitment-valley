@@ -266,7 +266,8 @@ class Company
         if (!empty($acf)) {
             $terms = get_terms([
                 'taxonomy' => $taxonomy,
-                'include' => $acf
+                'include' => $acf,
+                'hide_emtpy' => false
             ]);
 
             $termsResponse = [];

@@ -651,6 +651,17 @@ class VacancyCrudController
             $wpdb->query('START TRANSACTION');
             $vacancyModel = new Vacancy($vacancy_id);
 
+            /** Added line start here */
+            if ($vacancyModel->getStatus()['slug'] == 'processing') {
+                throw new Exception($this->_message->get("vacancy.update.free.on_process"));
+            }
+
+            $fromRejected = false;
+            if ($vacancyModel->getStatus()['slug'] == 'declined') {
+                $fromRejected = true;
+            }
+            /** Added line end here */
+
             $payload = $this->createFreeVacancyPayload($request);
 
             $vacancyModel->setTaxonomy($payload["taxonomy"]);
@@ -662,6 +673,10 @@ class VacancyCrudController
             }
 
             /** Changes start here */
+            if ($fromRejected) {
+                $vacancyModel->setStatus('processing');
+            }
+
             $vacancyModel->setCityLongLat($payload["placement_city"]);
             // $vacancyModel->setAddressLongLat($payload["placement_address"]);
             $vacancyModel->setPlacementAddressLatitude($payload["placementAddressLatitude"]);
@@ -669,6 +684,15 @@ class VacancyCrudController
             $vacancyModel->setDistance($payload["placement_city"], $payload["placement_city"] . " " . $payload["placement_address"]);
 
             $wpdb->query('COMMIT');
+
+            /** Create notification if current status is rejected */
+            if ($fromRejected) {
+                $this->_notification->write($this->_notificationConstant::VACANCY_SUBMITTED, $request['user_id'], [
+                    'id'    => $vacancyModel->vacancy_id,
+                    'slug'  => $vacancyModel->getSlug(),
+                    'title' => $vacancyModel->getTitle()
+                ]);
+            }
         } catch (\Throwable $th) {
             $wpdb->query('ROLLBACK');
 

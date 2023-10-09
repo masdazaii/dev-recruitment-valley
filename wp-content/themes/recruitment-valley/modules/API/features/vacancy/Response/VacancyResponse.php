@@ -311,6 +311,8 @@ class VacancyResponse
             "postedDate" => $vacancyModel->getPublishDate("Y-m-d H:i A"),
             "expiredDate" => $vacancyModel->getExpiredAt(),
             "socialMedia" => $socialMediaResponse,
+            "longitude" => $vacancyModel->getPlacementAddressLongitude(),
+            "latitude" => $vacancyModel->getPlacementAddressLatitude(),
             "applicationProcedure" =>  [
                 "title" => $vacancyModel->getApplicationProcessTitle(),
                 "text" => $vacancyModel->getApplicationProcessDescription(),

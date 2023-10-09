@@ -344,7 +344,8 @@ class Vacancy
 
         if (isset($status[0])) {
 
-            return ['term_id' =>  $status[0]->term_id, 'name' =>  $status[0]->name];
+            // return ['term_id' =>  $status[0]->term_id, 'name' =>  $status[0]->name]; // Changed Below
+            return ['term_id' =>  $status[0]->term_id, 'name' =>  $status[0]->name, 'slug' =>  $status[0]->slug]; // Changed Below
         }
 
         return ['term_id' => 0, 'name' =>  ""];
@@ -404,7 +405,8 @@ class Vacancy
         foreach ($taxonomies as $key => $taxonomy) {
             $terms = get_terms([
                 "taxonomy" => $taxonomy,
-                "object_ids" => $this->vacancy_id
+                "object_ids" => $this->vacancy_id,
+                "hide_empty" => false
             ]);
 
             if (count($terms) == 0) {
@@ -508,7 +510,7 @@ class Vacancy
             $tempTax = $tax->taxonomy;
             $taxField = [
                 "id" => $tax->term_id,
-                "name" => $tax->name
+                "name" => html_entity_decode($tax->name)
             ];
 
             if ($formatted) {
@@ -611,12 +613,12 @@ class Vacancy
         $this->setProp($this->acf_placement_address_longitude, $coordinat["long"]);
     }
 
-    public function setPlacementAddressLatitude( $latitude )
+    public function setPlacementAddressLatitude($latitude)
     {
-        $this->setProp($this->acf_placement_address_latitude, $latitude );
+        $this->setProp($this->acf_placement_address_latitude, $latitude);
     }
 
-    public function setPlacementAddressLongitude( $longitude )
+    public function setPlacementAddressLongitude($longitude)
     {
         $this->setProp($this->acf_placement_address_longitude, $longitude);
     }

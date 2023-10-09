@@ -66,7 +66,8 @@ class ProfileController
         // $sectors = Helper::isset($user_data_acf, 'ucma_sector');
         $terms = get_terms([
             'taxonomy' => 'sector',
-            'include' => Helper::isset($user_data_acf, 'ucma_sector') ?? []
+            'include' => Helper::isset($user_data_acf, 'ucma_sector') ?? [],
+            'hide_empty' => false
         ]);
         $termsResponse = [];
         foreach ($terms as $term) {
