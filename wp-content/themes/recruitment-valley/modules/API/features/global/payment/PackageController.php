@@ -414,9 +414,13 @@ class PackageController
                 try {
                     $coupon = new Coupon($transaction_data->metadata->coupon_id);
 
-                    $usedCount   = $coupon->getUsedCount();
-                    $usedCount[] = $user_id;
+                    $usedCount = $coupon->getUsedCount();
+                    $usedCount++;
+
+                    $usedBy   = $coupon->getUsedBy();
+                    $usedBy[] = $user_id;
                     update_post_meta($transaction_data->metadata->coupon_id, 'used_count', $usedCount);
+                    update_post_meta($transaction_data->metadata->coupon_id, 'used_by', $usedBy);
                 } catch (\WP_Error $error) {
                     return [
                         "status"    => 400,

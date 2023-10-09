@@ -37,6 +37,7 @@ class Coupon
     public $description = "description";
 
     private $metaUsedCount = "used_count";
+    private $metaUsedBy = "used_by";
 
     public function __construct($coupon_id = false)
     {
@@ -164,5 +165,10 @@ class Coupon
     public function getUsedCount()
     {
         return $this->getMeta($this->metaUsedCount);
+    }
+
+    public function getUsedBy()
+    {
+        return $this->getMeta($this->metaUsedBy);
     }
 }
