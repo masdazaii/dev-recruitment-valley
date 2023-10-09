@@ -279,6 +279,10 @@ class Message
                 'delete_failed' => __("Kennisgeving niet verwijderd!", THEME_DOMAIN),
                 'read_all_success' => __("Succes met het lezen van alle meldingen!", THEME_DOMAIN),
                 'read_all_failed' => __("Niet alle meldingen gelezen!", THEME_DOMAIN),
+                'read_single_success' => __("Bericht is al gelezen", THEME_DOMAIN),
+                'read_not_authorize' => __("Bericht is al gelezen", THEME_DOMAIN),
+                'read_already' => __("Bericht is al gelezen", THEME_DOMAIN),
+                'read_single_failed' => __("Er is iets misgegaan bij het lezen van de notificatie", THEME_DOMAIN),
             ]
         ];
     }
