@@ -137,13 +137,23 @@ class Coupon
             throw new Exception("Specify the coupon code!");
         }
     }
+    
     public function getUsedCount()
     {
-        return $this->getMeta($this->metaUsedCount);
+        $metaValue = $this->getMeta($this->metaUsedCount);
+        if (empty($metaValue) || !$metaValue) {
+            return 0;
+        }
+        return (int)$metaValue;
     }
+
     public function getUsedBy()
     {
-        return $this->getMeta($this->metaUsedBy);
+        $metaValue = $this->getMeta($this->metaUsedBy);
+        if (empty($metaValue) || !$metaValue) {
+            return [];
+        }
+        return $metaValue;
     }
 
     public function getProperties()
