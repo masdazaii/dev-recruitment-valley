@@ -279,6 +279,14 @@ class Message
                 'delete_failed' => __("Kennisgeving niet verwijderd!", THEME_DOMAIN),
                 'read_all_success' => __("Succes met het lezen van alle meldingen!", THEME_DOMAIN),
                 'read_all_failed' => __("Niet alle meldingen gelezen!", THEME_DOMAIN),
+            ],
+            'coupon' => [
+                'get_success'   => __("Success get coupons!", THEME_DOMAIN),
+                'get_failed'    => __("Failed get coupons!", THEME_DOMAIN),
+                'not_found'     => __("Coupon not found!", THEME_DOMAIN),
+                'expired'       => __("Coupon already expired!", THEME_DOMAIN),
+                'not_available' => __("Coupon is no longer available!", THEME_DOMAIN),
+                'run_out'       => __("Coupons have run out!", THEME_DOMAIN),
             ]
         ];
     }
