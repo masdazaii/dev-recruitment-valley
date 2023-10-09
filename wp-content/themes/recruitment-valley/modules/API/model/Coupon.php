@@ -148,7 +148,7 @@ class Coupon
 
     public function getProperties()
     {
-        return $this->properties;
+        return $this->porperties;
     }
 
     public function validate( $args )
