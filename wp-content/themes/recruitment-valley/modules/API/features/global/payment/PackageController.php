@@ -19,6 +19,7 @@ use Transaction;
 use WP_REST_Request;
 use constant\NotificationConstant;
 use Global\NotificationService;
+use Model\Coupon;
 
 require_once(get_template_directory() . '/vendor/autoload.php');
 
@@ -99,6 +100,44 @@ class PackageController
         $packagePrice = $package->getPrice();
         $pacakgeDescription = $package->getDescription();
 
+        /** Added line to calculate new price based on discount */
+        $couponID = false;
+        if (isset($request['coupon'])) {
+            try {
+                $coupon = new Coupon();
+                $coupon->setByCode($request['coupon']);
+
+                /** Calculate new price */
+                $discounType = $coupon->getDiscountType()['value'];
+                if ($discounType == $coupon::DISCOUNT_TYPE_PERCENTAGE_VALUE) {
+                    $discount = $coupon->getDiscountValue();
+                    $discount = ((float)$discount / 100) * (float)$packagePrice;
+                } else if ($discounType == $coupon::DISCOUNT_TYPE_FIX_AMOUNT_VALUE) {
+                    $discount = (float)$coupon->getDiscountValue();
+                } else {
+                    $discount = 0;
+                }
+
+                $packagePrice = (float)$packagePrice - $discount;
+                $couponID = $coupon->couponID;
+            } catch (\WP_Error $error) {
+                return [
+                    "status"    => 400,
+                    "message"   => $error->get_error_message()
+                ];
+            } catch (\Exception $e) {
+                return [
+                    "status"    => 400,
+                    "message"   => $e->getMessage()
+                ];
+            } catch (\Throwable $throw) {
+                return [
+                    "status"    => 400,
+                    "message"   => $throw->getMessage()
+                ];
+            }
+        }
+
         $secretKey = get_field("stripe_secret_key", "option");
         $stripe = new \Stripe\StripeClient($secretKey);
         $amount = $packagePrice * 100;
@@ -136,7 +175,8 @@ class PackageController
         $stripeMetadata = [
             "transaction_id" => $transaction->getTransactionId(),
             "user_id" => $company->getId(),
-            "package_id" => $package->getPackageId()
+            "package_id" => $package->getPackageId(),
+            "coupon_id" => $couponID ?? NULL
         ];
 
         $session = $stripe->checkout->sessions->create([
@@ -146,7 +186,7 @@ class PackageController
                         'currency' => 'EUR', //current currency used by birdles
                         'product_data' => [
                             'name' => 'Pacakge Credit for user ' . $userId, // Product name, after the data provided it will be change by user filter name
-                            'description' => $package->getBenefit() ?? ' '
+                            'description' => $package->getBenefit() ?? ' ',
                         ],
                         'unit_amount' => $amount, // divide by 2 zero example ; 2000 it will converted to 20
                         'tax_behavior' => "exclusive",
@@ -365,6 +405,35 @@ class PackageController
             /** Changes end here */
 
             $user = get_user_by('id', $user_id);
+
+            /** Add user meta when coupon is used */
+            // update_user_meta($user_id, 'used_count', );
+
+            /** Update coupon meta when coupon is used */
+            if ($transaction_data->metadata->coupon_id) {
+                try {
+                    $coupon = new Coupon($transaction_data->metadata->coupon_id);
+
+                    $usedCount   = $coupon->getUsedCount();
+                    $usedCount[] = $user_id;
+                    update_post_meta($transaction_data->metadata->coupon_id, 'used_count', $usedCount);
+                } catch (\WP_Error $error) {
+                    return [
+                        "status"    => 400,
+                        "message"   => $error->get_error_message()
+                    ];
+                } catch (\Exception $e) {
+                    return [
+                        "status"    => 400,
+                        "message"   => $e->getMessage()
+                    ];
+                } catch (\Throwable $throw) {
+                    return [
+                        "status"    => 400,
+                        "message"   => $throw->getMessage()
+                    ];
+                }
+            }
 
             $args = [
                 'client.name' => $user->display_name,

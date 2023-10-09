@@ -36,6 +36,8 @@ class Coupon
     public $discount_type = "discount_type";
     public $description = "description";
 
+    private $metaUsedCount = "used_count";
+
     public function __construct($coupon_id = false)
     {
         if ($coupon_id) {
@@ -66,10 +68,9 @@ class Coupon
      *
      * @param string $key   : acf / meta key
      * @param string $value : value to store
-     * @param string $type  : type of data to get, either meta or acf
      * @return mixed : either object, array
      */
-    public function get($key, $type = 'acf'): mixed
+    public function get($key): mixed
     {
         $key = $this->prefix . '_' . $key;
 
@@ -78,6 +79,11 @@ class Coupon
         }
 
         return get_field($key, $this->couponID, true);
+    }
+
+    public function getMeta($key, $single = true): mixed
+    {
+        return get_post_meta($this->couponID, $key, $single);
     }
 
     public function getExpiredAt(): int
@@ -129,39 +135,34 @@ class Coupon
     public function setByCode($code)
     {
         if (isset($code)) {
-            try {
-                $coupon = new WP_Query([
-                    'post_type'     => $this->slugCPT,
-                    'numberposts'   => 1,
-                    'meta_query'    => [
-                        [
-                            'key'   => $this->prefix . '_' . $this->code,
-                            'value' => $code,
-                            'compare'   => '='
-                        ]
+            $coupon = new WP_Query([
+                'post_type'     => $this->slugCPT,
+                'numberposts'   => 1,
+                'meta_query'    => [
+                    [
+                        'key'   => $this->prefix . '_' . $this->code,
+                        'value' => $code,
+                        'compare'   => '='
                     ]
-                ]);
+                ]
+            ]);
 
-                // print('<pre>' . print_r($coupon, true) . '</pre>');
-                // die;
+            if ($coupon->post_count > 0) {
 
-                if ($coupon->post_count > 0) {
-                    $this->couponID = $coupon->posts[0]->ID;
-                    $this->post     = $coupon->posts[0];
+                $this->couponID = $coupon->posts[0]->ID;
+                $this->post     = $coupon->posts[0];
 
-                    return true;
-                } else {
-                    throw new Exception("Coupon not found!");
-                }
-            } catch (\WP_Error $error) {
-                return $error;
-            } catch (\Exception $e) {
-                return $e;
-            } catch (\Throwable $throw) {
-                return $throw;
+                return true;
+            } else {
+                throw new Exception("Coupon not found!");
             }
         } else {
             throw new Exception("Specify the coupon code!");
         }
+    }
+
+    public function getUsedCount()
+    {
+        return $this->getMeta($this->metaUsedCount);
     }
 }

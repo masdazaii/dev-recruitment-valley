@@ -260,7 +260,7 @@ class GlobalEndpoint
                     'url'                   => 'coupons/validate',
                     'methods'               => 'POST',
                     'permission_callback'   => [$authMiddleware, 'authorize_company'],
-                    'callback'              => [$couponService, 'validate']
+                    'callback'              => [$couponService, 'apply']
                 ]
             ]
 
