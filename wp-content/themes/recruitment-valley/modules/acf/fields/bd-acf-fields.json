@@ -1330,6 +1330,46 @@
                 "step": 2,
                 "prepend": "",
                 "append": ""
+            },
+            {
+                "key": "field_6523bf27b11c2",
+                "label": "Coupon used",
+                "name": "transaction_coupon_used",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_6523c07220b0a",
+                "label": "Transaction total amount (before discount)",
+                "name": "transaction_total_amount_before_coupon_discount",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
             }
         ],
         "location": [

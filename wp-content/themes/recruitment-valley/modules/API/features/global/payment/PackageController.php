@@ -101,6 +101,7 @@ class PackageController
         $pacakgeDescription = $package->getDescription();
 
         /** Added line to calculate new price based on discount */
+        $packagePriceBeforeCoupon = $package->getPrice();
         $couponID = false;
         if (isset($request['coupon'])) {
             try {
@@ -163,6 +164,16 @@ class PackageController
         $transaction->setUserId($company->getId());
         $transaction->setPackageId($package->getPackageId());
         $transaction->setStatus("pending");
+
+        if (isset($request['coupon'])) {
+            $transaction->setTransactionAmountBeforeCoupon($packagePriceBeforeCoupon);
+            $transaction->setCouponData([
+                'title' => $coupon->getTitle(),
+                'code'  => $coupon->getCode(),
+                'discount_type'     => $coupon->getDiscountType(),
+                'discount_value'    => $coupon->getDiscountValue()
+            ]);
+        }
 
         $encodedTransactionID = JWTHelper::generate(
             [
