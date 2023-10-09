@@ -260,13 +260,13 @@ class PackageController
         $payload = @file_get_contents('php://input');
 
         /** Local */
-        // $endpoint_secret = 'whsec_810a0ac4101e64dd0507eeb60b53f0607db537584afd885691e7fd78019361c5';
+        $endpoint_secret = 'whsec_810a0ac4101e64dd0507eeb60b53f0607db537584afd885691e7fd78019361c5';
 
         /** Staging */
         // $endpoint_secret = 'whsec_sNleb1SSC34n3RmxQl9cIXsmlvSkwViL';
 
         /** Live */
-        $endpoint_secret = 'whsec_C5lTo64sQQDtJUErA64AERvtVm9dNZ7D';
+        // $endpoint_secret = 'whsec_C5lTo64sQQDtJUErA64AERvtVm9dNZ7D';
 
         $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
 
