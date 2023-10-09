@@ -4,6 +4,7 @@ namespace Global;
 
 use Constant\Message;
 use Model\Coupon;
+use Package;
 use WP_Error;
 use WP_Query;
 
@@ -195,14 +196,57 @@ class CouponController
      */
     public function apply($request)
     {
-        // $coupon = new Coupon();
-        /** Check Expiry */
+        try {
+            $coupon = new Coupon();
+            $coupon->setByCode($request['coupon']);
 
-        /** Get Coupon */
+            // Calculate Package Price
+            $package    = new Package($request['packageId']);
+            $price      = $package->getPrice();
 
-        /** Set Coupon & User meta */
+            // Get Discount
+            $discounType = $coupon->getDiscountType()['value'];
+            if ($discounType == $coupon::DISCOUNT_TYPE_PERCENTAGE_VALUE) {
+                $discount = $coupon->getDiscountValue();
+                $discount = ((float)$discount / 100) * (float)$price;
+            } else if ($discounType == $coupon::DISCOUNT_TYPE_FIX_AMOUNT_VALUE) {
+                $discount = (float)$coupon->getDiscountValue();
+            } else {
+                $discount = 0;
+            }
 
-        /** Decrease Coupon Availability */
+            $newPrice = (float)$price - $discount;
+
+            return [
+                "status"    => 200,
+                "message"   => $this->_message->get('coupon.apply_success'),
+                "data"      => [
+                    "coupon"    => [
+                        "title" => $coupon->getTitle(),
+                        "discountType"  => $discounType,
+                        "discountValue" => $coupon->getDiscountValue(),
+                        "discountPrice" => $discount,
+                    ],
+                    "packageOldPrice" => (float)$price,
+                    "packageNewPrice" => $newPrice
+                ]
+            ];
+        } catch (\WP_Error $error) {
+            return [
+                "status"    => 400,
+                "message"   => $error->get_error_message()
+            ];
+        } catch (\Exception $e) {
+            return [
+                "status"    => 400,
+                "message"   => $e->getMessage()
+            ];
+        } catch (\Throwable $throw) {
+            return [
+                "status"    => 400,
+                "message"   => $throw->getMessage()
+            ];
+        }
 
         return [
             "status"    => 200,

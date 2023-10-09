@@ -33,7 +33,8 @@ class CouponService
 
     public function apply(WP_REST_Request $request)
     {
-        $body = $request->get_body_params();
+        $body = $request->get_params();
+        // print('<pre>' . print_r($body, true) . '</pre>');
         $response = $this->_couponController->apply($body);
         return ResponseHelper::build($response);
     }

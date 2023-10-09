@@ -256,11 +256,11 @@ class GlobalEndpoint
                     'permission_callback'   => [$authMiddleware, 'authorize_company'],
                     'callback'              => [$couponService, 'list']
                 ],
-                'single_coupon' => [
-                    'url'                   => 'coupons/apply',
+                'validate_coupon' => [
+                    'url'                   => 'coupons/validate',
                     'methods'               => 'POST',
                     'permission_callback'   => [$authMiddleware, 'authorize_company'],
-                    'callback'              => [$couponService, 'apply']
+                    'callback'              => [$couponService, 'validate']
                 ]
             ]
 

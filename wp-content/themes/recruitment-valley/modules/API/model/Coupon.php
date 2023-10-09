@@ -8,6 +8,7 @@ use WP_Query;
 class Coupon
 {
     public $prefix = "coupon";
+    public $slugCPT = "coupon";
 
     const STATUS_AVAILABLE_VALUE = "available";
     const STATUS_AVAILABLE_LABEL = "Available";
@@ -71,7 +72,12 @@ class Coupon
     public function get($key, $type = 'acf'): mixed
     {
         $key = $this->prefix . '_' . $key;
-        return $this->porperties[$key];
+
+        if ($this->porperties && is_array($this->porperties) && array_key_exists($key, $this->porperties)) {
+            return $this->porperties[$key];
+        }
+
+        return get_field($key, $this->couponID, true);
     }
 
     public function getExpiredAt(): int
@@ -105,6 +111,15 @@ class Coupon
         return $this->get($this->discount_value);
     }
 
+    public function getTitle(): string
+    {
+        if ($this->post) {
+            return $this->post->post_title;
+        } else {
+            throw new Exception("Please specify the coupon!");
+        }
+    }
+
     /**
      * Set coupon by coupon code function
      *
@@ -114,14 +129,37 @@ class Coupon
     public function setByCode($code)
     {
         if (isset($code)) {
-            $coupon = new WP_Query([
-                'meta_query' => [
-                    'relation' => 'AND',
-                    [
-                        ''
+            try {
+                $coupon = new WP_Query([
+                    'post_type'     => $this->slugCPT,
+                    'numberposts'   => 1,
+                    'meta_query'    => [
+                        [
+                            'key'   => $this->prefix . '_' . $this->code,
+                            'value' => $code,
+                            'compare'   => '='
+                        ]
                     ]
-                ]
-            ]);
+                ]);
+
+                // print('<pre>' . print_r($coupon, true) . '</pre>');
+                // die;
+
+                if ($coupon->post_count > 0) {
+                    $this->couponID = $coupon->posts[0]->ID;
+                    $this->post     = $coupon->posts[0];
+
+                    return true;
+                } else {
+                    throw new Exception("Coupon not found!");
+                }
+            } catch (\WP_Error $error) {
+                return $error;
+            } catch (\Exception $e) {
+                return $e;
+            } catch (\Throwable $throw) {
+                return $throw;
+            }
         } else {
             throw new Exception("Specify the coupon code!");
         }
