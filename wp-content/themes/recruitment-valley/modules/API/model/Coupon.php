@@ -35,12 +35,6 @@ class Coupon
     public $discount_type = "discount_type";
     public $description = "description";
 
-    private $_couponDiscountValue;
-    private $_couponDiscountType;
-    private $_couponCode;
-
-
-
     public function __construct($coupon_id = false)
     {
         if ($coupon_id) {
@@ -63,7 +57,7 @@ class Coupon
      */
     public function set($key, $value, $type = 'acf'): mixed
     {
-        return  update_field($key, $value, $this->_couponCode);
+        return  update_field($key, $value, $this->couponID);
     }
 
     /**
@@ -109,5 +103,27 @@ class Coupon
     public function getDiscountValue(): int
     {
         return $this->get($this->discount_value);
+    }
+
+    /**
+     * Set coupon by coupon code function
+     *
+     * @param string $code
+     * @return void
+     */
+    public function setByCode($code)
+    {
+        if (isset($code)) {
+            $coupon = new WP_Query([
+                'meta_query' => [
+                    'relation' => 'AND',
+                    [
+                        ''
+                    ]
+                ]
+            ]);
+        } else {
+            throw new Exception("Specify the coupon code!");
+        }
     }
 }

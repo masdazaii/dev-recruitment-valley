@@ -4,6 +4,8 @@ namespace Global;
 
 use Constant\Message;
 use Model\Coupon;
+use WP_Error;
+use WP_Query;
 
 class CouponController
 {
@@ -61,13 +63,46 @@ class CouponController
         ];
 
         /** Get Coupons */
-        // $coupons = get_posts([
-        //     'post_type'     => $this->_slug,
-        //     'post_status'   => 'publish',
-        //     // 'orderby'       => 'meta_value_num',
-        //     // 'meta_key'      => 'rv_package_price',
-        //     'order'         => "ASC"
-        // ]);
+        // try {
+        //     $coupons = get_posts([
+        //         'post_type'     => $this->_slug,
+        //         'post_status'   => 'publish',
+        //         // 'orderby'       => 'meta_value_num',
+        //         // 'meta_key'      => 'rv_package_price',
+        //         'order'         => "ASC"
+        //     ]);
+        //     print('<pre>' . print_r($coupons, true) . '</pre>');
+        //     die;
+
+        //     // Set response data
+        //     $responseData = [];
+        //     if (!empty($coupons) && is_array($coupons)) {
+        //         foreach ($coupons as $coupon) {
+        //             try {
+        //                 $couponModel = new Coupon();
+
+        //                 $responseData[] = [
+        //                     'title' => $coupon->post_title,
+        //                     'code'  => $
+        //                 ];
+        //             } catch (\Exception $e) {
+        //                 error_log($e);
+        //             }
+        //         }
+        //     }
+
+        //     return [
+        //         "status"    => 200,
+        //         "message"   => $this->_message->get('coupon.get_success'),
+        //         "data"      => $responseData
+        //     ];
+        // } catch (WP_Error $error) {
+        //     return $error;
+        // } catch (\Exception $e) {
+        //     return $e;
+        // } catch (\Throwable $th) {
+        //     return $th;
+        // }
 
         return [
             "status"    => 200,
@@ -160,6 +195,7 @@ class CouponController
      */
     public function apply($request)
     {
+        // $coupon = new Coupon();
         /** Check Expiry */
 
         /** Get Coupon */
