@@ -405,7 +405,8 @@ class Vacancy
         foreach ($taxonomies as $key => $taxonomy) {
             $terms = get_terms([
                 "taxonomy" => $taxonomy,
-                "object_ids" => $this->vacancy_id
+                "object_ids" => $this->vacancy_id,
+                "hide_empty" => false
             ]);
 
             if (count($terms) == 0) {
