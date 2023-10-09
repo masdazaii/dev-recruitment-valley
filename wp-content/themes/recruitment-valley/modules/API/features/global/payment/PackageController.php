@@ -311,7 +311,7 @@ class PackageController
         $payload = @file_get_contents('php://input');
 
         /** Local */
-        $endpoint_secret = 'whsec_810a0ac4101e64dd0507eeb60b53f0607db537584afd885691e7fd78019361c5';
+        $endpoint_secret = 'whsec_02c7938964b4c50fc49380728f70538105c68b52df5a50da93130db4e6023ebf';
 
         /** Staging */
         // $endpoint_secret = 'whsec_sNleb1SSC34n3RmxQl9cIXsmlvSkwViL';
