@@ -16,6 +16,7 @@ use Sitemap\SitemapService;
 use Service\ParserService;
 use Vacancy\Import\ImportService;
 use Global\NotificationService;
+use Global\CouponService;
 
 class GlobalEndpoint
 {
@@ -45,6 +46,7 @@ class GlobalEndpoint
         $parserService = new ParserService;
         $importService = new ImportService;
         $notificationService = new NotificationService;
+        $couponService = new CouponService;
 
         $endpoint = [
             'path' => '',
@@ -247,6 +249,18 @@ class GlobalEndpoint
                     'methods'               => 'GET',
                     'permission_callback'   => '__return_true',
                     'callback'              => [$importService, 'nationaleVacatureBank']
+                ],
+                'list_coupon' => [
+                    'url'                   => 'coupons',
+                    'methods'               => 'GET',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company'],
+                    'callback'              => [$couponService, 'list']
+                ],
+                'validate_coupon' => [
+                    'url'                   => 'coupons/validate',
+                    'methods'               => 'POST',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company'],
+                    'callback'              => [$couponService, 'validate']
                 ]
             ]
 

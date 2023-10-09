@@ -8,6 +8,7 @@ use WP_Query;
 class Coupon
 {
     public $prefix = "coupon";
+    public $slugCPT = "coupon";
 
     const STATUS_AVAILABLE_VALUE = "available";
     const STATUS_AVAILABLE_LABEL = "Available";
@@ -34,22 +35,15 @@ class Coupon
     public $discount_value = "discount_value";
     public $discount_type = "discount_type";
     public $description = "description";
-    
-    private $_couponDiscountValue;
-    private $_couponDiscountType;
-    private $_couponCode;
-
-
 
     public function __construct($coupon_id = false)
     {
         if ($coupon_id) {
             $this->couponID = $coupon_id;
             $this->post = get_post($coupon_id);
-            $this->porperties = get_fields( $coupon_id );
+            $this->porperties = get_fields($coupon_id);
 
-            if(!$this->post)
-            {
+            if (!$this->post) {
                 throw new Exception("Coupon not found", 400);
             }
         }
@@ -64,7 +58,7 @@ class Coupon
      */
     public function set($key, $value, $type = 'acf'): mixed
     {
-        return  update_field($key, $value, $this->_couponCode);
+        return  update_field($key, $value, $this->couponID);
     }
 
     /**
@@ -77,38 +71,97 @@ class Coupon
      */
     public function get($key, $type = 'acf'): mixed
     {
-        $key = $this->prefix. '_' . $key;
-        return $this->porperties[$key];
+        $key = $this->prefix . '_' . $key;
+
+        if ($this->porperties && is_array($this->porperties) && array_key_exists($key, $this->porperties)) {
+            return $this->porperties[$key];
+        }
+
+        return get_field($key, $this->couponID, true);
     }
 
-    public function getExpiredAt() : int
+    public function getExpiredAt(): int
     {
         $date = $this->get($this->expiredAt);
         return strtotime($date);
     }
 
-    public function getCode() : string
+    public function getCode(): string
     {
         return $this->get($this->code);
     }
 
-    public function getDiscountType() : array
+    public function getDiscountType(): array
     {
         return $this->get($this->discount_type);
     }
 
-    public function getDescription() : string | null
+    public function getDescription(): string | null
     {
         return $this->get($this->description);
     }
 
-    public function getStatus() : array
+    public function getStatus(): array
     {
         return $this->get($this->status);
     }
 
-    public function getDiscountValue() : int
+    public function getDiscountValue(): int
     {
         return $this->get($this->discount_value);
+    }
+
+    public function getTitle(): string
+    {
+        if ($this->post) {
+            return $this->post->post_title;
+        } else {
+            throw new Exception("Please specify the coupon!");
+        }
+    }
+
+    /**
+     * Set coupon by coupon code function
+     *
+     * @param string $code
+     * @return void
+     */
+    public function setByCode($code)
+    {
+        if (isset($code)) {
+            try {
+                $coupon = new WP_Query([
+                    'post_type'     => $this->slugCPT,
+                    'numberposts'   => 1,
+                    'meta_query'    => [
+                        [
+                            'key'   => $this->prefix . '_' . $this->code,
+                            'value' => $code,
+                            'compare'   => '='
+                        ]
+                    ]
+                ]);
+
+                // print('<pre>' . print_r($coupon, true) . '</pre>');
+                // die;
+
+                if ($coupon->post_count > 0) {
+                    $this->couponID = $coupon->posts[0]->ID;
+                    $this->post     = $coupon->posts[0];
+
+                    return true;
+                } else {
+                    throw new Exception("Coupon not found!");
+                }
+            } catch (\WP_Error $error) {
+                return $error;
+            } catch (\Exception $e) {
+                return $e;
+            } catch (\Throwable $throw) {
+                return $throw;
+            }
+        } else {
+            throw new Exception("Specify the coupon code!");
+        }
     }
 }
