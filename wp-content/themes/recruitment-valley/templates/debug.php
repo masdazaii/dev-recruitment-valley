@@ -12,11 +12,6 @@ defined( 'ABSPATH' ) || die( "Can't access directly" );
 
 $notification = new Coupon(627);
 echo '<pre>';
-var_dump($notification->getCode());
-var_dump($notification->getDescription());
-var_dump($notification->getExpiredAt());
-var_dump($notification->getDiscountType());
-var_dump($notification->getDiscountValue());
-var_dump($notification->getStatus());
+var_dump($notification->getProperties());
 echo '</pre>';die;
 ?>
