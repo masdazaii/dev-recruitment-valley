@@ -129,6 +129,7 @@ class Coupon
             if ($coupon->post_count > 0) {
                 $this->couponID = $coupon->posts[0]->ID;
                 $this->post     = $coupon->posts[0];
+                $this->porperties = get_fields($coupon->posts[0]->ID);
                 return true;
             } else {
                 throw new Exception("Coupon not found!");
@@ -136,6 +137,13 @@ class Coupon
         } else {
             throw new Exception("Specify the coupon code!");
         }
+    }
+
+    public function isExpired()
+    {
+        $expiredAtTimestamp = $this->getExpiredAt();
+        $today = date("Y-m-d");
+        return strtotime( $today ) > $expiredAtTimestamp;
     }
     
     public function getUsedCount()
@@ -169,15 +177,17 @@ class Coupon
             switch($rule["acf_fc_layout"]){
                 case "coupon_max_used" :
                     $this->maxUse( $rule );
+                    break;
                 case "coupon_max_used_per_user" :
                     $this->maxUsePerUser($rule, $args["user_id"]);
+                    break;
             }
         }
     }
 
     private function maxUse( $rule )
     {
-        $coupon_used = get_post_meta($this->couponID, 'used', true) ?? 0;
+        $coupon_used = get_post_meta($this->couponID, $this->metaUsedCount, true) ?? 0;
         if( $coupon_used >= (int) $rule["count"] )
         {
             throw new Exception("Coupon reached use limit", 400);
@@ -188,7 +198,7 @@ class Coupon
 
     private function maxUsePerUser( $rule , $user_id )
     {
-        $used_by = get_post_meta($this->couponID, 'used_by', true);
+        $used_by = get_post_meta($this->couponID, $this->metaUsedBy, true);
         $used_by = maybe_unserialize( $used_by );
 
         $used_count = 0;
