@@ -96,6 +96,8 @@ class PackageController
         $packageId = $request["packageId"];
         $userId = $request["user_id"];
 
+        $user = get_user_by('id', $userId);
+
         $package = new Package($packageId);
         $packagePrice = $package->getPrice();
         $pacakgeDescription = $package->getDescription();
@@ -196,7 +198,7 @@ class PackageController
                     'price_data' => [
                         'currency' => 'EUR', //current currency used by birdles
                         'product_data' => [
-                            'name' => 'Pacakge Credit for user ' . $userId, // Product name, after the data provided it will be change by user filter name
+                            'name' => 'Package Credit for user ' . $user->first_name, // Product name, after the data provided it will be change by user filter name
                             'description' => $package->getBenefit() ?? ' ',
                         ],
                         'unit_amount' => $amount, // divide by 2 zero example ; 2000 it will converted to 20
@@ -283,28 +285,12 @@ class PackageController
             ->sessions
             ->retrieve($transaction->getTransactionStripeId());
 
-        $transactionData = [
-            "package" => [
-                // "price" => intval($package->getPrice()),
-                "price" => intval($transaction->getTransactionAmount()),
-                "credit" => $package->getCredit(),
-                "pricePerCredit" => $package->getCredit() == "unlimited" ? "unlimited" : $package->getPrice() / $package->getCredit(),
-                /** Added line start here */
-                "taxAmount" => $transaction->getTaxAmount(),
-                "totalPayment" => $transaction->getTotalAmount(),
-                "totalBeforeDiscount" => $transaction->getTotalAmountBeforeDiscount()
-            ],
-            "status" => $transaction->getStatus(),
-            "date" =>  DateHelper::doLocale(strtotime($transaction->getDate()), 'nl_NL', 'd MMMM yyyy'),
-            "transactionId" => $transaction->getTransactionId(),
-            "transactionStripeId" => $transaction->getTransactionStripeId()
-        ];
-
         return [
             "status" => 200,
             "data" => [
                 "package" => [
-                    "price" => intval($package->getPrice()),
+                    // "price" => intval($package->getPrice()),
+                    "price" => intval($transaction->getTransactionAmount()),
                     "credit" => $package->getCredit(),
                     "pricePerCredit" => $package->getCredit() == "unlimited" ? "unlimited" : $package->getPrice() / $package->getCredit(),
                     /** Added line start here */
