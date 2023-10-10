@@ -71,6 +71,7 @@ class Vacancy
 
     /** ACF for imported vacancy */
     private $_acf_is_imported = "rv_vacancy_is_imported";
+    private $_acf_imported_vacancy_source_id = "rv_vacancy_imported_source_id";
     private $_acf_imported_company_name = "rv_vacancy_imported_company_name";
     private $_acf_imported_company_city = "rv_vacancy_imported_company_city";
     private $_acf_imported_company_country = "rv_vacancy_imported_company_country";

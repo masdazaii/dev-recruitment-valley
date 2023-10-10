@@ -649,6 +649,53 @@ acf_add_local_field_group(array(
 ));
 
 acf_add_local_field_group(array(
+	'key' => 'group_652506a4e8ee7',
+	'title' => 'Import API',
+	'fields' => array(
+		array(
+			'key' => 'field_652506a5aa773',
+			'label' => 'Refresh per day',
+			'name' => 'import_api_refresh_per_day',
+			'aria-label' => '',
+			'type' => 'number',
+			'instructions' => 'How many time request will be made to the API. max is 4 time(s) a day.',
+			'required' => 0,
+			'conditional_logic' => 0,
+			'wrapper' => array(
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'default_value' => '',
+			'min' => 1,
+			'max' => 4,
+			'placeholder' => '',
+			'step' => '',
+			'prepend' => '',
+			'append' => '',
+		),
+	),
+	'location' => array(
+		array(
+			array(
+				'param' => 'options_page',
+				'operator' => '==',
+				'value' => 'import-api-settings',
+			),
+		),
+	),
+	'menu_order' => 0,
+	'position' => 'normal',
+	'style' => 'default',
+	'label_placement' => 'top',
+	'instruction_placement' => 'label',
+	'hide_on_screen' => '',
+	'active' => true,
+	'description' => '',
+	'show_in_rest' => 0,
+));
+
+acf_add_local_field_group(array(
 	'key' => 'group_64eda0ae70c5f',
 	'title' => 'Job Alerts',
 	'fields' => array(
@@ -3019,6 +3066,26 @@ acf_add_local_field_group(array(
 					),
 				),
 			),
+			'wrapper' => array(
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'default_value' => '',
+			'maxlength' => '',
+			'placeholder' => '',
+			'prepend' => '',
+			'append' => '',
+		),
+		array(
+			'key' => 'field_6524e6f54ddc2',
+			'label' => 'Vacancy Import ID',
+			'name' => 'rv_vacancy_imported_source_id',
+			'aria-label' => '',
+			'type' => 'text',
+			'instructions' => '',
+			'required' => 0,
+			'conditional_logic' => 0,
 			'wrapper' => array(
 				'width' => '',
 				'class' => '',

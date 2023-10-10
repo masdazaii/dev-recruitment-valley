@@ -81,6 +81,7 @@ class StringHelper
             $string = preg_replace('/[\n\t]+/', ' ', $string); // Trim new line and tab char
             $string = preg_replace('/\s+/', ' ', $string); // Trim multiple whitespace
             $string = preg_replace('/\s+/', $separator, $string); // replace whitespace with dash
+            $string = preg_replace('/(-+)/', $separator, $string); // replace multiple dash into 1
 
             switch ($style) {
                 case 'upper':
