@@ -202,7 +202,7 @@ class CouponController
             
             if($coupon->isExpired()) return [
                 "status"    => 400,
-                "message"   => "Coupon expired"
+                "message"   => $this->_message->get('coupon.expired')
             ];
 
             $coupon->validate(["user_id" => $request['user_id']]);

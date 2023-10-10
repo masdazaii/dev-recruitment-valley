@@ -1,5 +1,7 @@
 <?php
 namespace Model;
+
+use Constant\Message;
 use Exception;
 use WP_Query;
 class Coupon
@@ -32,17 +34,22 @@ class Coupon
     public $description = "description";
     private $metaUsedCount = "used_count";
     private $metaUsedBy = "used_by";
+
+    private $_message;
+
     public function __construct($coupon_id = false)
     {
+        $this->_message = new Message;
         if ($coupon_id) {
             $this->couponID = $coupon_id;
             $this->post = get_post($coupon_id);
             $this->porperties = get_fields($coupon_id);
             if (!$this->post) {
-                throw new Exception("Coupon not found", 400);
+                throw new Exception($this->_message->get("coupon.not_found"), 400);
             }
         }
     }
+
     /**
      * Setter function
      *
@@ -132,7 +139,7 @@ class Coupon
                 $this->porperties = get_fields($coupon->posts[0]->ID);
                 return true;
             } else {
-                throw new Exception("Coupon not found!");
+                throw new Exception();
             }
         } else {
             throw new Exception("Specify the coupon code!");
@@ -190,7 +197,7 @@ class Coupon
         $coupon_used = get_post_meta($this->couponID, $this->metaUsedCount, true) ?? 0;
         if( $coupon_used >= (int) $rule["count"] )
         {
-            throw new Exception("Coupon reached use limit", 400);
+            throw new Exception($this->_message->get("coupon.reach_limit"), 400);
         }
 
         return true;
@@ -211,7 +218,7 @@ class Coupon
 
         if($used_count >= (int) $rule["count"])
         {
-            throw new Exception("You already reached the coupon limit used", 400);
+            throw new Exception($this->_message->get("coupon.reach_limit_user"), 400);
         }
 
         return true;

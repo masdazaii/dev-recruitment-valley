@@ -283,15 +283,15 @@ class Message
             'coupon' => [
                 'get_success'   => __("Success get coupons!", THEME_DOMAIN),
                 'get_failed'    => __("Failed get coupons!", THEME_DOMAIN),
-                'not_found'     => __("Coupon not found!", THEME_DOMAIN),
-                'expired'       => __("Coupon already expired!", THEME_DOMAIN),
+                'not_found'     => __("coupon niet gevonden!", THEME_DOMAIN),
+                'expired'       => __("Coupon al verlopen", THEME_DOMAIN),
                 'not_available' => __("Coupon is no longer available!", THEME_DOMAIN),
                 'run_out'       => __("Coupons have run out!", THEME_DOMAIN),
-                'apply_success' => __("Coupons applied"),
-                'read_single_success' => __("Bericht is al gelezen", THEME_DOMAIN),
-                'read_not_authorize' => __("Bericht is al gelezen", THEME_DOMAIN),
-                'read_already' => __("Bericht is al gelezen", THEME_DOMAIN),
-                'read_single_failed' => __("Er is iets misgegaan bij het lezen van de notificatie", THEME_DOMAIN),
+                'apply_success' => __("Coupons toegepast", THEME_DOMAIN),
+                'insert_coupon' => __("vul de coupon in aub", THEME_DOMAIN),
+                'reach_limit'   => __("coupon limiet bereikt", THEME_DOMAIN),
+                'reach_limit_user' => __("je hebt het coupon limiet reeds bereikt", THEME_DOMAIN),
+                'specify_coupon' => __("Geef de coupon aan!", THEME_DOMAIN)
             ]
         ];
     }
