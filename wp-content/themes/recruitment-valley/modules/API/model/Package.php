@@ -21,6 +21,8 @@ class Package
             $package = get_post($packageId);
             if ($package) {
                 $this->package = $package;
+            } else {
+                throw new Exception("Package not found!");
             }
         }
     }

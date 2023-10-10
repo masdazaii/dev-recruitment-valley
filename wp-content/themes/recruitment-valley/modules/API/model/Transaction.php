@@ -18,6 +18,9 @@ class Transaction
     private $_transaction_tax_amount = "transaction_tax_amount";
     private $_transaction_total_amount = "transaction_total_amount";
 
+    private $_transaction_coupon_used = "transaction_coupon_used";
+    private $_transaction_total_amount_before_coupon_discount = "transaction_total_amount_before_coupon_discount";
+
     private $granted = "granted";
 
     public function __construct($transactionId = false)
@@ -174,6 +177,23 @@ class Transaction
     {
         update_post_meta($this->transaction_id, $this->granted, true);
     }
+    
+    /**
+     * hasCoupon
+     * check whether transaction have coupon or no
+     * 
+     * @return void
+     */
+    public function hasCoupon()
+    {
+        $couponData = $this->getProp($this->_transaction_coupon_used);
+        return $couponData ? true : false; 
+    }
+
+    public function getTotalAmountBeforeDiscount()
+    {
+        return $this->getProp($this->_transaction_total_amount_before_coupon_discount);
+    }
 
     public function setTaxAmount($amount)
     {
@@ -192,5 +212,15 @@ class Transaction
     public function getTotalAmount()
     {
         return $this->getProp($this->_transaction_total_amount);
+    }
+
+    public function setTransactionAmountBeforeCoupon($value)
+    {
+        return $this->setProp($this->_transaction_total_amount_before_coupon_discount, $value);
+    }
+
+    public function setCouponData($value)
+    {
+        return $this->setProp($this->_transaction_coupon_used, $value);
     }
 }

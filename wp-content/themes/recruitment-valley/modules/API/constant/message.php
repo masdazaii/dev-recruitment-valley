@@ -279,6 +279,19 @@ class Message
                 'delete_failed' => __("Kennisgeving niet verwijderd!", THEME_DOMAIN),
                 'read_all_success' => __("Succes met het lezen van alle meldingen!", THEME_DOMAIN),
                 'read_all_failed' => __("Niet alle meldingen gelezen!", THEME_DOMAIN),
+            ],
+            'coupon' => [
+                'get_success'   => __("Success get coupons!", THEME_DOMAIN),
+                'get_failed'    => __("Failed get coupons!", THEME_DOMAIN),
+                'not_found'     => __("coupon niet gevonden!", THEME_DOMAIN),
+                'expired'       => __("Coupon al verlopen", THEME_DOMAIN),
+                'not_available' => __("Coupon is no longer available!", THEME_DOMAIN),
+                'run_out'       => __("Coupons have run out!", THEME_DOMAIN),
+                'apply_success' => __("Coupons toegepast", THEME_DOMAIN),
+                'insert_coupon' => __("vul de coupon in aub", THEME_DOMAIN),
+                'reach_limit'   => __("coupon limiet bereikt", THEME_DOMAIN),
+                'reach_limit_user' => __("je hebt het coupon limiet reeds bereikt", THEME_DOMAIN),
+                'specify_coupon' => __("Geef de coupon aan!", THEME_DOMAIN)
             ]
         ];
     }

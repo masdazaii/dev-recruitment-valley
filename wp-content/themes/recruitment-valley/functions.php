@@ -29,3 +29,5 @@ function setup_theme() {
 
 // initialize!
 setup_theme();
+
+ini_set('error_log', ABSPATH . '/wp-content' . '/log/' . date('Y-m-d') . '.log');
