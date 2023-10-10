@@ -199,6 +199,13 @@ class CouponController
         try {
             $coupon = new Coupon();
             $coupon->setByCode($request['coupon']);
+            
+            if($coupon->isExpired()) return [
+                "status"    => 400,
+                "message"   => $this->_message->get('coupon.expired')
+            ];
+
+            $coupon->validate(["user_id" => $request['user_id']]);
 
             // Calculate Package Price
             $package    = new Package($request['packageId']);

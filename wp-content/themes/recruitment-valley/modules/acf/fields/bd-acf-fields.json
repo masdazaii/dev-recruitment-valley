@@ -616,6 +616,90 @@
                 "toolbar": "full",
                 "media_upload": 1,
                 "delay": 0
+            },
+            {
+                "key": "field_652387c9405a3",
+                "label": "Rule",
+                "name": "coupon_rule",
+                "aria-label": "",
+                "type": "flexible_content",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "layouts": {
+                    "layout_652387d276efb": {
+                        "key": "layout_652387d276efb",
+                        "name": "coupon_max_used",
+                        "label": "Max used",
+                        "display": "block",
+                        "sub_fields": [
+                            {
+                                "key": "field_65238973405a4",
+                                "label": "Count",
+                                "name": "count",
+                                "aria-label": "",
+                                "type": "number",
+                                "instructions": "",
+                                "required": 0,
+                                "conditional_logic": 0,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "default_value": "",
+                                "min": "",
+                                "max": "",
+                                "placeholder": "",
+                                "step": "",
+                                "prepend": "",
+                                "append": ""
+                            }
+                        ],
+                        "min": "",
+                        "max": ""
+                    },
+                    "layout_6523a2f26d24a": {
+                        "key": "layout_6523a2f26d24a",
+                        "name": "coupon_max_used_per_user",
+                        "label": "Max used per user",
+                        "display": "block",
+                        "sub_fields": [
+                            {
+                                "key": "field_6523a3016d24c",
+                                "label": "Count",
+                                "name": "count",
+                                "aria-label": "",
+                                "type": "number",
+                                "instructions": "",
+                                "required": 0,
+                                "conditional_logic": 0,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "default_value": "",
+                                "min": "",
+                                "max": "",
+                                "placeholder": "",
+                                "step": "",
+                                "prepend": "",
+                                "append": ""
+                            }
+                        ],
+                        "min": "",
+                        "max": ""
+                    }
+                },
+                "min": "",
+                "max": "",
+                "button_label": "Add Rule"
             }
         ],
         "location": [
@@ -1097,26 +1181,6 @@
                 "ui": 0,
                 "ui_on_text": "",
                 "ui_off_text": ""
-            },
-            {
-                "key": "field_650a647a51bdf",
-                "label": "Package Benefit",
-                "name": "rv_package_benefit",
-                "aria-label": "",
-                "type": "textarea",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "maxlength": "",
-                "rows": "",
-                "placeholder": "",
-                "new_lines": ""
             }
         ],
         "location": [
@@ -1166,6 +1230,26 @@
                 "key": "field_64dc9a5b1cb8e",
                 "label": "Secret key",
                 "name": "stripe_secret_key",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_6524c76db060a",
+                "label": "Stripe webhook signing secret",
+                "name": "stripe_webhook_signing_secret",
                 "aria-label": "",
                 "type": "text",
                 "instructions": "",
@@ -1374,46 +1458,6 @@
                 "max": "",
                 "placeholder": "",
                 "step": 2,
-                "prepend": "",
-                "append": ""
-            },
-            {
-                "key": "field_6523bf27b11c2",
-                "label": "Coupon used",
-                "name": "transaction_coupon_used",
-                "aria-label": "",
-                "type": "text",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "maxlength": "",
-                "placeholder": "",
-                "prepend": "",
-                "append": ""
-            },
-            {
-                "key": "field_6523c07220b0a",
-                "label": "Transaction total amount (before discount)",
-                "name": "transaction_total_amount_before_coupon_discount",
-                "aria-label": "",
-                "type": "text",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "maxlength": "",
-                "placeholder": "",
                 "prepend": "",
                 "append": ""
             }

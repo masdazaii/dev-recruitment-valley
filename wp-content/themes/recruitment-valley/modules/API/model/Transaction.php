@@ -177,6 +177,23 @@ class Transaction
     {
         update_post_meta($this->transaction_id, $this->granted, true);
     }
+    
+    /**
+     * hasCoupon
+     * check whether transaction have coupon or no
+     * 
+     * @return void
+     */
+    public function hasCoupon()
+    {
+        $couponData = $this->getProp($this->_transaction_coupon_used);
+        return $couponData ? true : false; 
+    }
+
+    public function getTotalAmountBeforeDiscount()
+    {
+        return $this->getProp($this->_transaction_total_amount_before_coupon_discount);
+    }
 
     public function setTaxAmount($amount)
     {

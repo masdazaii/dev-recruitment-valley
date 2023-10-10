@@ -96,6 +96,8 @@ class PackageController
         $packageId = $request["packageId"];
         $userId = $request["user_id"];
 
+        $user = get_user_by('id', $userId);
+
         $package = new Package($packageId);
         $packagePrice = $package->getPrice();
         $pacakgeDescription = $package->getDescription();
@@ -196,7 +198,7 @@ class PackageController
                     'price_data' => [
                         'currency' => 'EUR', //current currency used by birdles
                         'product_data' => [
-                            'name' => 'Pacakge Credit for user ' . $userId, // Product name, after the data provided it will be change by user filter name
+                            'name' => 'Package Credit for user ' . $user->first_name, // Product name, after the data provided it will be change by user filter name
                             'description' => $package->getBenefit() ?? ' ',
                         ],
                         'unit_amount' => $amount, // divide by 2 zero example ; 2000 it will converted to 20
@@ -287,7 +289,8 @@ class PackageController
             "status" => 200,
             "data" => [
                 "package" => [
-                    "price" => intval($package->getPrice()),
+                    // "price" => intval($package->getPrice()),
+                    "price" => number_format(floatval($transaction->getTransactionAmount()), 2),
                     "credit" => $package->getCredit(),
                     "pricePerCredit" => $package->getCredit() == "unlimited" ? "unlimited" : $package->getPrice() / $package->getCredit(),
                     /** Added line start here */
@@ -310,14 +313,7 @@ class PackageController
 
         $payload = @file_get_contents('php://input');
 
-        /** Local */
-        // $endpoint_secret = 'whsec_02c7938964b4c50fc49380728f70538105c68b52df5a50da93130db4e6023ebf';
-
-        /** Staging */
-        $endpoint_secret = 'whsec_3Z07iu7314TUwmpuohrnAEuV6BwcgcoT';
-
-        /** Live */
-        // $endpoint_secret = 'whsec_C5lTo64sQQDtJUErA64AERvtVm9dNZ7D';
+        $endpoint_secret = get_field("stripe_webhook_signing_secret", "option");
 
         $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
 
