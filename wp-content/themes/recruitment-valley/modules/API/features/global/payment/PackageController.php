@@ -283,6 +283,23 @@ class PackageController
             ->sessions
             ->retrieve($transaction->getTransactionStripeId());
 
+        $transactionData = [
+            "package" => [
+                // "price" => intval($package->getPrice()),
+                "price" => intval($transaction->getTransactionAmount()),
+                "credit" => $package->getCredit(),
+                "pricePerCredit" => $package->getCredit() == "unlimited" ? "unlimited" : $package->getPrice() / $package->getCredit(),
+                /** Added line start here */
+                "taxAmount" => $transaction->getTaxAmount(),
+                "totalPayment" => $transaction->getTotalAmount(),
+                "totalBeforeDiscount" => $transaction->getTotalAmountBeforeDiscount()
+            ],
+            "status" => $transaction->getStatus(),
+            "date" =>  DateHelper::doLocale(strtotime($transaction->getDate()), 'nl_NL', 'd MMMM yyyy'),
+            "transactionId" => $transaction->getTransactionId(),
+            "transactionStripeId" => $transaction->getTransactionStripeId()
+        ];
+
         return [
             "status" => 200,
             "data" => [

@@ -9,9 +9,13 @@ defined( 'ABSPATH' ) || die( "Can't access directly" );
  * Template Name: Debugging
  */
 
+ try {
+    $notification = new Transaction(61);
+    echo '<pre>';
+    var_dump($notification->hasCoupon());
+    echo '</pre>';die;
+ } catch (Exception $th) {
+    echo $th;
+ }
 
-$notification = new Coupon(627);
-echo '<pre>';
-var_dump($notification->getProperties());
-echo '</pre>';die;
 ?>
