@@ -290,7 +290,7 @@ class PackageController
             "data" => [
                 "package" => [
                     // "price" => intval($package->getPrice()),
-                    "price" => intval($transaction->getTransactionAmount()),
+                    "price" => number_format(floatval($transaction->getTransactionAmount()), 2),
                     "credit" => $package->getCredit(),
                     "pricePerCredit" => $package->getCredit() == "unlimited" ? "unlimited" : $package->getPrice() / $package->getCredit(),
                     /** Added line start here */
