@@ -317,12 +317,15 @@ class FlexFeedController
                                 $vacancy->setProp($acf_field, $acfValue, is_array($acfValue));
                             }
 
-                            /** Calc coordinate */
-                            // if (isset($payload["placement_city"]) && isset($payload["placement_address"])) {
-                            //     $vacancy->setCityLongLat($payload["placement_city"], true);
-                            //     $vacancy->setAddressLongLat($payload["placement_address"]);
-                            //     $vacancy->setDistance($payload["placement_city"], $payload["placement_city"] . " " . $payload["placement_address"]);
-                            // }
+                            /** IF MAP API IS ENABLED */
+                            if (defined('ENABLE_MAP_API') && ENABLE_MAP_API == true) {
+                                /** Calc coordinate */
+                                if (isset($payload["placement_city"]) && isset($payload["placement_address"])) {
+                                    $vacancy->setCityLongLat($payload["placement_city"], true);
+                                    $vacancy->setAddressLongLat($payload["placement_address"]);
+                                    $vacancy->setDistance($payload["placement_city"], $payload["placement_city"] . " " . $payload["placement_address"]);
+                                }
+                            }
 
                             /** store unused to post meta */
                             update_post_meta($post, 'rv_vacancy_unused_data', $unusedData);
