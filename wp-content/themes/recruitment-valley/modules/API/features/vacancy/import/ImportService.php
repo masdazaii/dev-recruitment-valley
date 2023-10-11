@@ -8,14 +8,13 @@ use Vacancy\Import\JSON\NationaleVacatureBankController as NVBController;
 
 class ImportService
 {
-    // public $flexFeedController;
     private $_nvbController;
     private $_flexFeedController;
 
     public function __construct()
     {
         // $this->flexFeedController = new FlexFeedController;
-        $this->_flexFeedController = new FlexFeedController;
+        $this->_flexFeedController = new FlexFeedController(FLEXFEED_API_URL ?? NULL);
         $this->_nvbController = new NVBController();
     }
 
@@ -30,7 +29,8 @@ class ImportService
         $response = $this->_flexFeedController->import(1);
         return ResponseHelper::build([
             'status' => 200,
-            'message' => 'done'
+            'message' => 'done',
+            'data' => $response
         ]);
     }
 
