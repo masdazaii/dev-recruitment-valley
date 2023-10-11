@@ -18,3 +18,4 @@ require_once __DIR__ . '/class-company-option.php';
 require_once __DIR__ . '/class-stripe-option.php';
 require_once __DIR__ . '/class-validation.php';
 require_once __DIR__ . '/class-custom-action.php';
+require_once __DIR__ . '/class-active-campaign-option.php';

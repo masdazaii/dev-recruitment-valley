@@ -5,6 +5,7 @@ namespace Global;
 use WP_User;
 use Constant\Message;
 use Helper\EmailHelper;
+use Integration\ActiveCampaign\ActiveCampaign;
 
 class ContactController
 {
@@ -67,6 +68,17 @@ class ContactController
         if ($request['email']) {
             update_field('email', $request['email'], $contactID);
         }
+
+        $activeCampaign = new ActiveCampaign;
+
+        $data = [
+            "email" => $request['email'],
+            "first_name" => $from == "company" ?  $request['name'] : $request['firstName'],
+            "last_name" => $from == "company" ?  $request['companyName'] : $request['lastName'],
+            "telephone" => $request['phoneNumberCode'].$request['phoneNumber'],
+        ];
+
+        $activeCampaign->createContact($data, "send contact ". $from );
 
         /** Send email to admin */
         // $adminEmail = get_option('admin_email');

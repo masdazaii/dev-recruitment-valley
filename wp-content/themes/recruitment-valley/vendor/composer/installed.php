@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '8db3596dfd835bb9f13b7109ec62ce48aa39ec60',
+        'reference' => '8ed2200b063312ae2680aa02454bcb9c6fa268f3',
         'name' => '__root__',
         'dev' => true,
     ),
@@ -16,7 +16,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '8db3596dfd835bb9f13b7109ec62ce48aa39ec60',
+            'reference' => '8ed2200b063312ae2680aa02454bcb9c6fa268f3',
             'dev_requirement' => false,
         ),
         'firebase/php-jwt' => array(
