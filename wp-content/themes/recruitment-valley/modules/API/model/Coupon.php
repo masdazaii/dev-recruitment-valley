@@ -1,9 +1,11 @@
 <?php
+
 namespace Model;
 
 use Constant\Message;
 use Exception;
 use WP_Query;
+
 class Coupon
 {
     public $prefix = "coupon";
@@ -22,7 +24,7 @@ class Coupon
     const DISCOUNT_TYPE_FIX_AMOUNT_LABEL = "Fix Amount";
     const DISCOUNT_TYPE_PERCENTAGE_VALUE = "percentage";
     const DISCOUNT_TYPE_PERCENTAGE_LABEL = "Percentage";
-    
+
     public $couponID;
     public $post;
     public $porperties;
@@ -150,9 +152,9 @@ class Coupon
     {
         $expiredAtTimestamp = $this->getExpiredAt();
         $today = date("Y-m-d");
-        return strtotime( $today ) > $expiredAtTimestamp;
+        return strtotime($today) > $expiredAtTimestamp;
     }
-    
+
     public function getUsedCount()
     {
         $metaValue = $this->getMeta($this->metaUsedCount);
@@ -176,48 +178,49 @@ class Coupon
         return $this->porperties;
     }
 
-    public function validate( $args )
+    public function validate($args)
     {
-        if(count($this->porperties["coupon_rule"]) === 0) return true;
+        if (!is_array($this->porperties["coupon_rule"])) {
+            return true;
+        }
 
-        foreach ($this->porperties["coupon_rule"] as $rule ) {
-            switch($rule["acf_fc_layout"]){
-                case "coupon_max_used" :
-                    $this->maxUse( $rule );
+        if (count($this->porperties["coupon_rule"]) === 0) return true;
+
+        foreach ($this->porperties["coupon_rule"] as $rule) {
+            switch ($rule["acf_fc_layout"]) {
+                case "coupon_max_used":
+                    $this->maxUse($rule);
                     break;
-                case "coupon_max_used_per_user" :
+                case "coupon_max_used_per_user":
                     $this->maxUsePerUser($rule, $args["user_id"]);
                     break;
             }
         }
     }
 
-    private function maxUse( $rule )
+    private function maxUse($rule)
     {
         $coupon_used = get_post_meta($this->couponID, $this->metaUsedCount, true) ?? 0;
-        if( $coupon_used >= (int) $rule["count"] )
-        {
+        if ($coupon_used >= (int) $rule["count"]) {
             throw new Exception($this->_message->get("coupon.reach_limit"), 400);
         }
 
         return true;
     }
 
-    private function maxUsePerUser( $rule , $user_id )
+    private function maxUsePerUser($rule, $user_id)
     {
         $used_by = get_post_meta($this->couponID, $this->metaUsedBy, true);
-        $used_by = maybe_unserialize( $used_by );
+        $used_by = maybe_unserialize($used_by);
 
         $used_count = 0;
         foreach ($used_by as $uid) {
-            if((int) $user_id == (int) $uid)
-            {
+            if ((int) $user_id == (int) $uid) {
                 $used_count++;
             }
         }
 
-        if($used_count >= (int) $rule["count"])
-        {
+        if ($used_count >= (int) $rule["count"]) {
             throw new Exception($this->_message->get("coupon.reach_limit_user"), 400);
         }
 
