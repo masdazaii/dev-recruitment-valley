@@ -42,7 +42,6 @@ class ActiveCampaign
     public function createContact($data, $function = false )
     {
         error_log($function);
-        error_log(json_encode($data));
 
         $path = "/contacts";
         $method = "POST";
@@ -54,6 +53,8 @@ class ActiveCampaign
                 "phone" => $data["telephone"],
             ]
         ];
+
+        error_log(json_encode($payload));
 
         // Convert the data array to a JSON string
         $json_data = json_encode($payload);

@@ -44,7 +44,7 @@ class ProfileController
                 "email" => $user->getEmail(),
                 "image" => $user->getImage(),
                 "dateOfBirth" => $user->getDateOfBirth(),
-                "linkedIn" => $user->getLinkedinPage(),
+                "linkedin" => $user->getLinkedinPage(),
                 "cv" => [
                     'url' => $user->getCv() ? $user->getCv()["url"] : null,
                     'fileName' => $user->getCv() ? $user->getCv()["filename"] : null,
