@@ -7,6 +7,7 @@ use Constant\Message;
 use DateTimeImmutable;
 use WP_User;
 use Helper\OTPHelper as OTP;
+use Integration\ActiveCampaign\ActiveCampaign;
 
 /**
  * Note: for registration and reserndOTP
@@ -104,6 +105,16 @@ class RegistrationController
         
         $sendMail = Email::send($request["email"], "One Time Password - $site_title", $args, 'email-otp.php');
         
+        $data = [
+            "email" => $request['email'],
+            "first_name" => "-",
+            "last_name" =>  "-",
+            "telephone" => "-",
+        ];
+        
+        $activeCampaign = new ActiveCampaign;
+        $activeCampaign->createContact($data, "registration" );
+
         if(!$sendMail)
         {
             return [

@@ -9,9 +9,11 @@ class Applicant
     public $cover_letter = "cover_letter";
     public $phone_number = "phone_number";
     public $phone_number_code = "phone_code_area";
+    public $applicant_company = "applicant_company";
+    public $applicant_vacancy = "applicant_vacancy";
 
-    private $_acf_candidate     = "applicant_candidate";
     private $_acf_apply_date    = "apply_date";
+    private $_acf_candidate     = "applicant_candidate";
 
     public function __construct($applicant_id = false)
     {
@@ -41,6 +43,16 @@ class Applicant
     public function getCandidate()
     {
         return $this->getProp($this->_acf_candidate, true);
+    }
+
+    public function getCompany()
+    {
+        return $this->getProp($this->applicant_company);
+    }
+
+    public function getVacancy()
+    {
+        return $this->getProp($this->applicant_vacancy);
     }
 
     public function getApplyDate()

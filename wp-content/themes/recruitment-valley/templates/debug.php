@@ -1,5 +1,6 @@
 <?php
 
+use Integration\ActiveCampaign\ActiveCampaign;
 use Model\Coupon;
 use Model\Notification;
 
@@ -9,13 +10,12 @@ defined( 'ABSPATH' ) || die( "Can't access directly" );
  * Template Name: Debugging
  */
 
- try {
-    $notification = new Transaction(61);
-    echo '<pre>';
-    var_dump($notification->hasCoupon());
-    echo '</pre>';die;
- } catch (Exception $th) {
-    echo $th;
- }
+$activeCampaign = new ActiveCampaign();
+$data = [
+   "firstName" => "anggit",
+   "lastName" => "prayoga", 
+   "email" => "Anggitp@gmail.com",
+   "phone" => "09409934128"
+];
 
 ?>

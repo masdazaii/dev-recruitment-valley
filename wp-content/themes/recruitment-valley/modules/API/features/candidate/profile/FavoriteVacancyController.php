@@ -68,7 +68,7 @@ class FavoriteVacancyController
         $filters = [
             'page' => isset($request['page']) ? sanitize_text_field($request['page']) : 1,
             'postPerPage' => isset($request['perPage']) ? sanitize_text_field($request['perPage']) : 0,
-            'orderBy' => isset($request['orderBy']) ? isset($request['orderBy']) : 'date',
+            'orderBy' => isset($request['orderBy']) ? sanitize_text_field($request['orderBy']) : 'date',
             'order' => isset($request['sort']) ? $request['sort'] : 'desc',
         ];
 
