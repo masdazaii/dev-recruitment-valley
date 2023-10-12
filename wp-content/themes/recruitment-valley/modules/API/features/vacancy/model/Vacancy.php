@@ -864,16 +864,16 @@ class Vacancy
     }
     /** Method for related to imported vacancy end here */
 
-    public function getApplicants()
+    public function getApplicants($filters = [])
     {
         if (isset($this->vacancy_id) && !empty($this->vacancy_id)) {
             $applicants = get_posts([
                 "post_type"     => "applicants",
                 "post_status"   => "publish",
-                "post_per_page"   => -1,
-                // "offset"        => 0,
-                // "order"         => "ASC",
-                // "orderBy"       => ""
+                "posts_per_page" => $filters["postPerPage"],
+                "offset"        => $filters['offset'],
+                "orderby"       => $filters["orderby"],
+                "order"         => $filters["order"],
                 "meta_query"    => [
                     "relation"  => "AND",
                     [

@@ -139,6 +139,15 @@ class VacancyController
 
     public function listApplicants($request)
     {
+        $filters = [
+            'page' => isset($request['page']) ? sanitize_text_field($request['page']) : 1,
+            'postPerPage' => isset($request['perPage']) ? sanitize_text_field($request['perPage']) : 10,
+            'orderby' => isset($request['orderBy']) ? sanitize_text_field($request['orderBy']) : 'date',
+            'order' => isset($request['sort']) ? sanitize_text_field($request['sort']) : 'desc',
+        ];
+
+        $filters['offset'] = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['postPerPage']));
+
         try {
             $vacancy = new Vacancy($request['vacancy']);  // key "vacancy" is the last uri segment that meant to be vacancy id
 
@@ -151,7 +160,7 @@ class VacancyController
             }
 
             $company = new Company($vacancy->getAuthor());
-            $applicants = $vacancy->getApplicants();
+            $applicants = $vacancy->getApplicants($filters);
 
             /** Get Applicants candidate data */
             $applicantsCandidate = [];
