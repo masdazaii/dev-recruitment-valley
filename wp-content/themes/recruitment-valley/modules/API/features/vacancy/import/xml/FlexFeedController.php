@@ -71,6 +71,12 @@ class FlexFeedController
 
                 $response       = curl_exec($curl);
                 $responseCode   = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+                /** If Curl error */
+                if (curl_errno($curl)) {
+                    error_log('Curl Error in fetch flexfeed API - ' . curl_error($curl));
+                }
+
                 curl_close($curl);
 
                 /** Map the data only if response is 200 */

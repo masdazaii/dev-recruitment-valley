@@ -10,6 +10,7 @@ class Message
     {
         $this->list = [
             'auth' => [
+                "unauthorize" => __("Unauthorized", THEME_DOMAIN),
                 'unauthenticate' => __('Unauthorized', THEME_DOMAIN),
                 'invalid_token' => __('Token ongeldig', THEME_DOMAIN),
                 'expired' => __('Verlopen', THEME_DOMAIN),
@@ -153,7 +154,11 @@ class Message
                     "success" => __("Succes, vacature is al verwijderd", THEME_DOMAIN),
                     "fail" => __("Er is iets misgegaan. Neem a.u.b. contact op met onze technische afdeling", THEME_DOMAIN),
                     "not_authorized" => __("Je hebt geen rechten om deze vacature te verwijderen", THEME_DOMAIN)
-                ]
+                ],
+                "get_applicant_success" => __("Succes Krijg sollicitaties van vacatures.", THEME_DOMAIN),
+                "get_applicant_failed"  => __("Mislukt sollicitaties ophalen.", THEME_DOMAIN),
+                "get_application_success"   => __("Succes krijg sollicitatie vacature.", THEME_DOMAIN),
+                "get_application_not_found" => __("Sollicitatie niet gevonden.", THEME_DOMAIN),
             ],
             'candidate' => [
                 "profile" => [

@@ -141,7 +141,7 @@ class Coupon
                 $this->porperties = get_fields($coupon->posts[0]->ID);
                 return true;
             } else {
-                throw new Exception();
+                throw new Exception($this->_message->get("coupon.not_found"));
             }
         } else {
             throw new Exception("Specify the coupon code!");

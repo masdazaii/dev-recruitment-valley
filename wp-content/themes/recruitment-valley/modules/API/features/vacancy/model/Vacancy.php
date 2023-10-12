@@ -2,6 +2,7 @@
 
 namespace Vacancy;
 
+use Exception;
 use Helper;
 use Helper\Maphelper;
 use WP_Error;
@@ -862,4 +863,30 @@ class Vacancy
         return $this->getProp($this->_acf_imported_company_city_latitude);
     }
     /** Method for related to imported vacancy end here */
+
+    public function getApplicants()
+    {
+        if (isset($this->vacancy_id) && !empty($this->vacancy_id)) {
+            $applicants = get_posts([
+                "post_type"     => "applicants",
+                "post_status"   => "publish",
+                "post_per_page"   => -1,
+                // "offset"        => 0,
+                // "order"         => "ASC",
+                // "orderBy"       => ""
+                "meta_query"    => [
+                    "relation"  => "AND",
+                    [
+                        "key"   => "applicant_vacancy",
+                        "value" => $this->vacancy_id,
+                        "compare" => "="
+                    ]
+                ]
+            ]);
+
+            return $applicants;
+        } else {
+            throw new Exception('Specify the vacancy');
+        }
+    }
 }
