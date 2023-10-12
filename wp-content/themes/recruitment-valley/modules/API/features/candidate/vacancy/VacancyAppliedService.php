@@ -116,4 +116,10 @@ class VacancyAppliedService
         $site_title = get_bloginfo('name');
         wp_mail($user->user_email, "Bevestiging van sollicitatie - $site_title", $content, $headers, [$attachment]);
     }
+
+    public function history( WP_REST_Request $request )
+    {
+        $response = $this->vacancyAppliedController->history( $request );
+        return ResponseHelper::build($response);
+    }
 }
