@@ -212,7 +212,12 @@ class Vacancy
     public function getTitle()
     {
         $vacancy = get_post($this->vacancy_id);
-        return $vacancy->post_title;
+        // return $vacancy->post_title;
+        /** Added Line */
+        if ($vacancy) {
+            $vacancy->post_title;
+        }
+        return null;
     }
 
     public function getTerm()
@@ -465,13 +470,23 @@ class Vacancy
     public function getAuthor()
     {
         $vacancy = get_post($this->vacancy_id);
-        return $vacancy->post_author;
+        // return $vacancy->post_author;
+        /** Added Line */
+        if ($vacancy) {
+            $vacancy->post_author;
+        }
+        return null;
     }
 
     public function getSlug()
     {
         $vacancy = get_post($this->vacancy_id);
-        return $vacancy->post_name;
+        // return $vacancy->post_name;
+        /** Added Line */
+        if ($vacancy) {
+            $vacancy->post_name;
+        }
+        return null;
     }
 
     public function getPublishDate($format = "Y-m-d H:i:s")

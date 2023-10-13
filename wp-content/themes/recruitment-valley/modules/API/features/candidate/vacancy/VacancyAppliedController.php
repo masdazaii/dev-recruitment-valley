@@ -166,7 +166,7 @@ class VacancyAppliedController
         }
     }
 
-    public function history( $request )
+    public function history($request)
     {
         $filters = [
             'page' => isset($request['page']) ? sanitize_text_field($request['page']) : 1,
@@ -197,7 +197,7 @@ class VacancyAppliedController
 
             $applicants = new WP_Query($args);
 
-            $applicantResult = array_map(function($applicantId){
+            $applicantResult = array_map(function ($applicantId) {
                 $applicant = new Applicant($applicantId);
                 $company = new Company($applicant->getCompany());
                 $vacancy = new Vacancy($applicant->getVacancy());
@@ -206,14 +206,14 @@ class VacancyAppliedController
                     "id" => $applicantId,
                     "slug" => $vacancy->getSlug(),
                     "name" => $vacancy->getTitle(),
-                    "status" => $vacancy->getStatus(),
-                    "image" => $company->getThumbnail(),
+                    "status" => $vacancy->getStatus()['name'],
+                    "image" => $company->getThumbnail('object'),
                     "description" => $vacancy->getDescription(),
                     "jobPostedDate" => $vacancy->getPublishDate(),
                     "applyDate" => $applicant->getApplyDate(),
                     "isNew" => $vacancy->getIsNew(),
                 ];
-            }, $applicants->posts ?? [] );
+            }, $applicants->posts ?? []);
 
             if (!is_wp_error($applicants)) {
                 return [
@@ -232,7 +232,7 @@ class VacancyAppliedController
                 ];
             }
         } catch (\Throwable $th) {
-            error_log("error get history applicant : ". $th->getMessage());
+            error_log("error get history applicant : " . $th->getMessage());
             return [
                 "message"   => $this->_message->get('system.overall_failed'),
                 "status"  => 500
