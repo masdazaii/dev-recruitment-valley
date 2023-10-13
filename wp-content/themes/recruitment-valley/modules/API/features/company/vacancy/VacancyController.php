@@ -222,18 +222,8 @@ class VacancyController
             $vacancyResponse = [
                 "id"        => $request['vacancy'],
                 "isPaid"    => $vacancy->getIsPaid(),
-                // "shortDescription" => $vacancy->getTaxonomy(true),
-                // "shortDescription2" => $vacancy->getTaxonomy(false),
                 "title"         => $vacancy->getTitle(),
-                "country"       => $vacancy->getCountry(),
-                "countryCode"   => $vacancy->getCountryCode(),
-                "city"          => $vacancy->getCity(),
-                "externalUrl"   => $vacancy->getExternalUrl(),
-                "placementAddress" => $vacancy->getPlacementAddress(),
-                "salaryStart"   => $vacancy->getSalaryStart(),
-                "salaryEnd"     => $vacancy->getSalaryEnd(),
-                "postedDate"    => $vacancy->getPublishDate("d-m-Y H:i"),
-                "expiredDate"   => $vacancy->getExpiredAt("d-m-Y H:i"),
+                "jobPostedDate"    => $vacancy->getPublishDate("d/m/Y"),
             ];
 
             /** set taxonomy  */
@@ -245,13 +235,14 @@ class VacancyController
                     case "working-hours":
                         $vacancyResponse['hoursPerWeek'] = $value;
                         break;
+                    case "status":
+                        $vacancyResponse["status"] = $value[0]['name'];
+                        break;
                     default:
                         $vacancyResponse[$terms] = $value;
                         break;
                 }
             }
-
-            // $vacancyResponse[] = $vacancy->getTaxonomy(true);
 
             return [
                 "status"    => 200,
