@@ -1,5 +1,89 @@
 [
     {
+        "key": "group_652641571200a",
+        "title": "Active campaign settings",
+        "fields": [
+            {
+                "key": "field_6526415765312",
+                "label": "Active campaign api url",
+                "name": "active_campaign_api_url",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_652641db65313",
+                "label": "Active campaign api version",
+                "name": "active_campaign_api_version",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_6526420565314",
+                "label": "Active campaign api key",
+                "name": "active_campaign_api_key",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "options_page",
+                    "operator": "==",
+                    "value": "active-campaign-settings"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": "",
+        "show_in_rest": 0
+    },
+    {
         "key": "group_64d2025201b99",
         "title": "Applicant field group",
         "fields": [
@@ -508,21 +592,61 @@
             },
             {
                 "key": "field_65236d27d75c7",
-                "label": "Discount value",
+                "label": "Discount Fix Amount",
                 "name": "coupon_discount_value",
                 "aria-label": "",
-                "type": "text",
+                "type": "number",
                 "instructions": "",
                 "required": 0,
-                "conditional_logic": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_65236d5dd75c8",
+                            "operator": "==",
+                            "value": "fix_amount"
+                        }
+                    ]
+                ],
                 "wrapper": {
                     "width": "",
                     "class": "",
                     "id": ""
                 },
                 "default_value": "",
-                "maxlength": "",
+                "min": 0,
+                "max": "",
                 "placeholder": "",
+                "step": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_6526550ef67b9",
+                "label": "Discount percentage",
+                "name": "coupon_discount_value",
+                "aria-label": "",
+                "type": "number",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_65236d5dd75c8",
+                            "operator": "==",
+                            "value": "percentage"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "min": "",
+                "max": 100,
+                "placeholder": "",
+                "step": "",
                 "prepend": "",
                 "append": ""
             },
@@ -708,6 +832,75 @@
                     "param": "post_type",
                     "operator": "==",
                     "value": "coupon"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": "",
+        "show_in_rest": 0
+    },
+    {
+        "key": "group_652506a4e8ee7",
+        "title": "Import API",
+        "fields": [
+            {
+                "key": "field_652506a5aa773",
+                "label": "Refresh per day",
+                "name": "import_api_refresh_per_day",
+                "aria-label": "",
+                "type": "number",
+                "instructions": "How many time request will be made to the API. max is 4 time(s) a day.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "min": 1,
+                "max": 4,
+                "placeholder": "",
+                "step": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_6528ccff22f76",
+                "label": "Admin to import",
+                "name": "import_api_user_to_import",
+                "aria-label": "",
+                "type": "user",
+                "instructions": "",
+                "required": 1,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "role": [
+                    "administrator"
+                ],
+                "return_format": "id",
+                "multiple": 0,
+                "allow_null": 0,
+                "bidirectional": 0,
+                "bidirectional_target": []
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "options_page",
+                    "operator": "==",
+                    "value": "import-api-settings"
                 }
             ]
         ],
@@ -3037,6 +3230,26 @@
                         }
                     ]
                 ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_6524e6f54ddc2",
+                "label": "Vacancy Import ID",
+                "name": "rv_vacancy_imported_source_id",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
                 "wrapper": {
                     "width": "",
                     "class": "",

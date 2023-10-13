@@ -209,6 +209,12 @@ class RequestRules
             'userChangeEmail' => [
                 'newEmail' => ["required", "email"] // Must add rules exists to check if email already used!
             ],
+            'vacancyApplicants' => [
+                'vacancy' => ["required", "exists:post/vacancy/post_id/single"],
+            ],
+            'vacancySingleApplicant' => [
+                'application' => ["required", "exists:post/applicants/post_id/single"],
+            ],
             'test' => [
                 'test.*.name' => ["required", "mime:jpg,jpeg,png,bmp,gif,svg,webp"]
             ]
