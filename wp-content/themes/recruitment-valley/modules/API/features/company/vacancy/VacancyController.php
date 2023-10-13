@@ -219,43 +219,45 @@ class VacancyController
                 $videoUrl = strpos($company->getVideoUrl(), "youtu") ? ["type" => "url", "url" => StringHelper::getYoutubeID($company->getVideoUrl())] : ["type" => "file", "url" => $company->getVideoUrl()];
             }
 
+            $vacancyResponse = [
+                "id"        => $request['vacancy'],
+                "isPaid"    => $vacancy->getIsPaid(),
+                // "shortDescription" => $vacancy->getTaxonomy(true),
+                // "shortDescription2" => $vacancy->getTaxonomy(false),
+                "title"         => $vacancy->getTitle(),
+                "country"       => $vacancy->getCountry(),
+                "countryCode"   => $vacancy->getCountryCode(),
+                "city"          => $vacancy->getCity(),
+                "externalUrl"   => $vacancy->getExternalUrl(),
+                "placementAddress" => $vacancy->getPlacementAddress(),
+                "salaryStart"   => $vacancy->getSalaryStart(),
+                "salaryEnd"     => $vacancy->getSalaryEnd(),
+                "postedDate"    => $vacancy->getPublishDate("d-m-Y H:i"),
+                "expiredDate"   => $vacancy->getExpiredAt("d-m-Y H:i"),
+            ];
+
+            /** set taxonomy  */
+            foreach ($vacancy->getTaxonomy(true) as $terms => $value) {
+                switch ($terms) {
+                    case "type":
+                        $vacancyResponse['employmentType'] = $value;
+                        break;
+                    case "working-hours":
+                        $vacancyResponse['hoursPerWeek'] = $value;
+                        break;
+                    default:
+                        $vacancyResponse[$terms] = $value;
+                        break;
+                }
+            }
+
+            // $vacancyResponse[] = $vacancy->getTaxonomy(true);
+
             return [
                 "status"    => 200,
                 "message"   => $this->_message->get('vacancy.get_applicant_success'),
                 "data"      => [
-                    "vacancy"    => [
-                        "id"        => $request['vacancy'],
-                        "isPaid"    => $vacancy->getIsPaid(),
-                        "shortDescription" => $vacancy->getTaxonomy(false),
-                        "title"         => $vacancy->getTitle(),
-                        "socialMedia"   => $socialMediaResponse,
-                        "contents"      => [
-                            "description"   => $vacancy->getDescription(),
-                            "term"          => $vacancy->getTerm(),
-                        ],
-                        "country"       => $vacancy->getCountry(),
-                        "countryCode"   => $vacancy->getCountryCode(),
-                        "city"          => $vacancy->getCity(),
-                        "externalUrl"   => $vacancy->getExternalUrl(),
-                        "placementAddress" => $vacancy->getPlacementAddress(),
-                        "videoId" => $videoUrl,
-                        "gallery" => $vacancy->getGallery(),
-                        "reviews" => $vacancy->getReviews(),
-                        "applicationProcessTitle"       => $vacancy->getApplicationProcessTitle(),
-                        "applicationProcessDescription" => $vacancy->getApplicationProcessDescription(),
-                        "steps"         => $vacancy->getApplicationProcessStep(),
-                        "salaryStart"   => $vacancy->getSalaryStart(),
-                        "salaryEnd"     => $vacancy->getSalaryEnd(),
-                        "postedDate"    => $vacancy->getPublishDate("d-m-Y H:i"),
-                        "expiredDate"   => $vacancy->getExpiredAt("d-m-Y H:i"),
-                        "longitude"     => $vacancy->getPlacementAddressLongitude(),
-                        "latitude"      => $vacancy->getPlacementAddressLatitude(),
-                        "applicationProcedure" => [
-                            "title" => $vacancy->getApplicationProcessTitle(),
-                            "text"  => $vacancy->getApplicationProcessDescription(),
-                            "steps" => $vacancy->getApplicationProcessStep()
-                        ]
-                    ],
+                    "vacancy"    => $vacancyResponse,
                     "applicants" => $applicantsCandidate
                 ]
             ];
