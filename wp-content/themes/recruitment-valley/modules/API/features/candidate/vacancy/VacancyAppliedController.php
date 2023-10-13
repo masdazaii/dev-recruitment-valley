@@ -8,6 +8,7 @@ use Model\ModelHelper;
 use Vacancy\Vacancy;
 use constant\NotificationConstant;
 use Global\NotificationService;
+use Helper\StringHelper;
 use Model\Applicant;
 use Model\Company;
 use WP_Query;
@@ -208,7 +209,7 @@ class VacancyAppliedController
                     "name" => $vacancy->getTitle(),
                     "status" => $vacancy->getStatus()['name'],
                     "image" => $company->getThumbnail('object'),
-                    "description" => $vacancy->getDescription(),
+                    "description" => StringHelper::shortenString($vacancy->getDescription() ?? '', 0, 10000),
                     "jobPostedDate" => $vacancy->getPublishDate(),
                     "applyDate" => $applicant->getApplyDate(),
                     "isNew" => $vacancy->getIsNew(),
