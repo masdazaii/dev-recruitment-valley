@@ -19,6 +19,7 @@ class Validator
     private $rules;
     private $_sanitizeRules;
     private $errors;
+    private $nonceErrors;
 
     public function __construct(array $data, array $rules, array $sanitizeRules = [])
     {
@@ -26,6 +27,7 @@ class Validator
         $this->rules = $rules;
         $this->_sanitizeRules = $sanitizeRules;
         $this->errors = [];
+        $this->nonceErrors = '';
     }
 
     public function validate()
@@ -283,5 +285,34 @@ class Validator
                 return $data;
                 break;
         endswitch;
+    }
+
+    public function validateNonce(String $action, $value)
+    {
+        if (!empty($action)) {
+            if (!empty($value)) {
+                if (!wp_verify_nonce($value, $action)) {
+                    $this->addNonceError("Nonce is invalid!");
+                    return false;
+                }
+
+                return true;
+            } else {
+                $this->addNonceError("Nonce is empty.");
+                return false;
+            }
+        } else {
+            throw new Exception('Please specify nonce action name!');
+        }
+    }
+
+    private function addNonceError($message = '')
+    {
+        $this->nonceErrors = $message;
+    }
+
+    public function getNonceError()
+    {
+        return $this->nonceErrors;
     }
 }

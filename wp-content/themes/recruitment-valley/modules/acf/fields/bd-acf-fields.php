@@ -3278,7 +3278,15 @@ acf_add_local_field_group(array(
 			'type' => 'text',
 			'instructions' => '',
 			'required' => 0,
-			'conditional_logic' => 0,
+			'conditional_logic' => array(
+				array(
+					array(
+						'field' => 'field_64fe7b3186a6b',
+						'operator' => '==',
+						'value' => '1',
+					),
+				),
+			),
 			'wrapper' => array(
 				'width' => '',
 				'class' => '',
@@ -3289,6 +3297,73 @@ acf_add_local_field_group(array(
 			'placeholder' => '',
 			'prepend' => '',
 			'append' => '',
+		),
+		array(
+			'key' => 'field_652cac3eeacdb',
+			'label' => 'Vacancy import approved by',
+			'name' => 'rv_vacancy_imported_approved_by',
+			'aria-label' => '',
+			'type' => 'user',
+			'instructions' => '',
+			'required' => 0,
+			'conditional_logic' => array(
+				array(
+					array(
+						'field' => 'field_64fe7b3186a6b',
+						'operator' => '==',
+						'value' => '1',
+					),
+				),
+			),
+			'wrapper' => array(
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'role' => array(
+				0 => 'administrator',
+			),
+			'return_format' => 'object',
+			'multiple' => 0,
+			'allow_null' => 0,
+			'bidirectional' => 0,
+			'bidirectional_target' => array(
+			),
+		),
+		array(
+			'key' => 'field_652cb51d484bd',
+			'label' => 'Vacancy import approval status',
+			'name' => 'rv_vacancy_imported_approval_status',
+			'aria-label' => '',
+			'type' => 'select',
+			'instructions' => '',
+			'required' => 0,
+			'conditional_logic' => array(
+				array(
+					array(
+						'field' => 'field_64fe7b3186a6b',
+						'operator' => '==',
+						'value' => '1',
+					),
+				),
+			),
+			'wrapper' => array(
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'choices' => array(
+				'admin-approved' => 'Approved',
+				'system-approved' => 'System Approved',
+				'rejected' => 'Rejected',
+			),
+			'default_value' => false,
+			'return_format' => 'array',
+			'multiple' => 0,
+			'allow_null' => 0,
+			'ui' => 0,
+			'ajax' => 0,
+			'placeholder' => '',
 		),
 	),
 	'location' => array(

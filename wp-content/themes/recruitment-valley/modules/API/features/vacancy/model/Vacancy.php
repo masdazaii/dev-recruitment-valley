@@ -80,6 +80,9 @@ class Vacancy
     private $_acf_imported_company_city_longitude = "rv_vacancy_imported_company_city_longitude";
     private $_acf_imported_company_city_latitude = "rv_vacancy_imported_company_city_latitude";
 
+    private $_acf_imported_approved_by      = "rv_vacancy_imported_approved_by";
+    private $_acf_imported_approved_status  = "rv_vacancy_imported_approval_status";
+
     public function __construct($vacancy_id = false)
     {
         if ($vacancy_id) {
@@ -861,6 +864,91 @@ class Vacancy
     public function getImportedCompanyLatitude()
     {
         return $this->getProp($this->_acf_imported_company_city_latitude);
+    }
+
+    /**
+     * Get imported vacancy function
+     *
+     * @param array $filters
+     * @return void
+     */
+    public function getImportedVacancy($filters = [], $taxonomyFilters = [], $args = [])
+    {
+        $args = $this->_setImportedArguments($args, $filters, $taxonomyFilters = []);
+        $vacancies = new WP_Query($args);
+
+        return $vacancies;
+    }
+
+    private function _setImportedArguments($args = [], $filters = [], $taxonomyFilters = [])
+    {
+        if (empty($args)) {
+            $args = [
+                "post_type" => $this->vacancy,
+                "posts_per_page" => $filters['postPerPage'] ?? -1,
+                "offset" => $filters['offset'] ?? 0,
+                "orderby" => $filters['orderBy'] ?? "date",
+                "order" => $filters['sort'] ?? 'ASC',
+                "post_status" => "publish",
+                "meta_query" => [
+                    "relation" => "AND",
+                    [
+                        'key'       => $this->_acf_is_imported,
+                        'value'     => 1,
+                        'compare'   => '=',
+                    ],
+                ],
+                "tax_query" => [
+                    "relation" => 'AND',
+                ]
+            ];
+        }
+
+        /** Set tax_query */
+        if (!empty($taxonomyFilters)) {
+            foreach ($taxonomyFilters as $key => $value) {
+                if ($value && $value !== null && !empty($value)) {
+                    $args['tax_query'][1]['relation'] = 'OR';
+
+                    array_push($args['tax_query'][1], [
+                        'taxonomy' => $key,
+                        'field'    => 'term_id',
+                        'terms'    => $value,
+                        'compare'  => 'IN'
+                    ]);
+                }
+            }
+        }
+
+        return $args;
+    }
+
+    public function setApprovedStatus($value)
+    {
+        return $this->setProp($this->_acf_imported_approved_status, $value);
+    }
+
+    public function getApprovedStatus($result = 'object')
+    {
+        if ($result == 'label') {
+            $value = $this->getProp($this->_acf_imported_approved_status, true);
+            if ($value && !empty($value)) {
+                if (is_array($value)) {
+                    return $value['label'];
+                } else {
+                    return $value;
+                }
+            } else {
+                return '';
+            }
+        } else {
+            return $this->getProp($this->_acf_imported_approved_status, true);
+        }
+    }
+
+    public function setApprovedBy($value)
+    {
+        return $this->setProp($this->_acf_imported_approved_by, $value);
     }
     /** Method for related to imported vacancy end here */
 

@@ -107,4 +107,14 @@ class ValidationHelper
     {
         return $this->_validator->tempSanitize();
     }
+
+    public function validateNonce(String $action, $value)
+    {
+        return $this->_validator->validateNonce($action, $value);
+    }
+
+    public function getNonceError()
+    {
+        return $this->_validator->getNonceError();
+    }
 }

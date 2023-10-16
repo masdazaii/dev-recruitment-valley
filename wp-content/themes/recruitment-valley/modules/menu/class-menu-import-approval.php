@@ -1,0 +1,248 @@
+<?php
+
+namespace Menu;
+
+use Vacancy\Vacancy;
+use Helper\ValidationHelper;
+
+defined('ABSPATH') or die("Direct access not allowed!");
+
+class ImportMenu
+{
+    public $successMessage;
+    public $errorMessage;
+
+    public function __construct()
+    {
+        add_action('init', [$this, 'initMethod']);
+        add_action('admin_menu', [$this, 'importVacancyApprovalMenu']);
+        add_action('admin_post_handle_imported_vacancy_approval', [$this, 'importVacancyApprovalSumbitHandle']);
+        add_action('admin_notices', [$this, 'importVacancyApprovalNotices']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueueImportVacancyApprovalScripts']);
+        add_action('wp_ajax_handle_imported_vacancy_list', [$this, 'importVacancyApprovalAjax']);
+        add_action('wp_ajax_nopriv_handle_imported_vacancy_list', [$this, 'importVacancyApprovalAjax']);
+    }
+
+    public function initMethod()
+    {
+        session_start();
+    }
+
+    public function importVacancyApprovalMenu()
+    {
+        if (is_admin() && current_user_can('administrator')) {
+            add_menu_page(
+                $page_title = __('Vacancy Approval', THEME_DOMAIN),
+                $menu_title = __('Vacancy Approval', THEME_DOMAIN),
+                $capability = 'manage_options',
+                $menu_slug  = 'import-approval',
+                $callback   = [$this, 'importVacancyApprovalRenderPage'],
+                $icon_url   = 'dashicons-pressthis',
+                $position   = 7
+            );
+        }
+    }
+
+    public function importVacancyApprovalRenderPage()
+    {
+        /** Get imported vacancies */
+        $vacancy = new Vacancy();
+        $importedVacancies = $vacancy->getImportedVacancy();
+
+        extract(['vacancies' => $importedVacancies]);
+
+        ob_start();
+        include __DIR__ . '/imported-vacancy-approval-page.php';
+        $output = ob_get_clean();
+        echo $output;
+    }
+
+    public function importVacancyApprovalSumbitHandle()
+    {
+        if (is_admin() && current_user_can('administrator')) {
+            global $wpdb;
+
+            $wpdb->query("START TRANSACTION");
+            try {
+                /** Validate and sanitize request */
+                $validator = new ValidationHelper('importVacancyApproval', $_POST);
+
+                if (!$validator->tempValidate()) {
+                    $errors = $validator->getErrors();
+                    $message = '';
+                    foreach ($errors as $field => $message) {
+                        $message .= $field . ' : ' . $message . PHP_EOL;
+                    }
+
+                    $_SESSION['flash_message'] = [
+                        'status'    => 'failed',
+                        'message'   => $message
+                    ];
+
+                    wp_redirect(esc_url(admin_url('admin.php')) . '?page=import-approval&result=failed');
+                }
+
+                /** Validate nonce */
+                if (!$validator->validateNonce('nonce_imported_vacancy_approval', $_POST['nonce'])) {
+                    $_SESSION['flash_message'] = [
+                        'status'    => 'failed',
+                        'message'   => $validator->getNonceError()
+                    ];
+
+                    wp_redirect(esc_url(admin_url('admin.php')) . '?page=import-approval&result=nonce-failed');
+                }
+
+                /** Sanitize request body */
+                $validator->tempSanitize();
+                $body       = $validator->getData();
+
+                /** Update vacancy */
+                $vacancy    = new Vacancy($body['vacancyID']);
+
+                /** Set status */
+                if (array_key_exists('approval', $body)) {
+                    if ($body['approval'] === 'approved') {
+                        $vacancy->setApprovedStatus('admin-approved');
+                        $vacancy->setStatus('open');
+
+                        $_SESSION['flash_message'] = [
+                            'status'    => 'success',
+                            'message'   => 'Vacancy Approved!'
+                        ];
+                    } else {
+                        $vacancy->setApprovedStatus('rejected');
+                        $vacancy->setStatus('close');
+
+                        $_SESSION['flash_message'] = [
+                            'status'    => 'success',
+                            'message'   => 'Vacancy Rejected!'
+                        ];
+                    }
+                }
+
+                $vacancy->setApprovedBy(get_current_user_id());
+
+                wp_redirect(esc_url(admin_url('admin.php')) . '?page=import-approval');
+
+                $wpdb->query("COMMIT");
+            } catch (\WP_Error $err) {
+                $wpdb->query("ROLLBACK");
+                error_log($err->get_error_message());
+                wp_redirect(esc_url(admin_url('admin.php')) . '?page=import-approval&result=failed-wp-err');
+            } catch (\Exception $e) {
+                $wpdb->query("ROLLBACK");
+                error_log($e->getMessage());
+                wp_redirect(esc_url(admin_url('admin.php')) . '?page=import-approval&result=failed-exception');
+            } catch (\Throwable $th) {
+                $wpdb->query("ROLLBACK");
+                error_log($th->getMessage());
+                wp_redirect(esc_url(admin_url('admin.php')) . '?page=import-approval&result=failed-throwable');
+            }
+        }
+    }
+
+    public function importVacancyApprovalNotices()
+    {
+        if (isset($_SESSION['flash_message'])) {
+            if (is_array($_SESSION['flash_message']) && array_key_exists('status', $_SESSION['flash_message'])) {
+                if ($_SESSION['flash_message']['status'] == 'success') {
+                    $this->successNotice();
+                } else {
+                    $this->errorNotice();
+                }
+                unset($_SESSION['flash_message']);
+            }
+        }
+    }
+
+    public function errorNotice()
+    {
+        echo '<div class="error notice">';
+        echo '<p>' . __($_SESSION['flash_message']['message'], THEME_DOMAIN) . '</p>';
+        echo '</div>';
+    }
+
+    public function successNotice()
+    {
+        echo '<div class="updated notice">';
+        echo '<p>' . __($_SESSION['flash_message']['message'], THEME_DOMAIN) . '</p>';
+        echo '</div>';
+    }
+
+    public function enqueueImportVacancyApprovalScripts()
+    {
+        wp_enqueue_script(
+            'importVacancyApprovalScript',
+            THEME_URL . '/assets/js/src/wp-admin.js',
+            array('jquery'),
+            FALSE
+        );
+
+        wp_localize_script(
+            'importVacancyApprovalScript',
+            'importedVacanciesData',
+            [
+                'ajaxUrl'       => admin_url('admin-ajax.php'),
+                'postUrl'       => esc_url(admin_url('admin-post.php')),
+                'themeUrl'      => THEME_URL,
+                'action'        => 'handle_imported_vacancy_list'
+            ]
+        );
+
+        wp_register_style('DataTables', 'https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css');
+        wp_enqueue_style('DataTables');
+
+        wp_register_script('DataTables', 'https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js');
+        wp_enqueue_script('DataTables');
+    }
+
+    public function importVacancyApprovalAjax()
+    {
+        try {
+            $filters = [
+                'page'          => $_GET['start'] ? ($_GET['start'] / $_GET['length'] + 1) :  1,
+                'postPerPage'   => $_GET['length'] ?? 10,
+                // 'postPerPage'   => -1,
+                'orderBy'       => $_GET['orderBy'],
+                'sort'          => $_GET['order'],
+            ];
+
+            $filters['offset']  = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['postPerPage']));
+
+            $vacancy = new Vacancy();
+            $vacancies = $vacancy->getImportedVacancy($filters);
+            $vacanciesResponse = [];
+
+            if ((int)$vacancies->found_posts > 0) {
+                foreach ($vacancies->posts as $vacancy) :
+                    $eachVacancy = new Vacancy($vacancy->ID);
+                    $eachVacancyApprovalStatus = $eachVacancy->getApprovedStatus();
+
+                    $vacanciesResponse[] = [
+                        'id'                => $vacancy->ID,
+                        'title'             => $eachVacancy->getTitle(),
+                        'vacancyStatus'     => $eachVacancy->getStatus()['name'],
+                        'approvalStatus'    => !empty($eachVacancyApprovalStatus) ? $eachVacancyApprovalStatus['label'] : 'waiting approval',
+                        'publishDate'       => $eachVacancy->getPublishDate(),
+                        'rowNonce'          => wp_create_nonce('nonce_imported_vacancy_approval')
+                    ];
+                endforeach;
+            }
+
+            wp_send_json([
+                'message'           => "Success",
+                "draw"              => (int)$_GET['draw'],
+                "recordsTotal"      => (int)$vacancies->found_posts,
+                // "recordsTotal"      => 100,
+                "recordsFiltered"   => (int)$vacancies->found_posts,
+                'data'              => $vacanciesResponse,
+                'filters'           => $filters
+            ], 200);
+        } catch (\Exception $error) {
+            wp_send_json(['message' => $error->getMessage()], 400);
+        }
+    }
+}
+
+// Initialize
+new ImportMenu();

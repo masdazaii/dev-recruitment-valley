@@ -111,6 +111,49 @@ class FlexFeedController
                     // $i = 0;
                     $jobs = $response->source->job;
                     for ($i = 0; $i < count($jobs); $i++) {
+                        /** ACF expired_at
+                         * Check if vacancy is expired or not
+                         */
+                        if (!property_exists($jobs[$i], 'expirationdate') && !empty($jobs[$i]->expirationdate)) {
+                            /** Set expired date 30 days from this data inputed */
+                            $expiredAt = new \DateTimeImmutable();
+                            $payload['expired_at'] = $expiredAt->modify("+30 days")->format("Y-m-d H:i:s");
+                        } else {
+                            $today = new \DateTimeImmutable();
+
+                            if (strtotime($payload['expired_at']) > $today->setTime(23, 59, 59)->getTimestamp()) {
+                                $taxonomy['status'] = $this->_findStatus('processing');
+
+                                /** Unset used key */
+                                // unset($jobs[$i]->expirationdate);
+                            } else {
+                                error_log('[Flexfeed] - Vacancy is expired, vacancy not stored to recruitment valley database. Title : ' . property_exists($jobs[$i], 'title') ? $jobs[$i]->title : '"NoTitleFound" - index : ' . $i);
+                                trigger_error('[Flexfeed] - Vacancy is expired, vacancy not stored to recruitment valley database.', E_USER_WARNING);
+                                $i++;
+                                continue;
+                            }
+                        }
+
+                        /** Check if vacancy is still open */
+                        if (!property_exists($jobs[$i], 'isActive') || empty($jobs[$i]->isActive)) {
+                            error_log('[Flexfeed] - Vacancy is closed, vacancy not stored to recruitment valley database. Title : ' . property_exists($jobs[$i], 'title') ? $jobs[$i]->title : '"NoTitleFound" - index : ' . $i);
+                            trigger_error('[Flexfeed] - Vacancy is closed, vacancy not stored to recruitment valley database.', E_USER_WARNING);
+                            $i++;
+                            continue;
+                        } else {
+                            if (!empty($jobs[$i]->isActive)) {
+                                $taxonomy['status'] = $this->_findStatus('processing');
+
+                                /** Unset used key */
+                                // unset($jobs[$i]->isActive);
+                            } else {
+                                error_log('[Flexfeed] - Vacancy is closed, vacancy not stored to recruitment valley database. Title : ' . property_exists($jobs[$i], 'title') ? $jobs[$i]->title : '"NoTitleFound" - index : ' . $i);
+                                trigger_error('[Flexfeed] - Vacancy is closed, vacancy not stored to recruitment valley database.', E_USER_WARNING);
+                                $i++;
+                                continue;
+                            }
+                        }
+
                         /** Validate - check if data is exists or not
                          * check by requisitionId (previously validate by url)
                          */
@@ -198,18 +241,6 @@ class FlexFeedController
                         /** ACF apply_from_this_platform */
                         $payload['apply_from_this_platform'] = false;
 
-                        /** ACF expired_at */
-                        if (property_exists($jobs[$i], 'expirationdate') && !empty($jobs[$i]->expirationdate)) {
-                            $payload['expired_at'] = \DateTime::createFromFormat('d-n-Y', preg_replace('/[\n\t]+/', '', $jobs[$i]->expirationdate))->setTime(23, 59, 59)->format('Y-m-d H:i:s');
-
-                            /** Unset used key */
-                            unset($jobs[$i]->expirationdate);
-                        } else {
-                            /** Set expired date 30 days from this data inputed */
-                            $expiredAt = new \DateTimeImmutable();
-                            $payload['expired_at'] = $expiredAt->modify("+30 days")->format("Y-m-d H:i:s");
-                        }
-
                         $payload['salary_start'] = 0;
                         $payload['salary_end'] = 0;
 
@@ -280,31 +311,6 @@ class FlexFeedController
                             unset($jobs[$i]->experience);
                         }
 
-                        /** Taxonomy Status */
-                        if (property_exists($jobs[$i], 'isActive') && !empty($jobs[$i]->isActive)) {
-                            /** Check if expired */
-                            if ($payload['expired_at']) {
-                                $today = new \DateTime("now");
-                                $endOfTheDay = $today->setTime(23, 59, 59);
-
-                                if (strtotime($payload['expired_at']) > $today->setTime(23, 59, 59)->getTimestamp()) {
-                                    $taxonomy['status'] = $this->_findStatus(true);
-                                    error_log($arguments['post_name'] . ' not expired - ' . $payload['expired_at'] . ' > ' . $endOfTheDay->format('Y-m-d H:i:s') . ' - ' . $taxonomy['status']);
-                                } else {
-                                    $taxonomy['status'] = $this->_findStatus(false);
-                                    error_log($arguments['post_name'] . ' expired - ' . $payload['expired_at'] . ' < ' . $endOfTheDay->format('Y-m-d H:i:s') . ' - ' . $taxonomy['status']);
-                                }
-                            } else {
-                                $taxonomy['status'] = $this->_findStatus($jobs[$i]->isActive);
-                                error_log($arguments['post_name'] . ' is active - ' . $taxonomy['status']);
-                            }
-
-                            /** Unset used key */
-                            // unset($jobs[$i]->isActive);
-                        } else {
-                            $taxonomy['status'] = $this->_findStatus(false);
-                        }
-
                         /** Taxonomy Role */
                         if (property_exists($jobs[$i], 'category') && !empty($jobs[$i]->category)) {
                             $taxonomy['role'] = $this->_findRole(preg_replace('/[\n\t]+/', '', $jobs[$i]->category));
@@ -331,14 +337,6 @@ class FlexFeedController
 
                             $vacancy->setTaxonomy($taxonomy);
 
-                            /** Taxonomy Status */
-                            // $vacancy->setStatus('open');
-
-                            /** Set expired date 30 days from this data inputed */
-                            // $expiredAt = new \DateTimeImmutable();
-                            // $expiredAt = $expiredAt->modify("+30 days")->format("Y-m-d H:i:s");
-                            // $vacancy->setProp("expired_at", $expiredAt);
-
                             foreach ($payload as $acf_field => $acfValue) {
                                 $vacancy->setProp($acf_field, $acfValue, is_array($acfValue));
                             }
@@ -352,6 +350,10 @@ class FlexFeedController
                                     $vacancy->setDistance($payload["placement_city"], $payload["placement_city"] . " " . $payload["placement_address"]);
                                 }
                             }
+
+                            /** Set approval data */
+                            $vacancy->setApprovedStatus(null);
+                            $vacancy->setApprovedBy(null);
 
                             /** store unused to post meta */
                             update_post_meta($post, 'rv_vacancy_unused_data', $unusedData);
@@ -561,8 +563,17 @@ class FlexFeedController
         $termOpen = get_term_by('slug', 'open', 'status', 'OBJECT');
         $termClose = get_term_by('slug', 'close', 'status', 'OBJECT');
 
-        if ($fetchValue || $fetchValue == "true") {
-            return $termOpen->term_id;
+        if ($fetchValue) {
+            if ($fetchValue == "true") {
+                return $termOpen->term_id;
+            } else {
+                $term = get_term_by('slug', $fetchValue, 'status', 'OBJECT');
+                if ($term) {
+                    return $term->term_id;
+                } else {
+                    throw new Exception("Term '{$fetchValue}' didn\'t exists!");
+                }
+            }
         } else {
             return $termClose->term_id;
         }

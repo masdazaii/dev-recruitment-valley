@@ -215,6 +215,11 @@ class RequestRules
             'vacancySingleApplicant' => [
                 'application' => ["required", "exists:post/applicants/post_id/single"],
             ],
+            // This one is admin submission
+            'importVacancyApproval' => [
+                'vacancyID' => ["required", "exists:post/vacancy/post_id/single"],
+                'approval'  => ["required", "in:rejected,approved"]
+            ],
             'test' => [
                 'test.*.name' => ["required", "mime:jpg,jpeg,png,bmp,gif,svg,webp"]
             ]
@@ -391,6 +396,12 @@ class RequestRules
             ],
             "userChangeEmail" => [
                 'newEmail' => "email"
+            ],
+            // This is admin submission
+            'importVacancyApproval' => [
+                'vacancyID' => "text",
+                'approval'  => "text",
+                'nonce'     => "text"
             ],
             /** When using rule other than these 2. Please add following sanitize rule in Validator.php. */
             "example" => [
