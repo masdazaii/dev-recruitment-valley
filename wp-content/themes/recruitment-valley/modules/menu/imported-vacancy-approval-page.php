@@ -12,9 +12,9 @@ use Vacancy\Vacancy;
             <div style="">
                 Filter goes here
             </div>
-            <table id="my-table">
+            <table id="admin-imported-vacancy-approval-table">
                 <thead style="text-align: left;">
-                    <th>ID</th>
+                    <th>No.</th>
                     <th>Vacancy Title</th>
                     <th>Vacancy Status</th>
                     <th>Approval Status</th>

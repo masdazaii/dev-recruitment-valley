@@ -920,6 +920,11 @@ class Vacancy
             }
         }
 
+        /** Set search query */
+        if (!empty($filters['search'])) {
+            $args['s'] = $filters['search'];
+        }
+
         return $args;
     }
 

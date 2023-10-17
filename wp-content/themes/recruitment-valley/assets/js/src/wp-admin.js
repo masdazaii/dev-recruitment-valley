@@ -5,7 +5,7 @@
 	$(() => {
 		/** Import script for imported vacancy handle */
 		if ($('main').hasClass('admin-imported-vacancy-approval')) {
-			import('./vacancy/imported-vacancy.js').then((module) => {
+			import('./vacancy/admin-imported-vacancy-approval.js').then((module) => {
 				const importedVacancyModule = module.default // Access the default property
 				importedVacancyModule.init()
 			})

@@ -202,30 +202,33 @@ class ImportMenu
             $filters = [
                 'page'          => $_GET['start'] ? ($_GET['start'] / $_GET['length'] + 1) :  1,
                 'postPerPage'   => $_GET['length'] ?? 10,
-                // 'postPerPage'   => -1,
                 'orderBy'       => $_GET['orderBy'],
                 'sort'          => $_GET['order'],
+                'search'        => isset($_GET['search']) ? $_GET['search']['value'] : null
             ];
 
             $filters['offset']  = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['postPerPage']));
 
             $vacancy = new Vacancy();
             $vacancies = $vacancy->getImportedVacancy($filters);
-            $vacanciesResponse = [];
+            $vacanciesResponse = [];;
 
             if ((int)$vacancies->found_posts > 0) {
+                $no = 1;
                 foreach ($vacancies->posts as $vacancy) :
                     $eachVacancy = new Vacancy($vacancy->ID);
                     $eachVacancyApprovalStatus = $eachVacancy->getApprovedStatus();
 
                     $vacanciesResponse[] = [
                         'id'                => $vacancy->ID,
+                        'no'                => $no,
                         'title'             => $eachVacancy->getTitle(),
                         'vacancyStatus'     => $eachVacancy->getStatus()['name'],
                         'approvalStatus'    => !empty($eachVacancyApprovalStatus) ? $eachVacancyApprovalStatus['label'] : 'waiting approval',
                         'publishDate'       => $eachVacancy->getPublishDate(),
                         'rowNonce'          => wp_create_nonce('nonce_imported_vacancy_approval')
                     ];
+                    $no++;
                 endforeach;
             }
 
@@ -233,9 +236,9 @@ class ImportMenu
                 'message'           => "Success",
                 "draw"              => (int)$_GET['draw'],
                 "recordsTotal"      => (int)$vacancies->found_posts,
-                // "recordsTotal"      => 100,
                 "recordsFiltered"   => (int)$vacancies->found_posts,
                 'data'              => $vacanciesResponse,
+                'search'            => isset($_GET['search']) ? $_GET['search']['value'] : null,
                 'filters'           => $filters
             ], 200);
         } catch (\Exception $error) {
