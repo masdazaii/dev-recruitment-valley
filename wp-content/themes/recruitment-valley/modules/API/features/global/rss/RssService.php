@@ -2,7 +2,7 @@
 
 namespace Global\Rss;
 
-use Company\Vacancy\VacancyController;
+use Vacancy\VacancyCrudController;
 
 class RssService
 {
@@ -12,7 +12,7 @@ class RssService
     public function __construct()
     {
         $this->rssController = new RssController;
-        $this->vacancyController = new VacancyController;
+        $this->vacancyController = new VacancyCrudController;
     }
 
     public function get()
