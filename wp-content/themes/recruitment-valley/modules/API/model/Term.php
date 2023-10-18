@@ -2,6 +2,8 @@
 
 namespace Model;
 
+defined('ABSPATH') or die('Direct access not allowed!');
+
 class Term
 {
     public $term;
@@ -113,5 +115,51 @@ class Term
         }
 
         return $this->arguments;
+    }
+
+    /**
+     * Insert new term function
+     *
+     * @param String $taxonomy
+     * @param String $term
+     * @param array $args
+     * @return int|false
+     */
+    public function createTerm(String $taxonomy, String $term, array $args = []): int|false
+    {
+        $newTerm = wp_insert_term($term, $taxonomy, $args);
+
+        if ($newTerm instanceof \WP_Error) {
+            /** Return term_id if term is exists */
+            if (array_key_exists('term_exists', $newTerm->error_data)) {
+                return $newTerm->error_data['term_exists'];
+            }
+            return false;
+        } else {
+            return $newTerm['term_id'];
+        }
+    }
+
+    public function selectTermByTaxonomy(String $taxonomy, Bool $formatted = true)
+    {
+        $theArguments = $this->_setArguments($taxonomy, []);
+        $terms = get_terms($theArguments);
+        if ($terms) {
+            if ($terms instanceof \WP_Error) {
+                throw new \Exception($terms->get_error_message());
+            } else {
+                $result = [];
+                foreach ($terms as $term) {
+                    $result[] = [
+                        'term_id'   => $term->term_id,
+                        'name'      => $term->name,
+                        'slug'      => $term->slug
+                    ];
+                }
+                return $result;
+            }
+        } else {
+            throw new \Exception('Error when get terms!');
+        }
     }
 }
