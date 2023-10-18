@@ -8,7 +8,6 @@ use Error;
 use Exception;
 use Helper\StringHelper;
 use SimpleXMLElement;
-use Spatie\ArrayToXml\ArrayToXml;
 use Vacancy\Vacancy;
 use Vacancy\VacancyResponse;
 use WP_Post;
