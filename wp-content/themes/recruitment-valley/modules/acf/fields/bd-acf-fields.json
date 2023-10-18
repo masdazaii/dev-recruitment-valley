@@ -893,6 +893,123 @@
                 "allow_null": 0,
                 "bidirectional": 0,
                 "bidirectional_target": []
+            },
+            {
+                "key": "field_652f5698fcd0a",
+                "label": "Number Role to Set",
+                "name": "import_api_role_to_set",
+                "aria-label": "",
+                "type": "number",
+                "instructions": "How many role to set for each imported vacancy.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": 1,
+                "min": 0,
+                "max": "",
+                "placeholder": "",
+                "step": 1,
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_652e11ee76ccd",
+                "label": "Import Mapping Role",
+                "name": "import_api_mapping_role",
+                "aria-label": "",
+                "type": "repeater",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "layout": "table",
+                "pagination": 0,
+                "min": 0,
+                "max": 0,
+                "collapsed": "",
+                "button_label": "Add Row",
+                "rows_per_page": 20,
+                "sub_fields": [
+                    {
+                        "key": "field_652e11f676cce",
+                        "label": "Selected Term",
+                        "name": "import_api_mapping_role_term",
+                        "aria-label": "",
+                        "type": "taxonomy",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "taxonomy": "role",
+                        "add_term": 1,
+                        "save_terms": 1,
+                        "load_terms": 0,
+                        "return_format": "id",
+                        "field_type": "select",
+                        "allow_null": 0,
+                        "bidirectional": 0,
+                        "multiple": 0,
+                        "bidirectional_target": [],
+                        "parent_repeater": "field_652e11ee76ccd"
+                    },
+                    {
+                        "key": "field_652e487fc0206",
+                        "label": "Accepted Keyword",
+                        "name": "import_api_mapping_role_keywords",
+                        "aria-label": "",
+                        "type": "repeater",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "layout": "table",
+                        "min": 0,
+                        "max": 0,
+                        "collapsed": "",
+                        "button_label": "Add Row",
+                        "rows_per_page": 20,
+                        "sub_fields": [
+                            {
+                                "key": "field_652e4924c0207",
+                                "label": "Keywords",
+                                "name": "import_api_mapping_role_eachword",
+                                "aria-label": "",
+                                "type": "text",
+                                "instructions": "",
+                                "required": 0,
+                                "conditional_logic": 0,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "default_value": "",
+                                "maxlength": "",
+                                "placeholder": "",
+                                "prepend": "",
+                                "append": "",
+                                "parent_repeater": "field_652e487fc0206"
+                            }
+                        ],
+                        "parent_repeater": "field_652e11ee76ccd"
+                    }
+                ]
             }
         ],
         "location": [
