@@ -1,5 +1,89 @@
 [
     {
+        "key": "group_652641571200a",
+        "title": "Active campaign settings",
+        "fields": [
+            {
+                "key": "field_6526415765312",
+                "label": "Active campaign api url",
+                "name": "active_campaign_api_url",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_652641db65313",
+                "label": "Active campaign api version",
+                "name": "active_campaign_api_version",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_6526420565314",
+                "label": "Active campaign api key",
+                "name": "active_campaign_api_key",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "options_page",
+                    "operator": "==",
+                    "value": "active-campaign-settings"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": "",
+        "show_in_rest": 0
+    },
+    {
         "key": "group_64d2025201b99",
         "title": "Applicant field group",
         "fields": [
@@ -560,7 +644,7 @@
                 },
                 "default_value": "",
                 "min": "",
-                "max": 99,
+                "max": 100,
                 "placeholder": "",
                 "step": "",
                 "prepend": "",
@@ -786,6 +870,29 @@
                 "step": "",
                 "prepend": "",
                 "append": ""
+            },
+            {
+                "key": "field_6528ccff22f76",
+                "label": "Admin to import",
+                "name": "import_api_user_to_import",
+                "aria-label": "",
+                "type": "user",
+                "instructions": "",
+                "required": 1,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "role": [
+                    "administrator"
+                ],
+                "return_format": "id",
+                "multiple": 0,
+                "allow_null": 0,
+                "bidirectional": 0,
+                "bidirectional_target": []
             }
         ],
         "location": [

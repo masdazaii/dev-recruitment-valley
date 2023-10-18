@@ -2,6 +2,8 @@
 
 namespace Vacancy\Import\Xml;
 
+use DateTime;
+use DateTimeImmutable;
 use Error;
 use Exception;
 use Vacancy\Vacancy;
@@ -60,8 +62,8 @@ class FlexFeedController
                     CURLOPT_HTTPHEADER      => ["Authorization: " . FLEXFEED_API_KEY],  // Add header to request
                     CURLOPT_HEADER          => false,   // true to include the header in the output.
                     CURLOPT_RETURNTRANSFER  => true,    // true to return the transfer as a string of the return value of curl_exec() instead of outputting it directly.
-                    CURLOPT_CONNECTTIMEOUT  => 30,  // time-out on connect
-                    CURLOPT_TIMEOUT         => 30,  // time-out on response
+                    CURLOPT_CONNECTTIMEOUT  => 120,  // time-out on connect
+                    CURLOPT_TIMEOUT         => 120,  // time-out on response
                 ]);
 
                 // curl_setopt($curl, CURLOPT_URL, $this->_sourceUrl);
@@ -88,12 +90,13 @@ class FlexFeedController
 
                     /** Get RV Administrator User data */
                     $rvAdmin = get_user_by('email', 'adminjob@recruitmentvalley.com');
+                    $importUser = get_field('import_api_user_to_import', 'option') ?? $rvAdmin->ID;
 
                     /** wp_insert_post arguments */
                     $arguments = [
                         'post_type' => 'vacancy',
                         'post_status' => 'publish',
-                        'post_author' => $rvAdmin->ID
+                        'post_author' => $importUser
                     ];
 
                     $payload    = [];
@@ -147,7 +150,7 @@ class FlexFeedController
                             $arguments['post_date'] = \DateTime::createFromFormat('d-n-Y H:i:s', preg_replace('/[\n\t]+/', '', $jobs[$i]->datePosted))->format('Y-m-d H:i:s');
 
                             /** Unset used key */
-                            unset($jobs[$i]->datePosted);
+                            // unset($jobs[$i]->datePosted);
                         }
 
                         /** ACF Description */
@@ -279,10 +282,27 @@ class FlexFeedController
 
                         /** Taxonomy Status */
                         if (property_exists($jobs[$i], 'isActive') && !empty($jobs[$i]->isActive)) {
-                            $taxonomy['status'] = $this->_findStatus($jobs[$i]->isActive);
+                            /** Check if expired */
+                            if ($payload['expired_at']) {
+                                $today = new \DateTime("now");
+                                $endOfTheDay = $today->setTime(23, 59, 59);
+
+                                if (strtotime($payload['expired_at']) > $today->setTime(23, 59, 59)->getTimestamp()) {
+                                    $taxonomy['status'] = $this->_findStatus(true);
+                                    error_log($arguments['post_name'] . ' not expired - ' . $payload['expired_at'] . ' > ' . $endOfTheDay->format('Y-m-d H:i:s') . ' - ' . $taxonomy['status']);
+                                } else {
+                                    $taxonomy['status'] = $this->_findStatus(false);
+                                    error_log($arguments['post_name'] . ' expired - ' . $payload['expired_at'] . ' < ' . $endOfTheDay->format('Y-m-d H:i:s') . ' - ' . $taxonomy['status']);
+                                }
+                            } else {
+                                $taxonomy['status'] = $this->_findStatus($jobs[$i]->isActive);
+                                error_log($arguments['post_name'] . ' is active - ' . $taxonomy['status']);
+                            }
 
                             /** Unset used key */
-                            unset($jobs[$i]->isActive);
+                            // unset($jobs[$i]->isActive);
+                        } else {
+                            $taxonomy['status'] = $this->_findStatus(false);
                         }
 
                         /** Taxonomy Role */
@@ -312,7 +332,7 @@ class FlexFeedController
                             $vacancy->setTaxonomy($taxonomy);
 
                             /** Taxonomy Status */
-                            $vacancy->setStatus('open');
+                            // $vacancy->setStatus('open');
 
                             /** Set expired date 30 days from this data inputed */
                             // $expiredAt = new \DateTimeImmutable();
@@ -355,6 +375,7 @@ class FlexFeedController
     {
         $args = [
             'post_type' => 'vacancy',
+            'post_status' => 'publish',
             'meta_query' => [
                 [
                     'key' => 'rv_vacancy_imported_source_id',
