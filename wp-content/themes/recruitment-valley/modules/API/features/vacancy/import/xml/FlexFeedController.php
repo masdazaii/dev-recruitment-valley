@@ -63,33 +63,31 @@ class FlexFeedController
         if (isset($this->_sourceUrl) && !empty($this->_sourceUrl)) {
             try {
                 /** Init the curl */
-                // $curl = curl_init();
-                // curl_setopt_array($curl, [
-                //     CURLOPT_URL             => $this->_sourceUrl,   // Source url
-                //     CURLOPT_CUSTOMREQUEST   => 'GET',   // Used HTTP Method
-                //     CURLOPT_HTTPHEADER      => ["Authorization: " . FLEXFEED_API_KEY],  // Add header to request
-                //     CURLOPT_HEADER          => false,   // true to include the header in the output.
-                //     CURLOPT_RETURNTRANSFER  => true,    // true to return the transfer as a string of the return value of curl_exec() instead of outputting it directly.
-                //     CURLOPT_CONNECTTIMEOUT  => 120,  // time-out on connect
-                //     CURLOPT_TIMEOUT         => 120,  // time-out on response
-                // ]);
+                $curl = curl_init();
+                curl_setopt_array($curl, [
+                    CURLOPT_URL             => $this->_sourceUrl,   // Source url
+                    CURLOPT_CUSTOMREQUEST   => 'GET',   // Used HTTP Method
+                    CURLOPT_HTTPHEADER      => ["Authorization: " . FLEXFEED_API_KEY],  // Add header to request
+                    CURLOPT_HEADER          => false,   // true to include the header in the output.
+                    CURLOPT_RETURNTRANSFER  => true,    // true to return the transfer as a string of the return value of curl_exec() instead of outputting it directly.
+                    CURLOPT_CONNECTTIMEOUT  => 120,  // time-out on connect
+                    CURLOPT_TIMEOUT         => 120,  // time-out on response
+                ]);
 
-                // curl_setopt($curl, CURLOPT_URL, $this->_sourceUrl);
-                // curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
-                // curl_setopt($curl, CURLOPT_HTTPHEADER, ["Authorization: " . FLEXFEED_API_KEY]);
-                // curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($curl, CURLOPT_URL, $this->_sourceUrl);
+                curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
+                curl_setopt($curl, CURLOPT_HTTPHEADER, ["Authorization: " . FLEXFEED_API_KEY]);
+                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
-                // $response       = curl_exec($curl);
-                // $responseCode   = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                $response       = curl_exec($curl);
+                $responseCode   = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
                 /** If Curl error */
-                // if (curl_errno($curl)) {
-                //     error_log('Curl Error in fetch flexfeed API - ' . curl_error($curl));
-                // }
+                if (curl_errno($curl)) {
+                    error_log('Curl Error in fetch flexfeed API - ' . curl_error($curl));
+                }
 
-                // curl_close($curl);
-                $responseCode = 200;
-                $response = file_get_contents(__DIR__ . '/example.json');
+                curl_close($curl);
 
                 /** Map the data only if response is 200 */
                 if ($responseCode != 200) {
