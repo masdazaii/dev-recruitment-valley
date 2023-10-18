@@ -17,6 +17,7 @@ use Service\ParserService;
 use Vacancy\Import\ImportService;
 use Global\NotificationService;
 use Global\CouponService;
+use Global\Rss\RssService;
 
 class GlobalEndpoint
 {
@@ -47,6 +48,7 @@ class GlobalEndpoint
         $importService = new ImportService;
         $notificationService = new NotificationService;
         $couponService = new CouponService;
+        $rssService = new RssService;
 
         $endpoint = [
             'path' => '',
@@ -261,6 +263,12 @@ class GlobalEndpoint
                     'methods'               => 'POST',
                     'permission_callback'   => [$authMiddleware, 'authorize_company'],
                     'callback'              => [$couponService, 'apply']
+                ],
+                'get_rss' => [
+                    'url'                   => 'rss/vacancy',
+                    'method'                => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$rssService, 'get']
                 ]
             ]
 
