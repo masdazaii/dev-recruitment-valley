@@ -2,6 +2,8 @@
 
 namespace Global\Rss;
 
+use DOMCdataSection;
+use DOMElement;
 use Error;
 use Exception;
 use Helper\StringHelper;
@@ -44,13 +46,13 @@ class RssController
                 $vacancyElement = $vacanciesResult->channel->addChild('item');
 
                 $vacancyElement->addChild('title', htmlspecialchars($vacancy->getTitle()));
-                $vacancyElement->addChild('url', FRONTEND_URL . $vacancy->getSlug());
+                $vacancyElement->addChild('link', FRONTEND_URL . '/' .$vacancy->getSlug());
+                $descriptionCData = new DOMCdataSection($vacancy->getDescription());
+                $vacancyElement->addChild( 'description', StringHelper::shortenString($descriptionCData->wholeText, 0, 300) );
+                $vacancyElement->addChild( 'pubDate', $vacancy->getPublishDate("D, d F Y H:i:s"));
             }
 
             header('Content-Type: application/rss+xml; charset=utf-8');
-            // echo '<pre>';
-            // var_dump($vacanciesResult);
-            // echo '</pre>';die;
 
             return $vacanciesResult->asXML();
         } catch (\Exception $e) {
