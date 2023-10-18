@@ -2,13 +2,10 @@
 
 namespace Global\Rss;
 
-require_once get_stylesheet_directory() . "/vendor/spatie/array-to-xml/src/ArrayToXml.php";
-
 use Error;
 use Exception;
 use Helper\StringHelper;
 use SimpleXMLElement;
-use Spatie\ArrayToXml\ArrayToXml;
 use Vacancy\Vacancy;
 use Vacancy\VacancyResponse;
 use WP_Post;
