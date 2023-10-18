@@ -83,6 +83,8 @@ class Vacancy
     private $_acf_imported_approved_by      = "rv_vacancy_imported_approved_by";
     private $_acf_imported_approved_status  = "rv_vacancy_imported_approval_status";
 
+    private $_taxonomies = ["sector", "role", "type", "education", "working-hours", "status", "location", "experiences"];
+
     public function __construct($vacancy_id = false)
     {
         if ($vacancy_id) {
@@ -928,6 +930,70 @@ class Vacancy
         return $args;
     }
 
+    public function getVacancies($filters = [], $taxonomyFilters = [], $args = [])
+    {
+        $args = $this->_setVacancyArguments($args, $filters, $taxonomyFilters = []);
+        $vacancies = new WP_Query($args);
+
+        return $vacancies;
+    }
+
+    private function _setVacancyArguments($args = [], $filters = [], $taxonomyFilters = [])
+    {
+        if (empty($args)) {
+            $args = [
+                "post_type" => $this->vacancy,
+                "posts_per_page" => $filters['postPerPage'] ?? -1,
+                "offset" => $filters['offset'] ?? 0,
+                "orderby" => $filters['orderBy'] ?? "date",
+                "order" => $filters['sort'] ?? 'ASC',
+                "post_status" => "publish",
+                "tax_query" => [
+                    "relation" => 'AND',
+                ]
+            ];
+        } else {
+            $arguments = [
+                "post_type" => $this->vacancy,
+                "posts_per_page" => $filters['postPerPage'] ?? -1,
+                "offset" => $filters['offset'] ?? 0,
+                "orderby" => $filters['orderBy'] ?? "date",
+                "order" => $filters['sort'] ?? 'ASC',
+                "post_status" => "publish",
+                "tax_query" => [
+                    "relation" => 'AND',
+                ]
+            ];
+            foreach ($args as $key => $value) {
+                $arguments[$key] = $value;
+            }
+            $args = $arguments;
+        }
+
+        /** Set tax_query */
+        if (!empty($taxonomyFilters)) {
+            foreach ($taxonomyFilters as $key => $value) {
+                if ($value && $value !== null && !empty($value)) {
+                    $args['tax_query'][1]['relation'] = 'OR';
+
+                    array_push($args['tax_query'][1], [
+                        'taxonomy' => $key,
+                        'field'    => 'term_id',
+                        'terms'    => $value,
+                        'compare'  => 'IN'
+                    ]);
+                }
+            }
+        }
+
+        /** Set search query */
+        if (!empty($filters['search'])) {
+            $args['s'] = $filters['search'];
+        }
+
+        return $args;
+    }
+
     public function setApprovedStatus($value)
     {
         return $this->setProp($this->_acf_imported_approved_status, $value);
@@ -980,6 +1046,67 @@ class Vacancy
             return $applicants;
         } else {
             throw new Exception('Specify the vacancy');
+        }
+    }
+
+    /**
+     * Get selected term in spesific taxonomy function
+     *
+     * @param String $taxonomy
+     * @param String $formatted
+     * @return Array if $formatted true will return array associative if false return array of object.
+     */
+    public function getSelectedTerm($taxonomy, $formatted = null)
+    {
+        if (!isset($this->vacancy_id) || empty($this->vacancy_id)) {
+            throw new Exception('Please specify vacancy id!');
+        }
+
+        if (!in_array($taxonomy, $this->_taxonomies)) {
+            throw new Exception('Taxonomy didn\'t exists in this post type!');
+        }
+
+        if (!empty($formatted)) {
+            $terms = get_the_terms($this->vacancy_id, $taxonomy);
+            if ($terms) {
+                if ($terms instanceof WP_Error) {
+                    throw new Exception($terms->get_error_message());
+                } else {
+                    $result = [];
+                    foreach ($terms as $term) {
+                        if ($formatted === 'id') {
+                            $result[] = $term->term_id;
+                        } else {
+                            $result[] = [
+                                'term_id'   => $term->term_id,
+                                'name'      => $term->name,
+                                'slug'      => $term->slug
+                            ];
+                        }
+                    }
+                    return $result;
+                }
+            }
+        } else {
+            return get_the_terms($this->vacancy_id, $taxonomy);
+        }
+    }
+
+    public function setVacancyTerms($taxonomy, $value)
+    {
+        if (taxonomy_exists($taxonomy)) {
+            if (is_array($value)) {
+                return wp_set_post_terms($this->vacancy_id, $value, $taxonomy);
+            } else if (!is_object($value)) {
+                $termExist = term_exists($value, $taxonomy);
+                if ($termExist) {
+                    return wp_set_post_terms($this->vacancy_id, $termExist["term_id"], $taxonomy);
+                } else {
+                    return false;
+                }
+            }
+        } else {
+            throw new Exception('Taxonomy not found!');
         }
     }
 }
