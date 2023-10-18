@@ -49,7 +49,7 @@ class RssController
                 $vacancyElement->addChild('link', FRONTEND_URL . '/' .$vacancy->getSlug());
                 $descriptionCData = new DOMCdataSection($vacancy->getDescription());
                 $vacancyElement->addChild( 'description', StringHelper::shortenString($descriptionCData->wholeText, 0, 300) );
-                $vacancyElement->addChild( 'pubDate', $vacancy->getPublishDate("D, d F Y H:i:s"));
+                // $vacancyElement->addChild( 'pubDate', $vacancy->getPublishDate("D, d F Y H:i:s"));
             }
 
             header('Content-Type: application/rss+xml; charset=utf-8');
