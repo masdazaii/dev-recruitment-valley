@@ -231,19 +231,47 @@ class ImportMenu
 
             // $vacancies = $vacancy->getImportedVacancy($filters)->posts; // Get imported only
 
+            $termProcessing = get_term('processing', 'status');
+            if ($termProcessing) {
+                $taxonomyFilters['status'] = $termProcessing;
+            }
+
+            /** Set time limit 24 hour ago */
+            $now = new \DateTimeImmutable('now');
+            $timeLimit = $now->format('Y-m-d H:i:s');
+
             $vacancies = $vacancy->getVacancies($filters, [], [
+                /** Anggit's changes add the query expired & processing */
                 "meta_query" => [
-                    "relation" => 'OR',
+                    "relation" => 'AND',
                     [
-                        'key'       => 'rv_vacancy_is_imported',
-                        'value'     => 1,
-                        'compare'   => '=',
+                        'key'       => 'expired_at',
+                        'value'     => $timeLimit,
+                        'compare'   => '>=',
+                        'type'      => 'Date',
                     ],
                     [
-                        'key'       => 'is_paid',
-                        'value'     => 0,
-                        'compare'   => '=',
-                    ],
+                        "relation" => 'OR',
+                        [
+                            'key'       => 'rv_vacancy_is_imported',
+                            'value'     => 1,
+                            'compare'   => '=',
+                        ],
+                        [
+                            'key'       => 'is_paid',
+                            'value'     => 0,
+                            'compare'   => '=',
+                        ],
+                    ]
+                ],
+                'tax_query' => [
+                    "relation" => "OR",
+                    [
+                        'taxonomy' => "status",
+                        'field'    => 'slug',
+                        'terms'    => 'processing',
+                        'compare'  => '='
+                    ]
                 ]
             ]);
 
