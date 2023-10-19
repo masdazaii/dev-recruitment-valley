@@ -13,6 +13,7 @@ use WP_Post;
 use WP_Query;
 use Global\NotificationService;
 use constant\NotificationConstant;
+use DateTime;
 
 class VacancyCrudController
 {
@@ -1082,6 +1083,81 @@ class VacancyCrudController
             return false;
         } else {
             return false;
+        }
+    }
+
+    public function checkVacancyApprovalInLastHours()
+    {
+        error_log('check approval in last 24 hour');
+        try {
+            $vacancy = new Vacancy();
+
+            /** Set time limit 24 hour ago */
+            $now = new DateTimeImmutable('now');
+            $timeLimit = $now->modify('-24 hours')->format('Y-m-d H:i:s');
+
+            /** Get imported vacancy that imported >= 24 hour ago and still waiting approval */
+            $importedVacancies = $vacancy->getVacancies([], [], [
+                "meta_query" => [
+                    "relation" => 'AND',
+                    [
+                        'key'       => 'rv_vacancy_is_imported',
+                        'value'     => 1,
+                        'compare'   => '=',
+                    ], [
+                        [
+                            'key'       => 'rv_vacancy_imported_approval_status',
+                            'value'     => 'waiting',
+                            'compare'   => '=',
+                        ],
+                        [
+                            'key'       => 'rv_vacancy_imported_at',
+                            'value'     => $timeLimit,
+                            'compare'   => '<=',
+                            'type'      => 'Date',
+                        ]
+                    ]
+                ]
+            ]);
+
+            if ($importedVacancies && $importedVacancies->found_posts > 0) {
+                /** Check if vacancy not yet expired, compare by start of today */
+                foreach ($importedVacancies->posts as $vacancy) {
+                    $vacancyModel   = new Vacancy($vacancy->ID);
+                    $approvalStatus = $vacancyModel->getApprovedStatus($vacancy->ID);
+
+                    $expiredAt      = $vacancyModel->getExpiredAt('Y-m-d H:i:s');
+                    if ($expiredAt) {
+                        $expiredAt = new DateTime($expiredAt);
+                    } else { // If expired didn't exist then set to rejected and continue the loop
+                        $vacancyModel->setApprovedStatus('rejected');
+                        // $vacancyModel->setApprovedBy(null);
+                        $vacancyModel->setStatus('close');
+                        continue;
+                    }
+
+                    /** Check if expired, set status to reject and close
+                     * If not, set status to approve and open
+                     */
+                    if ($expiredAt < $now) {
+                        $vacancyModel->setApprovedStatus('rejected');
+                        // $vacancyModel->setApprovedBy(null);
+                        $vacancyModel->setStatus('close');
+                    } else {
+                        if ($approvalStatus['value'] == 'waiting') {
+                            $vacancyModel->setApprovedStatus('system-approved');
+                            // $vacancyModel->setApprovedBy(null);
+                            $vacancyModel->setStatus('open');
+                        }
+                    }
+                }
+            }
+        } catch (\WP_Error $err) {
+            error_log($err->get_error_message());
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+        } catch (\Throwable $th) {
+            error_log($th->getMessage());
         }
     }
 }

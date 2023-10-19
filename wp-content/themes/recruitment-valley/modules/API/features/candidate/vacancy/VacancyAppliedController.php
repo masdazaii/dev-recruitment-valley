@@ -8,6 +8,10 @@ use Model\ModelHelper;
 use Vacancy\Vacancy;
 use constant\NotificationConstant;
 use Global\NotificationService;
+use Helper\StringHelper;
+use Model\Applicant;
+use Model\Company;
+use WP_Query;
 
 class VacancyAppliedController
 {
@@ -159,6 +163,80 @@ class VacancyAppliedController
             return [
                 "message"   => $th->getMessage(),
                 "status"    => 400
+            ];
+        }
+    }
+
+    public function history($request)
+    {
+        $filters = [
+            'page' => isset($request['page']) ? sanitize_text_field($request['page']) : 1,
+            'postPerPage' => isset($request['perPage']) ? sanitize_text_field($request['perPage']) : 10,
+            'orderBy' => isset($request['orderBy']) ? sanitize_text_field($request['orderBy']) : 'date',
+            'order' => isset($request['sort']) ? sanitize_text_field($request['sort']) : 'desc',
+        ];
+
+        $offset = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['postPerPage']));
+
+        try {
+            $args = [
+                "post_type" => "applicants",
+                "posts_per_page" => $filters["postPerPage"],
+                "post_status" => "publish",
+                "offset" => $offset,
+                "orderby" => $filters["orderby"],
+                "order" => $filters["order"],
+                "fields" => "ids",
+                "meta_query" => [
+                    [
+                        "key" => "applicant_candidate",
+                        "value" => $request["user_id"],
+                        "compare" => "="
+                    ]
+                ]
+            ];
+
+            $applicants = new WP_Query($args);
+
+            $applicantResult = array_map(function ($applicantId) {
+                $applicant = new Applicant($applicantId);
+                $company = new Company($applicant->getCompany());
+                $vacancy = new Vacancy($applicant->getVacancy());
+
+                return [
+                    "id" => $applicantId,
+                    "slug" => $vacancy->getSlug(),
+                    "name" => $vacancy->getTitle(),
+                    "status" => $vacancy->getStatus()['name'],
+                    "image" => $company->getThumbnail('object'),
+                    "description" => StringHelper::shortenString($vacancy->getDescription() ?? '', 0, 10000),
+                    "jobPostedDate" => $vacancy->getPublishDate(),
+                    "applyDate" => $applicant->getApplyDate(),
+                    "isNew" => $vacancy->getIsNew(),
+                ];
+            }, $applicants->posts ?? []);
+
+            if (!is_wp_error($applicants)) {
+                return [
+                    "message"   => $this->_message->get('candidate.favorite.get_success'),
+                    "data"    => $applicantResult ?? [],
+                    "meta"    => [
+                        "currentPage" => intval($filters['page']),
+                        "totalPage" => $applicants->max_num_pages
+                    ],
+                    "status"  => 200
+                ];
+            } else {
+                return [
+                    "message"   => $this->_message->get('system.overall_failed'),
+                    "status"  => 500
+                ];
+            }
+        } catch (\Throwable $th) {
+            error_log("error get history applicant : " . $th->getMessage());
+            return [
+                "message"   => $this->_message->get('system.overall_failed'),
+                "status"  => 500
             ];
         }
     }

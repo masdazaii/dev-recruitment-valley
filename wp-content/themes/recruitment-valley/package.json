@@ -33,6 +33,7 @@
 	},
 	"homepage": "https://github.com/freshforces-borndigital/project-starter/",
 	"dependencies": {
+		"datatables.net-dt": "^1.13.6",
 		"jquery": "^3.6.0"
 	},
 	"devDependencies": {

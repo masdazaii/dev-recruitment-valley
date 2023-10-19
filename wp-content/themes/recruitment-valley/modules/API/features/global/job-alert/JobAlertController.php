@@ -4,6 +4,7 @@ namespace JobAlert;
 
 use Constant\Message;
 use Helper\ValidationHelper;
+use Integration\ActiveCampaign\ActiveCampaign;
 use JWTHelper;
 use WP_Error;
 use WP_Query;
@@ -78,6 +79,17 @@ class JobAlertController
         if (!is_wp_error($postId)) {
 
             $this->_updateMeta($postId, $body);
+
+            $data = [
+                "email" => $request['email'],
+                "first_name" => $request['firstName'] ,
+                "last_name" =>   $request['lastName'],
+                "telephone" => "-",
+            ];
+    
+            $activeCampaign = new ActiveCampaign;
+            $activeCampaign->createContact($data, "job alert" );
+            
             return [
                 "status"    => 200,
                 "message"   => $this->message->get('job_alert.email_alert_success')

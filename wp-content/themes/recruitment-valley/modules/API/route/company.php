@@ -166,6 +166,18 @@ class CompanyEndpoint
                     'permission_callback'   => [$authMiddleware, 'authorize_company'],
                     'callback'              => [$profile, 'getCredit']
                 ],
+                "get_vacancy_applicants" => [
+                    'url'                   => 'vacancy/applicants/(?P<vacancy>[-\w]+)', // last uri segment is meant to be vacancy id
+                    'methods'               => 'GET',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company'],
+                    'callback'              => [$vacancyService, 'listApplicants']
+                ],
+                "get_vacancy_applications" => [
+                    'url'                   => 'vacancy/applications/(?P<application>[-\w]+)', // last uri segment is meant to be application id
+                    'methods'               => 'GET',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company'],
+                    'callback'              => [$vacancyService, 'showApplicants']
+                ],
                 "get_vacancy_detail" => [
                     'url'                   => 'vacancy/(?P<vacancy_id>[-\w]+)',
                     'methods'               => 'GET',

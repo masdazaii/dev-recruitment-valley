@@ -154,6 +154,13 @@ class CandidateEndpoint
                     'permission_callback'   => [$authMiddleware, 'check_token'],
                     'callback'              =>  [$profileService, 'changePassword'],
                 ],
+                'list_applied' => [
+                    'url'                   =>  'profile/applied-jobs',
+                    'methods'               =>  'GET',
+                    // 'permission_callback'   => [$authMiddleware, 'check_token'],
+                    'permission_callback'   => [$authMiddleware, 'authorize_candidate'],
+                    'callback'              =>  [$vacancyAppliedService, 'history'],
+                ]
             ]
         ];
 
