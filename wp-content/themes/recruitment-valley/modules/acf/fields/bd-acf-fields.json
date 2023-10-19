@@ -3442,7 +3442,8 @@
                 "choices": {
                     "admin-approved": "Approved",
                     "system-approved": "System Approved",
-                    "rejected": "Rejected"
+                    "rejected": "Rejected",
+                    "waiting": "Waiting for approval"
                 },
                 "default_value": false,
                 "return_format": "array",
