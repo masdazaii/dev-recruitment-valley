@@ -4,11 +4,15 @@ namespace Vacancy\Import\Xml;
 
 use DateTime;
 use DateTimeImmutable;
+use DateTimeZone;
 use Error;
 use Exception;
 use Vacancy\Vacancy;
 use WP_Error;
 use Helper\StringHelper;
+use Helper\CalculateHelper;
+use Model\Option;
+use Model\Term;
 
 class FlexFeedController
 {
@@ -18,6 +22,7 @@ class FlexFeedController
     private $_sourceUrl;
     private $_taxonomyKey;
     private $_terms;
+    private $_keywords;
 
     public function __construct($source)
     {
@@ -42,6 +47,10 @@ class FlexFeedController
     public function import($limit = 'all', $offset = 0)
     {
         error_log('Import Flexfeed Called.');
+
+        /** Get Mapped Keyword from option */
+        $this->_getMappedKeyword();
+
         /** Get All terms */
         $this->_getTerms();
 
@@ -66,10 +75,10 @@ class FlexFeedController
                     CURLOPT_TIMEOUT         => 120,  // time-out on response
                 ]);
 
-                // curl_setopt($curl, CURLOPT_URL, $this->_sourceUrl);
-                // curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
-                // curl_setopt($curl, CURLOPT_HTTPHEADER, ["Authorization: " . FLEXFEED_API_KEY]);
-                // curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($curl, CURLOPT_URL, $this->_sourceUrl);
+                curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
+                curl_setopt($curl, CURLOPT_HTTPHEADER, ["Authorization: " . FLEXFEED_API_KEY]);
+                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
                 $response       = curl_exec($curl);
                 $responseCode   = curl_getinfo($curl, CURLINFO_HTTP_CODE);
@@ -111,19 +120,58 @@ class FlexFeedController
                     // $i = 0;
                     $jobs = $response->source->job;
                     for ($i = 0; $i < count($jobs); $i++) {
+                        /** ACF expired_at
+                         * Check if vacancy is expired or not
+                         */
+                        if (!property_exists($jobs[$i], 'expirationdate') || empty($jobs[$i]->expirationdate)) {
+                            /** Set expired date 30 days from this data inputed */
+                            $expiredAt = new \DateTimeImmutable();
+                            $payload['expired_at'] = $expiredAt->modify("+30 days")->format("Y-m-d H:i:s");
+                        } else {
+                            $payload['expired_at'] = $jobs[$i]->expirationdate;
+                            $today = new \DateTimeImmutable();
+
+                            if (strtotime($jobs[$i]->expirationdate) > $today->setTime(23, 59, 59)->getTimestamp()) {
+                                $taxonomy['status'] = $this->_findStatus('processing');
+
+                                /** Unset used key */
+                                // unset($jobs[$i]->expirationdate);
+                            } else {
+                                error_log('[Flexfeed] - Vacancy is expired, vacancy will not stored to recruitment valley database. RequsitionId : ' . (property_exists($jobs[$i], 'requisitionId') ? $jobs[$i]->requisitionId : '"NoRequisitionIdFound"') . ' & Title : ' . (property_exists($jobs[$i], 'title') ? $jobs[$i]->title : '"NoTitleFound"') . ' - index : ' . $i);
+                                $i++;
+                                continue;
+                            }
+                        }
+
+                        /** Check if vacancy is still open */
+                        if (!property_exists($jobs[$i], 'isActive') || empty($jobs[$i]->isActive)) {
+                            error_log('[Flexfeed] - Vacancy is closed, vacancy will not stored to recruitment valley database. RequsitionId : ' . (property_exists($jobs[$i], 'requisitionId') ? $jobs[$i]->requisitionId : '"NoRequisitionIdFound"') . ' & Title : ' . (property_exists($jobs[$i], 'title') ? $jobs[$i]->title : '"NoTitleFound"') . ' - index : ' . $i);
+                            $i++;
+                            continue;
+                        } else {
+                            if (!empty($jobs[$i]->isActive)) {
+                                $taxonomy['status'] = $this->_findStatus('processing');
+
+                                /** Unset used key */
+                                // unset($jobs[$i]->isActive);
+                            } else {
+                                error_log('[Flexfeed] - Vacancy is closed, vacancy will not stored to recruitment valley database. RequsitionId : ' . (property_exists($jobs[$i], 'requisitionId') ? $jobs[$i]->requisitionId : '"NoRequisitionIdFound"') . ' & Title : ' . (property_exists($jobs[$i], 'title') ? $jobs[$i]->title : '"NoTitleFound"') . ' - index : ' . $i);
+                                $i++;
+                                continue;
+                            }
+                        }
+
                         /** Validate - check if data is exists or not
                          * check by requisitionId (previously validate by url)
                          */
                         if (!property_exists($jobs[$i], 'requisitionId') || empty($jobs[$i]->requisitionId)) {
                             error_log('[Flexfeed] - RequsistionId is empty, failed to store vacancy. Title : ' . property_exists($jobs[$i], 'title') ? $jobs[$i]->title : '"NoTitleFound" - index : ' . $i);
-                            trigger_error('[Flexfeed] - RequsistionId is empty, failed to store vacancy.', E_USER_WARNING);
                             $i++;
                             continue;
                         }
 
                         if (!$this->_validate($jobs[$i]->requisitionId)) {
                             error_log('[Flexfeed] - Vacancy already exists. RequsitionId : ' . (property_exists($jobs[$i], 'requisitionId') ? $jobs[$i]->requisitionId : '"NoRequisitionIdFound"') . ' & Title : ' . (property_exists($jobs[$i], 'title') ? $jobs[$i]->title : '"NoTitleFound"') . ' - index : ' . $i);
-                            trigger_error('[Flexfeed] - Vacancy already exists.', E_USER_WARNING);
                             $i++;
                             continue;
                         }
@@ -198,18 +246,6 @@ class FlexFeedController
                         /** ACF apply_from_this_platform */
                         $payload['apply_from_this_platform'] = false;
 
-                        /** ACF expired_at */
-                        if (property_exists($jobs[$i], 'expirationdate') && !empty($jobs[$i]->expirationdate)) {
-                            $payload['expired_at'] = \DateTime::createFromFormat('d-n-Y', preg_replace('/[\n\t]+/', '', $jobs[$i]->expirationdate))->setTime(23, 59, 59)->format('Y-m-d H:i:s');
-
-                            /** Unset used key */
-                            unset($jobs[$i]->expirationdate);
-                        } else {
-                            /** Set expired date 30 days from this data inputed */
-                            $expiredAt = new \DateTimeImmutable();
-                            $payload['expired_at'] = $expiredAt->modify("+30 days")->format("Y-m-d H:i:s");
-                        }
-
                         $payload['salary_start'] = 0;
                         $payload['salary_end'] = 0;
 
@@ -280,41 +316,51 @@ class FlexFeedController
                             unset($jobs[$i]->experience);
                         }
 
-                        /** Taxonomy Status */
-                        if (property_exists($jobs[$i], 'isActive') && !empty($jobs[$i]->isActive)) {
-                            /** Check if expired */
-                            if ($payload['expired_at']) {
-                                $today = new \DateTime("now");
-                                $endOfTheDay = $today->setTime(23, 59, 59);
+                        /** Taxonomy Role */
+                        if (property_exists($jobs[$i], 'category') && !empty($jobs[$i]->category)) {
+                            /** Check if keyword exists & if not exists get Mapped Keyword from option */
+                            if (!isset($this->_keywords) && empty($this->_keywords)) {
+                                $this->_getMappedKeyword();
+                            }
 
-                                if (strtotime($payload['expired_at']) > $today->setTime(23, 59, 59)->getTimestamp()) {
-                                    $taxonomy['status'] = $this->_findStatus(true);
-                                    error_log($arguments['post_name'] . ' not expired - ' . $payload['expired_at'] . ' > ' . $endOfTheDay->format('Y-m-d H:i:s') . ' - ' . $taxonomy['status']);
+                            /** Get closest role */
+                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords, strtolower(preg_replace('/[\n\t]+/', '', $jobs[$i]->category)), 5, 1, 1, 1, 'array');
+
+                            if ($taxonomy['role'] !== false) {
+                                /** If calculation return empty role,
+                                 * if not set the role,
+                                 * if empty create new role */
+                                if (empty($taxonomy['role'])) {
+                                    $termModel = new Term();
+                                    $taxonomy['role'] = $termModel->createTerm('role', $taxonomy['role'], []);
                                 } else {
-                                    $taxonomy['status'] = $this->_findStatus(false);
-                                    error_log($arguments['post_name'] . ' expired - ' . $payload['expired_at'] . ' < ' . $endOfTheDay->format('Y-m-d H:i:s') . ' - ' . $taxonomy['status']);
+                                    $option     = new Option(true);
+                                    $limitRole  = $option->getImportNumberRoleToSet();
+
+                                    $termCount  = 1;
+                                    $tempRole = [];
+                                    foreach ($taxonomy['role'] as $termID => $levenshteinCost) {
+                                        if ($termCount > $limitRole) {
+                                            break;
+                                        }
+                                        $tempRole[] = $termID;
+
+                                        $termCount++;
+                                    }
+                                    $taxonomy['role'] = $tempRole;
                                 }
                             } else {
-                                $taxonomy['status'] = $this->_findStatus($jobs[$i]->isActive);
-                                error_log($arguments['post_name'] . ' is active - ' . $taxonomy['status']);
+                                $termModel = new Term();
+                                $taxonomy['role'] = $termModel->createTerm('role', $taxonomy['role'], []);
                             }
 
                             /** Unset used key */
-                            // unset($jobs[$i]->isActive);
-                        } else {
-                            $taxonomy['status'] = $this->_findStatus(false);
+                            // unset($jobs[$i]->category);
                         }
 
-                        /** Taxonomy Role */
-                        if (property_exists($jobs[$i], 'category') && !empty($jobs[$i]->category)) {
-                            $taxonomy['role'] = $this->_findRole(preg_replace('/[\n\t]+/', '', $jobs[$i]->category));
-
-                            /** Unset used key */
-                            unset($jobs[$i]->category);
-                        }
-
+                        /** Map unused data */
                         foreach ($jobs[$i] as $key => $value) {
-                            if (!in_array($key, ['title', 'datePosted', 'description', 'city', 'streetAddress', 'url', 'expirationdate', 'hoursPerWeek', 'education', 'experience', 'isActive', 'category', 'company', 'email', 'salary'])) {
+                            if (!in_array($key, ['title', 'datePosted', 'description', 'city', 'streetAddress', 'url', 'hoursPerWeek', 'education', 'experience', 'isActive', 'company', 'email', 'salary'])) {
                                 $unusedData[$key] = $value;
                             }
                         }
@@ -331,14 +377,6 @@ class FlexFeedController
 
                             $vacancy->setTaxonomy($taxonomy);
 
-                            /** Taxonomy Status */
-                            // $vacancy->setStatus('open');
-
-                            /** Set expired date 30 days from this data inputed */
-                            // $expiredAt = new \DateTimeImmutable();
-                            // $expiredAt = $expiredAt->modify("+30 days")->format("Y-m-d H:i:s");
-                            // $vacancy->setProp("expired_at", $expiredAt);
-
                             foreach ($payload as $acf_field => $acfValue) {
                                 $vacancy->setProp($acf_field, $acfValue, is_array($acfValue));
                             }
@@ -353,11 +391,21 @@ class FlexFeedController
                                 }
                             }
 
+                            /** Set approval data */
+                            $vacancy->setApprovedStatus('waiting');
+                            $vacancy->setApprovedBy(null);
+
                             /** store unused to post meta */
+                            $now = new DateTimeImmutable("now");
                             update_post_meta($post, 'rv_vacancy_unused_data', $unusedData);
                             update_post_meta($post, 'rv_vacancy_source', 'flexfeed');
+                            update_post_meta($post, 'rv_vacancy_imported_at', $now->format('Y-m-d H:i:s'));
+                        } catch (\WP_Error $wperror) {
+                            error_log($wperror->get_error_message());
                         } catch (\Exception $error) {
-                            error_log($error);
+                            error_log($error->getMessage());
+                        } catch (\Throwable $th) {
+                            error_log($th->getMessage());
                         }
                     }
                 }
@@ -561,8 +609,17 @@ class FlexFeedController
         $termOpen = get_term_by('slug', 'open', 'status', 'OBJECT');
         $termClose = get_term_by('slug', 'close', 'status', 'OBJECT');
 
-        if ($fetchValue || $fetchValue == "true") {
-            return $termOpen->term_id;
+        if ($fetchValue) {
+            if ($fetchValue == "true") {
+                return $termOpen->term_id;
+            } else {
+                $term = get_term_by('slug', $fetchValue, 'status', 'OBJECT');
+                if ($term) {
+                    return $term->term_id;
+                } else {
+                    throw new Exception("Term '{$fetchValue}' didn\'t exists!");
+                }
+            }
         } else {
             return $termClose->term_id;
         }
@@ -608,6 +665,51 @@ class FlexFeedController
             } else {
                 return $newTerm['term_id'];
             }
+        }
+    }
+
+    /**
+     * Get Mapped Keyword function
+     *
+     * This function is to get mapped keyword from option.
+     *
+     * @return void
+     */
+    private function _getMappedKeyword()
+    {
+        error_log('getMappedKeyword');
+
+        try {
+            $this->_keywords = [];
+
+            /** Get term Name */
+            $termModel = new Term();
+            $terms = $termModel->selectTermByTaxonomy('role', 'array');
+            if ($terms) {
+                foreach ($terms as $term) {
+                    $this->_keywords[$term['term_id']][] = $term['name'];
+                }
+            }
+
+            /** Get keywords options and set each keyword to lowercase */
+            $keywordOption = get_field('import_api_mapping_role', 'option');
+            foreach ($keywordOption as $keyword) {
+                if (is_array($keyword)) {
+                    if (array_key_exists('import_api_mapping_role_term', $keyword) && array_key_exists('import_api_mapping_role_keywords', $keyword)) {
+                        // $this->_keywords[$keyword['import_api_mapping_role_term']] = [];
+                        foreach ($keyword['import_api_mapping_role_keywords'] as $word) {
+                            if (is_array($word)) {
+                                if (array_key_exists('import_api_mapping_role_eachword', $word))
+                                    $this->_keywords[$keyword['import_api_mapping_role_term']][] = strtolower($word['import_api_mapping_role_eachword']);
+                            } else if (is_string($word)) {
+                                $this->_keywords[$keyword['import_api_mapping_role_term']][] = strtolower($word);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $exception) {
+            error_log($exception->getMessage());
         }
     }
 }
