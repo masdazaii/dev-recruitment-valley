@@ -140,7 +140,17 @@ class Term
         }
     }
 
-    public function selectTermByTaxonomy(String $taxonomy, Bool $formatted = true)
+    /**
+     * Select Term by taxonomy function
+     *
+     * @param String $taxonomy
+     * @param mixed $formatted : Value is one of :
+     * - (string) 'array'   : expected to return associative array. Each array element would contain : term_id, name, slug.
+     * - (string) 'id'      : expected to return array of term id.
+     * - (bool) false       : expected to return WP_Term object
+     * @return array|object|int
+     */
+    public function selectTermByTaxonomy(String $taxonomy, mixed $formatted = false)
     {
         $theArguments = $this->_setArguments($taxonomy, []);
         $terms = get_terms($theArguments);
@@ -148,15 +158,27 @@ class Term
             if ($terms instanceof \WP_Error) {
                 throw new \Exception($terms->get_error_message());
             } else {
-                $result = [];
-                foreach ($terms as $term) {
-                    $result[] = [
-                        'term_id'   => $term->term_id,
-                        'name'      => $term->name,
-                        'slug'      => $term->slug
-                    ];
+                if ($formatted) {
+                    if (strtolower($formatted) == 'id') {
+                        $result = [];
+                        foreach ($terms as $term) {
+                            $result[] = $term->term_id;
+                        }
+                        return $result;
+                    } else {
+                        $result = [];
+                        foreach ($terms as $term) {
+                            $result[] = [
+                                'term_id'   => $term->term_id,
+                                'name'      => $term->name,
+                                'slug'      => $term->slug
+                            ];
+                        }
+                    }
+                    return $result;
+                } else {
+                    return $terms;
                 }
-                return $result;
             }
         } else {
             throw new \Exception('Error when get terms!');

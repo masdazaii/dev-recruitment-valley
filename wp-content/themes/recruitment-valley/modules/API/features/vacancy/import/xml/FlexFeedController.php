@@ -674,23 +674,38 @@ class FlexFeedController
     private function _getMappedKeyword()
     {
         error_log('getMappedKeyword');
-        /** Get keywords options and set each keyword to lowercase */
-        $keywordOption = get_field('import_api_mapping_role', 'option');
-        $this->_keywords = [];
-        foreach ($keywordOption as $keyword) {
-            if (is_array($keyword)) {
-                if (array_key_exists('import_api_mapping_role_term', $keyword) && array_key_exists('import_api_mapping_role_keywords', $keyword)) {
-                    $this->_keywords[$keyword['import_api_mapping_role_term']] = [];
-                    foreach ($keyword['import_api_mapping_role_keywords'] as $word) {
-                        if (is_array($word)) {
-                            if (array_key_exists('import_api_mapping_role_eachword', $word))
-                                $this->_keywords[$keyword['import_api_mapping_role_term']][] = strtolower($word['import_api_mapping_role_eachword']);
-                        } else if (is_string($word)) {
-                            $this->_keywords[$keyword['import_api_mapping_role_term']][] = strtolower($word);
+
+        try {
+            $this->_keywords = [];
+
+            /** Get term Name */
+            $termModel = new Term();
+            $terms = $termModel->selectTermByTaxonomy('role', 'array');
+            if ($terms) {
+                foreach ($terms as $term) {
+                    $this->_keywords[$term['term_id']][] = $term['name'];
+                }
+            }
+
+            /** Get keywords options and set each keyword to lowercase */
+            $keywordOption = get_field('import_api_mapping_role', 'option');
+            foreach ($keywordOption as $keyword) {
+                if (is_array($keyword)) {
+                    if (array_key_exists('import_api_mapping_role_term', $keyword) && array_key_exists('import_api_mapping_role_keywords', $keyword)) {
+                        // $this->_keywords[$keyword['import_api_mapping_role_term']] = [];
+                        foreach ($keyword['import_api_mapping_role_keywords'] as $word) {
+                            if (is_array($word)) {
+                                if (array_key_exists('import_api_mapping_role_eachword', $word))
+                                    $this->_keywords[$keyword['import_api_mapping_role_term']][] = strtolower($word['import_api_mapping_role_eachword']);
+                            } else if (is_string($word)) {
+                                $this->_keywords[$keyword['import_api_mapping_role_term']][] = strtolower($word);
+                            }
                         }
                     }
                 }
             }
+        } catch (\Exception $exception) {
+            error_log($exception->getMessage());
         }
     }
 }
