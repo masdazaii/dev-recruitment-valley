@@ -3474,6 +3474,7 @@ acf_add_local_field_group(array(
 				'admin-approved' => 'Approved',
 				'system-approved' => 'System Approved',
 				'rejected' => 'Rejected',
+				'waiting' => 'Waiting for approval',
 			),
 			'default_value' => false,
 			'return_format' => 'array',

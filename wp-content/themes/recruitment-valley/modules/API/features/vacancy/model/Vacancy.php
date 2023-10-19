@@ -85,6 +85,11 @@ class Vacancy
 
     private $_taxonomies = ["sector", "role", "type", "education", "working-hours", "status", "location", "experiences"];
 
+    /** Vacancy Meta */
+    private $_meta_rv_vacancy_unused_data   = 'rv_vacancy_unused_data';
+    private $_meta_rv_vacancy_source        = 'rv_vacancy_source';
+    private $_meta_rv_vacancy_imported_at   = 'rv_vacancy_imported_at';
+
     public function __construct($vacancy_id = false)
     {
         if ($vacancy_id) {
@@ -904,6 +909,27 @@ class Vacancy
                     "relation" => 'AND',
                 ]
             ];
+        } else {
+            $arguments = [
+                "post_type" => $this->vacancy,
+                "posts_per_page" => $filters['postPerPage'] ?? -1,
+                "offset" => $filters['offset'] ?? 0,
+                "orderby" => $filters['orderBy'] ?? "date",
+                "order" => $filters['sort'] ?? 'ASC',
+                "post_status" => "publish",
+                [
+                    'key'       => $this->_acf_is_imported,
+                    'value'     => 1,
+                    'compare'   => '=',
+                ],
+                "tax_query" => [
+                    "relation" => 'AND',
+                ]
+            ];
+            foreach ($args as $key => $value) {
+                $arguments[$key] = $value;
+            }
+            $args = $arguments;
         }
 
         /** Set tax_query */
@@ -1020,6 +1046,24 @@ class Vacancy
     public function setApprovedBy($value)
     {
         return $this->setProp($this->_acf_imported_approved_by, $value);
+    }
+
+    public function getterMeta($key, $single = true)
+    {
+        if ($this->vacancy_id) {
+            return get_post_meta($this->vacancy_id, $key, $single);
+        } else {
+            throw new Exception('Please specify vacancy!');
+        }
+    }
+
+    public function getImportedAt()
+    {
+        if ($this->vacancy_id) {
+            return $this->getterMeta($this->_meta_rv_vacancy_imported_at, true);
+        } else {
+            throw new Exception('Please specify vacancy!');
+        }
     }
     /** Method for related to imported vacancy end here */
 

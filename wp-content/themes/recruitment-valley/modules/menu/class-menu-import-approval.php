@@ -255,6 +255,22 @@ class ImportMenu
                     $eachVacancy = new Vacancy($vacancy->ID);
                     $eachVacancyApprovalStatus = $eachVacancy->getApprovedStatus();
 
+                    $now            = new \DateTimeImmutable('now');
+                    $isExpired      = false;
+                    $expiredAt      = $eachVacancy->getExpiredAt('Y-m-d H:i:s');
+                    if ($expiredAt) {
+                        $expiredAt = new \DateTime($expiredAt);
+
+                        /** Check if expired */
+                        if ($expiredAt < $now) {
+                            $isExpired = true;
+                        } else {
+                            $isExpired = false;
+                        }
+                    } else {
+                        $isExpired = true;
+                    }
+
                     $vacanciesResponse[] = [
                         'id'                => $vacancy->ID,
                         'no'                => $no,
@@ -267,7 +283,8 @@ class ImportMenu
                         'editUrl'           => get_edit_post_link($vacancy->ID),
                         'trashUrl'          => get_delete_post_link($vacancy->ID),
                         'paidStatus'        => $eachVacancy->getIsPaid(),
-                        'isImported'        => $eachVacancy->checkImported()
+                        'isImported'        => $eachVacancy->checkImported(),
+                        'isExpired'         => $isExpired
                     ];
                     $no++;
                 endforeach;

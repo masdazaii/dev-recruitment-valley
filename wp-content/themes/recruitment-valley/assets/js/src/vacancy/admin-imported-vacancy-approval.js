@@ -33,7 +33,20 @@ const importedVacancyModule = (function() {
             <a href="${row.trashUrl}" style="font-size: small; color: red">Trash</a>`,
           "sortable" : true
         },
-        { data : "vacancyStatus" },
+        { data : "vacancyStatus",
+          render : (data, type, row, meta) => {
+            let output = ''
+
+            if (row.isExpired) {
+              output += `Expired - ` + data
+            } else {
+              output += data
+            }
+
+            return output
+          },
+          "sortable" : false
+        },
         { data : "approvalStatus" },
         { data : "paidStatus",
           render : (data, type, row, meta) => {
@@ -86,14 +99,24 @@ const importedVacancyModule = (function() {
         },
         { data : "publishDate" },
         { data : "id",
-          render : (data, type, row, meta) => `
-          <form method="POST" action="${vacanciesData.postUrl}">
+          render : (data, type, row, meta) => {
+            let output = `<form method="POST" action="${vacanciesData.postUrl}">
               <input type="hidden" name="action" value="handle_imported_vacancy_approval">
               <input type="hidden" name="nonce" value="${row.rowNonce}">
-              <input type="hidden" name="vacancyID" value="${row.id}">
-              <button name="approval" value="approved">Approve</button>
-              <button name="approval" value="rejected">Reject</button>
-            </form>`,
+              <input type="hidden" name="vacancyID" value="${row.id}">`
+
+            if (row.isExpired) {
+              output += `<button disabled>Approve</button>
+              <button name="approval" value="rejected">Reject</button>`
+            } else {
+              output += `<button name="approval" value="approved">Approve</button>
+              <button name="approval" value="rejected">Reject</button>`
+            }
+
+            output += `</form>`
+
+            return output
+          },
           "sortable": false
         },
       ]
