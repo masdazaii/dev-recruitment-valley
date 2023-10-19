@@ -46,7 +46,7 @@ class RssController
                 $vacancyElement = $vacanciesResult->channel->addChild('item');
 
                 $vacancyElement->addChild('title', htmlspecialchars($vacancy->getTitle()));
-                $vacancyElement->addChild('link', FRONTEND_URL . '/' .$vacancy->getSlug());
+                $vacancyElement->addChild('link', FRONTEND_URL . '/vacatures/' .$vacancy->getSlug());
                 $descriptionCData = new DOMCdataSection($vacancy->getDescription());
                 $vacancyElement->addChild( 'description', StringHelper::shortenString($descriptionCData->wholeText, 0, 300) );
                 // $vacancyElement->addChild( 'pubDate', $vacancy->getPublishDate("D, d F Y H:i:s"));
