@@ -4,6 +4,7 @@ namespace Vacancy\Import\Xml;
 
 use DateTime;
 use DateTimeImmutable;
+use DateTimeZone;
 use Error;
 use Exception;
 use Vacancy\Vacancy;
@@ -127,6 +128,7 @@ class FlexFeedController
                             $expiredAt = new \DateTimeImmutable();
                             $payload['expired_at'] = $expiredAt->modify("+30 days")->format("Y-m-d H:i:s");
                         } else {
+                            $payload['expired_at'] = $jobs[$i]->expirationdate;
                             $today = new \DateTimeImmutable();
 
                             if (strtotime($jobs[$i]->expirationdate) > $today->setTime(23, 59, 59)->getTimestamp()) {
@@ -390,12 +392,14 @@ class FlexFeedController
                             }
 
                             /** Set approval data */
-                            $vacancy->setApprovedStatus(null);
+                            $vacancy->setApprovedStatus('waiting');
                             $vacancy->setApprovedBy(null);
 
                             /** store unused to post meta */
+                            $now = new DateTimeImmutable("now");
                             update_post_meta($post, 'rv_vacancy_unused_data', $unusedData);
                             update_post_meta($post, 'rv_vacancy_source', 'flexfeed');
+                            update_post_meta($post, 'rv_vacancy_imported_at', $now->format('Y-m-d H:i:s'));
                         } catch (\WP_Error $wperror) {
                             error_log($wperror->get_error_message());
                         } catch (\Exception $error) {
