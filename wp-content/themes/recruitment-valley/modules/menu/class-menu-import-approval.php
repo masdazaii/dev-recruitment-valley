@@ -183,7 +183,12 @@ class ImportMenu
 
         /** Get Vacancy Term from taxonomy 'role' */
         $termModel = new Term();
-        $terms = $termModel->selectTermByTaxonomy('role', true);
+        $termModel = new Term();
+        try {
+            $terms = $termModel->selectTermByTaxonomy('role', true);
+        } catch (\Exception $exception) {
+            error_log($exception->getMessage());
+        }
 
         wp_localize_script(
             'vacancyApprovalScript',
