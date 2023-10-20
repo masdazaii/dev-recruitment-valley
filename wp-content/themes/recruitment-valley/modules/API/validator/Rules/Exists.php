@@ -42,8 +42,8 @@ class ExistsRule implements Rule
                         return true;
                         break;
                     default:
-                        return true;
-                        // $dbValue = get_user()
+                        $databaseValue = get_user_by($column, $value);
+                        return $databaseValue ? true : false;
                 }
                 break;
             case 'post':
