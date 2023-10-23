@@ -114,7 +114,7 @@ class Message
                     'job_seeker_last_name_required' => __("Achternaam is verplicht.", THEME_DOMAIN),
                     'message_required' => __("Bericht is verplicht.", THEME_DOMAIN),
                 ],
-                'success'   => __("We hebben je sollicitatie ontvangen en we nemen spoedig contact op!", THEME_DOMAIN)
+                'success'   => __("Bedankt voor je bericht. We nemen spoedig contact met je op.", THEME_DOMAIN)
             ],
             'vacancy' => [
                 "get_all" => __("Vacatures gevonden"),
