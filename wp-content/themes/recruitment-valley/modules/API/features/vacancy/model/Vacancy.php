@@ -981,7 +981,7 @@ class Vacancy
             }
 
             if (isset($filters['author'])) {
-                $args['author '] = $filters['author'];
+                $args['author__in'] = [$filters['author']];
             }
         }
 

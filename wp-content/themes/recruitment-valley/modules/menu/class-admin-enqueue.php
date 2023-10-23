@@ -19,13 +19,14 @@ class AdminEnqueue
         wp_enqueue_script(
             'vacancyApprovalScript',
             THEME_URL . '/assets/js/src/wp-admin.js',
-            array('jquery'),
+            array('jquery', 'acf-input'),
             FALSE
         );
 
         /** Get Vacancy Term from taxonomy 'role' */
         $termModel = new Term();
         $termModel = new Term();
+
         try {
             $terms = $termModel->selectTermByTaxonomy('role', true);
         } catch (\Exception $exception) {
@@ -34,8 +35,8 @@ class AdminEnqueue
 
         /** RSS Ajax Data */
         $rssData = [
-            'action'    => 'get_vacancy_option_value',
-            'nonce'     => wp_create_nonce('nonce_vacancy_option_value'),
+            'action'    => 'get_vacancies_by_company',
+            'nonce'     => wp_create_nonce('get_vacancies_by_company'),
         ];
 
         wp_localize_script(
