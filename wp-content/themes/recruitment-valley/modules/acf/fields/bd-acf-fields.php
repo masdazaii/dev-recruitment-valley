@@ -1520,28 +1520,32 @@ acf_add_local_field_group(array(
 		),
 		array(
 			'key' => 'field_65323cf4cd7be',
-			'label' => 'Select Vacancy(es)',
+			'label' => 'Select Vacancy(s/es)',
 			'name' => 'rv_rss_select_vacancy',
 			'aria-label' => '',
-			'type' => 'select',
+			'type' => 'post_object',
 			'instructions' => 'Select vacancy (vacancies) based on selected company.',
 			'required' => 0,
 			'conditional_logic' => 0,
 			'wrapper' => array(
-				'width' => '',
+				'width' => '100',
 				'class' => '',
 				'id' => '',
 			),
-			'choices' => array(
+			'post_type' => array(
+				0 => 'vacancy',
 			),
-			'default_value' => array(
+			'post_status' => array(
+				0 => 'publish',
 			),
-			'return_format' => 'array',
+			'taxonomy' => '',
+			'return_format' => 'id',
 			'multiple' => 1,
 			'allow_null' => 0,
+			'bidirectional' => 0,
 			'ui' => 1,
-			'ajax' => 1,
-			'placeholder' => '',
+			'bidirectional_target' => array(
+			),
 		),
 	),
 	'location' => array(

@@ -1161,4 +1161,46 @@ class VacancyCrudController
             error_log($th->getMessage());
         }
     }
+
+    /**
+     * GET Vacancy by company ID function
+     *
+     * @param Mixed $companyID
+     * @param integer $limit
+     * @return array
+     */
+    public function getVacancyByCompany(Mixed $companyID, Int $limit = -1, String $result = 'posts')
+    {
+        try {
+            $vacancyModel   = new Vacancy();
+
+            $filters        = [
+                'author'    => $companyID,
+            ];
+
+            $vacancies      = $vacancyModel->getVacancies($filters, []);
+
+            switch (strtolower($result)) {
+                case 'options':
+                case 'option-value':
+                    $optionValue    = [];
+                    if ($vacancies && $vacancies->found_posts > 0) {
+                        foreach ($vacancies->posts as $post) {
+                            $optionValue[$post->ID] = $post->post_title;
+                        }
+                    }
+
+                    return $optionValue;
+                    break;
+                case 'count':
+                    return $vacancies->found_posts;
+                    break;
+                default:
+                    return $vacancies->posts;
+                    break;
+            }
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+        }
+    }
 }

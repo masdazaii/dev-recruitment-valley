@@ -1017,6 +1017,10 @@ class Vacancy
             if (array_key_exists('author', $filters)) {
                 $args['author '] = $filters['author'];
             }
+
+            if (array_key_exists('in', $filters)) {
+                $args['post__in'] = $filters['in'];
+            }
         }
 
         return $args;

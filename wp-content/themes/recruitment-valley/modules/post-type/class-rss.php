@@ -2,9 +2,6 @@
 
 namespace PostType;
 
-use Global\Rss\RssController;
-use Helper\ValidationHelper;
-
 defined("ABSPATH") or die("Direct access not allowed!");
 
 class RssCPT extends RegisterCPT
@@ -12,8 +9,10 @@ class RssCPT extends RegisterCPT
     public function __construct()
     {
         add_action('init', [$this, 'RegisterRSSCPT']);
-        add_action('wp_ajax_get_vacancy_option_value', [$this, 'getVacancyOptionValues']);
-        add_action('wp_ajax_nopriv_get_vacancy_option_value', [$this, 'getVacancyOptionValues']);
+        add_action('save_post', [$this, 'saveRSS'], 10, 3);
+        add_action('add_meta_boxes', [$this, 'rssUrlMetaBox']);
+        add_filter('manage_rss_posts_columns', [$this, 'rssColoumn'], 10, 1);
+        add_action('manage_rss_posts_custom_column', [$this, 'rssCustomColoumn'], 10, 2);
     }
 
     public function RegisterRSSCPT()
@@ -28,47 +27,60 @@ class RssCPT extends RegisterCPT
         $this->customPostType($title, $slug, $args);
     }
 
-    public function getVacancyOptionValues()
+    public function saveRSS($post_id, $post, $update)
     {
         try {
-            /** Validate and sanitize request */
-            $validator  = new ValidationHelper('vacancyOptionValue', $_POST);
+            $rssModel = new \Model\Rss($post_id);
 
-            if (!$validator->tempValidate()) {
-                $errors     = $validator->getErrors();
-                $message    = '';
-                foreach ($errors as $field => $message) {
-                    $message .= $field . ' : ' . $message . PHP_EOL;
-                }
-
-                wp_send_json([
-                    'success'   => false,
-                    'message'   => $message
-                ], 400);
-            }
-
-            /** Validate nonce */
-            if (!$validator->validateNonce('nonce_vacancy_option_value', $_POST['nonce'])) {
-                wp_send_json([
-                    'success' => false,
-                    'message' => $validator->getNonceError()
-                ], 400);
-            }
-
-            /** Sanitize request body */
-            $validator->tempSanitize();
-            $body = $validator->getData();
-
-            $rssController  = new RssController();
-            $optionValues   = $rssController->vacancyOptionValue($body['company'], -1);
-
-            wp_send_json([
-                'success'   => true,
-                'message'   => 'Success get values',
-                'data'      => $optionValues
-            ], 200);
+            $endpoint = rest_url() . 'mi/v1/rss/vacancy/' . $post->post_name;
+            // $updateMeta = $rssModel->setRssEndpointURL($endpoint);
+            $updateMeta = update_post_meta($post_id, 'qwerqweqwe', $endpoint);
+            error_log('rss meta - ' . $post_id . ' - ' . gettype($updateMeta));
         } catch (\Exception $e) {
             error_log($e->getMessage());
+        }
+    }
+
+    public function rssUrlMetaBox()
+    {
+        $rssModel = new \Model\Rss();
+        add_meta_box(
+            'rss_endpoint_url',
+            'RSS Url',
+            [$this, 'rssUrlRenderMetabox'],
+            'rss',
+            'advanced',
+            'default',
+            ['meta' => $rssModel->getRssEndpointURL()]
+        );
+    }
+
+    public function rssUrlRenderMetabox($post, $callback_args = [])
+    {
+        $rssModel = new \Model\Rss($post->ID);
+        echo '<div style="display: flex; flex-direction: column; gap: 0.5rem;">';
+        echo '<div class="cs-flex cs-flex-col cs-flex-nowrap cs-items-start cs-gap-2">';
+        echo '<label style="display; block; font-weight: bold; color: rgba(0, 0, 0, 1);" for="rss-url-endpoint">RSS URL</label>';
+        echo '<input style="width: 100%; border: 1px solid rgba(209, 213, 219, 1); padding: 0.375rem 0.5rem; font-size: 1rem; line-height: 1.5rem; font-weight: 400;" type="text" id="rss-url-endpoint" readonly disabled value="' . $rssModel->getRssEndpointURL() . '"/>';
+        echo '</div>';
+        echo '</div>';
+    }
+
+    public function rssColoumn($coloumn)
+    {
+        $coloumn['url'] = __('RSS Url');
+
+        return $coloumn;
+    }
+
+    public function rssCustomColoumn($coloumn, $post_id)
+    {
+        $rssModel = new \Model\Rss($post_id);
+
+        switch ($coloumn) {
+            case 'url':
+                echo $rssModel->getRssEndpointURL();
+                break;
         }
     }
 }
