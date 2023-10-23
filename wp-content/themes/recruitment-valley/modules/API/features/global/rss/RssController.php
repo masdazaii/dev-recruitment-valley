@@ -10,6 +10,7 @@ use Helper\StringHelper;
 use SimpleXMLElement;
 use Vacancy\Vacancy;
 use Vacancy\VacancyResponse;
+use Model\Rss;
 use WP_Post;
 
 class RssController
@@ -38,6 +39,8 @@ class RssController
 
     public function convert($vacancies)
     {
+        // print('<pre>' . print_r($vacancies, true) . '</pre>');
+        // die;
         try {
             $vacanciesResult = new SimpleXMLElement($this->xml);
 
@@ -46,7 +49,7 @@ class RssController
                 $vacancyElement = $vacanciesResult->channel->addChild('item');
 
                 $vacancyElement->addChild('title', htmlspecialchars($vacancy->getTitle()));
-                $vacancyElement->addChild('link', FRONTEND_URL . '/vacatures/' .$vacancy->getSlug());
+                $vacancyElement->addChild('link', FRONTEND_URL . '/vacatures/' . $vacancy->getSlug());
                 $descriptionCData = new DOMCdataSection($vacancy->getDescription());
                 $vacancyElement->addChild('description', StringHelper::shortenString($descriptionCData->wholeText, 0, 300));
                 // $vacancyElement->addChild( 'pubDate', $vacancy->getPublishDate("D, d F Y H:i:s"));
@@ -61,26 +64,27 @@ class RssController
         }
     }
 
-    public function vacancyOptionValue(Mixed $companyID, Int $limit = -1)
+    public function show($request)
     {
-        try {
-            $vacancyModel   = new Vacancy();
+        $rssModel = new Rss();
 
-            $filters        = [
-                'author'    => $companyID,
-            ];
+        /** get rss  */
+        $rss = $rssModel->getRssBySlug($request['rss'], 'object');
+        $rssVacancies = $rssModel->getRssVacancies();
 
-            $vacancies      = $vacancyModel->getVacancies($filters, []);
-            $optionValue    = [];
-            if ($vacancies && $vacancies->found_posts > 0) {
-                foreach ($vacancies->posts as $post) {
-                    $optionValue[$post->ID] = $post->title;
-                }
-            }
+        $vacancyModel = new Vacancy();
+        $vacancies = $vacancyModel->getVacancies(['in' => array_values($rssVacancies)]);
 
-            return $optionValue;
-        } catch (\Exception $e) {
-            error_log($e->getMessage());
+        // print('<pre>' . print_r($vacancies->posts, true) . '</pre>');
+        // die;
+
+        $response = [];
+        if ($vacancies && $vacancies->found_posts > 0) {
+            $response['data'] = $vacancies->posts;
         }
+
+        // print('<pre>' . print_r($response, true) . '</pre>');
+        // die;
+        echo $this->convert($response);
     }
 }
