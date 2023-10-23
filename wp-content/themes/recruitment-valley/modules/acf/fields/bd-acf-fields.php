@@ -1491,6 +1491,80 @@ acf_add_local_field_group(array(
 ));
 
 acf_add_local_field_group(array(
+	'key' => 'group_65323cc4d240a',
+	'title' => 'RSS Field Group',
+	'fields' => array(
+		array(
+			'key' => 'field_65323cc5cd7bd',
+			'label' => 'Select Company',
+			'name' => 'rv_rss_select_company',
+			'aria-label' => '',
+			'type' => 'user',
+			'instructions' => '',
+			'required' => 0,
+			'conditional_logic' => 0,
+			'wrapper' => array(
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'role' => array(
+				0 => 'company',
+			),
+			'return_format' => 'id',
+			'multiple' => 0,
+			'allow_null' => 0,
+			'bidirectional' => 0,
+			'bidirectional_target' => array(
+			),
+		),
+		array(
+			'key' => 'field_65323cf4cd7be',
+			'label' => 'Select Vacancy(es)',
+			'name' => 'rv_rss_select_vacancy',
+			'aria-label' => '',
+			'type' => 'select',
+			'instructions' => 'Select vacancy (vacancies) based on selected company.',
+			'required' => 0,
+			'conditional_logic' => 0,
+			'wrapper' => array(
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'choices' => array(
+			),
+			'default_value' => array(
+			),
+			'return_format' => 'array',
+			'multiple' => 1,
+			'allow_null' => 0,
+			'ui' => 1,
+			'ajax' => 1,
+			'placeholder' => '',
+		),
+	),
+	'location' => array(
+		array(
+			array(
+				'param' => 'post_type',
+				'operator' => '==',
+				'value' => 'rss',
+			),
+		),
+	),
+	'menu_order' => 0,
+	'position' => 'normal',
+	'style' => 'default',
+	'label_placement' => 'top',
+	'instruction_placement' => 'label',
+	'hide_on_screen' => '',
+	'active' => true,
+	'description' => '',
+	'show_in_rest' => 0,
+));
+
+acf_add_local_field_group(array(
 	'key' => 'group_64dc99a3d5433',
 	'title' => 'Stripe settings',
 	'fields' => array(

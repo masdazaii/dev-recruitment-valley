@@ -90,6 +90,9 @@ class FlexFeedController
 
                 curl_close($curl);
 
+                /** Log the response */
+                error_log(json_encode($response));
+
                 /** Map the data only if response is 200 */
                 if ($responseCode != 200) {
                     error_log('Failed fetch flexfeed API - response code : ' . $responseCode . ' - response trace : ' . $response);

@@ -18,8 +18,8 @@ class RssController
 
     public function __construct()
     {
-        $this->xml = "<?xml version='1.0' encoding='".get_option('blog_charset')."'?>
-        <rss 
+        $this->xml = "<?xml version='1.0' encoding='" . get_option('blog_charset') . "'?>
+        <rss
             version='2.0'
             xmlns:content='http://purl.org/rss/1.0/modules/content/'
             xmlns:wfw='http://wellformedweb.org/CommentAPI/'
@@ -27,7 +27,7 @@ class RssController
             xmlns:atom='http://www.w3.org/2005/Atom'
             xmlns:sy='http://purl.org/rss/1.0/modules/syndication/'
             xmlns:slash='http://purl.org/rss/1.0/modules/slash/'
-            ".do_action('rss2_ns').">
+            " . do_action('rss2_ns') . ">
                 <channel>
                     <title>Vacancy RSS</title>
                     <link>https://recruitmentvalley.com</link>
@@ -36,7 +36,7 @@ class RssController
         </rss>";
     }
 
-    public function convert( $vacancies )
+    public function convert($vacancies)
     {
         try {
             $vacanciesResult = new SimpleXMLElement($this->xml);
@@ -48,7 +48,7 @@ class RssController
                 $vacancyElement->addChild('title', htmlspecialchars($vacancy->getTitle()));
                 $vacancyElement->addChild('link', FRONTEND_URL . '/vacatures/' .$vacancy->getSlug());
                 $descriptionCData = new DOMCdataSection($vacancy->getDescription());
-                $vacancyElement->addChild( 'description', StringHelper::shortenString($descriptionCData->wholeText, 0, 300) );
+                $vacancyElement->addChild('description', StringHelper::shortenString($descriptionCData->wholeText, 0, 300));
                 // $vacancyElement->addChild( 'pubDate', $vacancy->getPublishDate("D, d F Y H:i:s"));
             }
 
@@ -58,6 +58,29 @@ class RssController
         } catch (\Exception $e) {
             error_log($e->getMessage());
             return "error";
+        }
+    }
+
+    public function vacancyOptionValue(Mixed $companyID, Int $limit = -1)
+    {
+        try {
+            $vacancyModel   = new Vacancy();
+
+            $filters        = [
+                'author'    => $companyID,
+            ];
+
+            $vacancies      = $vacancyModel->getVacancies($filters, []);
+            $optionValue    = [];
+            if ($vacancies && $vacancies->found_posts > 0) {
+                foreach ($vacancies->posts as $post) {
+                    $optionValue[$post->ID] = $post->title;
+                }
+            }
+
+            return $optionValue;
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
         }
     }
 }

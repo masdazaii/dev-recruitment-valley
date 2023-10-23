@@ -20,7 +20,6 @@ class ImportMenu
         add_action('admin_menu', [$this, 'importVacancyApprovalMenu']);
         add_action('admin_post_handle_imported_vacancy_approval', [$this, 'vacancyApprovalSumbitHandle']);
         add_action('admin_notices', [$this, 'vacancyApprovalNotices']);
-        add_action('admin_enqueue_scripts', [$this, 'enqueueVacancyApprovalScripts']);
         add_action('wp_ajax_handle_vacancy_list', [$this, 'vacancyApprovalListAjax']);
         // add_action('wp_ajax_nopriv_handle_vacancy_list', [$this, 'vacancyApprovalListAjax']);
         add_action('wp_ajax_handle_vacancy_role_change', [$this, 'vacancyChangeRoleAjax']);
@@ -172,48 +171,6 @@ class ImportMenu
         echo '</div>';
     }
 
-    public function enqueueVacancyApprovalScripts()
-    {
-        wp_enqueue_script(
-            'vacancyApprovalScript',
-            THEME_URL . '/assets/js/src/wp-admin.js',
-            array('jquery'),
-            FALSE
-        );
-
-        /** Get Vacancy Term from taxonomy 'role' */
-        $termModel = new Term();
-        $termModel = new Term();
-        try {
-            $terms = $termModel->selectTermByTaxonomy('role', true);
-        } catch (\Exception $exception) {
-            error_log($exception->getMessage());
-        }
-
-        wp_localize_script(
-            'vacancyApprovalScript',
-            'vacanciesData',
-            [
-                'ajaxUrl'   => admin_url('admin-ajax.php'),
-                'postUrl'   => esc_url(admin_url('admin-post.php')),
-                'themeUrl'  => THEME_URL,
-                'list'      => [
-                    'action'    => 'handle_vacancy_list',
-                    'role'      => $terms
-                ],
-                'approval'  => [
-                    'changeRoleAction'    => 'handle_vacancy_role_change'
-                ]
-            ]
-        );
-
-        wp_register_style('DataTables', 'https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css');
-        wp_enqueue_style('DataTables');
-
-        wp_register_script('DataTables', 'https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js');
-        wp_enqueue_script('DataTables');
-    }
-
     public function vacancyApprovalListAjax()
     {
         try {
@@ -231,19 +188,53 @@ class ImportMenu
 
             // $vacancies = $vacancy->getImportedVacancy($filters)->posts; // Get imported only
 
-            $vacancies = $vacancy->getVacancies($filters, [], [
-                "meta_query" => [
-                    "relation" => 'OR',
+            $termProcessing = get_term('processing', 'status');
+            if ($termProcessing) {
+                $taxonomyFilters['status'] = $termProcessing;
+            }
+
+            /** Set time limit 24 hour ago */
+            $now = new \DateTimeImmutable('now');
+            $timeLimit = $now->format('Y-m-d H:i:s');
+
+            $vacancies = $vacancy->getVacancies($filters, [
+                /** Anggit's changes add the query expired & processing */
+                "post_type"         => 'vacancy',
+                "posts_per_page"    => $filters['postPerPage'] ?? 10,
+                "offset"            => $filters['offset'] ?? 0,
+                "orderby"           => $filters['orderBy'] ?? "date",
+                "order"             => $filters['sort'] ?? 'ASC',
+                "post_status"       => "publish",
+                "meta_query"        => [
+                    "relation"      => 'AND',
                     [
-                        'key'       => 'rv_vacancy_is_imported',
-                        'value'     => 1,
-                        'compare'   => '=',
+                        'key'       => 'expired_at',
+                        'value'     => $timeLimit,
+                        'compare'   => '>=',
+                        'type'      => 'Date',
                     ],
                     [
-                        'key'       => 'is_paid',
-                        'value'     => 0,
-                        'compare'   => '=',
-                    ],
+                        "relation" => 'OR',
+                        [
+                            'key'       => 'rv_vacancy_is_imported',
+                            'value'     => 1,
+                            'compare'   => '=',
+                        ],
+                        [
+                            'key'       => 'is_paid',
+                            'value'     => 0,
+                            'compare'   => '=',
+                        ],
+                    ]
+                ],
+                'tax_query' => [
+                    "relation" => "OR",
+                    [
+                        'taxonomy' => "status",
+                        'field'    => 'slug',
+                        'terms'    => 'processing',
+                        'compare'  => '='
+                    ]
                 ]
             ]);
 
