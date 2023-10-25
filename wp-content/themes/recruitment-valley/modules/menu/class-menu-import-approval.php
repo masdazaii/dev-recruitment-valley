@@ -197,6 +197,13 @@ class ImportMenu
             $now = new \DateTimeImmutable('now');
             $timeLimit = $now->format('Y-m-d H:i:s');
 
+            /** Get vacancies that fulfill this criteria :
+             * (Not expired OR didn't have meta expired_at)
+             * AND
+             * (Is imported OR didn't have meta rv_vacancy_is_imported OR is_paid = 0)
+             * AND
+             * Status is processing
+             */
             $vacancies = $vacancy->getVacancies($filters, [
                 /** Anggit's changes add the query expired & processing */
                 "post_type"         => 'vacancy',
@@ -208,10 +215,22 @@ class ImportMenu
                 "meta_query"        => [
                     "relation"      => 'AND',
                     [
-                        'key'       => 'expired_at',
-                        'value'     => $timeLimit,
-                        'compare'   => '>=',
-                        'type'      => 'Date',
+                        'relation'  => 'OR',
+                        [
+                            'key'       => 'expired_at',
+                            'value'     => $timeLimit,
+                            'compare'   => '>=',
+                            'type'      => 'Date',
+                        ],
+                        [
+                            'key'       => 'expired_at',
+                            'value'     => '',
+                            'compare'   => '='
+                        ],
+                        [
+                            'key'       => 'expired_at',
+                            'compare'   => 'NOT EXISTS'
+                        ]
                     ],
                     [
                         "relation" => 'OR',
@@ -219,6 +238,10 @@ class ImportMenu
                             'key'       => 'rv_vacancy_is_imported',
                             'value'     => 1,
                             'compare'   => '=',
+                        ],
+                        [
+                            'key'       => 'rv_vacancy_is_imported',
+                            'compare'   => 'NOT EXISTS'
                         ],
                         [
                             'key'       => 'is_paid',
@@ -259,7 +282,7 @@ class ImportMenu
                             $isExpired = false;
                         }
                     } else {
-                        $isExpired = true;
+                        $isExpired = false;
                     }
 
                     $vacanciesResponse[] = [

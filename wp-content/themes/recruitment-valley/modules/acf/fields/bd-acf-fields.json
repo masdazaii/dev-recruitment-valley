@@ -1513,7 +1513,9 @@
                 "post_status": [
                     "publish"
                 ],
-                "taxonomy": "",
+                "taxonomy": [
+                    "status:open"
+                ],
                 "return_format": "id",
                 "multiple": 1,
                 "allow_null": 0,

@@ -1538,7 +1538,9 @@ acf_add_local_field_group(array(
 			'post_status' => array(
 				0 => 'publish',
 			),
-			'taxonomy' => '',
+			'taxonomy' => array(
+				0 => 'status:open',
+			),
 			'return_format' => 'id',
 			'multiple' => 1,
 			'allow_null' => 0,
