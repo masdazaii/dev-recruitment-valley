@@ -6,4 +6,5 @@
 
 defined("ABSPATH") or die("Direct access not allowed!");
 
+require_once __DIR__ . '/class-admin-enqueue.php';
 require_once __DIR__ . '/class-menu-import-approval.php';

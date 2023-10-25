@@ -3,6 +3,7 @@
 namespace Global\Rss;
 
 use Vacancy\VacancyCrudController;
+use WP_REST_Request;
 
 class RssService
 {
@@ -19,13 +20,26 @@ class RssService
     {
         $defaultValue = [
             "page" => 1,
-            "search" => '', 
+            "search" => '',
             "salaryStart" => 0,
             "salaryEnd" => 10000,
             "perPage" => 10,
         ];
 
-        $vacancies = $this->vacancyController->getAll( $defaultValue );
+        $vacancies = $this->vacancyController->getAll($defaultValue);
         echo $this->rssController->convert($vacancies);
     }
-} 
+
+    public function show(WP_REST_Request $request)
+    {
+        $defaultValue = [
+            "page" => 1,
+            "search" => '',
+            "salaryStart" => 0,
+            "salaryEnd" => 10000,
+            "perPage" => 10,
+        ];
+
+        $vacancies = $this->rssController->show($request->get_params());
+    }
+}

@@ -225,6 +225,10 @@ class RequestRules
                 'inputRole.*'   => ["exists:term/role/term_id/single"],
                 'nonce'         => ["required"]
             ],
+            'vacancyByCompany'    => [
+                'company'   => ["required", "exists:user/user/ID"],
+                'result'    => ["in:options,option-value,count,posts"],
+            ],
             'test' => [
                 'test.*.name' => ["required", "mime:jpg,jpeg,png,bmp,gif,svg,webp"]
             ]
@@ -412,6 +416,10 @@ class RequestRules
                 'vacancyID'     => "text",
                 'inputRole.*'   => "text",
                 'nonce'         => "text",
+            ],
+            'vacancyByCompany'    => [
+                'company'   => "text",
+                'result'    => "text",
             ],
             /** When using rule other than these 2. Please add following sanitize rule in Validator.php. */
             "example" => [
