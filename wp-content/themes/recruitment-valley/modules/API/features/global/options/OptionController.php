@@ -62,6 +62,9 @@ class OptionController
                 array_push($newExpiredOption, ["post_id" => $id, "expired_at" => $expired]);
             }
 
+            /** Remove duplicate element with same post_id */
+            $newExpiredOption = array_unique($newExpiredOption, SORT_REGULAR);
+
             $isOptionUpdate = update_option("job_expires", $newExpiredOption);
 
             error_log('called from ' . ($class_name ?? 'self') . '::' . ($method_name ?? 'self') . ' - post : ' . $id . ' - set expired to : ' . $expired . ' - Logged from : OptionController::updateExpiredOptions');
