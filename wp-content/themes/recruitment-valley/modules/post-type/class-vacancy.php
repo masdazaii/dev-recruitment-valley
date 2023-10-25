@@ -7,6 +7,7 @@ use DateTimeImmutable;
 use Vacancy\Vacancy as VacancyModel;
 use constant\NotificationConstant;
 use Global\NotificationService;
+use Global\OptionController;
 
 class Vacancy extends RegisterCPT
 {
@@ -96,34 +97,62 @@ class Vacancy extends RegisterCPT
 
     public function setExpiredDate($object_id, $terms = [], $tt_ids = [], $taxonomy = '', $append = true, $old_tt_ids = [])
     {
+        $this->wpdb->query("START TRANSACTION");
+
         $post = get_post($object_id, 'object');
         if ($post->post_type == 'vacancy') {
-            $openTerm = get_term_by('slug', 'open', 'status', 'OBJECT');
-            $declineTerm = get_term_by('slug', 'declined', 'status', 'OBJECT');
-            $vacancyModel = new VacancyModel($object_id);
+            error_log('class-vacancy - method : setExpiredDate - Before try to update the expired date.');
+            error_log('class-vacancy - method : setExpiredDate - post : ' . $object_id . ' - terms : ' . json_encode($terms));
 
-            if ($taxonomy === 'status' && in_array($openTerm->term_id, $terms)) {
+            try {
+                $openTerm = get_term_by('slug', 'open', 'status', 'OBJECT');
+                $declineTerm = get_term_by('slug', 'declined', 'status', 'OBJECT');
+                $vacancyModel = new VacancyModel($object_id);
 
-                if (!get_field('is_paid', $object_id, true)) {
-                    $today = new DateTimeImmutable("now");
-                    $vacancyModel->setProp($vacancyModel->acf_expired_at, $today->modify("+30 days")->format("Y-m-d H:i:s"));
+                if ($taxonomy === 'status' && in_array($openTerm->term_id, $terms)) {
+                    /** Do only if vacancy is free */
+                    if (!get_field('is_paid', $object_id, true)) {
+                        /** Update the expired date */
+                        $today = new DateTimeImmutable("now");
+                        $vacancyExpiredDate = $today->modify("+30 days")->format("Y-m-d H:i:s");
 
+                        $setExpired = $vacancyModel->setProp($vacancyModel->acf_expired_at, $vacancyExpiredDate);
+
+                        /** If success update vacancy expired date */
+                        if ($setExpired) {
+                            /** Update options "job_expires" */
+                            $optionController       = new OptionController();
+                            $updateOptionJobExpires = $optionController->updateExpiredOptions($object_id, $vacancyExpiredDate, 'class-vacancy.php', 'setExpiredDate');
+                        }
+
+                        /** Create notification : vacancy is approved */
+                        $this->_notification->write($this->_notificationConstant::VACANCY_PUBLISHED, $vacancyModel->getAuthor(), [
+                            'id'    => $object_id,
+                            'slug'  => $vacancyModel->getSlug(),
+                            'title' => $vacancyModel->getTitle()
+                        ]);
+                    }
+                }
+
+                if ($taxonomy === 'status' && in_array($declineTerm->term_id, $terms)) {
                     /** Create notification : vacancy is approved */
-                    $this->_notification->write($this->_notificationConstant::VACANCY_PUBLISHED, $vacancyModel->getAuthor(), [
+                    $this->_notification->write($this->_notificationConstant::VACANCY_REJECTED, $vacancyModel->getAuthor(), [
                         'id'    => $object_id,
                         'slug'  => $vacancyModel->getSlug(),
                         'title' => $vacancyModel->getTitle()
                     ]);
                 }
-            }
 
-            if ($taxonomy === 'status' && in_array($declineTerm->term_id, $terms)) {
-                /** Create notification : vacancy is approved */
-                $this->_notification->write($this->_notificationConstant::VACANCY_REJECTED, $vacancyModel->getAuthor(), [
-                    'id'    => $object_id,
-                    'slug'  => $vacancyModel->getSlug(),
-                    'title' => $vacancyModel->getTitle()
-                ]);
+                $this->wpdb->query("COMMIT");
+            } catch (\WP_Error $err) {
+                $this->wpdb->query("ROLLBACK");
+                error_log($err->get_error_message());
+            } catch (\Exception $e) {
+                $this->wpdb->query("ROLLBACK");
+                error_log($e->getMessage());
+            } catch (\Throwable $th) {
+                $this->wpdb->query("ROLLBACK");
+                error_log($th->getMessage());
             }
         }
     }

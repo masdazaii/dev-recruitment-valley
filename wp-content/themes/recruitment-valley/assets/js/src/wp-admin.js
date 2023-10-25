@@ -10,6 +10,16 @@ $(() => {
 			importedVacancyModule.init()
 		})
 	}
+
+	/** Import script for rss */
+	if (vacanciesData.postType == 'rss') {
+		import('./vacancy/admin-rss.js').then((module) => {
+			console.log(vacanciesData.postType == 'rss' ? vacanciesData.postType : 'b')
+			const rssModule = module.default // Access the default property
+
+			rssModule.init()
+		})
+	}
 })
 
 /** Theme default script */

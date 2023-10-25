@@ -269,6 +269,12 @@ class GlobalEndpoint
                     'method'                => 'GET',
                     'permission_callback'   => '__return_true',
                     'callback'              => [$rssService, 'get']
+                ],
+                'show_single_rss' => [
+                    'url'                   => 'rss/vacancy/(?P<rss>[-\w]+)',
+                    'method'                => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$rssService, 'show']
                 ]
             ]
 

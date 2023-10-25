@@ -341,7 +341,7 @@ class VacancyCrudController
             $vacancyModel->setProp($vacancyModel->acf_salary_start, $payload["salary_start"]);
             $vacancyModel->setProp($vacancyModel->acf_salary_end, $payload["salary_end"]);
             $vacancyModel->setProp($vacancyModel->acf_apply_from_this_platform, $payload["apply_from_this_platform"]);
-            // $vacancyModel->setProp($vacancyModel->acf_expired_at, date("Y-m-d H:i:s"));
+            $vacancyModel->setProp($vacancyModel->acf_expired_at, ''); // Added Line
             $vacancyModel->setProp($vacancyModel->acf_placement_address, $payload["placementAddress"]);
             $vacancyModel->setProp($vacancyModel->acf_country_code, $payload["countryCode"]);
 
@@ -1159,6 +1159,48 @@ class VacancyCrudController
             error_log($e->getMessage());
         } catch (\Throwable $th) {
             error_log($th->getMessage());
+        }
+    }
+
+    /**
+     * GET Vacancy by company ID function
+     *
+     * @param Mixed $companyID
+     * @param integer $limit
+     * @return array
+     */
+    public function getVacancyByCompany(Mixed $companyID, Int $limit = -1, String $result = 'posts')
+    {
+        try {
+            $vacancyModel   = new Vacancy();
+
+            $filters        = [
+                'author'    => $companyID,
+            ];
+
+            $vacancies      = $vacancyModel->getVacancies($filters, []);
+
+            switch (strtolower($result)) {
+                case 'options':
+                case 'option-value':
+                    $optionValue    = [];
+                    if ($vacancies && $vacancies->found_posts > 0) {
+                        foreach ($vacancies->posts as $post) {
+                            $optionValue[$post->ID] = $post->post_title;
+                        }
+                    }
+
+                    return $optionValue;
+                    break;
+                case 'count':
+                    return $vacancies->found_posts;
+                    break;
+                default:
+                    return $vacancies->posts;
+                    break;
+            }
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
         }
     }
 }

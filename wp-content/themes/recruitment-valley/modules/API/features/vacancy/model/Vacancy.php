@@ -956,65 +956,71 @@ class Vacancy
         return $args;
     }
 
-    public function getVacancies($filters = [], $taxonomyFilters = [], $args = [])
+    public function getVacancies($filters = [], $args = [])
     {
-        $args = $this->_setVacancyArguments($args, $filters, $taxonomyFilters = []);
+        $args = $this->_setVacancyArguments($args, $filters);
         $vacancies = new WP_Query($args);
 
         return $vacancies;
     }
 
-    private function _setVacancyArguments($args = [], $filters = [], $taxonomyFilters = [])
+    private function _setVacancyArguments($args = [], $filters = [])
     {
         if (empty($args)) {
             $args = [
-                "post_type" => $this->vacancy,
-                "posts_per_page" => $filters['postPerPage'] ?? -1,
-                "offset" => $filters['offset'] ?? 0,
-                "orderby" => $filters['orderBy'] ?? "date",
-                "order" => $filters['sort'] ?? 'ASC',
-                "post_status" => "publish",
-                "tax_query" => [
-                    "relation" => 'AND',
-                ]
+                "post_type"         => $this->vacancy,
+                "posts_per_page"    => $filters['postPerPage'] ?? -1,
+                "offset"            => $filters['offset'] ?? 0,
+                "orderby"           => $filters['orderBy'] ?? "date",
+                "order"             => $filters['sort'] ?? 'ASC',
+                "post_status"       => "publish",
             ];
-        } else {
-            $arguments = [
-                "post_type" => $this->vacancy,
-                "posts_per_page" => $filters['postPerPage'] ?? -1,
-                "offset" => $filters['offset'] ?? 0,
-                "orderby" => $filters['orderBy'] ?? "date",
-                "order" => $filters['sort'] ?? 'ASC',
-                "post_status" => "publish",
-                "tax_query" => [
-                    "relation" => 'AND',
-                ]
-            ];
-            foreach ($args as $key => $value) {
-                $arguments[$key] = $value;
+
+            if (isset($filters['orderBy'])) {
+                $args['orderby'] = $filters['orderBy'];
             }
-            $args = $arguments;
-        }
 
-        /** Set tax_query */
-        if (!empty($taxonomyFilters)) {
-            foreach ($taxonomyFilters as $key => $value) {
-                if ($value && $value !== null && !empty($value)) {
-                    $args['tax_query'][1]['relation'] = 'OR';
-
-                    array_push($args['tax_query'][1], [
-                        'taxonomy' => $key,
-                        'field'    => 'term_id',
-                        'terms'    => $value,
-                        'compare'  => 'IN'
-                    ]);
-                }
+            if (isset($filters['author'])) {
+                $args['author__in'] = [$filters['author']];
             }
         }
 
-        /** Set search query */
-        if (!empty($filters['search'])) {
-            $args['s'] = $filters['search'];
+        if (!empty($filters)) {
+            if (array_key_exists('meta', $filters)) {
+                $args['meta_query'] = $filters['meta'];
+            }
+
+            if (array_key_exists('taxonomy', $filters)) {
+                $args['tax_query'] = $filters['taxonomy'];
+            }
+
+            if (array_key_exists('postPerPage', $filters)) {
+                $args['postPerPage'] = $filters['postPerPage'];
+            }
+
+            if (array_key_exists('offset', $filters)) {
+                $args['offset'] = $filters['offset'];
+            }
+
+            if (array_key_exists('orderBy', $filters)) {
+                $args['orderby'] = $filters['orderBy'];
+            }
+
+            if (array_key_exists('sort', $filters)) {
+                $args['order'] = $filters['sort'];
+            }
+
+            if (array_key_exists('post_status', $filters)) {
+                $args['post_status'] = $filters['post_status'];
+            }
+
+            if (array_key_exists('author', $filters)) {
+                $args['author '] = $filters['author'];
+            }
+
+            if (array_key_exists('in', $filters)) {
+                $args['post__in'] = $filters['in'];
+            }
         }
 
         return $args;
