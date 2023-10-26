@@ -18,6 +18,7 @@ use Vacancy\Import\ImportService;
 use Global\NotificationService;
 use Global\CouponService;
 use Global\Rss\RssService;
+use Global\FAQ\FaqService;
 
 class GlobalEndpoint
 {
@@ -49,6 +50,7 @@ class GlobalEndpoint
         $notificationService = new NotificationService;
         $couponService = new CouponService;
         $rssService = new RssService;
+        $faqService = new FaqService;
 
         $endpoint = [
             'path' => '',
@@ -275,6 +277,12 @@ class GlobalEndpoint
                     'method'                => 'GET',
                     'permission_callback'   => '__return_true',
                     'callback'              => [$rssService, 'show']
+                ],
+                'list_faq'  => [
+                    'url'                   => '/faq',
+                    'method'                => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$faqService, 'list']
                 ]
             ]
 

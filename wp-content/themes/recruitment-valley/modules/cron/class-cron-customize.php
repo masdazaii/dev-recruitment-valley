@@ -24,12 +24,16 @@ class CronCustomize
     protected $time_today, $fiveDayAfter;
     private $_notification;
     private $_notificationConstant;
+    private $wpdb;
 
     public function __construct()
     {
         add_action('init', [$this, 'create_cron_job']);
         $this->_notification = new NotificationService();
         $this->_notificationConstant = new NotificationConstant();
+
+        global $wpdb;
+        $this->wpdb = $wpdb;
     }
 
     public function create_cron_job()
@@ -51,7 +55,7 @@ class CronCustomize
 
         error_log('Start call');
         // $this->_expired_after_5_days($expired_posts);
-        
+
         // ? +7 days before
         $this->_expired_after_in_days($expired_posts, 7);
         // ? +5 days before
@@ -75,45 +79,64 @@ class CronCustomize
     private function _expired_posts_handle($expired_posts = [])
     {
         error_log('expired now');
-        $today = $this->time_today;
-        $expired_posts_already = array_filter($expired_posts, function ($el) use ($today) {
-            $time = strtotime($el['expired_at']);
-            return $time <= $today;
-        });
 
-        if (!$expired_posts_already) return;
+        /** Changes 25-10-2023: adding try catch, and DID NOT changing the script inside the try argument */
+        $this->wpdb->query("START TRANSACTION");
+        try {
+            $today = $this->time_today;
+            $expired_posts_already = array_filter($expired_posts, function ($el) use ($today) {
+                $time = strtotime($el['expired_at']);
+                return $time <= $today;
+            });
 
-        error_log('[expired posts] ' . json_encode($expired_posts_already, JSON_PRETTY_PRINT));
-        foreach ($expired_posts_already as $in => $the_post) {
-            $post = get_post($the_post['post_id']);
-            $user = get_user_by('id', $post->post_author);
+            if (!$expired_posts_already) return;
 
-            $vacancy = new Vacancy($post);
-            $vacancy->setStatus("close");
+            error_log('[expired posts] ' . json_encode($expired_posts_already, JSON_PRETTY_PRINT));
+            foreach ($expired_posts_already as $in => $the_post) {
+                $post = get_post($the_post['post_id']);
+                $user = get_user_by('id', $post->post_author);
 
-            $args = [
-                'vacancy_title' => $post->post_title,
-            ];
+                // $vacancy = new Vacancy($post); // Changed below 25-10-2023
+                $vacancy = new Vacancy($the_post['post_id']);
+                $setStatus = $vacancy->setStatus("close");
 
-            $headers = array(
-                'Content-Type: text/html; charset=UTF-8',
-            );
-            $content = Email::render_html_email('job-expired-company.php', $args);
-            $is_success = wp_mail($user->user_email, "Melding verlopen vacature", $content, $headers);
+                $args = [
+                    'vacancy_title' => $post->post_title,
+                ];
 
-            error_log('[notify][expired vacancy] sending email to ' . $user->user_email);
-            error_log('[notify][expired vacancy] sending email status (' . ($is_success ? 'success' : 'failed') . ')');
-            error_log('[notify][expired vacancy] unset post_id: ' . $the_post['post_id']);
+                $headers = array(
+                    'Content-Type: text/html; charset=UTF-8',
+                );
+                $content = Email::render_html_email('job-expired-company.php', $args);
+                $is_success = wp_mail($user->user_email, "Melding verlopen vacature", $content, $headers);
 
-            /** Create notification : vacancy is expired */
-            $this->_notification->write($this->_notificationConstant::VACANCY_EXPIRED, $post->post_author, [
-                'id'    => $the_post['post_id'],
-                'title' => $post->post_title,
-                'slug'  => $post->post_name
-            ]);
+                error_log('[notify][expired vacancy] sending email to ' . $user->user_email);
+                error_log('[notify][expired vacancy] sending email status (' . ($is_success ? 'success' : 'failed') . ')');
+                error_log('[notify][expired vacancy] unset post_id: ' . $the_post['post_id']);
+
+                /** Unset from option */
+                unset($expired_posts[$in]);
+
+                /** Create notification : vacancy is expired */
+                $this->_notification->write($this->_notificationConstant::VACANCY_EXPIRED, $post->post_author, [
+                    'id'    => $the_post['post_id'],
+                    'title' => $post->post_title,
+                    'slug'  => $post->post_name
+                ]);
+            }
+
+            $this->wpdb->query("COMMIT");
+            return $expired_posts;
+        } catch (WP_Error $err) {
+            $this->wpdb->query("ROLLBACK");
+            error_log($err->get_error_message());
+        } catch (Exception $e) {
+            $this->wpdb->query("ROLLBACK");
+            error_log($e->getMessage());
+        } catch (Throwable $th) {
+            $this->wpdb->query("ROLLBACK");
+            error_log($th->getMessage());
         }
-
-        return $expired_posts;
     }
 
     private function _expired_after_in_days($expired_posts, $in_days = 5, $template = 'reminder-5days-expire-company.php')
@@ -133,7 +156,7 @@ class CronCustomize
         error_log("[notify][expired '. $text_time .'] today is " . date('Y-m-d'));
         error_log("[notify][expired '. $text_time .'] will expired at " . $dateAfter);
 
-        error_log('[notify][expired '. $text_time .'] posts: ' . json_encode($expired_posts, JSON_PRETTY_PRINT));
+        error_log('[notify][expired ' . $text_time . '] posts: ' . json_encode($expired_posts, JSON_PRETTY_PRINT));
 
         foreach ($expired_posts as $in => $the_post) {
             $post = get_post($the_post['post_id']);
@@ -151,9 +174,9 @@ class CronCustomize
             $site_title = get_bloginfo('name');
             $is_success = wp_mail($user->user_email, "Reminder verlopen vacature - $site_title", $content, $headers);
 
-            error_log('[notify][expired '. $text_time .'] sending email to ' . $user->user_email);
-            error_log('[notify][expired '. $text_time .'] sending email status (' . ($is_success ? 'success' : 'failed') . ')');
-            error_log('[notify][expired '. $text_time .'] unset post_id: ' . $the_post['post_id']);
+            error_log('[notify][expired ' . $text_time . '] sending email to ' . $user->user_email);
+            error_log('[notify][expired ' . $text_time . '] sending email status (' . ($is_success ? 'success' : 'failed') . ')');
+            error_log('[notify][expired ' . $text_time . '] unset post_id: ' . $the_post['post_id']);
 
             /** Create notification : vacancy is expired in 5 days */
             $this->_notification->write($this->_notificationConstant::VACANCY_EXPIRED_5, $post->post_author, [

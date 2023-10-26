@@ -1,9 +1,11 @@
 const rssModule = (function () {
   function initialize() {
     $('*[data-name="rv_rss_select_company"] .acf-input select').on('change', ajaxVacancyOptionValue)
+    callTrigger()
   }
 
   function ajaxVacancyOptionValue(e) {
+    console.log('ajaxVacancyOptionValue')
     $('*[data-name="rv_rss_select_vacancy"] .acf-input select').select2({
       ajax: {
         method: "POST",
@@ -37,6 +39,17 @@ const rssModule = (function () {
         }
       }
     })
+  }
+
+  function callTrigger() {
+    console.log('callTrigger')
+    var event = new Event('change');
+    // Dispatch the event
+    document.dispatchEvent(event);
+    /** This is only for testing, THIS SHOULD BE CHANGE! */
+    setTimeout(() => {
+      $('*[data-name="rv_rss_select_company"] .acf-input select').trigger('change')
+    }, 3000)
   }
 
   return {

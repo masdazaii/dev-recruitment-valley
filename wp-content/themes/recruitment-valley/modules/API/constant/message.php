@@ -297,6 +297,10 @@ class Message
                 'reach_limit'   => __("coupon limiet bereikt", THEME_DOMAIN),
                 'reach_limit_user' => __("je hebt het coupon limiet reeds bereikt", THEME_DOMAIN),
                 'specify_coupon' => __("Geef de coupon aan!", THEME_DOMAIN)
+            ],
+            'faq' => [
+                'list_success'   => __("Success get faqs!", THEME_DOMAIN),
+                'list_failed'    => __("Failed get faqs!", THEME_DOMAIN),
             ]
         ];
     }

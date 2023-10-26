@@ -858,6 +858,57 @@ acf_add_local_field_group(array(
 ));
 
 acf_add_local_field_group(array(
+	'key' => 'group_6539d648b59cd',
+	'title' => 'FAQ Field Group',
+	'fields' => array(
+		array(
+			'key' => 'field_6539d649eefa0',
+			'label' => 'Type',
+			'name' => 'rv_faq_type',
+			'aria-label' => '',
+			'type' => 'select',
+			'instructions' => '',
+			'required' => 1,
+			'conditional_logic' => 0,
+			'wrapper' => array(
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'choices' => array(
+				'company' => 'Question from company',
+				'candidate' => 'Question from candidate',
+			),
+			'default_value' => false,
+			'return_format' => 'array',
+			'multiple' => 0,
+			'allow_null' => 0,
+			'ui' => 0,
+			'ajax' => 0,
+			'placeholder' => '',
+		),
+	),
+	'location' => array(
+		array(
+			array(
+				'param' => 'post_type',
+				'operator' => '==',
+				'value' => 'faq',
+			),
+		),
+	),
+	'menu_order' => 0,
+	'position' => 'normal',
+	'style' => 'default',
+	'label_placement' => 'top',
+	'instruction_placement' => 'label',
+	'hide_on_screen' => '',
+	'active' => true,
+	'description' => '',
+	'show_in_rest' => 0,
+));
+
+acf_add_local_field_group(array(
 	'key' => 'group_652506a4e8ee7',
 	'title' => 'Import API',
 	'fields' => array(
@@ -1538,7 +1589,9 @@ acf_add_local_field_group(array(
 			'post_status' => array(
 				0 => 'publish',
 			),
-			'taxonomy' => '',
+			'taxonomy' => array(
+				0 => 'status:open',
+			),
 			'return_format' => 'id',
 			'multiple' => 1,
 			'allow_null' => 0,
