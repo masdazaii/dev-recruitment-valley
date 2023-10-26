@@ -268,8 +268,10 @@ class FlexFeedController
 
                         /** ACF Paid
                          * set all import to paid
+                         * set import to free based on feedback 19/10
                          */
-                        $payload["is_paid"] = true;
+                        // $payload["is_paid"] = true;
+                        $payload["is_paid"] = false;
 
                         /** ACF Imported
                          * set all is_imported acf data to "true"

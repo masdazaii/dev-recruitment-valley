@@ -311,7 +311,7 @@ class ImportMenu
                 "recordsFiltered"   => (int)$vacancies->found_posts,
                 'data'              => $vacanciesResponse,
                 'search'            => isset($_GET['search']) ? $_GET['search']['value'] : null,
-                'filters'           => $filters
+                // 'filters'           => $filters
             ], 200);
         } catch (\Exception $error) {
             wp_send_json(['message' => $error->getMessage()], 400);

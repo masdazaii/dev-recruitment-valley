@@ -229,6 +229,10 @@ class RequestRules
                 'company'   => ["required", "exists:user/user/ID"],
                 'result'    => ["in:options,option-value,count,posts"],
             ],
+            'vacancyByRSS'    => [
+                'rss'       => ["required", "exists:post/rss/post_id/single"],
+                'result'    => ["in:options,option-value,count,posts"],
+            ],
             'test' => [
                 'test.*.name' => ["required", "mime:jpg,jpeg,png,bmp,gif,svg,webp"]
             ]
@@ -419,6 +423,10 @@ class RequestRules
             ],
             'vacancyByCompany'    => [
                 'company'   => "text",
+                'result'    => "text",
+            ],
+            'vacancyByRSS'    => [
+                'rss'       => "text",
                 'result'    => "text",
             ],
             /** When using rule other than these 2. Please add following sanitize rule in Validator.php. */

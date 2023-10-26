@@ -1569,37 +1569,6 @@ acf_add_local_field_group(array(
 			'bidirectional_target' => array(
 			),
 		),
-		array(
-			'key' => 'field_65323cf4cd7be',
-			'label' => 'Select Vacancy(s/es)',
-			'name' => 'rv_rss_select_vacancy',
-			'aria-label' => '',
-			'type' => 'post_object',
-			'instructions' => 'Select vacancy (vacancies) based on selected company.',
-			'required' => 0,
-			'conditional_logic' => 0,
-			'wrapper' => array(
-				'width' => '100',
-				'class' => '',
-				'id' => '',
-			),
-			'post_type' => array(
-				0 => 'vacancy',
-			),
-			'post_status' => array(
-				0 => 'publish',
-			),
-			'taxonomy' => array(
-				0 => 'status:open',
-			),
-			'return_format' => 'id',
-			'multiple' => 1,
-			'allow_null' => 0,
-			'bidirectional' => 0,
-			'ui' => 1,
-			'bidirectional_target' => array(
-			),
-		),
 	),
 	'location' => array(
 		array(
@@ -3549,7 +3518,7 @@ acf_add_local_field_group(array(
 		),
 		array(
 			'key' => 'field_652cac3eeacdb',
-			'label' => 'Vacancy import approved by',
+			'label' => 'Vacancy Approved By',
 			'name' => 'rv_vacancy_imported_approved_by',
 			'aria-label' => '',
 			'type' => 'user',
@@ -3560,6 +3529,13 @@ acf_add_local_field_group(array(
 					array(
 						'field' => 'field_64fe7b3186a6b',
 						'operator' => '==',
+						'value' => '1',
+					),
+				),
+				array(
+					array(
+						'field' => 'field_64d0a7570f8f2',
+						'operator' => '!=',
 						'value' => '1',
 					),
 				),
@@ -3581,7 +3557,7 @@ acf_add_local_field_group(array(
 		),
 		array(
 			'key' => 'field_652cb51d484bd',
-			'label' => 'Vacancy import approval status',
+			'label' => 'Vacancy Approval Status',
 			'name' => 'rv_vacancy_imported_approval_status',
 			'aria-label' => '',
 			'type' => 'select',
