@@ -83,7 +83,6 @@ class FaqController
                     'totalPage' => $faqsResponse['meta']['max_pages'],
                     'totalData' => $faqsResponse['meta']['max_posts']
                 ],
-                "a" => $faqs,
                 "status"    => 200
             ];
         } catch (\WP_Error $err) {
