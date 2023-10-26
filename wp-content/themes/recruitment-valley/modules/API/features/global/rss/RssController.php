@@ -75,16 +75,11 @@ class RssController
         $vacancyModel = new Vacancy();
         $vacancies = $vacancyModel->getVacancies(['in' => array_values($rssVacancies)]);
 
-        // print('<pre>' . print_r($vacancies->posts, true) . '</pre>');
-        // die;
-
         $response = [];
         if ($vacancies && $vacancies->found_posts > 0) {
             $response['data'] = $vacancies->posts;
         }
 
-        // print('<pre>' . print_r($response, true) . '</pre>');
-        // die;
         echo $this->convert($response);
     }
 }

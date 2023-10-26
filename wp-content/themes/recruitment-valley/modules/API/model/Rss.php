@@ -11,7 +11,8 @@ class Rss
     private $_rssID;
 
     private $_acf_rss_company = 'rv_rss_select_company';
-    private $_acf_rss_vacancy = 'rv_rss_select_vacancy';
+    // private $_acf_rss_vacancy = 'rv_rss_select_vacancy';
+    public $_meta_rss_vacancy = 'rv_rss_select_vacancy';
 
     private $_meta_rss_endpoint_url = 'rv_rss_endpoint_url';
 
@@ -40,7 +41,7 @@ class Rss
         return [
             'acf' => [
                 'rss_company' => $this->_acf_rss_company,
-                'rss_vacancy' => $this->_acf_rss_vacancy,
+                'rss_vacancy' => $this->_meta_rss_vacancy,
             ],
             'meta' => [
                 'endpoint_url' => $this->_meta_rss_endpoint_url,
@@ -99,12 +100,22 @@ class Rss
 
     public function getRssVacancies()
     {
-        return $this->getter($this->_acf_rss_vacancy, true);
+        return maybe_unserialize($this->getter($this->_meta_rss_vacancy, true, 'meta'));
+    }
+
+    public function setRssVacancies($value)
+    {
+        return $this->setter($this->_meta_rss_vacancy, $value, 'meta');
     }
 
     public function setRssEndpointURL($value)
     {
         return $this->setter($this->_meta_rss_endpoint_url, $value, 'meta');
+    }
+
+    public function getRssCompany()
+    {
+        return $this->getter($this->_acf_rss_company, true, 'acf');
     }
 
     public function getRssEndpointURL()
