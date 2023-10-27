@@ -53,7 +53,7 @@ class AjaxVacancy
             $body = $validator->getData();
 
             $vacancyController  = new VacancyCrudController();
-            $optionValues       = $vacancyController->getVacancyByCompany($body['company'], -1, $body['result']);
+            $optionValues       = $vacancyController->getVacancyByCompany($body['company'], -1, $body['result'], ['with_expired' => false, 'with_rejected' => false]);
 
             wp_send_json([
                 'success'   => true,
