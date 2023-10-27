@@ -21,6 +21,8 @@ class Vacancy extends RegisterCPT
         add_action('init', [$this, 'RegisterVacancyCPT']);
         add_action('set_object_terms', [$this, 'setExpiredDate'], 10, 5);
         add_action('add_meta_boxes', [$this, 'addVacancyMetaboxes'], 10, 2);
+        add_filter('manage_vacancy_posts_columns', [$this, 'vacancyColoumn'], 10, 1);
+        add_action('manage_vacancy_posts_custom_column', [$this, 'vacancyCustomColoumn'], 10, 2);
         $this->_message = new Message();
 
         global $wpdb;
@@ -214,6 +216,45 @@ class Vacancy extends RegisterCPT
         echo '<input style="width: 100%; border: 1px solid rgba(209, 213, 219, 1); padding: 0.375rem 0.5rem; font-size: 1rem; line-height: 1.5rem; font-weight: 400;" type="text" id="rss-url-endpoint" readonly disabled value="' . $vacancy->getImportedAt('d F Y H:i:s') . '"/>';
         echo '</div>';
         echo '</div>';
+    }
+
+    public function vacancyColoumn($coloumn)
+    {
+        unset($coloumn['date']);
+        unset($coloumn['author']);
+        $coloumn['status']      = __('Status');
+        $coloumn['expired']     = __('Expired Date');
+        $coloumn['approvedat']  = __('Approval Date');
+        $coloumn['author']      = __('Author');
+        $coloumn['date']        = __('Submitted On');
+
+        return $coloumn;
+    }
+
+    public function vacancyCustomColoumn($coloumn, $post_id)
+    {
+        $vacancyModel = new VacancyModel($post_id);
+
+        switch ($coloumn) {
+            case 'status':
+                $status = $vacancyModel->getStatus();
+                if ($status['slug'] == 'open') {
+                    echo '<span style="color: green; font-weight: bold;">' . $status['name'] . '<span>';
+                } else if ($status['slug'] == 'close') {
+                    echo '<span style="color: red; font-weight: bold;">' . $status['name'] . '<span>';
+                } else if ($status['slug'] == 'declined') {
+                    echo '<span style="color: orange; font-weight: bold;">' . $status['name'] . '<span>';
+                } else {
+                    echo '<span style="color: black; font-weight: bold;">' . $status['name'] . '<span>';
+                }
+                break;
+            case 'expired':
+                echo $vacancyModel->getExpiredAt('d M Y');
+                break;
+            case 'approvedat':
+                echo $vacancyModel->getApprovedAt('d M Y H:i:s');
+                break;
+        }
     }
 }
 new Vacancy();
