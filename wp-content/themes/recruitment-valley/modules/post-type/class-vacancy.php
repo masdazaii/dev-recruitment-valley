@@ -179,6 +179,19 @@ class Vacancy extends RegisterCPT
             'default',
             ['post_id' => $post->ID, 'meta' => []]
         );
+
+        $vacancyModel = new VacancyModel($post->ID);
+        if ($vacancyModel->getImportedAt()) {
+            add_meta_box(
+                'imported_vacancies_metaboxes',
+                'Vacancies Imported At',
+                [$this, 'vacancyImportedAtRenderMetabox'],
+                'vacancy',
+                'advanced',
+                'default',
+                ['post_id' => $post->ID, 'meta' => []]
+            );
+        }
     }
 
     public function vacancyApprovedAtRenderMetabox($post, $callback_arguments = [])
@@ -188,6 +201,17 @@ class Vacancy extends RegisterCPT
         echo '<div class="cs-flex cs-flex-col cs-flex-nowrap cs-items-start cs-gap-2">';
         echo '<label style="display; block; font-weight: bold; color: rgba(0, 0, 0, 1);" for="rss-url-endpoint">Vacancy Approved At</label>';
         echo '<input style="width: 100%; border: 1px solid rgba(209, 213, 219, 1); padding: 0.375rem 0.5rem; font-size: 1rem; line-height: 1.5rem; font-weight: 400;" type="text" id="rss-url-endpoint" readonly disabled value="' . $vacancy->getApprovedAt('d F Y H:i:s') . '"/>';
+        echo '</div>';
+        echo '</div>';
+    }
+
+    public function vacancyImportedAtRenderMetabox($post, $callback_arguments = [])
+    {
+        $vacancy = new VacancyModel($post->ID);
+        echo '<div style="display: flex; flex-direction: column; gap: 0.5rem;">';
+        echo '<div class="cs-flex cs-flex-col cs-flex-nowrap cs-items-start cs-gap-2">';
+        echo '<label style="display; block; font-weight: bold; color: rgba(0, 0, 0, 1);" for="rss-url-endpoint">Vacancy Imported At</label>';
+        echo '<input style="width: 100%; border: 1px solid rgba(209, 213, 219, 1); padding: 0.375rem 0.5rem; font-size: 1rem; line-height: 1.5rem; font-weight: 400;" type="text" id="rss-url-endpoint" readonly disabled value="' . $vacancy->getImportedAt('d F Y H:i:s') . '"/>';
         echo '</div>';
         echo '</div>';
     }

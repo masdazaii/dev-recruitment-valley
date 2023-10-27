@@ -1090,10 +1090,14 @@ class Vacancy
         return update_post_meta($this->vacancy_id, $key, $value);
     }
 
-    public function getImportedAt()
+    public function getImportedAt($format = 'Y-m-d H:i:s')
     {
         if ($this->vacancy_id) {
-            return $this->getterMeta($this->_meta_rv_vacancy_imported_at, true);
+            $importedAt = $this->getterMeta($this->_meta_rv_vacancy_imported_at, true);
+            if ($importedAt) {
+                return date($format, strtotime($importedAt));
+            }
+            return $importedAt;
         } else {
             throw new Exception('Please specify vacancy!');
         }
