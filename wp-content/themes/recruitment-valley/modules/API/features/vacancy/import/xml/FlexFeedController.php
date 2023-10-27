@@ -13,6 +13,8 @@ use Helper\StringHelper;
 use Helper\CalculateHelper;
 use Model\Option;
 use Model\Term;
+use BD\Emails\Email;
+use Constant\Message;
 
 class FlexFeedController
 {
@@ -23,6 +25,7 @@ class FlexFeedController
     private $_taxonomyKey;
     private $_terms;
     private $_keywords;
+    private $_message;
 
     public function __construct($source)
     {
@@ -405,6 +408,20 @@ class FlexFeedController
                             update_post_meta($post, 'rv_vacancy_unused_data', $unusedData);
                             update_post_meta($post, 'rv_vacancy_source', 'flexfeed');
                             update_post_meta($post, 'rv_vacancy_imported_at', $now->format('Y-m-d H:i:s'));
+
+                            /** Email to admin */
+                            $this->_message = new Message();
+
+                            $headers = [
+                                'Content-Type: text/html; charset=UTF-8',
+                            ];
+
+                            $approvalArgs = [
+                                // 'url' => menu_page_url('import-approval'),
+                            ];
+                            $adminEmail = get_option('admin_email', false);
+                            $content = Email::render_html_email('admin-new-vacancy-approval.php', $approvalArgs);
+                            wp_mail($adminEmail, $this->_message->get('vacancy.approval_subject'), $content, $headers);
                         } catch (\WP_Error $wperror) {
                             error_log($wperror->get_error_message());
                         } catch (\Exception $error) {
