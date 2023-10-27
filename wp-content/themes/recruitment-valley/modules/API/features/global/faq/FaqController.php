@@ -64,12 +64,19 @@ class FaqController
 
                 if ($faqs->found_posts > 0) {
                     foreach ($faqs->posts as $faq) {
-                        $faqsResponse['data'][] = [
-                            'id'    => $faq->ID,
-                            'slug'  => $faq->post_name,
-                            'question'  => $faq->post_title,
-                            'answer'    => StringHelper::shortenString($faq->post_content, 0, -1, '')
-                        ];
+                        try {
+                            $faqModel = new Faq($faq->ID);
+                            $faqsResponse['data'][] = [
+                                'id'    => $faq->ID,
+                                'slug'  => $faq->post_name,
+                                'question'  => $faq->post_title,
+                                'answer'    => StringHelper::shortenString($faq->post_content, 0, -1, ''),
+                                'type'      => $faqModel->getType()['value']
+                            ];
+                        } catch (\Exception $e) {
+                            error_log($e->getMessage() . ' - ' . $faq->ID . ' - logged by FaqController::list');
+                            continue;
+                        }
                     }
                 }
             }

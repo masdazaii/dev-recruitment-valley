@@ -1087,6 +1087,15 @@ class VacancyCrudController
         }
     }
 
+    /**
+     * Aproval last 24 hour function
+     *
+     * If admin not approve in last 24 hour, system will auto-approve.
+     * It will be recommended to change the hour range to be dynamic,
+     * so end-user can change the range themself.
+     *
+     * @return void
+     */
     public function checkVacancyApprovalInLastHours()
     {
         error_log('check approval in last 24 hour');
@@ -1142,13 +1151,14 @@ class VacancyCrudController
                      */
                     if ($expiredAt < $now) {
                         $vacancyModel->setApprovedStatus('rejected');
-                        // $vacancyModel->setApprovedBy(null);
+                        $vacancyModel->setApprovedBy(null);
                         $vacancyModel->setStatus('close');
                     } else {
                         if ($approvalStatus['value'] == 'waiting') {
                             $vacancyModel->setApprovedStatus('system-approved');
                             // $vacancyModel->setApprovedBy(null);
                             $vacancyModel->setStatus('open');
+                            $vacancyModel->setApprovedAt('now');
                         }
                     }
                 }
@@ -1169,7 +1179,7 @@ class VacancyCrudController
      * @param integer $limit
      * @return array
      */
-    public function getVacancyByCompany(Mixed $companyID, Int $limit = -1, String $result = 'posts')
+    public function getVacancyByCompany(Mixed $companyID, Int $limit = -1, String $result = 'posts', $filter = [])
     {
         try {
             $vacancyModel   = new Vacancy();
@@ -1177,6 +1187,50 @@ class VacancyCrudController
             $filters        = [
                 'author'    => $companyID,
             ];
+
+            if (!empty($filter)) {
+                if (array_key_exists('with_expired', $filter) && !$filter['with_expired']) {
+                    if (isset($filters['meta'])) {
+                        array_push($filters['meta'], [
+                            'key' => 'expired_at',
+                            'value' => date("Y-m-d H:i:s"),
+                            'compare' => '>',
+                            'type' => "DATE"
+                        ]);
+                    } else {
+                        $filters['meta'] = [
+                            "relation" => "AND",
+                            [
+                                'key' => 'expired_at',
+                                'value' => date("Y-m-d H:i:s"),
+                                'compare' => '>',
+                                'type' => "DATE"
+                            ],
+                        ];
+                    }
+                }
+
+                if (array_key_exists('with_rejected', $filter) && !$filter['with_rejected']) {
+                    if (isset($filters['taxonomy'])) {
+                        array_push($filters['taxonomy'], [
+                            'taxonomy' => 'status',
+                            'field'    => 'slug',
+                            'terms'    => 'open',
+                            'compare'  => 'IN'
+                        ]);
+                    } else {
+                        $filters['taxonomy'] = [
+                            "relation" => "AND",
+                            [
+                                'taxonomy' => 'status',
+                                'field'    => 'slug',
+                                'terms'    => 'open',
+                                'compare'  => 'IN'
+                            ],
+                        ];
+                    }
+                }
+            }
 
             $vacancies      = $vacancyModel->getVacancies($filters, []);
 
