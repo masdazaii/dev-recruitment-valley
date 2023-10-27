@@ -15,7 +15,7 @@ class AjaxVacancy
         add_action('wp_ajax_get_vacancies_by_company', [$this, 'getVacancyByCompany']);
         add_action('wp_ajax_nopriv_get_vacancies_by_company', [$this, 'getVacancyByCompany']);
         add_action('wp_ajax_get_vacancies_by_rss', [$this, 'getVacancyByRSS']);
-        add_action('wp_ajax_nopriv_get_vacancies_by_rss', [$this, 'getVacancyByRSS']);
+        // add_action('wp_ajax_nopriv_get_vacancies_by_rss', [$this, 'getVacancyByRSS']);
 
         add_filter("acf/load_field/key=rv_rss_select_vacancy", 'filter_field', 10, 1);
     }
