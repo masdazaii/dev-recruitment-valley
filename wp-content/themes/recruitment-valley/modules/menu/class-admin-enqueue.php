@@ -5,6 +5,8 @@ namespace Custom\Setup;
 defined("ABSPATH") or die("Direct access not allowed!");
 
 use Model\Term;
+use Model\Rss;
+use Vacancy\Vacancy;
 use WP_Query;
 
 class AdminEnqueue
@@ -25,7 +27,6 @@ class AdminEnqueue
 
         /** Get Vacancy Term from taxonomy 'role' */
         $termModel = new Term();
-        $termModel = new Term();
 
         try {
             $terms = $termModel->selectTermByTaxonomy('role', true);
@@ -37,7 +38,36 @@ class AdminEnqueue
         $rssData = [
             'action'    => 'get_vacancies_by_company',
             'nonce'     => wp_create_nonce('get_vacancies_by_company'),
+            'screen'    => 'add',
+            'selectedCompany' => null,
+            'selectedVacancies' => null
         ];
+
+        // $screen = get_current_screen(); // not working in enqueue
+        // if ($screen->parent_base == 'edit') {
+        if (isset($_GET['action']) && $_GET['action'] == 'edit') {
+            try {
+                $rssController  = new Rss($_GET['post']);
+                $rssVacancies   = $rssController->getRssVacancies();
+                $rssCompany   = $rssController->getRssCompany();
+                $selectedVacancy = [];
+                if ($rssVacancies && is_array($rssVacancies)) {
+                    foreach ($rssVacancies as $vacancy) {
+                        $vacancyModel = new Vacancy($vacancy);
+                        $selectedVacancy[] = [
+                            'id'    => $vacancy,
+                            'text'  => $vacancyModel->getTitle()
+                        ];
+                    }
+                }
+
+                $rssData['screen']              = 'edit';
+                $rssData['selectedCompany']     = $rssCompany;
+                $rssData['selectedVacancies']   = $selectedVacancy;
+            } catch (\Exception $e) {
+                error_log($e->getMessage());
+            }
+        }
 
         wp_localize_script(
             'vacancyApprovalScript',

@@ -67,6 +67,33 @@ acf_add_local_field_group(array(
 			'prepend' => '',
 			'append' => '',
 		),
+		array(
+			'key' => 'field_653a249a6f6ce',
+			'label' => 'Active Campaign Tags',
+			'name' => 'active_campaign_tags',
+			'aria-label' => '',
+			'type' => 'select',
+			'instructions' => '',
+			'required' => 0,
+			'conditional_logic' => 0,
+			'wrapper' => array(
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'choices' => array(
+				1 => 'Vacancy Recruitment Valley',
+				2 => 'Custom Tag 1',
+			),
+			'default_value' => array(
+			),
+			'return_format' => 'value',
+			'multiple' => 1,
+			'allow_null' => 0,
+			'ui' => 1,
+			'ajax' => 0,
+			'placeholder' => '',
+		),
 	),
 	'location' => array(
 		array(
@@ -998,6 +1025,7 @@ acf_add_local_field_group(array(
 					'collapsed' => '',
 					'button_label' => 'Add Row',
 					'rows_per_page' => 20,
+					'parent_repeater' => 'field_652e11ee76ccd',
 					'sub_fields' => array(
 						array(
 							'key' => 'field_652e4924c0207',
@@ -1021,7 +1049,6 @@ acf_add_local_field_group(array(
 							'parent_repeater' => 'field_652e487fc0206',
 						),
 					),
-					'parent_repeater' => 'field_652e11ee76ccd',
 				),
 			),
 		),
@@ -1520,7 +1547,7 @@ acf_add_local_field_group(array(
 		),
 		array(
 			'key' => 'field_65323cf4cd7be',
-			'label' => 'Select Vacancy(s/es)',
+			'label' => 'Select Vacancy(es)',
 			'name' => 'rv_rss_select_vacancy',
 			'aria-label' => '',
 			'type' => 'post_object',
@@ -1528,20 +1555,16 @@ acf_add_local_field_group(array(
 			'required' => 0,
 			'conditional_logic' => 0,
 			'wrapper' => array(
-				'width' => '100',
+				'width' => '',
 				'class' => '',
 				'id' => '',
 			),
 			'post_type' => array(
 				0 => 'vacancy',
 			),
-			'post_status' => array(
-				0 => 'publish',
-			),
-			'taxonomy' => array(
-				0 => 'status:open',
-			),
-			'return_format' => 'id',
+			'post_status' => '',
+			'taxonomy' => '',
+			'return_format' => 'object',
 			'multiple' => 1,
 			'allow_null' => 0,
 			'bidirectional' => 0,

@@ -106,6 +106,7 @@ class ImportMenu
                     if ($body['approval'] === 'approved') {
                         $vacancy->setApprovedStatus('admin-approved');
                         $vacancy->setStatus('open');
+                        $vacancy->setApprovedAt('now');
 
                         $_SESSION['flash_message'] = [
                             'status'    => 'success',
@@ -113,7 +114,8 @@ class ImportMenu
                         ];
                     } else {
                         $vacancy->setApprovedStatus('rejected');
-                        $vacancy->setStatus('close');
+                        $vacancy->setStatus('declined');
+                        $vacancy->setApprovedAt('now');
 
                         $_SESSION['flash_message'] = [
                             'status'    => 'success',
@@ -311,7 +313,7 @@ class ImportMenu
                 "recordsFiltered"   => (int)$vacancies->found_posts,
                 'data'              => $vacanciesResponse,
                 'search'            => isset($_GET['search']) ? $_GET['search']['value'] : null,
-                'filters'           => $filters
+                // 'filters'           => $filters
             ], 200);
         } catch (\Exception $error) {
             wp_send_json(['message' => $error->getMessage()], 400);

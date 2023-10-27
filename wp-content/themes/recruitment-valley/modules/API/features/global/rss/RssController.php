@@ -73,18 +73,37 @@ class RssController
         $rssVacancies = $rssModel->getRssVacancies();
 
         $vacancyModel = new Vacancy();
-        $vacancies = $vacancyModel->getVacancies(['in' => array_values($rssVacancies)]);
+        $filters = [
+            'in' => array_values($rssVacancies),
+            'meta' => [
+                "relation" => "AND",
+                [
+                    'key' => 'expired_at',
+                    'value' => date("Y-m-d H:i:s"),
+                    'compare' => '>',
+                    'type' => "DATE"
+                ],
+            ],
+            'taxonomy' => [
+                "relation" => "AND",
+                [
+                    'taxonomy' => 'status',
+                    'field'    => 'slug',
+                    'terms'    => 'open',
+                    'compare'  => 'IN'
+                ],
+            ]
+        ];
+        $vacancies = $vacancyModel->getVacancies($filters);
 
-        // print('<pre>' . print_r($vacancies->posts, true) . '</pre>');
-        // die;
+        $response = [
+            'data' => []
+        ];
 
-        $response = [];
         if ($vacancies && $vacancies->found_posts > 0) {
             $response['data'] = $vacancies->posts;
         }
 
-        // print('<pre>' . print_r($response, true) . '</pre>');
-        // die;
         echo $this->convert($response);
     }
 }

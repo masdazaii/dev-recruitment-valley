@@ -62,6 +62,32 @@
                 "placeholder": "",
                 "prepend": "",
                 "append": ""
+            },
+            {
+                "key": "field_653a249a6f6ce",
+                "label": "Active Campaign Tags",
+                "name": "active_campaign_tags",
+                "aria-label": "",
+                "type": "select",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "1": "Vacancy Recruitment Valley",
+                    "2": "Custom Tag 1"
+                },
+                "default_value": [],
+                "return_format": "value",
+                "multiple": 1,
+                "allow_null": 0,
+                "ui": 1,
+                "ajax": 0,
+                "placeholder": ""
             }
         ],
         "location": [
@@ -984,6 +1010,7 @@
                         "collapsed": "",
                         "button_label": "Add Row",
                         "rows_per_page": 20,
+                        "parent_repeater": "field_652e11ee76ccd",
                         "sub_fields": [
                             {
                                 "key": "field_652e4924c0207",
@@ -1006,8 +1033,7 @@
                                 "append": "",
                                 "parent_repeater": "field_652e487fc0206"
                             }
-                        ],
-                        "parent_repeater": "field_652e11ee76ccd"
+                        ]
                     }
                 ]
             }
@@ -1495,7 +1521,7 @@
             },
             {
                 "key": "field_65323cf4cd7be",
-                "label": "Select Vacancy(s\/es)",
+                "label": "Select Vacancy(es)",
                 "name": "rv_rss_select_vacancy",
                 "aria-label": "",
                 "type": "post_object",
@@ -1503,20 +1529,16 @@
                 "required": 0,
                 "conditional_logic": 0,
                 "wrapper": {
-                    "width": "100",
+                    "width": "",
                     "class": "",
                     "id": ""
                 },
                 "post_type": [
                     "vacancy"
                 ],
-                "post_status": [
-                    "publish"
-                ],
-                "taxonomy": [
-                    "status:open"
-                ],
-                "return_format": "id",
+                "post_status": "",
+                "taxonomy": "",
+                "return_format": "object",
                 "multiple": 1,
                 "allow_null": 0,
                 "bidirectional": 0,

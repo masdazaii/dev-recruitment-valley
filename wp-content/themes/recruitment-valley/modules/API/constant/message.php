@@ -114,7 +114,7 @@ class Message
                     'job_seeker_last_name_required' => __("Achternaam is verplicht.", THEME_DOMAIN),
                     'message_required' => __("Bericht is verplicht.", THEME_DOMAIN),
                 ],
-                'success'   => __("We hebben je sollicitatie ontvangen en we nemen spoedig contact op!", THEME_DOMAIN)
+                'success'   => __("Bedankt voor je bericht. We nemen spoedig contact met je op.", THEME_DOMAIN)
             ],
             'vacancy' => [
                 "get_all" => __("Vacatures gevonden"),
@@ -297,6 +297,10 @@ class Message
                 'reach_limit'   => __("coupon limiet bereikt", THEME_DOMAIN),
                 'reach_limit_user' => __("je hebt het coupon limiet reeds bereikt", THEME_DOMAIN),
                 'specify_coupon' => __("Geef de coupon aan!", THEME_DOMAIN)
+            ],
+            'faq' => [
+                'list_success'   => __("Success get faqs!", THEME_DOMAIN),
+                'list_failed'    => __("Failed get faqs!", THEME_DOMAIN),
             ]
         ];
     }

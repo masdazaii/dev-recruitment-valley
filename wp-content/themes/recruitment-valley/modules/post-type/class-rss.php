@@ -2,17 +2,24 @@
 
 namespace PostType;
 
+use Vacancy\Vacancy;
+
 defined("ABSPATH") or die("Direct access not allowed!");
 
 class RssCPT extends RegisterCPT
 {
+    public $wpdb;
+
     public function __construct()
     {
         add_action('init', [$this, 'RegisterRSSCPT']);
         add_action('save_post', [$this, 'saveRSS'], 10, 3);
-        add_action('add_meta_boxes', [$this, 'rssUrlMetaBox']);
+        add_action('add_meta_boxes', [$this, 'addRSSMetaboxes'], 10, 2);
         add_filter('manage_rss_posts_columns', [$this, 'rssColoumn'], 10, 1);
         add_action('manage_rss_posts_custom_column', [$this, 'rssCustomColoumn'], 10, 2);
+
+        global $wpdb;
+        $this->wpdb = $wpdb;
     }
 
     public function RegisterRSSCPT()
@@ -29,16 +36,101 @@ class RssCPT extends RegisterCPT
 
     public function saveRSS($post_id, $post, $update)
     {
-        try {
-            $rssModel = new \Model\Rss($post_id);
+        if ($post->post_type == 'rss') {
+            $this->wpdb->query('START TRANSACTION');
+            // print('<pre>' . print_r($_POST, true) . '</pre>');
+            // die;
+            try {
+                $rssModel = new \Model\Rss($post_id);
 
-            $endpoint = rest_url() . 'mi/v1/rss/vacancy/' . $post->post_name;
-            // $updateMeta = $rssModel->setRssEndpointURL($endpoint);
-            $updateMeta = update_post_meta($post_id, 'qwerqweqwe', $endpoint);
-            error_log('rss meta - ' . $post_id . ' - ' . gettype($updateMeta));
-        } catch (\Exception $e) {
-            error_log($e->getMessage());
+                // $endpoint = rest_url() . 'mi/v1/rss/vacancy/' . $post->post_name;
+                $endpoint = '/rss/vacancy/' . $post->post_name;
+
+                $updateMetaUrlRSS = $rssModel->setRssEndpointURL($endpoint);
+                $updateMetaVacancies = $rssModel->setRssVacancies(isset($_POST['rv_rss_select_vacancy']) ? $_POST['rv_rss_select_vacancy'] : '');
+
+                error_log('rss meta url - ' . $post_id . ' - ' . gettype($updateMetaUrlRSS));
+                error_log('rss meta vacancy - ' . $post_id . ' - ' . gettype($updateMetaVacancies));
+
+                $this->wpdb->query('COMMIT');
+            } catch (\Exception $e) {
+                $this->wpdb->query('ROLLBACK');
+                error_log($e->getMessage());
+            }
         }
+    }
+
+    public function addRSSMetaBoxes($post_type, $post)
+    {
+        /** Select vacancies metabox */
+        $this->rssSelectVacanciesMetabox($post);
+
+        /** url metabox */
+        $this->rssUrlMetaBox();
+    }
+
+    public function rssSelectVacanciesMetabox($post)
+    {
+        $rssModel = new \Model\Rss();
+        add_meta_box(
+            'rss_select_vacancies',
+            'Select Vacancies',
+            [$this, 'rssSelectVacanciesRenderMetabox'],
+            'rss',
+            'advanced',
+            'default',
+            ['post_id' => $post->ID, 'meta' => $rssModel->getRssVacancies()]
+        );
+    }
+
+    public function rssSelectVacanciesRenderMetabox($post, $callback_args = [])
+    {
+        $rssModel = new \Model\Rss($post->ID);
+
+        /** Declare var for vacancy option */
+        $vacanciesOption = [];
+
+        /** Check whether is post or edit screen */
+        $screen = get_current_screen();
+        if ($screen->parent_base == 'edit') {
+            /** Get selected company */
+            $selectedCompany = $rssModel->getRssCompany();
+
+            if ($selectedCompany) {
+                $vacancyModel = new Vacancy();
+
+                /** Get vacancy by selected company */
+                $vacancies = $vacancyModel->getVacancies([
+                    'author' => $selectedCompany
+                ]);
+
+                /** Get selected vacancies */
+                $selectedVacancies = $rssModel->getRssVacancies();
+
+                if ($vacancies) {
+                    if ($vacancies->found_posts > 0) {
+                        foreach ($vacancies->posts as $vacancy) {
+                            $vacanciesOption[] = [
+                                'value' => $vacancy->ID,
+                                'label' => $vacancy->post_title,
+                                'selected' => in_array($vacancy->ID, $selectedVacancies)
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+
+        echo '<div style="display: flex; flex-direction: column; gap: 0.5rem;">';
+        echo '<div class="cs-flex cs-flex-col cs-flex-nowrap cs-items-start cs-gap-2">';
+        echo '<label style="display; block; font-weight: bold; color: rgba(0, 0, 0, 1);" for="rss-url-endpoint">Select Vacancies</label>';
+        echo '<select id="metabox-' . $rssModel->_meta_rss_vacancy . '" name="' . $rssModel->_meta_rss_vacancy . '[]" style="width: 100%; border: 1px solid rgba(209, 213, 219, 1); padding: 0.375rem 0.5rem; font-size: 1rem; line-height: 1.5rem; font-weight: 400;" multiple>';
+        foreach ($vacanciesOption as $option) {
+            echo '<option value="' . $option['value'] . '" ' . ($option['selected'] ? 'selected="selected"' : '') . '>' . $option['label'] . '</option>';
+        }
+        echo '</select>';
+        echo '</div>';
+        echo '</div>';
     }
 
     public function rssUrlMetaBox()
@@ -61,7 +153,7 @@ class RssCPT extends RegisterCPT
         echo '<div style="display: flex; flex-direction: column; gap: 0.5rem;">';
         echo '<div class="cs-flex cs-flex-col cs-flex-nowrap cs-items-start cs-gap-2">';
         echo '<label style="display; block; font-weight: bold; color: rgba(0, 0, 0, 1);" for="rss-url-endpoint">RSS URL</label>';
-        echo '<input style="width: 100%; border: 1px solid rgba(209, 213, 219, 1); padding: 0.375rem 0.5rem; font-size: 1rem; line-height: 1.5rem; font-weight: 400;" type="text" id="rss-url-endpoint" readonly disabled value="' . $rssModel->getRssEndpointURL() . '"/>';
+        echo '<input style="width: 100%; border: 1px solid rgba(209, 213, 219, 1); padding: 0.375rem 0.5rem; font-size: 1rem; line-height: 1.5rem; font-weight: 400;" type="text" id="rss-url-endpoint" readonly disabled value="' . rest_url() . 'mi/v1' . $rssModel->getRssEndpointURL() . '"/>';
         echo '</div>';
         echo '</div>';
     }
@@ -79,7 +171,7 @@ class RssCPT extends RegisterCPT
 
         switch ($coloumn) {
             case 'url':
-                echo $rssModel->getRssEndpointURL();
+                echo rest_url() . 'mi/v1' . $rssModel->getRssEndpointURL();
                 break;
         }
     }
