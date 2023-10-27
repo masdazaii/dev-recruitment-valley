@@ -2,6 +2,7 @@
 
 namespace Vacancy;
 
+use DateTime;
 use Exception;
 use Helper;
 use Helper\Maphelper;
@@ -89,6 +90,7 @@ class Vacancy
     private $_meta_rv_vacancy_unused_data   = 'rv_vacancy_unused_data';
     private $_meta_rv_vacancy_source        = 'rv_vacancy_source';
     private $_meta_rv_vacancy_imported_at   = 'rv_vacancy_imported_at';
+    public $meta_rv_vacancy_approved_at     = 'rv_vacancy_approved_at';
 
     public function __construct($vacancy_id = false)
     {
@@ -1054,6 +1056,26 @@ class Vacancy
         return $this->setProp($this->_acf_imported_approved_by, $value);
     }
 
+    public function getApprovedAt($format = 'Y-m-d H:i:s')
+    {
+        $approvedAt = $this->getterMeta($this->meta_rv_vacancy_approved_at);
+        if ($approvedAt) {
+            return date($format, strtotime($approvedAt));
+        } else {
+            return false;
+        }
+    }
+
+    public function setApprovedAt($value)
+    {
+        if ($value == 'now') {
+            $value = new DateTime("now");
+            $value = $value->format('Y-m-d H:i:s');
+        }
+
+        return $this->setterMeta($this->meta_rv_vacancy_approved_at, $value);
+    }
+
     public function getterMeta($key, $single = true)
     {
         if ($this->vacancy_id) {
@@ -1061,6 +1083,11 @@ class Vacancy
         } else {
             throw new Exception('Please specify vacancy!');
         }
+    }
+
+    public function setterMeta($key, $value)
+    {
+        return update_post_meta($this->vacancy_id, $key, $value);
     }
 
     public function getImportedAt()

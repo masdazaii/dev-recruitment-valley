@@ -171,7 +171,7 @@ class RssCPT extends RegisterCPT
 
         switch ($coloumn) {
             case 'url':
-                echo $rssModel->getRssEndpointURL();
+                echo rest_url() . 'mi/v1' . $rssModel->getRssEndpointURL();
                 break;
         }
     }

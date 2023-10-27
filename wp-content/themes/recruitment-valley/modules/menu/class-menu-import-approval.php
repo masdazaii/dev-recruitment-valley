@@ -106,6 +106,7 @@ class ImportMenu
                     if ($body['approval'] === 'approved') {
                         $vacancy->setApprovedStatus('admin-approved');
                         $vacancy->setStatus('open');
+                        $vacancy->setApprovedAt('now');
 
                         $_SESSION['flash_message'] = [
                             'status'    => 'success',
@@ -114,6 +115,7 @@ class ImportMenu
                     } else {
                         $vacancy->setApprovedStatus('rejected');
                         $vacancy->setStatus('close');
+                        $vacancy->setApprovedAt('now');
 
                         $_SESSION['flash_message'] = [
                             'status'    => 'success',

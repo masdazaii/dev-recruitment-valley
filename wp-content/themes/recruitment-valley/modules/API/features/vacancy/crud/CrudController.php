@@ -1087,6 +1087,15 @@ class VacancyCrudController
         }
     }
 
+    /**
+     * Aproval last 24 hour function
+     *
+     * If admin not approve in last 24 hour, system will auto-approve.
+     * It will be recommended to change the hour range to be dynamic,
+     * so end-user can change the range themself.
+     *
+     * @return void
+     */
     public function checkVacancyApprovalInLastHours()
     {
         error_log('check approval in last 24 hour');
@@ -1142,13 +1151,14 @@ class VacancyCrudController
                      */
                     if ($expiredAt < $now) {
                         $vacancyModel->setApprovedStatus('rejected');
-                        // $vacancyModel->setApprovedBy(null);
+                        $vacancyModel->setApprovedBy(null);
                         $vacancyModel->setStatus('close');
                     } else {
                         if ($approvalStatus['value'] == 'waiting') {
                             $vacancyModel->setApprovedStatus('system-approved');
                             // $vacancyModel->setApprovedBy(null);
                             $vacancyModel->setStatus('open');
+                            $vacancyModel->setApprovedAt('now');
                         }
                     }
                 }

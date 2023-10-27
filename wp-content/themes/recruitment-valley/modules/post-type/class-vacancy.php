@@ -20,6 +20,7 @@ class Vacancy extends RegisterCPT
     {
         add_action('init', [$this, 'RegisterVacancyCPT']);
         add_action('set_object_terms', [$this, 'setExpiredDate'], 10, 5);
+        add_action('add_meta_boxes', [$this, 'addVacancyMetaboxes'], 10, 2);
         $this->_message = new Message();
 
         global $wpdb;
@@ -125,6 +126,11 @@ class Vacancy extends RegisterCPT
                             $updateOptionJobExpires = $optionController->updateExpiredOptions($object_id, $vacancyExpiredDate, 'class-vacancy.php', 'setExpiredDate');
                         }
 
+                        /** Set Approval status */
+                        $vacancyModel->setApprovedStatus('admin-approved');
+                        $vacancyModel->setApprovedBy(get_current_user_id());
+                        $vacancyModel->setApprovedAt('now');
+
                         /** Create notification : vacancy is approved */
                         $this->_notification->write($this->_notificationConstant::VACANCY_PUBLISHED, $vacancyModel->getAuthor(), [
                             'id'    => $object_id,
@@ -135,6 +141,11 @@ class Vacancy extends RegisterCPT
                 }
 
                 if ($taxonomy === 'status' && in_array($declineTerm->term_id, $terms)) {
+                    /** Set Approval status */
+                    $vacancyModel->setApprovedStatus('admin-approved');
+                    $vacancyModel->setApprovedBy(get_current_user_id());
+                    $vacancyModel->setApprovedAt('now');
+
                     /** Create notification : vacancy is approved */
                     $this->_notification->write($this->_notificationConstant::VACANCY_REJECTED, $vacancyModel->getAuthor(), [
                         'id'    => $object_id,
@@ -155,6 +166,30 @@ class Vacancy extends RegisterCPT
                 error_log($th->getMessage());
             }
         }
+    }
+
+    public function addVacancyMetaboxes($post_type, $post)
+    {
+        add_meta_box(
+            'vacancies_metaboxes',
+            'Vacancies Approved At',
+            [$this, 'vacancyApprovedAtRenderMetabox'],
+            'vacancy',
+            'advanced',
+            'default',
+            ['post_id' => $post->ID, 'meta' => []]
+        );
+    }
+
+    public function vacancyApprovedAtRenderMetabox($post, $callback_arguments = [])
+    {
+        $vacancy = new VacancyModel($post->ID);
+        echo '<div style="display: flex; flex-direction: column; gap: 0.5rem;">';
+        echo '<div class="cs-flex cs-flex-col cs-flex-nowrap cs-items-start cs-gap-2">';
+        echo '<label style="display; block; font-weight: bold; color: rgba(0, 0, 0, 1);" for="rss-url-endpoint">Vacancy Approved At</label>';
+        echo '<input style="width: 100%; border: 1px solid rgba(209, 213, 219, 1); padding: 0.375rem 0.5rem; font-size: 1rem; line-height: 1.5rem; font-weight: 400;" type="text" id="rss-url-endpoint" readonly disabled value="' . $vacancy->getApprovedAt('d F Y H:i:s') . '"/>';
+        echo '</div>';
+        echo '</div>';
     }
 }
 new Vacancy();
