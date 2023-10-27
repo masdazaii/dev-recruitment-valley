@@ -67,6 +67,33 @@ acf_add_local_field_group(array(
 			'prepend' => '',
 			'append' => '',
 		),
+		array(
+			'key' => 'field_653a249a6f6ce',
+			'label' => 'Active Campaign Tags',
+			'name' => 'active_campaign_tags',
+			'aria-label' => '',
+			'type' => 'select',
+			'instructions' => '',
+			'required' => 0,
+			'conditional_logic' => 0,
+			'wrapper' => array(
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'choices' => array(
+				1 => 'Vacancy Recruitment Valley',
+				2 => 'Custom Tag 1',
+			),
+			'default_value' => array(
+			),
+			'return_format' => 'value',
+			'multiple' => 1,
+			'allow_null' => 0,
+			'ui' => 1,
+			'ajax' => 0,
+			'placeholder' => '',
+		),
 	),
 	'location' => array(
 		array(
@@ -858,57 +885,6 @@ acf_add_local_field_group(array(
 ));
 
 acf_add_local_field_group(array(
-	'key' => 'group_6539d648b59cd',
-	'title' => 'FAQ Field Group',
-	'fields' => array(
-		array(
-			'key' => 'field_6539d649eefa0',
-			'label' => 'Type',
-			'name' => 'rv_faq_type',
-			'aria-label' => '',
-			'type' => 'select',
-			'instructions' => '',
-			'required' => 1,
-			'conditional_logic' => 0,
-			'wrapper' => array(
-				'width' => '',
-				'class' => '',
-				'id' => '',
-			),
-			'choices' => array(
-				'company' => 'Question from company',
-				'candidate' => 'Question from candidate',
-			),
-			'default_value' => false,
-			'return_format' => 'array',
-			'multiple' => 0,
-			'allow_null' => 0,
-			'ui' => 0,
-			'ajax' => 0,
-			'placeholder' => '',
-		),
-	),
-	'location' => array(
-		array(
-			array(
-				'param' => 'post_type',
-				'operator' => '==',
-				'value' => 'faq',
-			),
-		),
-	),
-	'menu_order' => 0,
-	'position' => 'normal',
-	'style' => 'default',
-	'label_placement' => 'top',
-	'instruction_placement' => 'label',
-	'hide_on_screen' => '',
-	'active' => true,
-	'description' => '',
-	'show_in_rest' => 0,
-));
-
-acf_add_local_field_group(array(
 	'key' => 'group_652506a4e8ee7',
 	'title' => 'Import API',
 	'fields' => array(
@@ -1049,6 +1025,7 @@ acf_add_local_field_group(array(
 					'collapsed' => '',
 					'button_label' => 'Add Row',
 					'rows_per_page' => 20,
+					'parent_repeater' => 'field_652e11ee76ccd',
 					'sub_fields' => array(
 						array(
 							'key' => 'field_652e4924c0207',
@@ -1072,7 +1049,6 @@ acf_add_local_field_group(array(
 							'parent_repeater' => 'field_652e487fc0206',
 						),
 					),
-					'parent_repeater' => 'field_652e11ee76ccd',
 				),
 			),
 		),
@@ -1566,6 +1542,33 @@ acf_add_local_field_group(array(
 			'multiple' => 0,
 			'allow_null' => 0,
 			'bidirectional' => 0,
+			'bidirectional_target' => array(
+			),
+		),
+		array(
+			'key' => 'field_65323cf4cd7be',
+			'label' => 'Select Vacancy(es)',
+			'name' => 'rv_rss_select_vacancy',
+			'aria-label' => '',
+			'type' => 'post_object',
+			'instructions' => 'Select vacancy (vacancies) based on selected company.',
+			'required' => 0,
+			'conditional_logic' => 0,
+			'wrapper' => array(
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'post_type' => array(
+				0 => 'vacancy',
+			),
+			'post_status' => '',
+			'taxonomy' => '',
+			'return_format' => 'object',
+			'multiple' => 1,
+			'allow_null' => 0,
+			'bidirectional' => 0,
+			'ui' => 1,
 			'bidirectional_target' => array(
 			),
 		),
@@ -3518,7 +3521,7 @@ acf_add_local_field_group(array(
 		),
 		array(
 			'key' => 'field_652cac3eeacdb',
-			'label' => 'Vacancy Approved By',
+			'label' => 'Vacancy import approved by',
 			'name' => 'rv_vacancy_imported_approved_by',
 			'aria-label' => '',
 			'type' => 'user',
@@ -3529,13 +3532,6 @@ acf_add_local_field_group(array(
 					array(
 						'field' => 'field_64fe7b3186a6b',
 						'operator' => '==',
-						'value' => '1',
-					),
-				),
-				array(
-					array(
-						'field' => 'field_64d0a7570f8f2',
-						'operator' => '!=',
 						'value' => '1',
 					),
 				),
@@ -3557,7 +3553,7 @@ acf_add_local_field_group(array(
 		),
 		array(
 			'key' => 'field_652cb51d484bd',
-			'label' => 'Vacancy Approval Status',
+			'label' => 'Vacancy import approval status',
 			'name' => 'rv_vacancy_imported_approval_status',
 			'aria-label' => '',
 			'type' => 'select',

@@ -90,6 +90,9 @@ class ActiveCampaign
         $decodedResponse = json_decode($response);
 
         $tags = get_field('active_campaign_tags', 'options');
+
+        error_log("selected tags : ". json_encode($tags));
+
         foreach ($tags as $tagId) {
             $this->addTagToContact($decodedResponse->contact->id, $tagId);
         }
@@ -159,11 +162,13 @@ class ActiveCampaign
 
         $payload = json_encode($payload);
 
+        error_log("start add tags to contact on url : ". $this->url.$this->version.$path );
         $ch = curl_init($this->url.$this->version.$path);
 
         // Set cURL options
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method); // Set the request method to POST
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json', // Set the content type to JSON
             'accept: application/json',
