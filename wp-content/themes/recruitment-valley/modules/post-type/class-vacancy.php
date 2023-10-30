@@ -117,12 +117,14 @@ class Vacancy extends RegisterCPT
                     if (!get_field('is_paid', $object_id, true)) {
                         /** Only set expired date if vacancy is free and not imported vacancy */
                         if ($vacancyModel->checkImported()) {
-                            /** Get imported expired Date */
-                            $vacancyExpiredDate = $vacancyModel->getExpiredAt('Y-m-d H:i:s');
+                            if ($vacancyModel->getImportedSource() == 'flexfeed') {
+                                /** Get imported expired Date */
+                                $vacancyExpiredDate = $vacancyModel->getExpiredAt('Y-m-d H:i:s');
 
-                            /** Update options "job_expires" */
-                            $optionController       = new OptionController();
-                            $updateOptionJobExpires = $optionController->updateExpiredOptions($object_id, $vacancyExpiredDate, 'class-vacancy.php', 'setExpiredDate');
+                                /** Update options "job_expires" */
+                                $optionController       = new OptionController();
+                                $updateOptionJobExpires = $optionController->updateExpiredOptions($object_id, $vacancyExpiredDate, 'class-vacancy.php', 'setExpiredDate');
+                            }
                         } else {
                             /** Update the expired date */
                             $today = new DateTimeImmutable("now");

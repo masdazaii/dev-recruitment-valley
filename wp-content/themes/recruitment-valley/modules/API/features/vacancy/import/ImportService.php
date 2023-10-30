@@ -56,4 +56,14 @@ class ImportService
             'message' => 'done'
         ]);
     }
+
+    public function jobfeedExpire(WP_REST_Request $request)
+    {
+        $params = $request->get_params();
+        $this->_jobfeedController->expire($params, 1, 0);
+        return ResponseHelper::build([
+            'status' => 200,
+            'message' => 'done'
+        ]);
+    }
 }

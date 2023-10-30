@@ -261,6 +261,12 @@ class GlobalEndpoint
                     'permission_callback'   => '__return_true',
                     'callback'              => [$importService, 'jobfeedImport']
                 ],
+                'jobfeed_expire' => [
+                    'url'                   => 'import/jobfeed/expire',
+                    'methods'               => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$importService, 'jobfeedExpire']
+                ],
                 'list_coupon' => [
                     'url'                   => 'coupons',
                     'methods'               => 'GET',

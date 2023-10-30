@@ -41,6 +41,7 @@ class CronImportJobfeed
 
         try {
             $jobFeedController->import([], 'all', 0);
+            $jobFeedController->expire([], 'all', 0);
         } catch (\Exception $e) {
             error_log('Cron jobfeed, Exception - ' . $e->getMessage());
         } catch (\Throwable $th) {

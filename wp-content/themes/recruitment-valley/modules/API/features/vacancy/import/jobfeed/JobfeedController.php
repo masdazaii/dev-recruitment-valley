@@ -162,7 +162,7 @@ class JobfeedController
                              * This should be temporary solution, and would recommend to change the expiration vacancy flow.
                              */
                             $payload['expired_at'] = $today->modify('+3 years')->format('Y-m-d H:i:s');
-                            // error_log('[Jobfeed ] - Vacancy is expired, vacancy will not stored to recruitment valley database. RequsitionId : ' . (isset($vacancy->job_id) ? $vacancy->job_id : '"NoJobIdFound"') . ' & Title : ' . (isset($vacancy->job_title) ? $vacancy->job_title : '"NoTitleFound"') . ' - index : ' . $i);
+                            // error_log('[Jobfeed] - Vacancy is expired, vacancy will not stored to recruitment valley database. RequsitionId : ' . (isset($vacancy->job_id) ? $vacancy->job_id : '"NoJobIdFound"') . ' & Title : ' . (isset($vacancy->job_title) ? $vacancy->job_title : '"NoTitleFound"') . ' - index : ' . $i);
                             // $i++;
                             // continue;
                         }
@@ -179,7 +179,7 @@ class JobfeedController
                     }
 
                     if (!$this->_validate($vacancy->job_id)) {
-                        error_log('[Jobfeed ] - Vacancy already exists. JobID : ' . (isset($vacancy->job_id) ? $vacancy->job_id : 'No_job_id_found') . '. Title : ' . (isset($vacancy->job_title) ? $vacancy->job_title : 'no_job_title_found') . ' - index : ' . $i);
+                        error_log('[Jobfeed] - Vacancy already exists. JobID : ' . (isset($vacancy->job_id) ? $vacancy->job_id : 'No_job_id_found') . '. Title : ' . (isset($vacancy->job_title) ? $vacancy->job_title : 'no_job_title_found') . ' - index : ' . $i);
                         $i++;
                         continue;
                     }
@@ -644,6 +644,108 @@ class JobfeedController
         }
     }
 
+    public function expire($parameter, $limit = 'all', $offset = 0)
+    {
+        try {
+            $date = new \DateTime($parameter['date'] ?? "now");
+            $parameter['date'] = $date->format('Y-m-d');
+            $dateNow = $parameter['date'] ?? date('Y-m-d');
+
+            if (isset($parameter['test']) && $parameter['test'] == true) {
+                error_log('Expired Jobfeed test! ' . $parameter['date']);
+                $fileName = wp_upload_dir()["basedir"] . '/aws/job/expired/' . $dateNow . '.gz';
+                error_log(json_encode(wp_upload_dir()));
+
+                // Raising this value may increase performance
+                $out_file_name = str_replace('.gz', '.jsonl', $fileName);
+                $vacancies = file_get_contents($out_file_name);
+                $vacancies = explode("\n", $vacancies);
+            } else {
+                error_log('Expired Jobfeed live! ' . $parameter['date']);
+                $s3 = new \Aws\S3\S3Client([
+                    'region' => 'eu-central-1',
+                    'version' => 'latest',
+                    'credentials' => [
+                        'key' => get_field('aws_key_id', 'option'),
+                        'secret' => get_field('aws_secret_key', 'option'),
+                    ]
+                ]);
+
+                $key = "NL/daily/" . $dateNow . "/jobs_expired.0.jsonl.gz";
+                $fileName = wp_upload_dir()["basedir"] . '/aws/job/expired/' . $dateNow . '.gz';
+                error_log(json_encode(wp_upload_dir()));
+
+                $result = $s3->getObject([
+                    'Bucket' => 'jobfeed-intelligence-group',
+                    'Key'    => $key,
+                    'SaveAs' => $fileName,
+                ]);
+
+                // Raising this value may increase performance
+                $buffer_size = 4096000; // read 4kb at a time
+                $out_file_name = str_replace('.gz', '.jsonl', $fileName);
+
+                // Open our files (in binary mode)
+                $file = gzopen($fileName, 'rb');
+                $out_file = fopen($out_file_name, 'wb');
+
+                // Keep repeating until the end of the input file
+                while (!gzeof($file)) {
+                    // Read buffer-size bytes
+                    // Both fwrite and gzread and binary-safe
+                    fwrite($out_file, gzread($file, $buffer_size));
+                }
+
+                // Files are done, close files
+                fclose($out_file);
+                gzclose($file);
+
+                $vacancies = file_get_contents($out_file_name);
+                $vacancies = explode("\n", $vacancies);
+            }
+
+            $i = 0;
+
+            foreach ($vacancies as $vacancy) {
+                /** Decode vacancy */
+                $vacancy = json_decode($vacancy);
+
+                if (isset($vacancy)) {
+                    if (!isset($vacancy->job_id)) {
+                        error_log('Vacancy didn\'t has job id');
+                        $i++;
+                        continue;
+                    }
+
+                    $validate = $this->_validate($vacancy->job_id, true);
+                    if (!$validate) {
+                        error_log('[Expired Jobfeed] - Vacancy not exists. JobID : ' . (isset($vacancy->job_id) ? $vacancy->job_id : 'No_job_id_found') . '. Expiration Date : ' . (isset($vacancy->expiration_date) ? $vacancy->expiration_date : 'no_expiration_date_found') . ' - index : ' . $i);
+                        $i++;
+                        continue;
+                    }
+
+                    error_log('[Expired Jobfeed] - Vacancy exists. Vacancy_id : ' . $validate . ' - JobID : ' . (isset($vacancy->job_id) ? $vacancy->job_id : 'No_job_id_found') . '. Expiration Date : ' . (isset($vacancy->expiration_date) ? $vacancy->expiration_date : 'no_expiration_date_found') . ' - index : ' . $i);
+                    /** Set expired_at */
+                    $payload['expired_at']  = $vacancy->expiration_date;
+                    $taxonomy['status']     = $this->_findStatus('close');
+
+                    $vacancyModel = new Vacancy($validate);
+                    $vacancyModel->setTaxonomy($taxonomy);
+
+                    foreach ($payload as $acf_field => $acfValue) {
+                        $vacancyModel->setProp($acf_field, $acfValue, is_array($acfValue));
+                    }
+                }
+            }
+        } catch (AwsException $e) {
+            error_log('Exception in fetch AWS S3 Bucket - ' . $e->getMessage());
+        } catch (\Exception $e) {
+            error_log('Exception in fetch AWS S3 Bucket - ' . $e->getMessage());
+        } catch (\Throwable $throw) {
+            error_log('All thrown exception in fetch AWS S3 Bucket - ' . $throw->getMessage());
+        }
+    }
+
     private function _getTerms()
     {
         $terms = get_terms([
@@ -704,7 +806,7 @@ class JobfeedController
         }
     }
 
-    private function _validate($fetchValue)
+    private function _validate($fetchValue, $returnID = false)
     {
         $args = [
             'post_type' => 'vacancy',
@@ -719,7 +821,11 @@ class JobfeedController
         ];
         $query = new \WP_Query($args);
 
-        return $query->post_count > 0 ? false : true;
+        if ($returnID) {
+            return $query->post_count > 0 ? $query->posts[0]->ID : false;
+        } else {
+            return $query->post_count > 0 ? false : true;
+        }
     }
 
     private function _findStatus($fetchValue)
