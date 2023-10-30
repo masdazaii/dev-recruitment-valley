@@ -115,17 +115,27 @@ class Vacancy extends RegisterCPT
                 if ($taxonomy === 'status' && in_array($openTerm->term_id, $terms)) {
                     /** Do only if vacancy is free */
                     if (!get_field('is_paid', $object_id, true)) {
-                        /** Update the expired date */
-                        $today = new DateTimeImmutable("now");
-                        $vacancyExpiredDate = $today->modify("+30 days")->format("Y-m-d H:i:s");
+                        /** Only set expired date if vacancy is free and not imported vacancy */
+                        if ($vacancyModel->checkImported()) {
+                            /** Get imported expired Date */
+                            $vacancyExpiredDate = $vacancyModel->getExpiredAt('Y-m-d H:i:s');
 
-                        $setExpired = $vacancyModel->setProp($vacancyModel->acf_expired_at, $vacancyExpiredDate);
-
-                        /** If success update vacancy expired date */
-                        if ($setExpired) {
                             /** Update options "job_expires" */
                             $optionController       = new OptionController();
                             $updateOptionJobExpires = $optionController->updateExpiredOptions($object_id, $vacancyExpiredDate, 'class-vacancy.php', 'setExpiredDate');
+                        } else {
+                            /** Update the expired date */
+                            $today = new DateTimeImmutable("now");
+                            $vacancyExpiredDate = $today->modify("+30 days")->format("Y-m-d H:i:s");
+
+                            $setExpired = $vacancyModel->setProp($vacancyModel->acf_expired_at, $vacancyExpiredDate);
+
+                            /** If success update vacancy expired date */
+                            if ($setExpired) {
+                                /** Update options "job_expires" */
+                                $optionController       = new OptionController();
+                                $updateOptionJobExpires = $optionController->updateExpiredOptions($object_id, $vacancyExpiredDate, 'class-vacancy.php', 'setExpiredDate');
+                            }
                         }
 
                         /** Set Approval status */
@@ -249,7 +259,15 @@ class Vacancy extends RegisterCPT
                 }
                 break;
             case 'expired':
-                echo $vacancyModel->getExpiredAt('d M Y');
+                if ($vacancyModel->checkImported()) {
+                    if ($vacancyModel->getImportedSource() == 'jobfeed') {
+                        echo '-';
+                    } else {
+                        echo $vacancyModel->getExpiredAt('d M Y');
+                    }
+                } else {
+                    echo $vacancyModel->getExpiredAt('d M Y');
+                }
                 break;
             case 'approvedat':
                 echo $vacancyModel->getApprovedAt('d M Y H:i:s');

@@ -6,6 +6,7 @@ use ResponseHelper;
 use Vacancy\Import\Xml\FlexFeedController;
 use Vacancy\Import\JSON\NationaleVacatureBankController as NVBController;
 use Vacancy\Import\Jobfeed\JobfeedController;
+use WP_REST_Request;
 
 class ImportService
 {
@@ -46,9 +47,10 @@ class ImportService
         ]);
     }
 
-    public function jobfeedImport()
+    public function jobfeedImport(WP_REST_Request $request)
     {
-        $this->_jobfeedController->import(1, 0);
+        $params = $request->get_params();
+        $this->_jobfeedController->import($params, 1, 0);
         return ResponseHelper::build([
             'status' => 200,
             'message' => 'done'
