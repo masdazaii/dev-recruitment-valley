@@ -16,14 +16,14 @@ defined( 'ABSPATH' ) || die( "Can't access directly" );
 
  try {
 
-   $dateNow = date('Y-m-d');
+   $dateNow = "2023-10-29";
 
    $s3 = new \Aws\S3\S3Client([
       'region' => 'eu-central-1',
       'version' => 'latest',
       'credentials' => [
-         'key' => "AKIAWCFQSHUA36DCMDW7",
-         'secret' => "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",
+         'key' => get_field('aws_key_id', 'option'),
+         'secret' => get_field('aws_secret_key', 'option'),
       ]
     ]);
    
