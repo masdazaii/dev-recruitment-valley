@@ -16,16 +16,20 @@ require_once get_stylesheet_directory() . "/vendor/autoload.php";
 
 try {
 
-  $dateNow = date('Y-m-d');
+  $dateNow = "2023-10-29";
 
   $s3 = new \Aws\S3\S3Client([
     'region' => 'eu-central-1',
     'version' => 'latest',
     'credentials' => [
-      'key' => JOBFEED_KEY ?? '',
-      'secret' => JOBFEED_SECRET_KEY ?? '',
+      'key' => get_field('aws_key_id', 'option'),
+      'secret' => get_field('aws_secret_key', 'option'),
     ]
   ]);
+
+  $key = "NL/daily/" . $dateNow . "/jobs_new.0.jsonl.gz";
+  $fileName = wp_upload_dir()["basedir"] . '/aws/job/new/' . $dateNow . '.gz';
+  error_log(json_encode(wp_upload_dir()));
 
   $key = "NL/daily/" . $dateNow . "/jobs_new.0.jsonl.gz";
   $fileName = wp_upload_dir()["basedir"] . '/aws/job/new/' . $dateNow . '.gz';
