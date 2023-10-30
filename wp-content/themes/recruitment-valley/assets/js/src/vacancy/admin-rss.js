@@ -32,11 +32,7 @@ const rssModule = (function () {
           company: $(e.target).val() || $('*[data-name="rv_rss_select_company"] .acf-input select').val(),
           result: 'options'
         },
-        beforeSend: () => {
-          console.log(vacanciesData.rss)
-        },
         processResults: function(response) {
-          console.log(response)
           /** Format the response */
           let options = [];
           let i = 1;
@@ -68,11 +64,7 @@ const rssModule = (function () {
           company: $('*[data-name="rv_rss_select_company"] .acf-input select').val(),
           result: 'options'
         },
-        beforeSend: () => {
-          console.log(vacanciesData.rss)
-        },
         processResults: function(response) {
-          console.log(response)
           /** Format the response */
           let options = [];
           let i = 1;
