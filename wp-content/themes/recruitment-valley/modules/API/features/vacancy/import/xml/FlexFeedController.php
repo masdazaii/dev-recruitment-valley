@@ -340,7 +340,7 @@ class FlexFeedController
                                  * if empty create new role */
                                 if (empty($taxonomy['role'])) {
                                     $termModel = new Term();
-                                    $taxonomy['role'] = $termModel->createTerm('role', $taxonomy['role'], []);
+                                    $taxonomy['role'] = $termModel->createTerm('role', $jobs[$i]->category, []);
                                 } else {
                                     $option     = new Option(true);
                                     $limitRole  = $option->getImportNumberRoleToSet();

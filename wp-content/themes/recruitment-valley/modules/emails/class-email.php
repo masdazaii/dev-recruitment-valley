@@ -53,17 +53,16 @@ class Email
 		require THEME_DIR . '/templates/email/' . $file;
 		$content = ob_get_clean();
 
-		foreach ($args as $key => $value)
-		{
+		foreach ($args as $key => $value) {
 			$content = str_replace("{{ $key }}", $value, $content);
 		}
 
 		return $content;
 	}
-	
+
 	/**
 	 * send
-	 * 
+	 *
 	 * to send email using template in `wp-content\themes\recruitment-valley\templates\email`
 	 *
 	 * @param  string $to

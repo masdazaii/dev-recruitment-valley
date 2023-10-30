@@ -20,16 +20,31 @@ class ResetPassword
 
 		$errors = new \WP_Error();
 
-		if (empty($_POST['user_login'])) {
+		/** BD Syntax start here */
+		// if (empty($_POST['user_login'])) {
+		// 	$errors->add('empty_username', __('<strong>ERROR</strong>: Enter a username or email address.', 'asmlinteractive'));
+		// } elseif (strpos($_POST['user_login'], '@')) {
+		// 	$user_data = get_user_by('email', trim(wp_unslash($_POST['user_login'])));
+		// 	if (empty($user_data))
+		// 		$errors->add('invalid_email', __('<strong>ERROR</strong>: There is no user registered with that email address.', 'asmlinteractive'));
+		// } else {
+		// 	$login = trim($_POST['user_login']);
+		// 	$user_data = get_user_by('login', $login);
+		// }
+		/** BD Syntax end here */
+
+		/** Changes start here */
+		if (empty($user_data->data->user_email)) {
 			$errors->add('empty_username', __('<strong>ERROR</strong>: Enter a username or email address.', 'asmlinteractive'));
-		} elseif (strpos($_POST['user_login'], '@')) {
-			$user_data = get_user_by('email', trim(wp_unslash($_POST['user_login'])));
+		} elseif (strpos($user_data->data->user_email, '@')) {
+			$user_data = get_user_by('email', trim(wp_unslash($user_data->data->user_email)));
 			if (empty($user_data))
 				$errors->add('invalid_email', __('<strong>ERROR</strong>: There is no user registered with that email address.', 'asmlinteractive'));
 		} else {
-			$login = trim($_POST['user_login']);
+			$login = trim($user_data->data->user_email);
 			$user_data = get_user_by('login', $login);
 		}
+		/** Changes end here */
 
 		do_action('lostpassword_post', $errors);
 
@@ -41,9 +56,16 @@ class ResetPassword
 			return $errors;
 		}
 
+		/** BD Syntax start from here */
 		// Redefining user_login ensures we return the right case in the email.
-		$user_login = $user_data->user_login;
-		$user_email = $user_data->user_email;
+		// $user_login = $user_data->user_login;
+		// $user_email = $user_data->user_email;
+		/** BD Syntax end here */
+
+		/** Changes Start here */
+		$user_login = $user_data->data->user_login;
+		$user_email = $user_data->data->user_email;
+		/** Changes End here */
 
 		$key = wp_generate_password(20, false);
 
@@ -59,6 +81,9 @@ class ResetPassword
 			return $key;
 		}
 
+		/** Make sure acf is exists.
+		 * ACF supposed to be created when class-setup.php is called.
+		 */
 		$subject = get_field('bd_lost_password_subject', 'option');
 		$body    = get_field('bd_lost_password_body', 'option');
 
