@@ -520,21 +520,21 @@ class JobfeedController
                         $termModel = new Term();
                         if (isset($vacancy->profession)) {
                             if (is_array($vacancy->profession) && array_key_exists('label', $vacancy->profession)) {
-                                $newRole = $termModel->createTerm('role', $vacancy->profession['label'], []);
+                                $newRole = $vacancy->profession['label'];
                             } else if (is_object($vacancy->profession) && property_exists($vacancy->profession, 'label')) {
-                                $newRole = $termModel->createTerm('role', $vacancy->profession->label, []);
+                                $newRole = $vacancy->profession->label;
                             }
                         } else if (isset($vacancy->profession_group)) {
                             if (is_array($vacancy->profession_group) && array_key_exists('label', $vacancy->profession_group)) {
-                                $taxonomy['role'] = $termModel->createTerm('role', $vacancy->profession_group['label'], []);
+                                $newRole = $vacancy->profession_group['label'];
                             } else if (is_object($vacancy->profession_group) && property_exists($vacancy->profession_group, 'label')) {
-                                $taxonomy['role'] = $termModel->createTerm('role', $vacancy->profession_group->label, []);
+                                $newRole = $vacancy->profession_group->label;
                             }
                         } else if (isset($vacancy->profession_class)) {
                             if (is_array($vacancy->profession_class) && array_key_exists('label', $vacancy->profession_class)) {
-                                $taxonomy['role'] = $termModel->createTerm('role', $vacancy->profession_class['label'], []);
+                                $newRole = $vacancy->profession_class['label'];
                             } else if (is_object($vacancy->profession_class) && property_exists($vacancy->profession_class, 'label')) {
-                                $taxonomy['role'] = $termModel->createTerm('role', $vacancy->profession_class->label, []);
+                                $newRole = $vacancy->profession_class->label;
                             }
                         }
                         $taxonomy['role'] = $termModel->createTerm('role', $newRole, []);
@@ -555,6 +555,7 @@ class JobfeedController
 
                         $vacancy = new Vacancy($post);
 
+                        // print('<pre>' . print_r($taxonomy['role'], true) . '</pre>');
                         $vacancy->setTaxonomy($taxonomy);
 
                         foreach ($payload as $acf_field => $acfValue) {
