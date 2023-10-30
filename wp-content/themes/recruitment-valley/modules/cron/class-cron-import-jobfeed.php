@@ -40,7 +40,7 @@ class CronImportJobfeed
         $jobFeedController = new JobfeedController();
 
         try {
-            $jobFeedController->import(['date' => '2023-10-26', 'test' => true], 'all', 0);
+            $jobFeedController->import([], 'all', 0);
         } catch (\Exception $e) {
             error_log('Cron jobfeed, Exception - ' . $e->getMessage());
         } catch (\Throwable $th) {
