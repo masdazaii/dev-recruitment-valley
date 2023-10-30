@@ -7,6 +7,11 @@ require_once get_stylesheet_directory() . "/vendor/autoload.php";
 use Exception;
 use Helper\Maphelper;
 use Helper\StringHelper;
+use Helper\CalculateHelper;
+use Model\Option;
+use Model\Term;
+use BD\Emails\Email;
+use Constant\Message;
 use Vacancy\Vacancy;
 use WP_Error;
 use Aws\Exception\AwsException;
@@ -15,6 +20,7 @@ class JobfeedController
 {
     private $_taxonomy;
     private $_terms;
+    private $_keywords;
 
     public function __construct()
     {
@@ -23,6 +29,9 @@ class JobfeedController
 
     public function import($limit = 'all', $offset = 0)
     {
+        /** Get Mapped Keyword from option */
+        $this->_getMappedKeyword();
+
         $this->_getTerms();
 
         $this->_parse($limit, $offset);
@@ -31,15 +40,14 @@ class JobfeedController
     private function _parse($limit, $start)
     {
         try {
-
             $dateNow = date('Y-m-d');
 
             $s3 = new \Aws\S3\S3Client([
                 'region' => 'eu-central-1',
                 'version' => 'latest',
                 'credentials' => [
-                    'key' => JOBFEED_KEY ?? '',
-                    'secret' => JOBFEED_SECRET_KEY ?? '',
+                    'key' => get_field('aws_key_id', 'option'),
+                    'secret' => get_field('aws_secret_key', 'option'),
                 ]
             ]);
 
@@ -78,6 +86,26 @@ class JobfeedController
             // print('<pre>' . print_r($vacancies, true) . '</pre>');
 
             $i = 0;
+
+            /** Get RV Administrator User data */
+            $rvAdmin = get_user_by('email', 'adminjob@recruitmentvalley.com');
+            $importUser = get_field('import_api_user_to_import', 'option') ?? $rvAdmin->ID;
+
+            /** wp_insert_post arguments */
+            $arguments = [
+                'post_type' => 'vacancy',
+                'post_status' => 'publish',
+                'post_author' => $importUser
+            ];
+
+            $payload    = [];
+            $taxonomy   = [];
+
+            /** Map property that not used.
+             * this will be stored in post meta.
+             */
+            $unusedData = [];
+
             foreach ($vacancies as $vacancy) {
                 /** Decode vacancy */
                 $vacancy = json_decode($vacancy);
@@ -99,23 +127,33 @@ class JobfeedController
                  */
                 if (!isset($vacancy->expiration_date)) {
                     /** Set expired date 30 days from this data inputed */
-                    $expiredAt = new \DateTimeImmutable();
-                    $payload['expired_at'] = $expiredAt->modify("+30 days")->format("Y-m-d H:i:s");
+                    // $expiredAt = new \DateTimeImmutable();
+                    // $payload['expired_at'] = $expiredAt->modify("+30 days")->format("Y-m-d H:i:s");
+
+                    /** Set expired date to 3 years for now.
+                     * This is because currently rv is detect empty expiration date as expired vacancy.
+                     * This should be temporary solution, and would recommend to change the expiration vacancy flow.
+                     */
+                    $today = new \DateTimeImmutable();
+                    $payload['expired_at'] = $today->modify('+3 years')->format('Y-m-d H:i:s');
                 } else {
                     $payload['expired_at'] = $vacancy->expiration_date;
                     $today = new \DateTimeImmutable();
 
-                    if (strtotime($vacancy->expiration_date) > $today->setTime(23, 59, 59)->getTimestamp()) {
-                        $taxonomy['status'] = $this->_findStatus('processing');
-
-                        /** Unset used key */
-                        // unset($vacancy->expiration_date);
-                    } else {
-                        error_log('[Flexfeed] - Vacancy is expired, vacancy will not stored to recruitment valley database. RequsitionId : ' . (property_exists($jobs[$i], 'requisitionId') ? $jobs[$i]->requisitionId : '"NoRequisitionIdFound"') . ' & Title : ' . (property_exists($jobs[$i], 'title') ? $jobs[$i]->title : '"NoTitleFound"') . ' - index : ' . $i);
-                        $i++;
-                        continue;
+                    if (strtotime($vacancy->expiration_date) <= $today->setTime(23, 59, 59)->getTimestamp()) {
+                        /** Set expired date to 3 years for now.
+                         * This is because currently rv is detect empty expiration date as expired vacancy.
+                         * This should be temporary solution, and would recommend to change the expiration vacancy flow.
+                         */
+                        $payload['expired_at'] = $today->modify('+3 years')->format('Y-m-d H:i:s');
+                        // error_log('[Flexfeed] - Vacancy is expired, vacancy will not stored to recruitment valley database. RequsitionId : ' . (isset($vacancy->job_id) ? $vacancy->job_id : '"NoJobIdFound"') . ' & Title : ' . (isset($vacancy->job_title) ? $vacancy->job_title : '"NoTitleFound"') . ' - index : ' . $i);
+                        // $i++;
+                        // continue;
                     }
                 }
+
+                /** Set status to processing */
+                $taxonomy['status'] = $this->_findStatus('processing');
 
                 /** Validate - check if data id is exists */
                 if (!isset($vacancy->job_id)) {
@@ -299,53 +337,246 @@ class JobfeedController
                     unset($vacancy->organization_name);
 
                     /** ACF Imported rv_vacancy_imported_company_email */
-                    if (array_key_exists('organization_email', $data[$i]) && !empty($data[$i]['organization_email'])) {
-                        $payload["rv_vacancy_imported_company_email"] = preg_replace('/[\n\t]+/', '', $data[$i]['organization_email']);
+                    if (isset($vacancy->organization_email)) {
+                        $payload["rv_vacancy_imported_company_email"] = preg_replace('/[\n\t]+/', '', $vacancy->organization_email);
 
                         /** Unset data key */
-                        unset($data[$i]['organization_email']);
+                        unset($vacancy->organization_email);
                     }
 
                     /** ACF Imported company_city */
-                    if (array_key_exists('organization_location_name', $data[$i]) && !empty($data[$i]['organization_location_name']) !== "") {
-                        $payload["rv_vacancy_imported_company_city"] = preg_replace('/[\n\t]+/', '', $data[$i]['organization_location_name']);
+                    if (isset($vacancy->organization_location_name)) {
+                        $payload["rv_vacancy_imported_company_city"] = preg_replace('/[\n\t]+/', '', $vacancy->organization_location_name);
 
                         /** Unset data key */
-                        unset($data[$i]['organization_location_name']);
+                        unset($vacancy->organization_location_name);
                     }
-                } else if (array_key_exists('advertiser_name', $data[$i]) && !empty($data[$i]['advertiser_name']) !== "") {
-                    $payload["rv_vacancy_imported_company_name"] = preg_replace('/[\n\t]+/', '', $data[$i]['advertiser_name']);
+                } else if (isset($vacancy->advertiser_name)) {
+                    $payload["rv_vacancy_imported_company_name"] = preg_replace('/[\n\t]+/', '', $vacancy->advertiser_name);
 
                     /** Unset data key */
-                    unset($data[$i]['advertiser_name']);
+                    unset($vacancy->advertiser_name);
 
                     /** ACF Imported rv_vacancy_imported_company_email */
-                    if (array_key_exists('advertiser_email', $data[$i]) && !empty($data[$i]['advertiser_email'])) {
-                        $payload["rv_vacancy_imported_company_email"] = preg_replace('/[\n\t]+/', '', $data[$i]['advertiser_email']);
+                    if (isset($vacancy->advertiser_email)) {
+                        $payload["rv_vacancy_imported_company_email"] = preg_replace('/[\n\t]+/', '', $vacancy->advertiser_email);
 
                         /** Unset data key */
-                        unset($data[$i]['advertiser_email']);
+                        unset($vacancy->advertiser_email);
                     }
 
                     /** ACF Imported company_city */
-                    if (array_key_exists('advertiser_location', $data[$i]) && !empty($data[$i]['advertiser_location']) !== "") {
-                        $payload["rv_vacancy_imported_company_city"] = preg_replace('/[\n\t]+/', '', $data[$i]['advertiser_location']);
+                    if (isset($vacancy->advertiser_location)) {
+                        $payload["rv_vacancy_imported_company_city"] = preg_replace('/[\n\t]+/', '', $vacancy->advertiser_location);
 
                         /** Unset data key */
-                        unset($data[$i]['advertiser_location']);
+                        unset($vacancy->advertiser_location);
                     }
-                } else {
-                    $payload["rv_vacancy_imported_company_name"] = $rvAdmin->first_name . ' ' . $rvAdmin->last_name;
                 }
 
-                // echo '<pre>';
-                // var_dump(json_decode($vacancy)->job_id);
-                // echo '</pre>';
+                /** ACF Imported Country */
+                if (array_key_exists('rv_vacancy_imported_company_city', $payload) && !empty($payload['rv_vacancy_imported_company_city'])) {
+
+                    if (isset($vacancy->organization_address)) {
+                        $mapAddress = preg_replace('/[\n\t]+/', '', $vacancy->organization_address);
+                    } else {
+                        $mapAddress = $payload['rv_vacancy_imported_company_city'];
+                    }
+
+                    /** IF MAP API IS ENABLED */
+                    if (defined('ENABLE_MAP_API') && ENABLE_MAP_API == true) {
+                        $payload['rv_vacancy_imported_company_country'] = Maphelper::reverseGeoData('address', 'nl', 'country', [], $mapAddress)['long_name'];
+                    }
+                }
+
+                /** Taxonomy Working-hours */
+                if (isset($vacancy->hours_per_week_from)) {
+                    if (isset($vacancy->hours_per_week_to)) {
+                        $taxonomy['working-hours'] = $this->_findWorkingHours($vacancy->hours_per_week_from . ' - ' . $vacancy->hours_per_week_to);
+
+                        /** Unset used key */
+                        unset($vacancy->hours_per_week_to);
+                    } else {
+                        $taxonomy['working-hours'] = $this->_findWorkingHours($vacancy->hours_per_week_from);
+                    }
+
+                    /** Unset used key */
+                    unset($vacancy->hours_per_week_from);
+                }
+
+                /** Taxonomy Education */
+                if (isset($vacancy->education_level)) {
+                    if (is_array($vacancy->education_level)) {
+                        if (array_key_exists('label', $vacancy->education_level)) {
+                            $taxonomy['education'] = $this->_findEducation($vacancy->education_level['label']);
+
+                            /** Unset used key */
+                            unset($vacancy->education_level);
+                        }
+                    }
+                }
+
+                /** Taxonomy Experiences */
+                if (isset($vacancy->experience_level)) {
+                    if (is_array($vacancy->experience_level)) {
+                        if (array_key_exists('label', $vacancy->experience_level)) {
+                            $taxonomy['experiences'] = $this->_findExperience($vacancy->experience_level['label']);
+
+                            /** Unset used key */
+                            unset($vacancy->experience_level);
+                        }
+                    }
+                }
+
+                /** Taxonomy Job Type */
+                if (isset($vacancy->employment_type)) {
+                    if (is_array($vacancy->employment_type)) {
+                        if (array_key_exists('label', $vacancy->employment_type)) {
+                            $taxonomy['type'] = $this->_findEmploymentType($vacancy->employment_type['label']);
+
+                            /** Unset used key */
+                            unset($vacancy->employment_type);
+                        }
+                    }
+                }
+
+                /** Taxonomy Role */
+                $taxonomy['role'] = false;
+
+                if (isset($vacancy->profession)) {
+                    if (is_array($vacancy->profession)) {
+                        if (array_key_exists('label', $vacancy->profession)) {
+                            /** Get closest role */
+                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords, strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession['label'])), 5, 1, 1, 1, 'array');
+
+                            /** Unset used key */
+                            // unset($vacancy->profession);
+                        }
+                    }
+                } else if (isset($vacancy->profession_group)) {
+                    if (is_array($vacancy->profession_group)) {
+                        if (array_key_exists('label', $vacancy->profession_group)) {
+                            /** Get closest role */
+                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords, strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_group['label'])), 5, 1, 1, 1, 'array');
+
+                            /** Unset used key */
+                            // unset($vacancy->profession_group);
+                        }
+                    }
+                } else if (isset($vacancy->profession_class)) {
+                    if (is_array($vacancy->profession_class)) {
+                        if (array_key_exists('label', $vacancy->profession_class)) {
+                            /** Get closest role */
+                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords, strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_class['label'])), 5, 1, 1, 1, 'array');
+
+                            /** Unset used key */
+                            // unset($vacancy->profession_class);
+                        }
+                    }
+                }
+
+                /** Set the role */
+                if ($taxonomy['role'] !== false) {
+                    /** If calculation return empty role,
+                     * if not set the role,
+                     * if empty create new role */
+                    if (empty($taxonomy['role'])) {
+                        $termModel = new Term();
+                        $taxonomy['role'] = $termModel->createTerm('role', $taxonomy['role'], []);
+                    } else {
+                        $option     = new Option(true);
+                        $limitRole  = $option->getImportNumberRoleToSet();
+
+                        $termCount  = 1;
+                        $tempRole = [];
+                        foreach ($taxonomy['role'] as $termID => $levenshteinCost) {
+                            if ($termCount > $limitRole) {
+                                break;
+                            }
+                            $tempRole[] = $termID;
+
+                            $termCount++;
+                        }
+                        $taxonomy['role'] = $tempRole;
+                    }
+                } else {
+                    $termModel = new Term();
+                    $taxonomy['role'] = $termModel->createTerm('role', $taxonomy['role'], []);
+                }
+
+                /** Mapping Unused data */
+                foreach ($vacancy as $propertyKey => $propertyValue) {
+                    $unusedData[$propertyKey] = $propertyValue;
+                }
+
+                /** Insert data */
+                try {
+                    $post = wp_insert_post($arguments, true);
+
+                    if (is_wp_error($post)) {
+                        error_log(json_encode($post->get_error_messages()));
+                    }
+
+                    $vacancy = new Vacancy($post);
+
+                    $vacancy->setTaxonomy($taxonomy);
+
+                    foreach ($payload as $acf_field => $acfValue) {
+                        $vacancy->setProp($acf_field, $acfValue, is_array($acfValue));
+                    }
+
+                    /** store unused to post meta */
+                    $now = new \DateTimeImmutable("now");
+                    update_post_meta($post, 'rv_vacancy_unused_data', $unusedData);
+                    update_post_meta($post, 'rv_vacancy_source', 'jobfeed');
+                    update_post_meta($post, 'rv_vacancy_imported_at', $now->format('Y-m-d H:i:s'));
+
+
+                    /** IF MAP API IS ENABLED */
+                    if (defined('ENABLE_MAP_API') && ENABLE_MAP_API == true) {
+                        /** Calc coordinate placement City*/
+                        if (isset($payload["placement_city"]) || isset($payload["placement_address"])) {
+                            if ($payload['city_latitude'] == "" && $payload["city_longitude"] == "") {
+                                $vacancy->setCityLongLat($payload["placement_city"]);
+                            }
+
+                            if (isset($payload["placement_address"])) {
+                                $vacancy->setAddressLongLat($payload["placement_address"]);
+                            }
+
+                            if ($payload['city_latitude'] == "" && $payload["city_longitude"] == "" && isset($payload["placement_address"])) {
+                                $vacancy->setDistance($payload["placement_city"], $payload["placement_city"] . " " . $payload["placement_address"]);
+                            } else if ($payload['city_latitude'] !== "" && $payload["city_longitude"] !== "" && isset($payload["placement_address"])) {
+                                $cityCoordinate = [
+                                    'lat' => $payload['city_latitude'],
+                                    'long' => $payload['city_longitude']
+                                ];
+
+                                $vacancy->setAddressLongLat($payload['placement_address']);
+                                $placementCoordinate = [
+                                    'lat' => $vacancy->getProp('placement_address_latitude', true),
+                                    'long' => $vacancy->getProp('placement_address_longitude', true),
+                                ];
+
+                                $vacancy->setCoordinateDistance($cityCoordinate, $placementCoordinate);
+                            }
+                        }
+
+                        /** Calc coordinate company city */
+                        if (isset($payload["rv_vacancy_imported_company_city"]) && $payload["rv_vacancy_imported_company_city"] !== "") {
+                            $vacancy->setImportedCompanyCityLongLat($payload["rv_vacancy_imported_company_city"]);
+                        }
+                    }
+                } catch (\Exception $error) {
+                    error_log($error);
+                }
             }
         } catch (AwsException $e) {
-            echo '<pre>';
-            var_dump($e->getMessage());
-            echo '</pre>';
+            error_log('Exception in fetch AWS S3 Bucket - ' . $e->getMessage());
+        } catch (\Exception $e) {
+            error_log('Exception in fetch AWS S3 Bucket - ' . $e->getMessage());
+        } catch (\Throwable $throw) {
+            error_log('All thrown exception in fetch AWS S3 Bucket - ' . $throw->getMessage());
         }
     }
 
@@ -362,6 +593,50 @@ class JobfeedController
                 'name'      => strtolower($value->name),
                 'slug'      => strtolower($value->slug)
             ];
+        }
+    }
+
+    /**
+     * Get Mapped Keyword function
+     *
+     * This function is to get mapped keyword from option.
+     *
+     * @return void
+     */
+    private function _getMappedKeyword()
+    {
+        error_log('getMappedKeyword');
+
+        try {
+            $this->_keywords = [];
+
+            /** Get term Name */
+            $termModel = new Term();
+            $terms = $termModel->selectTermByTaxonomy('role', 'array');
+            if ($terms) {
+                foreach ($terms as $term) {
+                    $this->_keywords[$term['term_id']][] = $term['name'];
+                }
+            }
+
+            /** Get keywords options and set each keyword to lowercase */
+            $keywordOption = get_field('import_api_mapping_role', 'option');
+            foreach ($keywordOption as $keyword) {
+                if (is_array($keyword)) {
+                    if (array_key_exists('import_api_mapping_role_term', $keyword) && array_key_exists('import_api_mapping_role_keywords', $keyword)) {
+                        foreach ($keyword['import_api_mapping_role_keywords'] as $word) {
+                            if (is_array($word)) {
+                                if (array_key_exists('import_api_mapping_role_eachword', $word))
+                                    $this->_keywords[$keyword['import_api_mapping_role_term']][] = strtolower($word['import_api_mapping_role_eachword']);
+                            } else if (is_string($word)) {
+                                $this->_keywords[$keyword['import_api_mapping_role_term']][] = strtolower($word);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $exception) {
+            error_log($exception->getMessage());
         }
     }
 
@@ -401,6 +676,147 @@ class JobfeedController
             }
         } else {
             return $termClose->term_id;
+        }
+    }
+
+    private function _findWorkingHours($jsonValue)
+    {
+        $terms = $this->_terms['working-hours'];
+        $alternative = strtolower(preg_replace('/\s+/', '', $jsonValue));
+
+        foreach ($terms as $key => $value) {
+            if ($value['name'] == strtolower($jsonValue) || $value['slug'] == strtolower($jsonValue) || $value['name'] == strtolower($alternative) || $value['slug'] == strtolower($alternative)) {
+                return $value['term_id'];
+            }
+        }
+
+        /** Check using term_exists query */
+        $termExists = term_exists(strtolower(preg_replace('/\s+/', '-', $jsonValue)), 'working-hours');
+        if ($termExists) {
+            if (is_array($termExists)) {
+                return $termExists['term_id'];
+            }
+            return $termExists;;
+        } else {
+            $newTerm = wp_insert_term($jsonValue, 'working-hours', []);
+
+            if ($newTerm instanceof WP_Error) {
+                if (array_key_exists('term_exists', $newTerm->error_data)) {
+                    return $newTerm->error_data['term_exists'];
+                }
+                return null;
+            } else {
+                return $newTerm['term_id'];
+            }
+        }
+    }
+
+    private function _findEducation($jsonValue)
+    {
+        $terms = $this->_terms['education'];
+        $alternative = strtolower(preg_replace('/\s+/', '-', $jsonValue));
+
+        foreach ($terms as $key => $value) {
+            switch ($value) {
+                case $value['name'] == strtolower($jsonValue):
+                case $value['slug'] == strtolower($jsonValue):
+                case $value['name'] == strtolower($alternative):
+                case $value['slug'] == strtolower($alternative):
+                    return $value['term_id'];
+            }
+        }
+
+        /** Check using term_exists query */
+        $termExists = term_exists(strtolower(preg_replace('/\s+/', '-', $jsonValue)), 'education');
+        if ($termExists) {
+            if (is_array($termExists)) {
+                return $termExists['term_id'];
+            }
+            return $termExists;;
+        } else {
+            $newTerm = wp_insert_term($jsonValue, 'education', []);
+
+            if ($newTerm instanceof WP_Error) {
+                if (array_key_exists('term_exists', $newTerm->error_data)) {
+                    return $newTerm->error_data['term_exists'];
+                }
+                return null;
+            } else {
+                return $newTerm['term_id'];
+            }
+        }
+    }
+
+    private function _findExperience($jsonValue)
+    {
+        $terms = $this->_terms['experiences'];
+        $alternative = strtolower(preg_replace('/\s+/', '-', $jsonValue));
+
+        foreach ($terms as $key => $value) {
+            switch ($value) {
+                case $value['name'] == strtolower($jsonValue):
+                case $value['slug'] == strtolower($jsonValue):
+                case $value['name'] == strtolower($alternative):
+                case $value['slug'] == strtolower($alternative):
+                    return $value['term_id'];
+            }
+        }
+
+        /** Check using term_exists query */
+        $termExists = term_exists(strtolower(preg_replace('/\s+/', '-', $jsonValue)), 'experiences');
+        if ($termExists) {
+            if (is_array($termExists)) {
+                return $termExists['term_id'];
+            }
+            return $termExists;;
+        } else {
+            $newTerm = wp_insert_term($jsonValue, 'experiences', []);
+
+            if ($newTerm instanceof WP_Error) {
+                if (array_key_exists('term_exists', $newTerm->error_data)) {
+                    return $newTerm->error_data['term_exists'];
+                }
+                return null;
+            } else {
+                return $newTerm['term_id'];
+            }
+        }
+    }
+
+    private function _findEmploymentType($jsonValue)
+    {
+        /** Manual */
+        $terms = $this->_terms['type'];
+        $alternative = strtolower(preg_replace('/\s+/', '-', $jsonValue));
+
+        foreach ($terms as $key => $value) {
+            switch ($value) {
+                case $value['name'] == strtolower($jsonValue):
+                case $value['slug'] == strtolower($jsonValue):
+                case $value['name'] == strtolower($alternative):
+                case $value['slug'] == strtolower($alternative):
+                    return $value['term_id'];
+            }
+        }
+
+        /** Check using term_exists query */
+        $termExists = term_exists(strtolower(preg_replace('/\s+/', '-', $jsonValue)), 'type');
+        if ($termExists) {
+            if (is_array($termExists)) {
+                return $termExists['term_id'];
+            }
+            return $termExists;;
+        } else {
+            $newTerm = wp_insert_term($jsonValue, 'type', []);
+
+            if ($newTerm instanceof WP_Error) {
+                if (array_key_exists('term_exists', $newTerm->error_data)) {
+                    return $newTerm->error_data['term_exists'];
+                }
+                return null;
+            } else {
+                return $newTerm['term_id'];
+            }
         }
     }
 }
