@@ -118,7 +118,7 @@ class ActiveCampaign
 
         error_log("start getting data from ". $this->url.$this->version.$path.$queryParams);
 
-        $ch = curl_init($this->url.$this->version.$path);
+        $ch = curl_init($this->url.$this->version.$path.$queryParams);
 
         // Set cURL options
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method); // Set the request method to POST

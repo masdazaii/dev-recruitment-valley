@@ -159,6 +159,7 @@ class Message
                 "get_applicant_failed"  => __("Mislukt sollicitaties ophalen.", THEME_DOMAIN),
                 "get_application_success"   => __("Succes krijg sollicitatie vacature.", THEME_DOMAIN),
                 "get_application_not_found" => __("Sollicitatie niet gevonden.", THEME_DOMAIN),
+                "approval_subject"  => __("Kennisgeving vacaturegoedkeuring", THEME_DOMAIN),
             ],
             'candidate' => [
                 "profile" => [
