@@ -950,7 +950,8 @@
                 },
                 "choices": {
                     "company": "Question from company",
-                    "candidate": "Question from candidate"
+                    "candidate": "Question from candidate",
+                    "both": "Question from both (company and candidate)"
                 },
                 "default_value": false,
                 "return_format": "array",
@@ -959,6 +960,26 @@
                 "ui": 0,
                 "ajax": 0,
                 "placeholder": ""
+            },
+            {
+                "key": "field_6540a54a66404",
+                "label": "Is Favorite",
+                "name": "rv_faq_display_on_contact",
+                "aria-label": "",
+                "type": "true_false",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "Also show the question in Contact Page",
+                "default_value": 0,
+                "ui": 0,
+                "ui_on_text": "",
+                "ui_off_text": ""
             }
         ],
         "location": [
