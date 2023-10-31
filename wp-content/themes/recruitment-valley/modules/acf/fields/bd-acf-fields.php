@@ -67,6 +67,31 @@ acf_add_local_field_group(array(
 			'prepend' => '',
 			'append' => '',
 		),
+		array(
+			'key' => 'field_653a249a6f6ce',
+			'label' => 'Active Campaign Tags',
+			'name' => 'active_campaign_tags',
+			'aria-label' => '',
+			'type' => 'select',
+			'instructions' => '',
+			'required' => 0,
+			'conditional_logic' => 0,
+			'wrapper' => array(
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'choices' => array(
+			),
+			'default_value' => array(
+			),
+			'return_format' => 'value',
+			'multiple' => 1,
+			'allow_null' => 0,
+			'ui' => 1,
+			'ajax' => 0,
+			'placeholder' => '',
+		),
 	),
 	'location' => array(
 		array(
@@ -269,6 +294,69 @@ acf_add_local_field_group(array(
 				'param' => 'post_type',
 				'operator' => '==',
 				'value' => 'applicants',
+			),
+		),
+	),
+	'menu_order' => 0,
+	'position' => 'normal',
+	'style' => 'default',
+	'label_placement' => 'top',
+	'instruction_placement' => 'label',
+	'hide_on_screen' => '',
+	'active' => true,
+	'description' => '',
+	'show_in_rest' => 0,
+));
+
+acf_add_local_field_group(array(
+	'key' => 'group_653f589068590',
+	'title' => 'Aws Settings',
+	'fields' => array(
+		array(
+			'key' => 'field_653f58904c48e',
+			'label' => 'AWS key ID',
+			'name' => 'aws_key_id',
+			'aria-label' => '',
+			'type' => 'text',
+			'instructions' => '',
+			'required' => 0,
+			'conditional_logic' => 0,
+			'wrapper' => array(
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'default_value' => '',
+			'maxlength' => '',
+			'placeholder' => '',
+			'prepend' => '',
+			'append' => '',
+		),
+		array(
+			'key' => 'field_653f58b94c48f',
+			'label' => 'AWS Secret key',
+			'name' => 'aws_secret_key',
+			'aria-label' => '',
+			'type' => 'password',
+			'instructions' => '',
+			'required' => 0,
+			'conditional_logic' => 0,
+			'wrapper' => array(
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'placeholder' => '',
+			'prepend' => '',
+			'append' => '',
+		),
+	),
+	'location' => array(
+		array(
+			array(
+				'param' => 'options_page',
+				'operator' => '==',
+				'value' => 'aws-settings',
 			),
 		),
 	),
@@ -914,7 +1002,7 @@ acf_add_local_field_group(array(
 	'fields' => array(
 		array(
 			'key' => 'field_652506a5aa773',
-			'label' => 'Refresh per day',
+			'label' => 'Flexfeed Refresh per day',
 			'name' => 'import_api_refresh_per_day',
 			'aria-label' => '',
 			'type' => 'number',
@@ -1049,6 +1137,7 @@ acf_add_local_field_group(array(
 					'collapsed' => '',
 					'button_label' => 'Add Row',
 					'rows_per_page' => 20,
+					'parent_repeater' => 'field_652e11ee76ccd',
 					'sub_fields' => array(
 						array(
 							'key' => 'field_652e4924c0207',
@@ -1072,7 +1161,6 @@ acf_add_local_field_group(array(
 							'parent_repeater' => 'field_652e487fc0206',
 						),
 					),
-					'parent_repeater' => 'field_652e11ee76ccd',
 				),
 			),
 		),
@@ -3578,7 +3666,7 @@ acf_add_local_field_group(array(
 				'id' => '',
 			),
 			'choices' => array(
-				'admin-approved' => 'Approved',
+				'admin-approved' => 'Admin Approved',
 				'system-approved' => 'System Approved',
 				'rejected' => 'Rejected',
 				'waiting' => 'Waiting for approval',

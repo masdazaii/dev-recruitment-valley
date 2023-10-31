@@ -45,9 +45,6 @@ class OptionController
             /** Get current options "job_expires" */
             $oldExpiredOption = maybe_unserialize(get_option("job_expires"));
 
-            error_log('called from ' . ($class_name ?? 'self') . '::' . ($method_name ?? 'self') . ' - Inside try to update the expired date. - Logged from : OptionController::updateExpiredOptions');
-            error_log('called from ' . ($class_name ?? 'self') . '::' . ($method_name ?? 'self') . ' - post : ' . $id . ' - old expired option : ' . json_encode($oldExpiredOption) . ' - Logged from : OptionController::updateExpiredOptions');
-
             $postFound          = false;
             $newExpiredOption   = array_map(function ($optionData) use ($id, $expired) {
                 if ($optionData["post_id"] == $id) {

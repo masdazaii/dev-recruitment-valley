@@ -254,6 +254,19 @@ class GlobalEndpoint
                     'permission_callback'   => '__return_true',
                     'callback'              => [$importService, 'nationaleVacatureBank']
                 ],
+                // This is live version of nationale_vacature_bank_import
+                'jobfeed_import' => [
+                    'url'                   => 'import/jobfeed',
+                    'methods'               => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$importService, 'jobfeedImport']
+                ],
+                'jobfeed_expire' => [
+                    'url'                   => 'import/jobfeed/expire',
+                    'methods'               => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$importService, 'jobfeedExpire']
+                ],
                 'list_coupon' => [
                     'url'                   => 'coupons',
                     'methods'               => 'GET',

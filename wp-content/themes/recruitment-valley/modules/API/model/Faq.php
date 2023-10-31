@@ -12,13 +12,40 @@ class Faq
     public $faq;
 
     public $acf_faq_type    = 'rv_faq_type';
+    public $property = [
+        'acf' => [],
+        'meta' => []
+    ];
 
-    public function __construct($faq_id = false)
+    public function __construct($faq_id = false, $get_all = false)
     {
         if ($faq_id) {
+            $this->faq_id = $faq_id;
             $this->faq = get_post($faq_id);
             if (!$this->faq) {
                 throw new Exception("FAQ not found!");
+            }
+
+            if ($get_all) {
+                $this->property['acf'] = get_fields($faq_id);
+                $this->property['meta'] = get_post_meta($faq_id);
+            }
+        }
+    }
+
+    public function getter($key, $format, $type = 'acf')
+    {
+        if (array_key_exists($key, $this->property[$type])) {
+            return $this->property[$type][$key];
+        } else {
+            if ($this->faq_id) {
+                if ($type == 'meta') {
+                    return get_post_meta($this->faq_id, $key, $format);
+                } else {
+                    return get_field($key, $this->faq_id, $format);
+                }
+            } else {
+                throw new Exception('Please specify faq!');
             }
         }
     }
@@ -104,5 +131,10 @@ class Faq
         }
 
         return $args;
+    }
+
+    public function getType()
+    {
+        return $this->getter($this->acf_faq_type, true);
     }
 }

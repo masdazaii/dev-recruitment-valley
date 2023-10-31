@@ -36,23 +36,27 @@ class RssCPT extends RegisterCPT
 
     public function saveRSS($post_id, $post, $update)
     {
-        $this->wpdb->query('START TRANSACTION');
-        try {
-            $rssModel = new \Model\Rss($post_id);
+        if ($post->post_type == 'rss') {
+            $this->wpdb->query('START TRANSACTION');
+            // print('<pre>' . print_r($_POST, true) . '</pre>');
+            // die;
+            try {
+                $rssModel = new \Model\Rss($post_id);
 
-            // $endpoint = rest_url() . 'mi/v1/rss/vacancy/' . $post->post_name;
-            $endpoint = '/rss/vacancy/' . $post->post_name;
+                // $endpoint = rest_url() . 'mi/v1/rss/vacancy/' . $post->post_name;
+                $endpoint = '/rss/vacancy/' . $post->post_name;
 
-            $updateMetaUrlRSS = $rssModel->setRssEndpointURL($endpoint);
-            $updateMetaVacancies = $rssModel->setRssVacancies(isset($_POST['rv_rss_select_vacancy']) ? $_POST['rv_rss_select_vacancy'] : '');
+                $updateMetaUrlRSS = $rssModel->setRssEndpointURL($endpoint);
+                $updateMetaVacancies = $rssModel->setRssVacancies(isset($_POST['rv_rss_select_vacancy']) ? $_POST['rv_rss_select_vacancy'] : '');
 
-            error_log('rss meta url - ' . $post_id . ' - ' . gettype($updateMetaUrlRSS));
-            error_log('rss meta vacancy - ' . $post_id . ' - ' . gettype($updateMetaVacancies));
+                error_log('rss meta url - ' . $post_id . ' - ' . gettype($updateMetaUrlRSS));
+                error_log('rss meta vacancy - ' . $post_id . ' - ' . gettype($updateMetaVacancies));
 
-            $this->wpdb->query('COMMIT');
-        } catch (\Exception $e) {
-            $this->wpdb->query('ROLLBACK');
-            error_log($e->getMessage());
+                $this->wpdb->query('COMMIT');
+            } catch (\Exception $e) {
+                $this->wpdb->query('ROLLBACK');
+                error_log($e->getMessage());
+            }
         }
     }
 
@@ -119,7 +123,7 @@ class RssCPT extends RegisterCPT
 
         echo '<div style="display: flex; flex-direction: column; gap: 0.5rem;">';
         echo '<div class="cs-flex cs-flex-col cs-flex-nowrap cs-items-start cs-gap-2">';
-        echo '<label style="display; block; font-weight: bold; color: rgba(0, 0, 0, 1);" for="rss-url-endpoint">RSS URL</label>';
+        echo '<label style="display; block; font-weight: bold; color: rgba(0, 0, 0, 1);" for="rss-url-endpoint">Select Vacancies</label>';
         echo '<select id="metabox-' . $rssModel->_meta_rss_vacancy . '" name="' . $rssModel->_meta_rss_vacancy . '[]" style="width: 100%; border: 1px solid rgba(209, 213, 219, 1); padding: 0.375rem 0.5rem; font-size: 1rem; line-height: 1.5rem; font-weight: 400;" multiple>';
         foreach ($vacanciesOption as $option) {
             echo '<option value="' . $option['value'] . '" ' . ($option['selected'] ? 'selected="selected"' : '') . '>' . $option['label'] . '</option>';
@@ -167,7 +171,7 @@ class RssCPT extends RegisterCPT
 
         switch ($coloumn) {
             case 'url':
-                echo $rssModel->getRssEndpointURL();
+                echo rest_url() . 'mi/v1' . $rssModel->getRssEndpointURL();
                 break;
         }
     }
