@@ -41,7 +41,24 @@ class FaqController
              * query params "type" can be string or array
              */
             if (isset($request['type']) && is_array($request['type'])) {
-                if (in_array('both', $request['type']) || (in_array('candidate', $request['type']) && in_array('company', $request['type']))) {
+                if (in_array('candidate', $request['type']) && in_array('company', $request['type'])) {
+                    $filters['meta'] = [
+                        'relation'  => 'AND',
+                        [
+                            'relation'  => 'OR',
+                            [
+                                'key'   => $faqModel->acf_faq_type,
+                                'value' => $request['type'],
+                                'compare'   => '='
+                            ],
+                            [
+                                'key'   => $faqModel->acf_faq_type,
+                                'value' => 'both',
+                                'compare'   => '='
+                            ]
+                        ]
+                    ];
+                } else if (in_array('both', $request['type'])) {
                     $request['type'] = 'both';
                 } else if (in_array('candidate', $request['type'])) {
                     $request['type'] = 'candidate';
@@ -53,14 +70,33 @@ class FaqController
             }
 
             if (isset($request['type']) && in_array($request['type'], ['company', 'candidate', 'both'])) {
-                $filters['meta'] = [
-                    'relation'  => 'AND',
-                    [
-                        'key'   => $faqModel->acf_faq_type,
-                        'value' => $request['type'],
-                        'compare'   => '='
-                    ]
-                ];
+                if ($request['type'] == 'company' || $request['type'] == 'candidate') {
+                    $filters['meta'] = [
+                        'relation'  => 'AND',
+                        [
+                            'relation'  => 'OR',
+                            [
+                                'key'   => $faqModel->acf_faq_type,
+                                'value' => $request['type'],
+                                'compare'   => '='
+                            ],
+                            [
+                                'key'   => $faqModel->acf_faq_type,
+                                'value' => 'both',
+                                'compare'   => '='
+                            ]
+                        ]
+                    ];
+                } else {
+                    $filters['meta'] = [
+                        'relation'  => 'AND',
+                        [
+                            'key'   => $faqModel->acf_faq_type,
+                            'value' => $request['type'],
+                            'compare'   => '='
+                        ],
+                    ];
+                }
             }
 
             /** Filter faq by display */
