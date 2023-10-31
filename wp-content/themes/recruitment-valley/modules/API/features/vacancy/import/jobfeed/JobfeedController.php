@@ -301,6 +301,14 @@ class JobfeedController
                         unset($vacancy->apply_url);
                     }
 
+                    /** ACF City */
+                    if (isset($vacancy->location_name)) {
+                        $payload['placement_city'] = preg_replace('/[\n\t]+/', '', $vacancy->location_name);
+
+                        /** Unset used key */
+                        unset($vacancy->location_name);
+                    }
+
                     /** ACF Placement Address
                      * sometimes, there is property "location_remote_possible"
                      * if this property value is false, set placement with organization address
@@ -391,7 +399,7 @@ class JobfeedController
                         }
                     }
 
-                    /** ACF Imported Country */
+                    /** ACF Imported Company Country */
                     if (array_key_exists('rv_vacancy_imported_company_city', $payload) && !empty($payload['rv_vacancy_imported_company_city'])) {
 
                         if (isset($vacancy->organization_address)) {
