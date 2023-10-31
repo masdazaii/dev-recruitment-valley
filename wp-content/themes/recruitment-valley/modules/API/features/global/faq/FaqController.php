@@ -37,8 +37,22 @@ class FaqController
 
             $filters['offset'] = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['postPerPage']));
 
-            /** Filter faq by what's question from / answer for */
-            if (isset($request['type']) && in_array($request['type'], ['company', 'candidate'])) {
+            /** Filter faq by what's question from / answer for
+             * query params "type" can be string or array
+             */
+            if (isset($request['type']) && is_array($request['type'])) {
+                if (in_array('both', $request['type']) || (in_array('candidate', $request['type']) && in_array('company', $request['type']))) {
+                    $request['type'] = 'both';
+                } else if (in_array('candidate', $request['type'])) {
+                    $request['type'] = 'candidate';
+                } else if (in_array('company', $request['type'])) {
+                    $request['type'] = 'company';
+                } else {
+                    unset($request['type']);
+                }
+            }
+
+            if (isset($request['type']) && in_array($request['type'], ['company', 'candidate', 'both'])) {
                 $filters['meta'] = [
                     'relation'  => 'AND',
                     [
@@ -47,6 +61,28 @@ class FaqController
                         'compare'   => '='
                     ]
                 ];
+            }
+
+            /** Filter faq by display */
+            if (isset($request['display']) && in_array($request['display'], ['faq', 'contact', 'both'])) {
+                if ($request['display'] == 'contact') {
+                    if (isset($filters['meta'])) {
+                        $filters['meta'][] = [
+                            'key'       => $faqModel->acf_faq_display_on_contact,
+                            'value'     => 1,
+                            'compare'   => '='
+                        ];
+                    } else {
+                        $filters['meta'] = [
+                            'relation'  => 'AND',
+                            [
+                                'key'       => $faqModel->acf_faq_display_on_contact,
+                                'value'     => 1,
+                                'compare'   => '='
+                            ]
+                        ];
+                    }
+                }
             }
 
             $faqs       = $faqModel->getFaqs($filters, []);
@@ -65,13 +101,19 @@ class FaqController
                 if ($faqs->found_posts > 0) {
                     foreach ($faqs->posts as $faq) {
                         try {
-                            $faqModel = new Faq($faq->ID);
+                            $faqModel   = new Faq($faq->ID);
+                            $faqType    = $faqModel->getType()['value'];
+                            if ($faqType == 'both') {
+                                $faqType = $faqModel->faq_type_values;
+                            }
+
                             $faqsResponse['data'][] = [
                                 'id'    => $faq->ID,
                                 'slug'  => $faq->post_name,
                                 'question'  => $faq->post_title,
                                 'answer'    => StringHelper::shortenString($faq->post_content, 0, -1, ''),
-                                'type'      => $faqModel->getType()['value']
+                                'type'      => $faqType,
+                                'isFavourite' => $faqModel->getDisplayOnContact() ?? false
                             ];
                         } catch (\Exception $e) {
                             error_log($e->getMessage() . ' - ' . $faq->ID . ' - logged by FaqController::list');

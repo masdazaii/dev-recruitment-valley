@@ -12,6 +12,8 @@ class Faq
     public $faq;
 
     public $acf_faq_type    = 'rv_faq_type';
+    public $acf_faq_display_on_contact = 'rv_faq_display_on_contact';
+    public $faq_type_values = ["candidate", "company"];
     public $property = [
         'acf' => [],
         'meta' => []
@@ -136,5 +138,10 @@ class Faq
     public function getType()
     {
         return $this->getter($this->acf_faq_type, true);
+    }
+
+    public function getDisplayOnContact()
+    {
+        return $this->getter($this->acf_faq_display_on_contact, true);
     }
 }
