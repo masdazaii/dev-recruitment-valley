@@ -212,6 +212,14 @@ class VacancyCrudService
             $site_title = get_bloginfo('name');
             $content = Email::render_html_email('confirmation-jobpost-company.php', $args);
             wp_mail($user->user_email, "Bevestiging plaatsing vacature - $site_title", $content, $headers);
+
+            /** Email to admin */
+            $approvalArgs = [
+                // 'url' => menu_page_url('import-approval'),
+            ];
+            $adminEmail = get_option('admin_email', false);
+            $content = Email::render_html_email('admin-new-vacancy-approval.php', $approvalArgs);
+            wp_mail($adminEmail, $this->_message->get('vacancy.approval_subject'), $content, $headers);
         }
     }
 

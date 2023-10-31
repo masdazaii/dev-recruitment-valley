@@ -82,8 +82,6 @@ acf_add_local_field_group(array(
 				'id' => '',
 			),
 			'choices' => array(
-				1 => 'Vacancy Recruitment Valley',
-				2 => 'Custom Tag 1',
 			),
 			'default_value' => array(
 			),
@@ -296,6 +294,69 @@ acf_add_local_field_group(array(
 				'param' => 'post_type',
 				'operator' => '==',
 				'value' => 'applicants',
+			),
+		),
+	),
+	'menu_order' => 0,
+	'position' => 'normal',
+	'style' => 'default',
+	'label_placement' => 'top',
+	'instruction_placement' => 'label',
+	'hide_on_screen' => '',
+	'active' => true,
+	'description' => '',
+	'show_in_rest' => 0,
+));
+
+acf_add_local_field_group(array(
+	'key' => 'group_653f589068590',
+	'title' => 'Aws Settings',
+	'fields' => array(
+		array(
+			'key' => 'field_653f58904c48e',
+			'label' => 'AWS key ID',
+			'name' => 'aws_key_id',
+			'aria-label' => '',
+			'type' => 'text',
+			'instructions' => '',
+			'required' => 0,
+			'conditional_logic' => 0,
+			'wrapper' => array(
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'default_value' => '',
+			'maxlength' => '',
+			'placeholder' => '',
+			'prepend' => '',
+			'append' => '',
+		),
+		array(
+			'key' => 'field_653f58b94c48f',
+			'label' => 'AWS Secret key',
+			'name' => 'aws_secret_key',
+			'aria-label' => '',
+			'type' => 'password',
+			'instructions' => '',
+			'required' => 0,
+			'conditional_logic' => 0,
+			'wrapper' => array(
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'placeholder' => '',
+			'prepend' => '',
+			'append' => '',
+		),
+	),
+	'location' => array(
+		array(
+			array(
+				'param' => 'options_page',
+				'operator' => '==',
+				'value' => 'aws-settings',
 			),
 		),
 	),
@@ -885,12 +946,84 @@ acf_add_local_field_group(array(
 ));
 
 acf_add_local_field_group(array(
+	'key' => 'group_6539d648b59cd',
+	'title' => 'FAQ Field Group',
+	'fields' => array(
+		array(
+			'key' => 'field_6539d649eefa0',
+			'label' => 'Type',
+			'name' => 'rv_faq_type',
+			'aria-label' => '',
+			'type' => 'select',
+			'instructions' => '',
+			'required' => 1,
+			'conditional_logic' => 0,
+			'wrapper' => array(
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'choices' => array(
+				'company' => 'Question from company',
+				'candidate' => 'Question from candidate',
+				'both' => 'Question from both (company and candidate)',
+			),
+			'default_value' => false,
+			'return_format' => 'array',
+			'multiple' => 0,
+			'allow_null' => 0,
+			'ui' => 0,
+			'ajax' => 0,
+			'placeholder' => '',
+		),
+		array(
+			'key' => 'field_6540a54a66404',
+			'label' => 'Is Favorite',
+			'name' => 'rv_faq_display_on_contact',
+			'aria-label' => '',
+			'type' => 'true_false',
+			'instructions' => '',
+			'required' => 0,
+			'conditional_logic' => 0,
+			'wrapper' => array(
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'message' => 'Also show the question in Contact Page',
+			'default_value' => 0,
+			'ui' => 0,
+			'ui_on_text' => '',
+			'ui_off_text' => '',
+		),
+	),
+	'location' => array(
+		array(
+			array(
+				'param' => 'post_type',
+				'operator' => '==',
+				'value' => 'faq',
+			),
+		),
+	),
+	'menu_order' => 0,
+	'position' => 'normal',
+	'style' => 'default',
+	'label_placement' => 'top',
+	'instruction_placement' => 'label',
+	'hide_on_screen' => '',
+	'active' => true,
+	'description' => '',
+	'show_in_rest' => 0,
+));
+
+acf_add_local_field_group(array(
 	'key' => 'group_652506a4e8ee7',
 	'title' => 'Import API',
 	'fields' => array(
 		array(
 			'key' => 'field_652506a5aa773',
-			'label' => 'Refresh per day',
+			'label' => 'Flexfeed Refresh per day',
 			'name' => 'import_api_refresh_per_day',
 			'aria-label' => '',
 			'type' => 'number',
@@ -1542,33 +1675,6 @@ acf_add_local_field_group(array(
 			'multiple' => 0,
 			'allow_null' => 0,
 			'bidirectional' => 0,
-			'bidirectional_target' => array(
-			),
-		),
-		array(
-			'key' => 'field_65323cf4cd7be',
-			'label' => 'Select Vacancy(es)',
-			'name' => 'rv_rss_select_vacancy',
-			'aria-label' => '',
-			'type' => 'post_object',
-			'instructions' => 'Select vacancy (vacancies) based on selected company.',
-			'required' => 0,
-			'conditional_logic' => 0,
-			'wrapper' => array(
-				'width' => '',
-				'class' => '',
-				'id' => '',
-			),
-			'post_type' => array(
-				0 => 'vacancy',
-			),
-			'post_status' => '',
-			'taxonomy' => '',
-			'return_format' => 'object',
-			'multiple' => 1,
-			'allow_null' => 0,
-			'bidirectional' => 0,
-			'ui' => 1,
 			'bidirectional_target' => array(
 			),
 		),
@@ -3521,7 +3627,7 @@ acf_add_local_field_group(array(
 		),
 		array(
 			'key' => 'field_652cac3eeacdb',
-			'label' => 'Vacancy import approved by',
+			'label' => 'Vacancy Approved By',
 			'name' => 'rv_vacancy_imported_approved_by',
 			'aria-label' => '',
 			'type' => 'user',
@@ -3532,6 +3638,13 @@ acf_add_local_field_group(array(
 					array(
 						'field' => 'field_64fe7b3186a6b',
 						'operator' => '==',
+						'value' => '1',
+					),
+				),
+				array(
+					array(
+						'field' => 'field_64d0a7570f8f2',
+						'operator' => '!=',
 						'value' => '1',
 					),
 				),
@@ -3553,7 +3666,7 @@ acf_add_local_field_group(array(
 		),
 		array(
 			'key' => 'field_652cb51d484bd',
-			'label' => 'Vacancy import approval status',
+			'label' => 'Vacancy Approval Status',
 			'name' => 'rv_vacancy_imported_approval_status',
 			'aria-label' => '',
 			'type' => 'select',
@@ -3574,7 +3687,7 @@ acf_add_local_field_group(array(
 				'id' => '',
 			),
 			'choices' => array(
-				'admin-approved' => 'Approved',
+				'admin-approved' => 'Admin Approved',
 				'system-approved' => 'System Approved',
 				'rejected' => 'Rejected',
 				'waiting' => 'Waiting for approval',

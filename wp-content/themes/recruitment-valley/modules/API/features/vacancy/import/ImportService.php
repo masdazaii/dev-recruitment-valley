@@ -5,17 +5,21 @@ namespace Vacancy\Import;
 use ResponseHelper;
 use Vacancy\Import\Xml\FlexFeedController;
 use Vacancy\Import\JSON\NationaleVacatureBankController as NVBController;
+use Vacancy\Import\Jobfeed\JobfeedController;
+use WP_REST_Request;
 
 class ImportService
 {
     private $_nvbController;
     private $_flexFeedController;
+    private $_jobfeedController;
 
     public function __construct()
     {
         // $this->flexFeedController = new FlexFeedController;
         $this->_flexFeedController = new FlexFeedController(FLEXFEED_API_URL ?? NULL);
         $this->_nvbController = new NVBController();
+        $this->_jobfeedController = new JobfeedController();
     }
 
     // public function flexFeed()
@@ -37,6 +41,26 @@ class ImportService
     public function nationaleVacatureBank()
     {
         $this->_nvbController->import(1, 1444);
+        return ResponseHelper::build([
+            'status' => 200,
+            'message' => 'done'
+        ]);
+    }
+
+    public function jobfeedImport(WP_REST_Request $request)
+    {
+        $params = $request->get_params();
+        $this->_jobfeedController->import($params, 1, 0);
+        return ResponseHelper::build([
+            'status' => 200,
+            'message' => 'done'
+        ]);
+    }
+
+    public function jobfeedExpire(WP_REST_Request $request)
+    {
+        $params = $request->get_params();
+        $this->_jobfeedController->expire($params, 1, 0);
         return ResponseHelper::build([
             'status' => 200,
             'message' => 'done'

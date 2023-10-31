@@ -13,6 +13,8 @@ use Helper\StringHelper;
 use Helper\CalculateHelper;
 use Model\Option;
 use Model\Term;
+use BD\Emails\Email;
+use Constant\Message;
 
 class FlexFeedController
 {
@@ -23,6 +25,7 @@ class FlexFeedController
     private $_taxonomyKey;
     private $_terms;
     private $_keywords;
+    private $_message;
 
     public function __construct($source)
     {
@@ -120,7 +123,7 @@ class FlexFeedController
                     $unusedData = [];
 
                     /** Loop through array data */
-                    // $i = 0;
+                    $imported = 0;
                     $jobs = $response->source->job;
                     for ($i = 0; $i < count($jobs); $i++) {
                         /** ACF expired_at
@@ -337,7 +340,7 @@ class FlexFeedController
                                  * if empty create new role */
                                 if (empty($taxonomy['role'])) {
                                     $termModel = new Term();
-                                    $taxonomy['role'] = $termModel->createTerm('role', $taxonomy['role'], []);
+                                    $taxonomy['role'] = $termModel->createTerm('role', $jobs[$i]->category, []);
                                 } else {
                                     $option     = new Option(true);
                                     $limitRole  = $option->getImportNumberRoleToSet();
@@ -405,6 +408,9 @@ class FlexFeedController
                             update_post_meta($post, 'rv_vacancy_unused_data', $unusedData);
                             update_post_meta($post, 'rv_vacancy_source', 'flexfeed');
                             update_post_meta($post, 'rv_vacancy_imported_at', $now->format('Y-m-d H:i:s'));
+
+                            /** Increase imported count */
+                            $imported++;
                         } catch (\WP_Error $wperror) {
                             error_log($wperror->get_error_message());
                         } catch (\Exception $error) {
@@ -412,6 +418,24 @@ class FlexFeedController
                         } catch (\Throwable $th) {
                             error_log($th->getMessage());
                         }
+                        $i++;
+                    }
+
+                    /** Email if imported is more than 0 */
+                    if ($imported > 0) {
+                        /** Email to admin */
+                        $this->_message = new Message();
+
+                        $headers = [
+                            'Content-Type: text/html; charset=UTF-8',
+                        ];
+
+                        $approvalArgs = [
+                            // 'url' => menu_page_url('import-approval'),
+                        ];
+                        $adminEmail = get_option('admin_email', false);
+                        $content = Email::render_html_email('admin-new-vacancy-approval.php', $approvalArgs);
+                        wp_mail($adminEmail, $this->_message->get('vacancy.approval_subject'), $content, $headers);
                     }
                 }
             } catch (\Exception $e) {

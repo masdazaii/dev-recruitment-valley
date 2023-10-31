@@ -88,9 +88,9 @@ class Vacancy
 
     /** Vacancy Meta */
     private $_meta_rv_vacancy_unused_data   = 'rv_vacancy_unused_data';
-    private $_meta_rv_vacancy_source        = 'rv_vacancy_source';
     private $_meta_rv_vacancy_imported_at   = 'rv_vacancy_imported_at';
     public $meta_rv_vacancy_approved_at     = 'rv_vacancy_approved_at';
+    public $meta_rv_vacancy_source        = 'rv_vacancy_source';
 
     public function __construct($vacancy_id = false)
     {
@@ -873,6 +873,11 @@ class Vacancy
     public function getImportedCompanyLatitude()
     {
         return $this->getProp($this->_acf_imported_company_city_latitude);
+    }
+
+    public function getImportedSource()
+    {
+        return $this->getterMeta($this->meta_rv_vacancy_source);
     }
 
     /**
