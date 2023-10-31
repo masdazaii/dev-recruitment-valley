@@ -141,6 +141,8 @@ class FaqController
                             $faqType    = $faqModel->getType()['value'];
                             if ($faqType == 'both') {
                                 $faqType = $faqModel->faq_type_values;
+                            } else {
+                                $faqType = [$faqType];
                             }
 
                             $faqsResponse['data'][] = [
