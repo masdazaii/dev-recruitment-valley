@@ -410,7 +410,15 @@ class JobfeedController
 
                         /** IF MAP API IS ENABLED */
                         if (defined('ENABLE_MAP_API') && ENABLE_MAP_API == true) {
-                            $payload['rv_vacancy_imported_company_country'] = Maphelper::reverseGeoData('address', 'nl', 'country', [], $mapAddress)['long_name'];
+                            try {
+                                $payload['rv_vacancy_imported_company_country'] = Maphelper::reverseGeoData('address', 'nl', 'country', [], $mapAddress)['long_name'];
+                            } catch (\WP_Error $wperror) {
+                                error_log($wperror->get_error_message());
+                            } catch (\Exception $error) {
+                                error_log($error->getMessage());
+                            } catch (\Throwable $th) {
+                                error_log($th->getMessage());
+                            }
                         }
                     }
 
@@ -633,16 +641,41 @@ class JobfeedController
                 /** Email to admin */
                 $this->_message = new Message();
 
-                $headers = [
-                    'Content-Type: text/html; charset=UTF-8',
-                ];
+                /** Get recipient email */
+                // $adminEmail = get_option('admin_email', false);
+                $optionModel = new Option();
+                $approvalMainRecipient  = $optionModel->getEmailApprovalMainAddress();
+                $approvalCCRecipients = $optionModel->getEmailApprovalCC();
+                $approvalBCCRecipients = $optionModel->getEmailApprovalBCC();
+
+                /** Set headers */
+                $headers[] = 'Content-Type: text/html; charset=UTF-8';
+
+                /** Set cc / bcc */
+                if (isset($approvalCCRecipients) && is_array($approvalCCRecipients)) {
+                    $ccRecipient = [];
+                    foreach ($approvalCCRecipients as $recipient) {
+                        $ccRecipient[] = 'Cc: ' . $recipient['rv_email_approval_cc_address'];
+                    }
+                    array_unique($ccRecipient);
+                    $headers = array_merge($headers, $ccRecipient);
+                }
+
+                if (isset($approvalBCCRecipients) && is_array($approvalBCCRecipients)) {
+                    $bccRecipient = [];
+                    foreach ($approvalBCCRecipients as $recipient) {
+                        $bccRecipient[] = 'Bcc: ' . $recipient['rv_email_approval_bcc_address'];
+                    }
+                    array_unique($bccRecipient);
+                    $headers = array_merge($headers, $bccRecipient);
+                }
 
                 $approvalArgs = [
                     // 'url' => menu_page_url('import-approval'),
                 ];
-                $adminEmail = get_option('admin_email', false);
+
                 $content = Email::render_html_email('admin-new-vacancy-approval.php', $approvalArgs);
-                wp_mail($adminEmail, $this->_message->get('vacancy.approval_subject'), $content, $headers);
+                wp_mail($approvalMainRecipient, ($this->_message->get('vacancy.approval_subject') ?? 'Approval requested - RecruitmentValley'), $content, $headers);
             }
         } catch (AwsException $e) {
             error_log('Exception in fetch AWS S3 Bucket - ' . $e->getMessage());
