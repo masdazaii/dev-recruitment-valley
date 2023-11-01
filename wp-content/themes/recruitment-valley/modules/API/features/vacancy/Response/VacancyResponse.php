@@ -114,7 +114,7 @@ class VacancyResponse
                     "sector" => $company->getTerms('sector'),
                     "totalEmployee" => $company->getTotalEmployees(),
                     "tel" => $company->getPhoneCode() . $company->getPhone(),
-                    "email" => $vacancyModel->getImportedCompanyEmail() ?? $company->getEmail(),
+                    "email" => $vacancyModel->getImportedCompanyEmail() ?? '-',
                     "gallery" => $company->getGallery(true),
                     "website" => $company->getWebsite(),
                     "city" => $vacancyModel->getImportedCompanyCity() ?? $company->getCity(),

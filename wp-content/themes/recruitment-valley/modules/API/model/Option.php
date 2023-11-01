@@ -14,6 +14,10 @@ class Option
     private $_importRoleKeywords    = 'import_api_mapping_role_keywords';
     private $_importEachKeyword     = 'import_api_mapping_role_eachword';
 
+    private const acf_rv_email_approval_main_address = 'rv_email_approval_main_address';
+    private const acf_rv_email_approval_cc  = 'rv_email_approval_cc';
+    private const acf_rv_email_approval_bcc = 'rv_email_approval_bcc';
+
     public $options;
 
     public function __construct($all = false)
@@ -39,5 +43,20 @@ class Option
         } else {
             return $this->getter($this->_importNumberRoleToSet, true);
         }
+    }
+
+    public function getEmailApprovalMainAddress()
+    {
+        return $this->getter(self::acf_rv_email_approval_main_address, true);
+    }
+
+    public function getEmailApprovalCC()
+    {
+        return $this->getter(self::acf_rv_email_approval_cc, true);
+    }
+
+    public function getEmailApprovalBCC()
+    {
+        return $this->getter(self::acf_rv_email_approval_bcc, true);
     }
 }
