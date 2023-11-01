@@ -40,45 +40,46 @@ class JobfeedController
     private function _parse($limit, $start)
     {
         try {
-            $dateNow = date('Y-m-d');
+            // $dateNow = date('Y-m-d');
+            $dateNow = "2023-10-29";
 
-            $s3 = new \Aws\S3\S3Client([
-                'region' => 'eu-central-1',
-                'version' => 'latest',
-                'credentials' => [
-                    'key' => get_field('aws_key_id', 'option'),
-                    'secret' => get_field('aws_secret_key', 'option'),
-                ]
-            ]);
+            // $s3 = new \Aws\S3\S3Client([
+            //     'region' => 'eu-central-1',
+            //     'version' => 'latest',
+            //     'credentials' => [
+            //         'key' => get_field('aws_key_id', 'option'),
+            //         'secret' => get_field('aws_secret_key', 'option'),
+            //     ]
+            // ]);
 
-            $key = "NL/daily/" . $dateNow . "/jobs_new.0.jsonl.gz";
+            // $key = "NL/daily/" . $dateNow . "/jobs_new.0.jsonl.gz";
             $fileName = wp_upload_dir()["basedir"] . '/aws/job/new/' . $dateNow . '.gz';
-            error_log(json_encode(wp_upload_dir()));
+            // error_log(json_encode(wp_upload_dir()));
 
-            $result = $s3->getObject([
-                'Bucket' => 'jobfeed-intelligence-group',
-                'Key'    => $key,
-                'SaveAs' => $fileName,
-            ]);
+            // $result = $s3->getObject([
+            //     'Bucket' => 'jobfeed-intelligence-group',
+            //     'Key'    => $key,
+            //     'SaveAs' => $fileName,
+            // ]);
 
-            // Raising this value may increase performance
-            $buffer_size = 4096000; // read 4kb at a time
+            // // Raising this value may increase performance
+            // $buffer_size = 4096000; // read 4kb at a time
             $out_file_name = str_replace('.gz', '.jsonl', $fileName);
 
-            // Open our files (in binary mode)
-            $file = gzopen($fileName, 'rb');
-            $out_file = fopen($out_file_name, 'wb');
+            // // Open our files (in binary mode)
+            // $file = gzopen($fileName, 'rb');
+            // $out_file = fopen($out_file_name, 'wb');
 
-            // Keep repeating until the end of the input file
-            while (!gzeof($file)) {
-                // Read buffer-size bytes
-                // Both fwrite and gzread and binary-safe
-                fwrite($out_file, gzread($file, $buffer_size));
-            }
+            // // Keep repeating until the end of the input file
+            // while (!gzeof($file)) {
+            //     // Read buffer-size bytes
+            //     // Both fwrite and gzread and binary-safe
+            //     fwrite($out_file, gzread($file, $buffer_size));
+            // }
 
-            // Files are done, close files
-            fclose($out_file);
-            gzclose($file);
+            // // Files are done, close files
+            // fclose($out_file);
+            // gzclose($file);
 
 
             $vacancies = file_get_contents($out_file_name);
@@ -113,7 +114,7 @@ class JobfeedController
                 /** Check "expired" property exists */
                 if (isset($vacancy->expired)) {
                     /** Check "expired" property value, if false then skip this one */
-                    if (!$vacancy->expired) {
+                    if ($vacancy->expired) {
                         $i++;
                         continue;
                     }
@@ -164,7 +165,7 @@ class JobfeedController
 
                 /** Validate - check if data is already exists */
                 if (!$this->_validate($vacancy->job_id)) {
-                    error_log('[Flexfeed] - Vacancy already exists. JobID : ' . (isset($vacancy->job_id) ? $vacancy->job_id : 'No_job_id_found') . '. Title : ' . (isset($vacancy->job_title) ? $vacancy->job_title : 'no_job_title_found') . ' - index : ' . $i);
+                    error_log('[Jobfeed] - Vacancy already exists. JobID : ' . (isset($vacancy->job_id) ? $vacancy->job_id : 'No_job_id_found') . '. Title : ' . (isset($vacancy->job_title) ? $vacancy->job_title : 'no_job_title_found') . ' - index : ' . $i);
                     $i++;
                     continue;
                 }
@@ -179,7 +180,7 @@ class JobfeedController
                     $arguments['post_title'] = preg_replace('/[\n\t]+/', '', $vacancy->job_title);
 
                     /** Post Data post_name */
-                    $slug = StringHelper::makeSlug(preg_replace('/[\n\t]+/', '', $vacancy->job_title, '-', 'lower'));
+                    $slug = StringHelper::makeSlug(preg_replace('/[\n\t]+/', '', $vacancy->job_title),  '-', 'lower');
                     $arguments['post_name'] = 'jobfeed-' . $slug;
 
                     /** Unset used key */
