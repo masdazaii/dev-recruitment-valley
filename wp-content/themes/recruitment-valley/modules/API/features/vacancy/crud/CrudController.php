@@ -1184,9 +1184,13 @@ class VacancyCrudController
         try {
             $vacancyModel   = new Vacancy();
 
-            $filters        = [
-                'author'    => $companyID,
-            ];
+            if (is_array($companyID)) {
+                $filters = [
+                    'author'    => $companyID,
+                ];
+            } else {
+                $filters['author'] = [$companyID];
+            }
 
             if (!empty($filter)) {
                 if (array_key_exists('with_expired', $filter) && !$filter['with_expired']) {
@@ -1233,7 +1237,6 @@ class VacancyCrudController
             }
 
             $vacancies      = $vacancyModel->getVacancies($filters, []);
-
             switch (strtolower($result)) {
                 case 'options':
                 case 'option-value':

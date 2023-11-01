@@ -1804,7 +1804,7 @@ acf_add_local_field_group(array(
 				0 => 'company',
 			),
 			'return_format' => 'id',
-			'multiple' => 0,
+			'multiple' => 1,
 			'allow_null' => 0,
 			'bidirectional' => 0,
 			'bidirectional_target' => array(

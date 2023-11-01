@@ -101,7 +101,25 @@ class RssCPT extends RegisterCPT
 
                 /** Get vacancy by selected company */
                 $vacancies = $vacancyModel->getVacancies([
-                    'author' => $selectedCompany
+                    'author' => $selectedCompany,
+                    'meta'  => [
+                        "relation" => "AND",
+                        [
+                            'key' => 'expired_at',
+                            'value' => date("Y-m-d H:i:s"),
+                            'compare' => '>',
+                            'type' => "DATE"
+                        ],
+                    ],
+                    'taxonomy'  => [
+                        "relation" => "AND",
+                        [
+                            'taxonomy' => 'status',
+                            'field'    => 'slug',
+                            'terms'    => 'open',
+                            'compare'  => 'IN'
+                        ],
+                    ]
                 ]);
 
                 /** Get selected vacancies */

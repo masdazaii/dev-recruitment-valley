@@ -9,16 +9,32 @@ const rssModule = (function () {
 
   function ajaxVacancyOptionValue(e) {
     /** Set selected data */
-    if (vacanciesData.rss.selectedCompany !== null && $(e.target).val() == vacanciesData.rss.selectedCompany) {
-      if (vacanciesData.rss.selectedVacancies !== null) {
-        vacanciesData.rss.selectedVacancies.forEach((option) => {
-          var newOption = new Option(option.text, option.id, true, true);
-          $('#metabox-rv_rss_select_vacancy').append(newOption).trigger('change');
-        })
-      }
+    // if (vacanciesData.rss.selectedCompany !== null && $(e.target).val() == vacanciesData.rss.selectedCompany) {
+    if (vacanciesData.rss.selectedCompany !== null) {
+      vacanciesData.rss.selectedCompany.find((value) => {
+        if ($(e.target).val().indexOf(value.toString()) !== -1) {
+          // console.log('index : ' + $(e.target).val().indexOf(value.toString()))
+          if (vacanciesData.rss.selectedVacancies !== null) {
+            vacanciesData.rss.selectedVacancies.forEach((option) => {
+              if (value.toString() == option.company) {
+                // var newOption = new Option(option.text, option.id, true, true)
+                // $('#metabox-rv_rss_select_vacancy').append(newOption).trigger('change')
+                if ($('#metabox-rv_rss_select_vacancy').find("option[value='" + option.id + "']").length) {
+                  $('#metabox-rv_rss_select_vacancy').val(option.id).trigger('change');
+                } else {
+                    // Create a DOM Option and pre-select by default
+                    var newOption = new Option(option.text, option.id, true, true);
+                    // Append it to the select
+                    $('#metabox-rv_rss_select_vacancy').append(newOption).trigger('change');
+                }
+              }
+            })
+          }
+        }
+      })
     } else {
       /** Empty selected vacancies */
-      $('#metabox-rv_rss_select_vacancy').val(null).trigger('change');
+      $('#metabox-rv_rss_select_vacancy').val(null).trigger('change')
     }
 
     $('*#metabox-rv_rss_select_vacancy').select2({
@@ -34,8 +50,8 @@ const rssModule = (function () {
         },
         processResults: function(response) {
           /** Format the response */
-          let options = [];
-          let i = 1;
+          let options = []
+          let i = 1
           for (let [key, value] of Object.entries(response.data)) { // This only work on > ES 6
             options.push({
               id: key,
@@ -46,7 +62,7 @@ const rssModule = (function () {
 
           return {
             results: options
-          };
+          }
         }
       }
     })
@@ -66,8 +82,8 @@ const rssModule = (function () {
         },
         processResults: function(response) {
           /** Format the response */
-          let options = [];
-          let i = 1;
+          let options = []
+          let i = 1
           for (let [key, value] of Object.entries(response.data)) { // This only work on > ES 6
             options.push({
               id: key,
@@ -78,7 +94,7 @@ const rssModule = (function () {
 
           return {
             results: options
-          };
+          }
         }
       }
     })
