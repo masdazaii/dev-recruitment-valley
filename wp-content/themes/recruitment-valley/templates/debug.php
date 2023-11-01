@@ -10,6 +10,7 @@ defined('ABSPATH') || die("Can't access directly");
 /**
  * Template Name: Debugging
  */
+<<<<<<< HEAD
 
 
 require_once get_stylesheet_directory() . "/vendor/autoload.php";
@@ -146,3 +147,5 @@ try {
 } catch (\Throwable $th) {
   //throw $th;
 }
+=======
+>>>>>>> 4b1991b7629d978e36768cd21ca74324706721f2
