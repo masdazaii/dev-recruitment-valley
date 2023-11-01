@@ -165,7 +165,6 @@ class PackageController
         $transaction->setTransactionAmount($amount / 100);
         $transaction->setUserId($company->getId());
         $transaction->setPackageId($package->getPackageId());
-        $transaction->setStatus("pending");
 
         if (isset($request['coupon'])) {
             $transaction->setTransactionAmountBeforeCoupon($packagePriceBeforeCoupon);
@@ -239,6 +238,8 @@ class PackageController
             'payment_url' => $session->url,
             'expired_at' => $session->expires_at
         ]);
+
+        $transaction->setStatus("pending");
 
         return [
             "status" => 200,

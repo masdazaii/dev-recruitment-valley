@@ -13,6 +13,7 @@ class Option
     private $_importMappingRoleTerm = 'import_api_mapping_role_term';
     private $_importRoleKeywords    = 'import_api_mapping_role_keywords';
     private $_importEachKeyword     = 'import_api_mapping_role_eachword';
+    private $_importDefaultImage    = 'import_api_default_image';
 
     public $options;
 
@@ -38,6 +39,25 @@ class Option
             }
         } else {
             return $this->getter($this->_importNumberRoleToSet, true);
+        }
+    }
+
+    public function getDefaultImage($result = 'url')
+    {
+        if ($result === 'object') {
+            $attachment = $this->getter($this->_importDefaultImage, true);
+            if (!empty($attachment)) {
+                return [
+                    'id' => $attachment['ID'],
+                    'title' => $attachment['title'],
+                    'url' => $attachment['url']
+                ];
+            } else {
+                return null;
+            }
+        } else {
+            $attachment = $this->getter($this->_importDefaultImage);
+            return $attachment['url'] ?? null;
         }
     }
 }

@@ -8,7 +8,7 @@ class Transaction
 
     private $transaction_id;
 
-    private $transaction_stripe_id = "transaction_stripe_id";
+    public $transaction_stripe_id = "transaction_stripe_id";
     private $transaction_user_name = "transaction_user_name";
     private $transaction_package_name = "transaction_package_name";
     private $transaction_amount = "transaction_amount";

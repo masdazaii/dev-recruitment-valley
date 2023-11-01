@@ -1181,11 +1181,15 @@ class VacancyCrudController
      */
     public function getVacancyByCompany(Mixed $companyID, Int $limit = -1, String $result = 'posts', $filter = [])
     {
+        $company = is_array($companyID) ? $companyID : [ $companyID ];
+
+
+
         try {
             $vacancyModel   = new Vacancy();
 
             $filters        = [
-                'author'    => $companyID,
+                'author__in'    => $company,
             ];
 
             if (!empty($filter)) {

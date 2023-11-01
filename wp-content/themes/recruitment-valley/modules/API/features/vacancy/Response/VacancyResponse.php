@@ -9,6 +9,7 @@ use Model\Company;
 use WP_Post;
 use Helper\StringHelper;
 use Helper\DateHelper;
+use Model\Option;
 
 class VacancyResponse
 {
@@ -28,7 +29,9 @@ class VacancyResponse
 
     public function format()
     {
-        $formattedResponse = array_map(function (WP_Post $vacancy) {
+        $defaultImageVacancyImport = get_field("import_api_default_image", "options");
+        $option = new Option;
+        $formattedResponse = array_map(function (WP_Post $vacancy) use ($defaultImageVacancyImport, $option) {
             $vacancyModel = new Vacancy($vacancy->ID);
             $company = new Company($vacancy->post_author);
             $vacancyTaxonomy = $vacancyModel->getTaxonomy(true);
@@ -50,12 +53,12 @@ class VacancyResponse
                 // "salaryRange"=> "2500-3000",
                 "salaryStart" => $vacancyModel->getSalaryStart(),
                 "salaryEnd" => $vacancyModel->getSalaryEnd(),
-                "thumbnail" => $company->getThumbnail('object'),
+                "thumbnail" => $vacancyModel->checkImported() ? $option->getDefaultImage('object') : $company->getThumbnail('object'),
                 "description" => StringHelper::shortenString($vacancyModel->getDescription(), 0, 10000),
                 // "postedDate" => date_format(new DateTime($vacancy->post_date_gmt), "Y-m-d H:i A")
                 "postedDate" => DateHelper::doLocale($vacancy->post_date_gmt, 'nl_NL'),
                 "isNew" => date('Y-m-d') === date('Y-m-d', strtotime($vacancy->post_date_gmt)),
-                "experiences" => $vacancyTaxonomy["experiences"] ?? null,
+                "experiences" => $vacancyTaxonomy["experiences"] ?? null,   
                 "status" => $vacancyTaxonomy["status"] ?? null
             ];
         }, $this->vacancyCollection);
