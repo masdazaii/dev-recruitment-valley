@@ -92,7 +92,8 @@ class EmailHelper
             $args = [
                 "application.job.url" => $jobListUrl,
                 "application.unsubscribe.url" => FRONTEND_URL . '/job-alert/uitschrijven?token=' . $token,
-                "applicant.email" => $email,
+                // "applicant.email" => $email, // Changed Below
+                "applicant.email" => $jobAlertData['firstName'],
                 "applicant.job.count" => $jobCount,
                 "applicant.job.item_html" => $jobHtml
             ];
