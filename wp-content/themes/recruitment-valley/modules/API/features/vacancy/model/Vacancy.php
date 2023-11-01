@@ -1022,7 +1022,8 @@ class Vacancy
             }
 
             if (array_key_exists('author', $filters)) {
-                $args['author '] = $filters['author'];
+                // $args['author'] = $filters['author'];
+                $args['author__in'] = $filters['author'];
             }
 
             if (array_key_exists('in', $filters)) {
@@ -1193,6 +1194,18 @@ class Vacancy
             }
         } else {
             throw new Exception('Taxonomy not found!');
+        }
+    }
+
+    public function getPostStatus()
+    {
+        if ($this->vacancy_id) {
+            $vacancy = get_post($this->vacancy_id);
+            if ($vacancy) {
+                return $vacancy->post_status;
+            }
+        } else {
+            throw new Exception('Please specify vacancy!');
         }
     }
 }

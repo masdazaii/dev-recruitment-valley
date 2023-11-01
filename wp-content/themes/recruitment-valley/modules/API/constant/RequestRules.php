@@ -226,7 +226,7 @@ class RequestRules
                 'nonce'         => ["required"]
             ],
             'vacancyByCompany'    => [
-                'company'   => ["required", "exists:user/user/ID"],
+                'company.*'   => ["required", "exists:user/user/ID"],
                 'result'    => ["in:options,option-value,count,posts"],
             ],
             'vacancyByRSS'    => [
@@ -422,7 +422,7 @@ class RequestRules
                 'nonce'         => "text",
             ],
             'vacancyByCompany'    => [
-                'company'   => "text",
+                'company.*'   => "text",
                 'result'    => "text",
             ],
             'vacancyByRSS'    => [

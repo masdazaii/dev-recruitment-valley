@@ -1297,6 +1297,31 @@
                         ]
                     }
                 ]
+            },
+            {
+                "key": "field_6541c4ea32152",
+                "label": "Import api vacancy image",
+                "name": "import_api_default_image",
+                "aria-label": "",
+                "type": "image",
+                "instructions": "The image will be default logo for imported job if the imported job doesnt have an image",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "return_format": "array",
+                "library": "all",
+                "min_width": "",
+                "min_height": "",
+                "min_size": "",
+                "max_width": "",
+                "max_height": "",
+                "max_size": "",
+                "mime_types": "",
+                "preview_size": "medium"
             }
         ],
         "location": [
@@ -1775,7 +1800,7 @@
                     "company"
                 ],
                 "return_format": "id",
-                "multiple": 0,
+                "multiple": 1,
                 "allow_null": 0,
                 "bidirectional": 0,
                 "bidirectional_target": []
