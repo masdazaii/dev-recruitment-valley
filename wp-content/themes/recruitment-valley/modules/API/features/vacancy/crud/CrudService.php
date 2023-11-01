@@ -13,6 +13,7 @@ use WP_REST_Request;
 use WP_REST_Response;
 use Constant\Message;
 use Helper\ValidationHelper;
+use Model\Option;
 
 class VacancyCrudService
 {
@@ -214,12 +215,43 @@ class VacancyCrudService
             wp_mail($user->user_email, "Bevestiging plaatsing vacature - $site_title", $content, $headers);
 
             /** Email to admin */
+            /** Get recipient email */
+            // $adminEmail = get_option('admin_email', false);
+            $optionModel = new Option();
+            $approvalMainRecipient  = $optionModel->getEmailApprovalMainAddress();
+            $approvalCCRecipients = $optionModel->getEmailApprovalCC();
+            $approvalBCCRecipients = $optionModel->getEmailApprovalBCC();
+
+            /** Set headers */
+            $headers[] = 'Content-Type: text/html; charset=UTF-8';
+
+            /** Set cc / bcc */
+            if (isset($approvalCCRecipients) && is_array($approvalCCRecipients)) {
+                $ccRecipient = [];
+                foreach ($approvalCCRecipients as $recipient) {
+                    $ccRecipient[] = 'Cc: ' . $recipient['rv_email_approval_cc_address'];
+                }
+                array_unique($ccRecipient);
+                $headers = array_merge($headers, $ccRecipient);
+            }
+
+            if (isset($approvalBCCRecipients) && is_array($approvalBCCRecipients)) {
+                $bccRecipient = [];
+                foreach ($approvalBCCRecipients as $recipient) {
+                    $bccRecipient[] = 'Bcc: ' . $recipient['rv_email_approval_bcc_address'];
+                }
+                array_unique($bccRecipient);
+                $headers = array_merge($headers, $bccRecipient);
+            }
+
+            error_log(json_encode($headers));
+
             $approvalArgs = [
                 // 'url' => menu_page_url('import-approval'),
             ];
-            $adminEmail = get_option('admin_email', false);
+
             $content = Email::render_html_email('admin-new-vacancy-approval.php', $approvalArgs);
-            wp_mail($adminEmail, $this->_message->get('vacancy.approval_subject'), $content, $headers);
+            wp_mail($approvalMainRecipient, ($this->_message->get('vacancy.approval_subject') ?? 'Approval requested - RecruitmentValley'), $content, $headers);
         }
     }
 
