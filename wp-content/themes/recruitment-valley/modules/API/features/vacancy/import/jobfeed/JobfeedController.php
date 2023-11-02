@@ -211,7 +211,9 @@ class JobfeedController
 
                     /** ACF Description */
                     if (isset($vacancy->full_text)) {
-                        $payload['description'] = preg_replace('/[\n\t]+/', '', $vacancy->full_text);
+                        // $payload['description'] = preg_replace('/[\n\t]+/', '', $vacancy->full_text);
+                        $payload['description'] = preg_replace('/[\n]+/', '<br>', $vacancy->full_text);
+                        $payload['description'] = preg_replace('/[\t]+/', '&emsp;', $payload['description']);
 
                         /** Unset used key */
                         unset($vacancy->full_text);
@@ -425,16 +427,39 @@ class JobfeedController
                     /** Taxonomy Working-hours */
                     if (isset($vacancy->hours_per_week_from)) {
                         if (isset($vacancy->hours_per_week_to)) {
-                            $taxonomy['working-hours'] = $this->_findWorkingHours($vacancy->hours_per_week_from . ' - ' . $vacancy->hours_per_week_to);
+                            if ((int)$vacancy->hours_per_week_from < (int)$vacancy->hours_per_week_to) {
+                                // $taxonomy['working-hours'] = $this->_findWorkingHours($vacancy->hours_per_week_from . '-' . $vacancy->hours_per_week_to);
+
+                                /** Check term.
+                                 * 1. Check by end of working hour.
+                                 * 2. If term not exists, check by start of working hour.
+                                 * 3. if both false, check / create term by both.
+                                 */
+                                $termByWorkingHour = $this->_findWorkingHours($vacancy->hours_per_week_to, false);
+
+                                if ($termByWorkingHour) {
+                                    $taxonomy['working-hours'] = $termByWorkingHour;
+                                } else {
+                                    $termByWorkingHour = $this->_findWorkingHours($vacancy->hours_per_week_from, false);
+
+                                    if ($termByWorkingHour) {
+                                        $taxonomy['working-hours'] = $termByWorkingHour;
+                                    } else {
+                                        $termByWorkingHour = $this->_findWorkingHours($vacancy->hours_per_week_from . '-' . $vacancy->hours_per_week_to);
+                                    }
+                                }
+                            } else {
+                                $taxonomy['working-hours'] = $this->_findWorkingHours($vacancy->hours_per_week_from);
+                            }
 
                             /** Unset used key */
-                            unset($vacancy->hours_per_week_to);
+                            // unset($vacancy->hours_per_week_to);
                         } else {
                             $taxonomy['working-hours'] = $this->_findWorkingHours($vacancy->hours_per_week_from);
                         }
 
                         /** Unset used key */
-                        unset($vacancy->hours_per_week_from);
+                        // unset($vacancy->hours_per_week_from);
                     }
 
                     /** Taxonomy Education */
@@ -891,35 +916,72 @@ class JobfeedController
         }
     }
 
-    private function _findWorkingHours($jsonValue)
+    private function _findWorkingHours($fetchValue, $createNew = true)
     {
         $terms = $this->_terms['working-hours'];
-        $alternative = strtolower(preg_replace('/\s+/', '', $jsonValue));
+        $alternative = strtolower(preg_replace('/\s+/', '', $fetchValue));
+        $alternative = strtolower(preg_replace('/(-+)/', '', $alternative));
 
         foreach ($terms as $key => $value) {
-            if ($value['name'] == strtolower($jsonValue) || $value['slug'] == strtolower($jsonValue) || $value['name'] == strtolower($alternative) || $value['slug'] == strtolower($alternative)) {
+            /** Check if exactly same */
+            if ($value['name'] == strtolower($fetchValue) || $value['slug'] == strtolower($fetchValue) || $value['name'] == strtolower($alternative) || $value['slug'] == strtolower($alternative)) {
                 return $value['term_id'];
+            }
+
+            /** Check if containt */
+            if (strpos($value['name'], strtolower($fetchValue)) !== false || strpos($value['slug'], strtolower($fetchValue)) !== false || strpos($value['name'], strtolower($alternative)) !== false || strpos($value['name'], $alternative) !== false) {
+                return $value['term_id'];
+            }
+
+            /** Check if between */
+            $toCompare = explode('-', preg_replace('/\s+/', '', $value['name']));
+
+            if (is_numeric($toCompare[0])) {
+                if (isset($toCompare[1]) && is_numeric($toCompare[1])) {
+                    if (is_numeric($fetchValue)) {
+                        if ((int)$toCompare[0] <= (int)$fetchValue && (int)$fetchValue <= (int)$toCompare[1]) {
+                            return (int)$value['term_id'];
+                        }
+                    }
+                } else {
+                    if (is_numeric($fetchValue)) {
+                        if ((int)$toCompare[0] <= (int)$fetchValue) {
+                            return (int)$value['term_id'];
+                        }
+                    }
+                }
             }
         }
 
-        /** Check using term_exists query */
-        $termExists = term_exists(strtolower(preg_replace('/\s+/', '-', $jsonValue)), 'working-hours');
-        if ($termExists) {
-            if (is_array($termExists)) {
-                return $termExists['term_id'];
-            }
-            return $termExists;;
-        } else {
-            $newTerm = wp_insert_term($jsonValue, 'working-hours', []);
+        if ($createNew) {
+            /** Check using term_exists query */
+            $termExists = term_exists(strtolower(preg_replace('/\s+/', '-', $fetchValue)), 'working-hours');
 
-            if ($newTerm instanceof WP_Error) {
-                if (array_key_exists('term_exists', $newTerm->error_data)) {
-                    return $newTerm->error_data['term_exists'];
+            if ($termExists) {
+                if (is_array($termExists)) {
+                    return $termExists['term_id'];
                 }
-                return null;
+                return $termExists;
             } else {
-                return $newTerm['term_id'];
+                /** Check the alternative */
+                $termExists = term_exists(strtolower($alternative), 'working-hours');
+                if ($termExists) {
+                    return $termExists;
+                }
+
+                $newTerm = wp_insert_term($fetchValue, 'working-hours', []);
+
+                if ($newTerm instanceof WP_Error) {
+                    if (array_key_exists('term_exists', $newTerm->error_data)) {
+                        return $newTerm->error_data['term_exists'];
+                    }
+                    return null;
+                } else {
+                    return $newTerm['term_id'];
+                }
             }
+        } else {
+            return false;
         }
     }
 

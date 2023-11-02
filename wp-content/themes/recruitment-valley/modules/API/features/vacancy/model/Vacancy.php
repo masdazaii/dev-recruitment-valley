@@ -978,7 +978,7 @@ class Vacancy
                 "post_type"         => $this->vacancy,
                 "posts_per_page"    => $filters['postPerPage'] ?? -1,
                 "offset"            => $filters['offset'] ?? 0,
-                "orderby"           => $filters['orderBy'] ?? "date",
+                "orderby"           => $filters['orderBy'] ?? "post_date",
                 "order"             => $filters['sort'] ?? 'ASC',
                 "post_status"       => "publish",
             ];
