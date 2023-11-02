@@ -179,10 +179,103 @@ class ImportMenu
             $filters = [
                 'page'          => $_GET['start'] ? ($_GET['start'] / $_GET['length'] + 1) :  1,
                 'postPerPage'   => $_GET['length'] ?? 10,
-                'orderBy'       => $_GET['orderBy'],
-                'sort'          => $_GET['order'],
+                // 'orderBy'       => ($_GET['orderBy']),
+                // 'sort'          => ,
                 'search'        => isset($_GET['search']) ? $_GET['search']['value'] : null
             ];
+
+            if (isset($_GET['orderBy'])) {
+                // $filters['prderBy'] = $_GET['orderBy'];
+                switch ($_GET['orderBy']) {
+                    case 'none':
+                        $filters['orderBy'] = 'none';
+                        break;
+                    case 'ID':
+                        $filters['orderBy'] = 'ID';
+                        break;
+                    case 'author':
+                        $filters['orderBy'] = 'author';
+                        break;
+                    case 'title':
+                        $filters['orderBy'] = 'title';
+                        break;
+                    case 'name':
+                        $filters['orderBy'] = 'name';
+                        break;
+                    case 'type':
+                        $filters['orderBy'] = 'type';
+                        break;
+                    case 'modified':
+                        $filters['orderBy'] = 'modified';
+                        break;
+                    case 'parent':
+                        $filters['orderBy'] = 'parent';
+                        break;
+                    case 'rand':
+                        $filters['orderBy'] = 'rand';
+                        break;
+                    case 'comment_count':
+                        $filters['orderBy'] = 'comment_count';
+                        break;
+                    case 'relevance':
+                        $filters['orderBy'] = 'relevance';
+                        break;
+                    case 'menu_order':
+                        $filters['orderBy'] = 'menu_order';
+                        break;
+                    case 'meta_value':
+                        $filters['orderBy'] = 'meta_value';
+                        break;
+                    case 'meta_value_num':
+                        $filters['orderBy'] = 'meta_value_num';
+                        break;
+                    case 'post__in':
+                        $filters['orderBy'] = 'post__in';
+                        break;
+                    case 'post_name__in':
+                        $filters['orderBy'] = 'post_name__in';
+                        break;
+                    case 'post_parent__in':
+                        $filters['orderBy'] = 'post_parent__in';
+                        break;
+                    case 'date':
+                    case 'post_date':
+                    default:
+                        $filters['orderBy'] = 'post_date';
+                        break;
+                }
+            } else {
+                $filters['oderBy'] = 'post_date';
+            }
+
+            if (isset($_GET['order'])) {
+                if (is_array($_GET['order'])) {
+                    /** Set sort for datatable */
+                    switch ($_GET['order'][0]['dir']) {
+                        case strtolower('ASC'):
+                        case strtolower('ASCENDING'):
+                            $filters['order'] = 'ASC';
+                            break;
+                        case strtolower('DESC'):
+                        case strtolower('DESCENDING'):
+                        default:
+                            $filters['order'] = 'DESC';
+                            break;
+                    }
+                } else {
+                    switch ($_GET['order']) {
+                        case strtolower('ASC'):
+                        case strtolower('ASCENDING'):
+                            $filters['order'] = 'ASC';
+                            break;
+                        case strtolower('DESC'):
+                        case strtolower('DESCENDING'):
+                        default:
+                            $filters['order'] = 'DESC';
+                            break;
+                    }
+                }
+            }
 
             $filters['offset']  = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['postPerPage']));
 
@@ -313,7 +406,8 @@ class ImportMenu
                 "recordsFiltered"   => (int)$vacancies->found_posts,
                 'data'              => $vacanciesResponse,
                 'search'            => isset($_GET['search']) ? $_GET['search']['value'] : null,
-                // 'filters'           => $filters
+                'filters'           => $filters,
+                'query'             => $vacancies->query
             ], 200);
         } catch (\Exception $error) {
             wp_send_json(['message' => $error->getMessage()], 400);
