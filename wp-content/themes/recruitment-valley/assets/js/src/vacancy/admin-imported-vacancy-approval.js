@@ -12,6 +12,7 @@ const importedVacancyModule = (function() {
     let table = new DataTable('#admin-imported-vacancy-approval-table', {
       serverSide: true,
       processing: true,
+      // aLengthMenu: [[1, 50, 75, -1], [1, 50, 75, "All"]],
       // ordering: false,
       ajax: {
         url: vacanciesData.ajaxUrl,
@@ -151,7 +152,9 @@ const importedVacancyModule = (function() {
       method: "POST",
       data: $.param(form),
       beforeSend: function () {
-        table.ajax.reload()
+        $('#admin-imported-vacancy-approval-table tbody').hide()
+        var currentPage = table.page()
+        table.ajax.reload().page(currentPage).draw(false)
       },
     })
       .done((response) => {
@@ -161,11 +164,16 @@ const importedVacancyModule = (function() {
           <span class="screen-reader-text">Dismiss this notice.</span>
         </button>
         </div>`)
-        table.ajax.reload()
+        // Get the current page
+        var currentPage = table.page()
+        table.ajax.reload().page(currentPage).draw(false)
+        $('#admin-imported-vacancy-approval-table tbody').show()
       })
       .fail((response) => {
         $('.update-nag').after('<div class="error notice is-dismissible"><p>' + response.message || response.statusText +'</p></div>')
-        table.ajax.reload()
+        var currentPage = table.page()
+        table.ajax.reload().page(currentPage).draw(false)
+        $('#admin-imported-vacancy-approval-table tbody').show()
       })
   }
 

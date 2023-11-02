@@ -4,6 +4,7 @@ namespace Custom\Setup;
 
 defined("ABSPATH") or die("Direct access not allowed!");
 
+use DateTime;
 use Model\Term;
 use Model\Rss;
 use Vacancy\Vacancy;
@@ -54,10 +55,26 @@ class AdminEnqueue
                 if ($rssVacancies && is_array($rssVacancies)) {
                     foreach ($rssVacancies as $vacancy) {
                         $vacancyModel = new Vacancy($vacancy);
-                        $selectedVacancy[] = [
-                            'id'    => $vacancy,
-                            'text'  => $vacancyModel->getTitle()
-                        ];
+
+                        $postStatus = $vacancyModel->getPostStatus();
+                        if ($postStatus && $vacancyModel->getPostStatus() == 'publish') {
+                            $expiredAt = $vacancyModel->getExpiredAt();
+                            if ($expiredAt) {
+                                $today      = new \DateTime("now");
+                                $expiredAt  = new \DateTime($expiredAt);
+                                $dateDiff   = date_diff($today, $expiredAt)->format('%R%a');
+                                if ($dateDiff >= 0) {
+                                    $status = $vacancyModel->getStatus();
+                                    if ($status && $status['name'] = 'open') {
+                                        $selectedVacancy[] = [
+                                            'id'    => $vacancy,
+                                            'text'  => $vacancyModel->getTitle(),
+                                            'company' => $vacancyModel->getAuthor()
+                                        ];
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 
