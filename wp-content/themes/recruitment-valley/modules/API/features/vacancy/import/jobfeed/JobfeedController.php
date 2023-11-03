@@ -361,6 +361,11 @@ class JobfeedController
                      */
                     $payload["rv_vacancy_is_imported"] = "1";
 
+                    /** ACF Language */
+                    if (isset($vacancy->language)) {
+                        $payload['rv_vacancy_language'] = $vacancy->language;
+                    }
+
                     /** ACF Imported rv_vacancy_imported_company_name */
                     if (isset($vacancy->organization_name)) {
                         $payload["rv_vacancy_imported_company_name"] = preg_replace('/[\n\t]+/', '', $vacancy->organization_name);

@@ -209,7 +209,8 @@ class FlexFeedController
 
                         /** ACF Description */
                         if (property_exists($jobs[$i], 'description') && !empty($jobs[$i]->description)) {
-                            $payload['description'] = preg_replace('/[\n\t]+/', '', $jobs[$i]->description);
+                            // $payload['description'] = preg_replace('/[\n\t]+/', '', $jobs[$i]->description);
+                            $payload['description'] = $jobs[$i]->description;
 
                             /** Unset used key */
                             unset($jobs[$i]->description);
@@ -280,6 +281,11 @@ class FlexFeedController
                          * set all is_imported acf data to "true"
                          */
                         $payload["rv_vacancy_is_imported"] = "1";
+
+                        /** ACF Language */
+                        if (property_exists($jobs[$i], 'language') && !empty($jobs[$i]->language)) {
+                            $payload['rv_vacancy_language'] = $jobs[$i]->language;
+                        }
 
                         /** ACF Imported rv_vacancy_imported_company_name */
                         if (property_exists($jobs[$i], 'company') && !empty($jobs[$i]->company) && strtolower($jobs[$i]->company) !== 'undisclosed') {
