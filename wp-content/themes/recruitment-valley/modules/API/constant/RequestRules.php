@@ -238,7 +238,7 @@ class RequestRules
                 'result'    => ["in:options,option-value,count,posts"],
             ],
             'vacancyForRSS' => [
-                'company.*' => ["required", "exists:user/user/ID"],
+                'company.*' => ["exists:user/user/ID"],
                 'language'  => [],
                 'result'    => ["in:options,option-value,count,posts"],
             ],
