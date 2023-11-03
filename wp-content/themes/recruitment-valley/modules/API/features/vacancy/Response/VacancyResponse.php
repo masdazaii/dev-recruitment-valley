@@ -104,7 +104,7 @@ class VacancyResponse
         if ($languageResponse) {
             $vacancyTaxonomy[] = [
                 'id' => $languageResponse['value'],
-                'label' => LanguageConstant::get('fe', $languageResponse['value'])
+                'name' => LanguageConstant::get('fe', $languageResponse['value'])
             ];
         }
         /** End Addition Feedback 01 Nov 2023 */
