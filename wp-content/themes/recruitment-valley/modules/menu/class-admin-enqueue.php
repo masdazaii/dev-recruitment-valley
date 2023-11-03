@@ -37,10 +37,11 @@ class AdminEnqueue
 
         /** RSS Ajax Data */
         $rssData = [
-            'action'    => 'get_vacancies_by_company',
-            'nonce'     => wp_create_nonce('get_vacancies_by_company'),
+            'action'    => 'get_vacancies_for_rss',
+            'nonce'     => wp_create_nonce('get_vacancies_for_rss'),
             'screen'    => 'add',
             'selectedCompany' => null,
+            'selectedLanguage' => null,
             'selectedVacancies' => null
         ];
 
@@ -48,9 +49,12 @@ class AdminEnqueue
         // if ($screen->parent_base == 'edit') {
         if (isset($_GET['action']) && $_GET['action'] == 'edit') {
             try {
-                $rssController  = new Rss($_GET['post']);
-                $rssVacancies   = $rssController->getRssVacancies();
-                $rssCompany   = $rssController->getRssCompany();
+                $rssModel  = new Rss($_GET['post']);
+
+                $selectedLanguage   = $rssModel->getRssLanguage();
+                $selectedCompany    = $rssModel->getRssCompany();
+
+                $rssVacancies   = $rssModel->getRssVacancies();
                 $selectedVacancy = [];
                 if ($rssVacancies && is_array($rssVacancies)) {
                     foreach ($rssVacancies as $vacancy) {
@@ -79,7 +83,8 @@ class AdminEnqueue
                 }
 
                 $rssData['screen']              = 'edit';
-                $rssData['selectedCompany']     = $rssCompany;
+                $rssData['selectedCompany']     = $selectedCompany;
+                $rssData['selectedLanguage']    = $selectedLanguage;
                 $rssData['selectedVacancies']   = $selectedVacancy;
             } catch (\Exception $e) {
                 error_log($e->getMessage());

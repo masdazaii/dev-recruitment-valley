@@ -191,7 +191,9 @@ class JobfeedController
 
                     /** Post Data Title */
                     if (isset($vacancy->job_title)) {
-                        $arguments['post_title'] = preg_replace('/[\n\t]+/', '', $vacancy->job_title);
+                        // $arguments['post_title'] = preg_replace('/[\n\t]+/', '', $vacancy->job_title);
+                        $arguments['post_title'] = preg_replace('/[\n]+/', '<br>', $vacancy->job_title);
+                        $arguments['post_title'] = preg_replace('/[\t]+/', '&emsp;', $arguments['post_title']);
 
                         /** Post Data post_name */
                         $slug = StringHelper::makeSlug(preg_replace('/[\n\t]+/', '', $vacancy->job_title), '-', 'lower');
@@ -212,8 +214,9 @@ class JobfeedController
                     /** ACF Description */
                     if (isset($vacancy->full_text)) {
                         // $payload['description'] = preg_replace('/[\n\t]+/', '', $vacancy->full_text);
-                        $payload['description'] = preg_replace('/[\n]+/', '<br>', $vacancy->full_text);
-                        $payload['description'] = preg_replace('/[\t]+/', '&emsp;', $payload['description']);
+                        // $payload['description'] = preg_replace('/[\n]+/', '<br>', $vacancy->full_text);
+                        // $payload['description'] = preg_replace('/[\t]+/', '&emsp;', $payload['description']);
+                        $payload['description'] = $vacancy->full_text;
 
                         /** Unset used key */
                         unset($vacancy->full_text);
@@ -305,7 +308,8 @@ class JobfeedController
 
                     /** ACF City */
                     if (isset($vacancy->location_name)) {
-                        $payload['placement_city'] = preg_replace('/[\n\t]+/', '', $vacancy->location_name);
+                        // $payload['placement_city'] = preg_replace('/[\n\t]+/', '', $vacancy->location_name);
+                        $payload['placement_city'] = $vacancy->location_name;
 
                         /** Unset used key */
                         unset($vacancy->location_name);
@@ -318,7 +322,8 @@ class JobfeedController
                     if (isset($vacancy->location_remote_possible) && (!empty($vacancy->location_remote_possible) || $vacancy->location_remote_possible == false)) {
                         /** Set Placement Address */
                         if (isset($vacancy->organization_address)) {
-                            $payload['placement_address'] = preg_replace('/[\n\t]+/', '', $vacancy->organization_address);
+                            // $payload['placement_address'] = preg_replace('/[\n\t]+/', '', $vacancy->organization_address);
+                            $payload['placement_address'] = $vacancy->organization_address;
 
                             /** Unset used key */
                             unset($vacancy->organization_address);

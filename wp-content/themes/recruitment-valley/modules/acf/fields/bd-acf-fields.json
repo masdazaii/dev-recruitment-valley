@@ -1804,6 +1804,35 @@
                 "allow_null": 0,
                 "bidirectional": 0,
                 "bidirectional_target": []
+            },
+            {
+                "key": "field_654353b383384",
+                "label": "Select Language",
+                "name": "rv_rss_select_language",
+                "aria-label": "",
+                "type": "select",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "nl": "Dutch - Nederlands, Vlaams",
+                    "en": "Engels - English",
+                    "de": "Duits \/ German - Deutsch",
+                    "fr": "Frans \/ French - français, langue française",
+                    "es": "Spaans\/Spanish; Castilian - español, castellano"
+                },
+                "default_value": false,
+                "return_format": "array",
+                "multiple": 0,
+                "allow_null": 1,
+                "ui": 1,
+                "ajax": 0,
+                "placeholder": ""
             }
         ],
         "location": [
@@ -3529,6 +3558,35 @@
                 "placeholder": "",
                 "prepend": "",
                 "append": ""
+            },
+            {
+                "key": "field_65433fabb6525",
+                "label": "Vacancy Language",
+                "name": "rv_vacancy_language",
+                "aria-label": "",
+                "type": "select",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "nl": "Dutch - Nederlands, Vlaams",
+                    "en": "Engels - English",
+                    "de": "Duits \/ German - Deutsch",
+                    "fr": "Frans \/ French - français, langue française",
+                    "es": "Spaans\/Spanish; Castilian - español, castellano"
+                },
+                "default_value": false,
+                "return_format": "array",
+                "multiple": 0,
+                "allow_null": 1,
+                "ui": 0,
+                "ajax": 0,
+                "placeholder": ""
             },
             {
                 "key": "field_64fe7b3186a6b",
