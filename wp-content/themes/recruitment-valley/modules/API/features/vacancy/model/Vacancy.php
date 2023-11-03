@@ -71,6 +71,9 @@ class Vacancy
     public $acf_distance_from_city = "distance_from_city";
     public $acf_country_code = "rv_vacancy_country_code";
 
+    /** 01 11 2023 added acf */
+    private $acf_rv_vacancy_language = "rv_vacancy_language";
+
     /** ACF for imported vacancy */
     private $_acf_is_imported = "rv_vacancy_is_imported";
     private $_acf_imported_vacancy_source_id = "rv_vacancy_imported_source_id";
@@ -1204,6 +1207,23 @@ class Vacancy
             if ($vacancy) {
                 return $vacancy->post_status;
             }
+        } else {
+            throw new Exception('Please specify vacancy!');
+        }
+    }
+
+    /** 02 11 2023 : Added Function */
+    public function getLanguage() {
+        if ($this->vacancy_id) {
+            return $this->getProp($this->acf_rv_vacancy_language, true);
+        } else {
+            throw new Exception('Please specify vacancy!');
+        }
+    }
+
+    public function setLanguage($value) {
+        if ($this->vacancy_id) {
+            return $this->setProp($this->acf_rv_vacancy_language, $value);
         } else {
             throw new Exception('Please specify vacancy!');
         }
