@@ -209,7 +209,8 @@ class FlexFeedController
 
                         /** ACF Description */
                         if (property_exists($jobs[$i], 'description') && !empty($jobs[$i]->description)) {
-                            $payload['description'] = preg_replace('/[\n\t]+/', '', $jobs[$i]->description);
+                            // $payload['description'] = preg_replace('/[\n\t]+/', '', $jobs[$i]->description);
+                            $payload['description'] = $jobs[$i]->description;
 
                             /** Unset used key */
                             unset($jobs[$i]->description);
@@ -280,6 +281,11 @@ class FlexFeedController
                          * set all is_imported acf data to "true"
                          */
                         $payload["rv_vacancy_is_imported"] = "1";
+
+                        /** ACF Language */
+                        if (property_exists($jobs[$i], 'language') && !empty($jobs[$i]->language)) {
+                            $payload['rv_vacancy_language'] = $jobs[$i]->language;
+                        }
 
                         /** ACF Imported rv_vacancy_imported_company_name */
                         if (property_exists($jobs[$i], 'company') && !empty($jobs[$i]->company) && strtolower($jobs[$i]->company) !== 'undisclosed') {
@@ -426,16 +432,41 @@ class FlexFeedController
                         /** Email to admin */
                         $this->_message = new Message();
 
-                        $headers = [
-                            'Content-Type: text/html; charset=UTF-8',
-                        ];
+                        /** Get recipient email */
+                        // $adminEmail = get_option('admin_email', false);
+                        $optionModel = new Option();
+                        $approvalMainRecipient  = $optionModel->getEmailApprovalMainAddress();
+                        $approvalCCRecipients = $optionModel->getEmailApprovalCC();
+                        $approvalBCCRecipients = $optionModel->getEmailApprovalBCC();
+
+                        /** Set headers */
+                        $headers[] = 'Content-Type: text/html; charset=UTF-8';
+
+                        /** Set cc / bcc */
+                        if (isset($approvalCCRecipients) && is_array($approvalCCRecipients)) {
+                            $ccRecipient = [];
+                            foreach ($approvalCCRecipients as $recipient) {
+                                $ccRecipient[] = 'Cc: ' . $recipient['rv_email_approval_cc_address'];
+                            }
+                            array_unique($ccRecipient);
+                            $headers = array_merge($headers, $ccRecipient);
+                        }
+
+                        if (isset($approvalBCCRecipients) && is_array($approvalBCCRecipients)) {
+                            $bccRecipient = [];
+                            foreach ($approvalBCCRecipients as $recipient) {
+                                $bccRecipient[] = 'Bcc: ' . $recipient['rv_email_approval_bcc_address'];
+                            }
+                            array_unique($bccRecipient);
+                            $headers = array_merge($headers, $bccRecipient);
+                        }
 
                         $approvalArgs = [
                             // 'url' => menu_page_url('import-approval'),
                         ];
-                        $adminEmail = get_option('admin_email', false);
+
                         $content = Email::render_html_email('admin-new-vacancy-approval.php', $approvalArgs);
-                        wp_mail($adminEmail, $this->_message->get('vacancy.approval_subject'), $content, $headers);
+                        wp_mail($approvalMainRecipient, ($this->_message->get('vacancy.approval_subject') ?? 'Approval requested - RecruitmentValley'), $content, $headers);
                     }
                 }
             } catch (\Exception $e) {

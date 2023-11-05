@@ -10,8 +10,9 @@ class Rss
     private $_post;
     private $_rssID;
 
-    private $_acf_rss_company = 'rv_rss_select_company';
-    // private $_acf_rss_vacancy = 'rv_rss_select_vacancy';
+    private $_acf_rss_company   = 'rv_rss_select_company';
+    private $_acf_rss_language  = 'rv_rss_select_language';
+
     public $_meta_rss_vacancy = 'rv_rss_select_vacancy';
 
     private $_meta_rss_endpoint_url = 'rv_rss_endpoint_url';
@@ -121,5 +122,13 @@ class Rss
     public function getRssEndpointURL()
     {
         return $this->getter($this->_meta_rss_endpoint_url, true, 'meta');
+    }
+
+    public function getRssLanguage() {
+        return $this->getter($this->_acf_rss_language, true, 'acf');
+    }
+
+    public function setRssLanguage($value) {
+        return $this->setter($this->_acf_rss_language, $value, 'acf');
     }
 }

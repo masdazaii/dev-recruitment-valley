@@ -114,6 +114,10 @@ class CronJobAlert
         error_log("send alert job daily trigerred");
 
         foreach ($job_data as $jobAlerEmail => $jobData) {
+            /** Added Line to get jobalert data */
+            $jobAlertModel = new \Model\JobAlert($jobData['jobAlertId']);
+            $jobData['firstName'] = $jobAlertModel->getJobAlertFirstName();
+
             EmailHelper::sendJobAlert($jobData);
         }
     }

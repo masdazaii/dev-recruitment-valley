@@ -4,6 +4,7 @@ namespace Custom\Setup;
 
 defined("ABSPATH") or die("Direct access not allowed!");
 
+use DateTime;
 use Model\Term;
 use Model\Rss;
 use Vacancy\Vacancy;
@@ -36,10 +37,11 @@ class AdminEnqueue
 
         /** RSS Ajax Data */
         $rssData = [
-            'action'    => 'get_vacancies_by_company',
-            'nonce'     => wp_create_nonce('get_vacancies_by_company'),
+            'action'    => 'get_vacancies_for_rss',
+            'nonce'     => wp_create_nonce('get_vacancies_for_rss'),
             'screen'    => 'add',
             'selectedCompany' => null,
+            'selectedLanguage' => null,
             'selectedVacancies' => null
         ];
 
@@ -47,22 +49,42 @@ class AdminEnqueue
         // if ($screen->parent_base == 'edit') {
         if (isset($_GET['action']) && $_GET['action'] == 'edit') {
             try {
-                $rssController  = new Rss($_GET['post']);
-                $rssVacancies   = $rssController->getRssVacancies();
-                $rssCompany   = $rssController->getRssCompany();
+                $rssModel  = new Rss($_GET['post']);
+
+                $selectedLanguage   = $rssModel->getRssLanguage();
+                $selectedCompany    = $rssModel->getRssCompany();
+
+                $rssVacancies   = $rssModel->getRssVacancies();
                 $selectedVacancy = [];
                 if ($rssVacancies && is_array($rssVacancies)) {
                     foreach ($rssVacancies as $vacancy) {
                         $vacancyModel = new Vacancy($vacancy);
-                        $selectedVacancy[] = [
-                            'id'    => $vacancy,
-                            'text'  => $vacancyModel->getTitle()
-                        ];
+
+                        $postStatus = $vacancyModel->getPostStatus();
+                        if ($postStatus && $vacancyModel->getPostStatus() == 'publish') {
+                            $expiredAt = $vacancyModel->getExpiredAt();
+                            if ($expiredAt) {
+                                $today      = new \DateTime("now");
+                                $expiredAt  = new \DateTime($expiredAt);
+                                $dateDiff   = date_diff($today, $expiredAt)->format('%R%a');
+                                if ($dateDiff >= 0) {
+                                    $status = $vacancyModel->getStatus();
+                                    if ($status && $status['name'] = 'open') {
+                                        $selectedVacancy[] = [
+                                            'id'    => $vacancy,
+                                            'text'  => $vacancyModel->getTitle(),
+                                            'company' => $vacancyModel->getAuthor()
+                                        ];
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 
                 $rssData['screen']              = 'edit';
-                $rssData['selectedCompany']     = $rssCompany;
+                $rssData['selectedCompany']     = $selectedCompany;
+                $rssData['selectedLanguage']    = $selectedLanguage;
                 $rssData['selectedVacancies']   = $selectedVacancy;
             } catch (\Exception $e) {
                 error_log($e->getMessage());

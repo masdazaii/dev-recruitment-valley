@@ -1,59 +1,94 @@
 const rssModule = (function () {
   function initialize() {
-    $('*[data-name="rv_rss_select_company"] .acf-input select').on('change', ajaxVacancyOptionValue)
-    if ($('#metabox-rv_rss_select_vacancy').length) {
-      $('#metabox-rv_rss_select_vacancy').select2()
+    $('*[data-name="rv_rss_select_company"] .acf-input select').on(
+      "change",
+      ajaxVacancyOptionValueCompany
+    );
+
+    $('*[data-name="rv_rss_select_language"] .acf-input select').on(
+      "change",
+      ajaxVacancyOptionValueLanguage
+    );
+
+    if ($("#metabox-rv_rss_select_vacancy").length) {
+      $("#metabox-rv_rss_select_vacancy").select2();
     }
     // getVacanciesOption()
   }
 
-  function ajaxVacancyOptionValue(e) {
+  function ajaxVacancyOptionValueCompany(e) {
+    ajaxVacancyOptionValue($(e.target).val(), $('*[data-name="rv_rss_select_language"] .acf-input select').val())
+  }
+
+  function ajaxVacancyOptionValueLanguage(e) {
+    ajaxVacancyOptionValue($('*[data-name="rv_rss_select_company"] .acf-input select').val(), $(e.target).val())
+  }
+
+  function ajaxVacancyOptionValue(company, language) {
     /** Set selected data */
-    if (vacanciesData.rss.selectedCompany !== null && $(e.target).val() == vacanciesData.rss.selectedCompany) {
-      if (vacanciesData.rss.selectedVacancies !== null) {
-        vacanciesData.rss.selectedVacancies.forEach((option) => {
-          var newOption = new Option(option.text, option.id, true, true);
-          $('#metabox-rv_rss_select_vacancy').append(newOption).trigger('change');
-        })
-      }
-    } else {
-      /** Empty selected vacancies */
-      $('#metabox-rv_rss_select_vacancy').val(null).trigger('change');
-    }
-
-    $('*#metabox-rv_rss_select_vacancy').select2({
-      ajax: {
-        method: "POST",
-        url: vacanciesData.ajaxUrl,
-        // dataType: 'json',
-        data: {
-          action: vacanciesData.rss.action,
-          nonce: vacanciesData.rss.nonce,
-          company: $(e.target).val() || $('*[data-name="rv_rss_select_company"] .acf-input select').val(),
-          result: 'options'
-        },
-        processResults: function(response) {
-          /** Format the response */
-          let options = [];
-          let i = 1;
-          for (let [key, value] of Object.entries(response.data)) { // This only work on > ES 6
-            options.push({
-              id: key,
-              text: value
-            })
-            i++
+      if (vacanciesData.rss.selectedCompany !== null) {
+        if (vacanciesData.rss.selectedLanguage == language)
+        vacanciesData.rss.selectedCompany.find((value) => {
+          if (company.indexOf(value.toString()) !== -1) {
+            // console.log('index : ' + company.indexOf(value.toString()))
+            if (vacanciesData.rss.selectedVacancies !== null) {
+              vacanciesData.rss.selectedVacancies.forEach((option) => {
+                if (value.toString() == option.company) {
+                  // var newOption = new Option(option.text, option.id, true, true)
+                  // $('#metabox-rv_rss_select_vacancy').append(newOption).trigger('change')
+                  if ($('#metabox-rv_rss_select_vacancy').find("option[value='" + option.id + "']").length) {
+                    $('#metabox-rv_rss_select_vacancy').val(option.id).trigger('change');
+                  } else {
+                      // Create a DOM Option and pre-select by default
+                      var newOption = new Option(option.text, option.id, true, true);
+                      // Append it to the select
+                      $('#metabox-rv_rss_select_vacancy').append(newOption).trigger('change');
+                  }
+                }
+              })
+            }
           }
-
-          return {
-            results: options
-          };
-        }
+        })
+      } else {
+        /** Empty selected vacancies */
+        $('#metabox-rv_rss_select_vacancy').val(null).trigger('change')
       }
-    })
+
+      $("*#metabox-rv_rss_select_vacancy").select2({
+        ajax: {
+          method: "POST",
+          url: vacanciesData.ajaxUrl,
+          // dataType: 'json',
+          data: {
+            action: vacanciesData.rss.action,
+            nonce: vacanciesData.rss.nonce,
+            company: company || $('*[data-name="rv_rss_select_company"] .acf-input select').val(),
+            language: language || $('*[data-name="rv_rss_select_language"] .acf-input select').val(),
+            result: "options",
+          },
+          processResults: function (response) {
+            // console.log(response);
+            /** Format the response */
+            let options = []
+            let i = 1
+            for (let [key, value] of Object.entries(response.data)) { // This only work on > ES 6
+              options.push({
+                id: key,
+                text: value,
+              });
+              i++;
+            }
+
+            return {
+              results: options
+            }
+          }
+        }
+      })
   }
 
   function getVacanciesOption() {
-    $('#metabox-rv_rss_select_vacancy').select2({
+    $("#metabox-rv_rss_select_vacancy").select2({
       ajax: {
         method: "POST",
         url: vacanciesData.ajaxUrl,
@@ -61,34 +96,36 @@ const rssModule = (function () {
         data: {
           action: vacanciesData.rss.action,
           nonce: vacanciesData.rss.nonce,
-          company: $('*[data-name="rv_rss_select_company"] .acf-input select').val(),
-          result: 'options'
+          company: $(
+            '*[data-name="rv_rss_select_company"] .acf-input select'
+          ).val(),
+          result: "options",
         },
-        processResults: function(response) {
+        processResults: function (response) {
           /** Format the response */
-          let options = [];
-          let i = 1;
+          let options = []
+          let i = 1
           for (let [key, value] of Object.entries(response.data)) { // This only work on > ES 6
             options.push({
               id: key,
-              text: value
-            })
-            i++
+              text: value,
+            });
+            i++;
           }
 
           return {
             results: options
-          };
+          }
         }
       }
     })
   }
 
   return {
-    init: initialize
-  }
+    init: initialize,
+  };
 
-  var current = 0
-})()
+  var current = 0;
+})();
 
-export default rssModule
+export default rssModule;

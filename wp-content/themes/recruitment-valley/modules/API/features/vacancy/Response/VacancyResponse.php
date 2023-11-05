@@ -9,6 +9,8 @@ use Model\Company;
 use WP_Post;
 use Helper\StringHelper;
 use Helper\DateHelper;
+use Model\Option;
+use Constant\LanguageConstant;
 
 class VacancyResponse
 {
@@ -28,7 +30,9 @@ class VacancyResponse
 
     public function format()
     {
-        $formattedResponse = array_map(function (WP_Post $vacancy) {
+        $defaultImageVacancyImport = get_field("import_api_default_image", "options");
+        $option = new Option;
+        $formattedResponse = array_map(function (WP_Post $vacancy) use ($defaultImageVacancyImport, $option) {
             $vacancyModel = new Vacancy($vacancy->ID);
             $company = new Company($vacancy->post_author);
             $vacancyTaxonomy = $vacancyModel->getTaxonomy(true);
@@ -50,7 +54,7 @@ class VacancyResponse
                 // "salaryRange"=> "2500-3000",
                 "salaryStart" => $vacancyModel->getSalaryStart(),
                 "salaryEnd" => $vacancyModel->getSalaryEnd(),
-                "thumbnail" => $company->getThumbnail('object'),
+                "thumbnail" => $vacancyModel->checkImported() ? $option->getDefaultImage('object') : $company->getThumbnail('object'),
                 "description" => StringHelper::shortenString($vacancyModel->getDescription(), 0, 10000),
                 // "postedDate" => date_format(new DateTime($vacancy->post_date_gmt), "Y-m-d H:i A")
                 "postedDate" => DateHelper::doLocale($vacancy->post_date_gmt, 'nl_NL'),
@@ -94,6 +98,17 @@ class VacancyResponse
             $videoUrl = strpos($company->getVideoUrl(), "youtu") ? ["type" => "url", "url" => StringHelper::getYoutubeID($company->getVideoUrl())] : ["type" => "file", "url" => $company->getVideoUrl()]; // Added Line
         }
 
+        /** Addition Feedback 01 Nov 2023 */
+        /** Get language */
+        $languageResponse = $vacancyModel->getLanguage();
+        if ($languageResponse) {
+            $vacancyTaxonomy[] = [
+                'id' => $languageResponse['value'],
+                'name' => LanguageConstant::get('fe', $languageResponse['value'])
+            ];
+        }
+        /** End Addition Feedback 01 Nov 2023 */
+
         /** Changes start here */
         $isImported = $vacancyModel->checkImported();
         if ($isImported) {
@@ -114,7 +129,7 @@ class VacancyResponse
                     "sector" => $company->getTerms('sector'),
                     "totalEmployee" => $company->getTotalEmployees(),
                     "tel" => $company->getPhoneCode() . $company->getPhone(),
-                    "email" => $vacancyModel->getImportedCompanyEmail() ?? $company->getEmail(),
+                    "email" => $vacancyModel->getImportedCompanyEmail() ?? '-',
                     "gallery" => $company->getGallery(true),
                     "website" => $company->getWebsite(),
                     "city" => $vacancyModel->getImportedCompanyCity() ?? $company->getCity(),
@@ -147,7 +162,7 @@ class VacancyResponse
                     "steps" => $vacancyModel->getApplicationProcessStep()
                 ],
                 "longitude" => $vacancyModel->getPlacementAddressLongitude(),
-                "latitude" => $vacancyModel->getPlacementAddressLatitude()
+                "latitude" => $vacancyModel->getPlacementAddressLatitude(),
             ];
         } else {
             /** Anggit's original response (unchanged) */
@@ -211,7 +226,7 @@ class VacancyResponse
                     "title" => $vacancyModel->getApplicationProcessTitle(),
                     "text" => $vacancyModel->getApplicationProcessDescription(),
                     "steps" => $vacancyModel->getApplicationProcessStep()
-                ]
+                ],
             ];
         }
 

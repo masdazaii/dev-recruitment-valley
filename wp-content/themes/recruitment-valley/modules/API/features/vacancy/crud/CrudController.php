@@ -327,7 +327,10 @@ class VacancyCrudController
                 "experiences" => $request["experiences"] ?? [], // Added Line
                 "status" => [31] // set free job become pending category
             ],
-            "countryCode" => $request["countryCode"]
+            "countryCode" => $request["countryCode"],
+
+            /** Addition Feedback 01 Nov 2023 */
+            "language"  => $request["language"]
         ];
 
         $this->wpdb->query("START TRANSACTION");
@@ -362,6 +365,10 @@ class VacancyCrudController
 
             $vacancyModel->setStatus('processing');
             // $vacancyModel->setProp("expired_at", $expiredAt);
+
+            /** Set language : 01 November Feedback */
+            $vacancyModel->setLanguage($payload['language']);
+
             $this->wpdb->query("COMMIT");
 
             /** Create notification */
@@ -426,7 +433,10 @@ class VacancyCrudController
             ],
             "application_process_step" => $request["applicationProcedureSteps"],
             'rv_vacancy_country' => $request['country'], // Added Line
-            'rv_vacancy_country_code' => $request['countryCode'] // Added Line
+            'rv_vacancy_country_code' => $request['countryCode'], // Added Line
+
+            /** Addition Feedback 01 Nov 2023 */
+            "language"  => $request["language"]
         ];
 
         global $wpdb;
@@ -525,6 +535,9 @@ class VacancyCrudController
                 $companyCredit -= $paidJobPrice;
                 $company->setCredit($companyCredit);
             }
+
+            /** Set language : 01 November Feedback */
+            $vacancyModel->setLanguage($payload['language']);
 
             /** Changes End Here */
 
@@ -685,6 +698,9 @@ class VacancyCrudController
             $vacancyModel->setPlacementAddressLongitude($payload["placementAddressLongitude"]);
             $vacancyModel->setDistance($payload["placement_city"], $payload["placement_city"] . " " . $payload["placement_address"]);
 
+            /** Set language : 01 November Feedback */
+            $vacancyModel->setLanguage($payload['language']);
+
             $wpdb->query('COMMIT');
 
             /** Create notification if current status is rejected */
@@ -777,6 +793,9 @@ class VacancyCrudController
             $vacancyModel->setPlacementAddressLatitude($payload["placementAddressLatitude"]);
             $vacancyModel->setPlacementAddressLongitude($payload["placementAddressLongitude"]);
             $vacancyModel->setDistance($payload["placement_city"], $payload["placement_city"] . " " . $payload["placement_address"]);
+
+            /** Set language : 01 November Feedback */
+            $vacancyModel->setLanguage($payload['language']);
 
             $wpdb->query('COMMIT');
 
@@ -872,6 +891,9 @@ class VacancyCrudController
                 'rv_vacancy_country_code' => $request['countryCode'], // Added Line
                 "placementAddressLongitude" => $request["longitude"],
                 "placementAddressLatitude" => $request["latitude"],
+
+                /** Addition Feedback 01 Nov 2023 */
+                "language"  => $request["language"]
             ];
         }
 
@@ -894,7 +916,10 @@ class VacancyCrudController
                     "education" => $request["education"],
                     "type" => $request["employmentType"],
                     "experiences" => $request["experiences"] ?? [], // Added Line
-                    "status" => [31] // set free job become pending category
+                    "status" => [31], // set free job become pending category
+
+                    /** Addition Feedback 01 Nov 2023 */
+                    "language"  => $request["language"]
                 ],
             ];
         }
@@ -927,7 +952,10 @@ class VacancyCrudController
                 "experiences" => $request["experiences"] ?? [], // Added Line
             ],
             'rv_vacancy_country' => $request['country'],
-            'rv_vacancy_country_code' => $request['countryCode'] // Added Line
+            'rv_vacancy_country_code' => $request['countryCode'], // Added Line,
+
+            /** Addition Feedback 01 Nov 2023 */
+            "language"  => $request["language"]
         ];
 
         return $payload;
@@ -968,7 +996,10 @@ class VacancyCrudController
             ],
             "application_process_step" => $request["applicationProcedureSteps"],
             'rv_vacancy_country' => $request['country'],
-            'rv_vacancy_country_code' => $request['countryCode'] // Added Line
+            'rv_vacancy_country_code' => $request['countryCode'], // Added Line,
+
+            /** Addition Feedback 01 Nov 2023 */
+            "language"  => $request["language"]
         ];
 
         return $payload;
@@ -1181,12 +1212,20 @@ class VacancyCrudController
      */
     public function getVacancyByCompany(Mixed $companyID, Int $limit = -1, String $result = 'posts', $filter = [])
     {
+        $company = is_array($companyID) ? $companyID : [$companyID];
+
+
+
         try {
             $vacancyModel   = new Vacancy();
 
-            $filters        = [
-                'author'    => $companyID,
-            ];
+            if (is_array($companyID)) {
+                $filters = [
+                    'author'    => $companyID,
+                ];
+            } else {
+                $filters['author'] = [$companyID];
+            }
 
             if (!empty($filter)) {
                 if (array_key_exists('with_expired', $filter) && !$filter['with_expired']) {
@@ -1233,7 +1272,6 @@ class VacancyCrudController
             }
 
             $vacancies      = $vacancyModel->getVacancies($filters, []);
-
             switch (strtolower($result)) {
                 case 'options':
                 case 'option-value':

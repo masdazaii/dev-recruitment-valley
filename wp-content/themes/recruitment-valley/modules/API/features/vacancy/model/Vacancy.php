@@ -71,6 +71,9 @@ class Vacancy
     public $acf_distance_from_city = "distance_from_city";
     public $acf_country_code = "rv_vacancy_country_code";
 
+    /** 01 11 2023 added acf */
+    private $acf_rv_vacancy_language = "rv_vacancy_language";
+
     /** ACF for imported vacancy */
     private $_acf_is_imported = "rv_vacancy_is_imported";
     private $_acf_imported_vacancy_source_id = "rv_vacancy_imported_source_id";
@@ -978,7 +981,7 @@ class Vacancy
                 "post_type"         => $this->vacancy,
                 "posts_per_page"    => $filters['postPerPage'] ?? -1,
                 "offset"            => $filters['offset'] ?? 0,
-                "orderby"           => $filters['orderBy'] ?? "date",
+                "orderby"           => $filters['orderBy'] ?? "post_date",
                 "order"             => $filters['sort'] ?? 'ASC',
                 "post_status"       => "publish",
             ];
@@ -1022,7 +1025,8 @@ class Vacancy
             }
 
             if (array_key_exists('author', $filters)) {
-                $args['author '] = $filters['author'];
+                // $args['author'] = $filters['author'];
+                $args['author__in'] = $filters['author'];
             }
 
             if (array_key_exists('in', $filters)) {
@@ -1193,6 +1197,35 @@ class Vacancy
             }
         } else {
             throw new Exception('Taxonomy not found!');
+        }
+    }
+
+    public function getPostStatus()
+    {
+        if ($this->vacancy_id) {
+            $vacancy = get_post($this->vacancy_id);
+            if ($vacancy) {
+                return $vacancy->post_status;
+            }
+        } else {
+            throw new Exception('Please specify vacancy!');
+        }
+    }
+
+    /** 02 11 2023 : Added Function */
+    public function getLanguage() {
+        if ($this->vacancy_id) {
+            return $this->getProp($this->acf_rv_vacancy_language, true);
+        } else {
+            throw new Exception('Please specify vacancy!');
+        }
+    }
+
+    public function setLanguage($value) {
+        if ($this->vacancy_id) {
+            return $this->setProp($this->acf_rv_vacancy_language, $value);
+        } else {
+            throw new Exception('Please specify vacancy!');
         }
     }
 }

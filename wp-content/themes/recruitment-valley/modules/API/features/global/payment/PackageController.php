@@ -165,7 +165,6 @@ class PackageController
         $transaction->setTransactionAmount($amount / 100);
         $transaction->setUserId($company->getId());
         $transaction->setPackageId($package->getPackageId());
-        $transaction->setStatus("pending");
 
         if (isset($request['coupon'])) {
             $transaction->setTransactionAmountBeforeCoupon($packagePriceBeforeCoupon);
@@ -240,6 +239,8 @@ class PackageController
             'expired_at' => $session->expires_at
         ]);
 
+        $transaction->setStatus("pending");
+
         return [
             "status" => 200,
             "data" => [
@@ -290,7 +291,7 @@ class PackageController
             "data" => [
                 "package" => [
                     // "price" => intval($package->getPrice()),
-                    "price" => number_format(floatval($transaction->getTransactionAmount()), 2),
+                    "price" => number_format(floatval($transaction->getTransactionAmount()), 2, '.', ''),
                     "credit" => $package->getCredit(),
                     "pricePerCredit" => $package->getCredit() == "unlimited" ? "unlimited" : $package->getPrice() / $package->getCredit(),
                     /** Added line start here */

@@ -13,6 +13,11 @@ class Option
     private $_importMappingRoleTerm = 'import_api_mapping_role_term';
     private $_importRoleKeywords    = 'import_api_mapping_role_keywords';
     private $_importEachKeyword     = 'import_api_mapping_role_eachword';
+    private $_importDefaultImage    = 'import_api_default_image';
+
+    private const acf_rv_email_approval_main_address = 'rv_email_approval_main_address';
+    private const acf_rv_email_approval_cc  = 'rv_email_approval_cc';
+    private const acf_rv_email_approval_bcc = 'rv_email_approval_bcc';
 
     public $options;
 
@@ -39,5 +44,39 @@ class Option
         } else {
             return $this->getter($this->_importNumberRoleToSet, true);
         }
+    }
+
+    public function getDefaultImage($result = 'url')
+    {
+        if ($result === 'object') {
+            $attachment = $this->getter($this->_importDefaultImage, true);
+            if (!empty($attachment)) {
+                return [
+                    'id' => $attachment['ID'],
+                    'title' => $attachment['title'],
+                    'url' => $attachment['url']
+                ];
+            } else {
+                return null;
+            }
+        } else {
+            $attachment = $this->getter($this->_importDefaultImage);
+            return $attachment['url'] ?? null;
+        }
+    }
+    
+    public function getEmailApprovalMainAddress()
+    {
+        return $this->getter(self::acf_rv_email_approval_main_address, true);
+    }
+
+    public function getEmailApprovalCC()
+    {
+        return $this->getter(self::acf_rv_email_approval_cc, true);
+    }
+
+    public function getEmailApprovalBCC()
+    {
+        return $this->getter(self::acf_rv_email_approval_bcc, true);
     }
 }
