@@ -47,7 +47,7 @@ class AdminEnqueue
 
                 foreach ($sectors as $sector) {
                     $options['sector'][$sector['term_id']] = [
-                        'id' => $sector['slug'],
+                        'id' => $sector['term_id'],
                         'text' => $sector['name']
                     ];
                 }

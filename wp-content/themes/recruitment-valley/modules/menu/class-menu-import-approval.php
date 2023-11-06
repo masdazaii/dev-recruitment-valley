@@ -570,10 +570,9 @@ class ImportMenu
 
                 /** Update vacancy */
                 $vacancy    = new Vacancy($body['vacancyID']);
+                print('<pre>' . print_r($body['inputSector'], true) . '</pre>');
                 if (isset($body['inputSector']) && !empty($body['inputSector'])) {
                     $updateSector = $vacancy->setVacancyTerms('sector', $body['inputSector']);
-
-                    // print('<pre>' . print_r($updateSector, true) . '</pre>');
                 } else {
                     $updateSector = $vacancy->setEmptyVacancyTerms('sector', $body['inputSector']);
                 }
