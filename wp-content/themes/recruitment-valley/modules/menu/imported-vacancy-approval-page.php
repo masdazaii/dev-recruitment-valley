@@ -17,6 +17,7 @@ use Vacancy\Vacancy;
                     <th>Paid / Free</th>
                     <th>Imported</th>
                     <th>Role</th>
+                    <th>Sector</th>
                     <th>Published Date</th>
                     <th>Action</th>
                 </thead>
