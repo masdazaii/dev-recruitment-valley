@@ -83,6 +83,8 @@ class Vacancy
     private $_acf_imported_company_email = "rv_vacancy_imported_company_email";
     private $_acf_imported_company_city_longitude = "rv_vacancy_imported_company_city_longitude";
     private $_acf_imported_company_city_latitude = "rv_vacancy_imported_company_city_latitude";
+    private $_acf_imported_company_sector = "rv_vacancy_imported_company_sector";
+    private $_acf_imported_company_total_employees = "rv_vacancy_imported_company_total_employees";
 
     private $_acf_imported_approved_by      = "rv_vacancy_imported_approved_by";
     private $_acf_imported_approved_status  = "rv_vacancy_imported_approval_status";
@@ -883,6 +885,43 @@ class Vacancy
         return $this->getterMeta($this->meta_rv_vacancy_source);
     }
 
+    public function getImportedCompanySector()
+    {
+        $sectors = $this->getProp($this->_acf_imported_company_sector);
+        if ($sectors && is_array($sectors)) {
+            $terms = get_terms([
+                'taxonomy'   => 'sector',
+                'hide_empty' => false,
+                'term_taxonomy_id' => $sectors
+            ]);
+
+            if ($terms instanceof \WP_Error) {
+                throw $terms;
+            } else if ($terms && is_array($terms)) {
+                $result = [];
+                foreach ($terms as $term) {
+                    $result[] = [
+                        'value'  => $term->term_id,
+                        'label'  => $term->name,
+                    ];
+                }
+                return $result;
+            }
+        } else {
+            return $sectors;
+        }
+    }
+
+    public function setImportedCompanySector($value)
+    {
+        return $this->setProp($this->_acf_imported_company_sector, $value);
+    }
+
+    public function getImportedCompanyTotalEmployees()
+    {
+        return $this->getProp($this->_acf_imported_company_total_employees, true);
+    }
+
     /**
      * Get imported vacancy function
      *
@@ -1013,7 +1052,16 @@ class Vacancy
             }
 
             if (array_key_exists('orderBy', $filters)) {
-                $args['orderby'] = $filters['orderBy'];
+                if (is_array($filters['orderBy'])) {
+                    $args['meta_key']   = $filters['orderBy']['key'];
+                    $args['orderby']    = $filters['orderBy']['by'];
+
+                    if (isset($filters['orderBy']['type'])) {
+                        $args['meta_type']  = $filters['orderBy']['type'];
+                    }
+                } else {
+                    $args['orderby'] = $filters['orderBy'];
+                }
             }
 
             if (array_key_exists('sort', $filters)) {
@@ -1166,6 +1214,8 @@ class Vacancy
                     foreach ($terms as $term) {
                         if ($formatted === 'id') {
                             $result[] = $term->term_id;
+                        } else if ($formatted === 'slug') {
+                            $result[] = $term->slug;
                         } else {
                             $result[] = [
                                 'term_id'   => $term->term_id,
@@ -1200,6 +1250,15 @@ class Vacancy
         }
     }
 
+    public function setEmptyVacancyTerms($taxonomy, $value)
+    {
+        if (taxonomy_exists($taxonomy)) {
+            return wp_set_post_terms($this->vacancy_id, '', $taxonomy);
+        } else {
+            throw new Exception('Taxonomy not found!');
+        }
+    }
+
     public function getPostStatus()
     {
         if ($this->vacancy_id) {
@@ -1213,7 +1272,8 @@ class Vacancy
     }
 
     /** 02 11 2023 : Added Function */
-    public function getLanguage() {
+    public function getLanguage()
+    {
         if ($this->vacancy_id) {
             return $this->getProp($this->acf_rv_vacancy_language, true);
         } else {
@@ -1221,7 +1281,8 @@ class Vacancy
         }
     }
 
-    public function setLanguage($value) {
+    public function setLanguage($value)
+    {
         if ($this->vacancy_id) {
             return $this->setProp($this->acf_rv_vacancy_language, $value);
         } else {

@@ -123,7 +123,6 @@ class JobfeedController
             foreach ($vacancies as $vacancy) {
                 /** Decode vacancy */
                 $vacancy = json_decode($vacancy);
-                // print('<pre>' . print_r(gettype($vacancy), true) . '</pre>' . PHP_EOL);
 
                 if (isset($vacancy)) {
                     /** Check "expired" property exists */
@@ -371,14 +370,14 @@ class JobfeedController
                         $payload["rv_vacancy_imported_company_name"] = preg_replace('/[\n\t]+/', '', $vacancy->organization_name);
 
                         /** Unset data key */
-                        unset($vacancy->organization_name);
+                        // unset($vacancy->organization_name);
 
                         /** ACF Imported rv_vacancy_imported_company_email */
                         if (isset($vacancy->organization_email)) {
                             $payload["rv_vacancy_imported_company_email"] = preg_replace('/[\n\t]+/', '', $vacancy->organization_email);
 
                             /** Unset data key */
-                            unset($vacancy->organization_email);
+                            // unset($vacancy->organization_email);
                         }
 
                         /** ACF Imported company_city */
@@ -386,20 +385,28 @@ class JobfeedController
                             $payload["rv_vacancy_imported_company_city"] = preg_replace('/[\n\t]+/', '', $vacancy->organization_location_name);
 
                             /** Unset data key */
-                            unset($vacancy->organization_location_name);
+                            // unset($vacancy->organization_location_name);
+                        }
+
+                        /** ACF Imported company_size */
+                        if (isset($vacancy->organization_size)) {
+                            $payload["rv_vacancy_imported_company_total_employees"] = preg_replace('/[\n\t]+/', '', $vacancy->organization_size);
+
+                            /** Unset data key */
+                            // unset($vacancy->organization_size);
                         }
                     } else if (isset($vacancy->advertiser_name)) {
                         $payload["rv_vacancy_imported_company_name"] = preg_replace('/[\n\t]+/', '', $vacancy->advertiser_name);
 
                         /** Unset data key */
-                        unset($vacancy->advertiser_name);
+                        // unset($vacancy->advertiser_name);
 
                         /** ACF Imported rv_vacancy_imported_company_email */
                         if (isset($vacancy->advertiser_email)) {
                             $payload["rv_vacancy_imported_company_email"] = preg_replace('/[\n\t]+/', '', $vacancy->advertiser_email);
 
                             /** Unset data key */
-                            unset($vacancy->advertiser_email);
+                            // unset($vacancy->advertiser_email);
                         }
 
                         /** ACF Imported company_city */
@@ -407,7 +414,7 @@ class JobfeedController
                             $payload["rv_vacancy_imported_company_city"] = preg_replace('/[\n\t]+/', '', $vacancy->advertiser_location);
 
                             /** Unset data key */
-                            unset($vacancy->advertiser_location);
+                            // unset($vacancy->advertiser_location);
                         }
                     }
 
@@ -514,32 +521,32 @@ class JobfeedController
                     if (isset($vacancy->profession)) {
                         if (is_array($vacancy->profession) && array_key_exists('label', $vacancy->profession)) {
                             /** Get closest role */
-                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords, strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession['label'])), 5, 1, 1, 1, 'array');
+                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession['label'])), 5, 1, 1, 1, 'array');
 
                             /** Unset used key */
                             // unset($vacancy->profession);
                         } else if (is_object($vacancy->profession) && property_exists($vacancy->profession, 'label')) {
-                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords, strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession->label)), 5, 1, 1, 1, 'array');
+                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession->label)), 5, 1, 1, 1, 'array');
                         }
                     } else if (isset($vacancy->profession_group)) {
                         if (is_array($vacancy->profession_group) && array_key_exists('label', $vacancy->profession_group)) {
                             /** Get closest role */
-                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords, strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_group['label'])), 5, 1, 1, 1, 'array');
+                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_group['label'])), 5, 1, 1, 1, 'array');
 
                             /** Unset used key */
                             // unset($vacancy->profession_group);
                         } else if (is_object($vacancy->profession_group) && property_exists($vacancy->profession, 'label')) {
-                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords, strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_group->label)), 5, 1, 1, 1, 'array');
+                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_group->label)), 5, 1, 1, 1, 'array');
                         }
                     } else if (isset($vacancy->profession_class)) {
                         if (is_array($vacancy->profession_class) && array_key_exists('label', $vacancy->profession_class)) {
                             /** Get closest role */
-                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords, strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_class['label'])), 5, 1, 1, 1, 'array');
+                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_class['label'])), 5, 1, 1, 1, 'array');
 
                             /** Unset used key */
                             // unset($vacancy->profession_class);
                         } else if (is_object($vacancy->profession_class) && property_exists($vacancy->profession_class, 'label')) {
-                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords, strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_class->label)), 5, 1, 1, 1, 'array');
+                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_class->label)), 5, 1, 1, 1, 'array');
                         }
                     }
 
@@ -591,6 +598,59 @@ class JobfeedController
                         $taxonomy['role'] = $termModel->createTerm('role', $newRole, []);
                     }
 
+                    /** Taxonomy Sector */
+                    $taxonomy['sector'] = false;
+
+                    if (isset($vacancy->organization_industry)) {
+                        if (is_array($vacancy->organization_industry) && array_key_exists('label', $vacancy->organization_industry)) {
+                            /** Get closest role */
+                            $taxonomy['sector'] = CalculateHelper::calcLevenshteinCost($this->_keywords['sector'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->organization_industry['label'])), 5, 1, 1, 1, 'array');
+
+                            /** Unset used key */
+                            // unset($vacancy->organization_industry);
+                        } else if (is_object($vacancy->organization_industry) && property_exists($vacancy->organization_industry, 'label')) {
+                            $taxonomy['sector'] = CalculateHelper::calcLevenshteinCost($this->_keywords['sector'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->organization_industry->label)), 5, 1, 1, 1, 'array');
+                        }
+                    }
+
+                    /** Set the sector */
+                    if (isset($taxonomy['sector']) && $taxonomy['sector'] != false) {
+                        /** If calculation return empty sector,
+                         * if not set the sector,
+                         * if empty create new sector */
+                        if (empty($taxonomy['sector'])) {
+                            $termModel = new Term();
+                            $taxonomy['sector'] = $termModel->createTerm('sector', $taxonomy['sector'], []);
+                        } else {
+                            $option     = new Option(true);
+                            $limitSector  = $option->getImportNumberRoleToSet();
+
+                            $termCount  = 1;
+                            $tempSector = [];
+                            foreach ($taxonomy['sector'] as $termID => $levenshteinCost) {
+                                if ($termCount > $limitSector) {
+                                    break;
+                                }
+                                $tempSector[] = $termID;
+
+                                $termCount++;
+                            }
+                            $taxonomy['sector'] = $tempSector;
+                            $payload['rv_vacancy_imported_company_sector'] = $tempSector[0];
+                        }
+                    } else {
+                        $termModel = new Term();
+                        if (isset($vacancy->organization_industry)) {
+                            if (is_array($vacancy->organization_industry) && array_key_exists('label', $vacancy->organization_industry)) {
+                                $newSector = $termModel->createTerm('sector', $vacancy->organization_industry['label'], []);
+                            } else if (is_object($vacancy->organization_industry) && property_exists($vacancy->organization_industry, 'label')) {
+                                $newSector = $termModel->createTerm('sector', $vacancy->organization_industry->label, []);
+                            }
+                        }
+                        $taxonomy['sector'] = $newSector;
+                        $payload['rv_vacancy_imported_company_sector'] = $newSector;
+                    }
+
                     /** Mapping Unused data */
                     foreach ($vacancy as $propertyKey => $propertyValue) {
                         $unusedData[$propertyKey] = $propertyValue;
@@ -606,7 +666,6 @@ class JobfeedController
 
                         $vacancy = new Vacancy($post);
 
-                        // print('<pre>' . print_r($taxonomy['role'], true) . '</pre>');
                         $vacancy->setTaxonomy($taxonomy);
 
                         foreach ($payload as $acf_field => $acfValue) {
@@ -851,14 +910,19 @@ class JobfeedController
         error_log('getMappedKeyword');
 
         try {
-            $this->_keywords = [];
+            $this->_keywords = [
+                'role' => [],
+                'sector' => [],
+            ];
 
-            /** Get term Name */
             $termModel = new Term();
+
+            /** Map Role  */
+            /** Get term role */
             $terms = $termModel->selectTermByTaxonomy('role', 'array');
             if ($terms) {
                 foreach ($terms as $term) {
-                    $this->_keywords[$term['term_id']][] = $term['name'];
+                    $this->_keywords['role'][$term['term_id']][] = $term['name'];
                 }
             }
 
@@ -870,9 +934,35 @@ class JobfeedController
                         foreach ($keyword['import_api_mapping_role_keywords'] as $word) {
                             if (is_array($word)) {
                                 if (array_key_exists('import_api_mapping_role_eachword', $word))
-                                    $this->_keywords[$keyword['import_api_mapping_role_term']][] = strtolower($word['import_api_mapping_role_eachword']);
+                                    $this->_keywords['role'][$keyword['import_api_mapping_role_term']][] = strtolower($word['import_api_mapping_role_eachword']);
                             } else if (is_string($word)) {
-                                $this->_keywords[$keyword['import_api_mapping_role_term']][] = strtolower($word);
+                                $this->_keywords['role'][$keyword['import_api_mapping_role_term']][] = strtolower($word);
+                            }
+                        }
+                    }
+                }
+            }
+
+            /** Map Sector */
+            /** Get term sector */
+            $terms = $termModel->selectTermByTaxonomy('sector', 'array');
+            if ($terms) {
+                foreach ($terms as $term) {
+                    $this->_keywords['sector'][$term['term_id']][] = $term['name'];
+                }
+            }
+
+            /** Get keywords options and set each keyword to lowercase */
+            $keywordOption = get_field('import_api_mapping_sector', 'option');
+            foreach ($keywordOption as $keyword) {
+                if (is_array($keyword)) {
+                    if (array_key_exists('import_api_mapping_sector_term', $keyword) && array_key_exists('import_api_mapping_sector_keywords', $keyword)) {
+                        foreach ($keyword['import_api_mapping_sector_keywords'] as $word) {
+                            if (is_array($word)) {
+                                if (array_key_exists('import_api_mapping_sector_eachword', $word))
+                                    $this->_keywords['sector'][$keyword['import_api_mapping_sector_term']][] = strtolower($word['import_api_mapping_sector_eachword']);
+                            } else if (is_string($word)) {
+                                $this->_keywords['sector'][$keyword['import_api_mapping_sector_term']][] = strtolower($word);
                             }
                         }
                     }
