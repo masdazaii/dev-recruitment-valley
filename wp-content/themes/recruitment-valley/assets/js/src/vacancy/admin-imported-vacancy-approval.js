@@ -124,8 +124,7 @@ const importedVacancyModule = (function() {
             <form id="change-sector-form-${row.id}" style="">
             <input type="hidden" name="action" value="${vacanciesData.approval.changeSectorAction}">
             <input type="hidden" name="nonce" value="${row.rowNonce}">
-            <select id="admin-approval-sector-${row.id}" class="admin-approval-sector" name="inputSector" data-id="${row.id}" style="width: 100%">
-              <option value="" selected>-- Select Sector --</option>
+            <select id="admin-approval-sector-${row.id}" class="admin-approval-sector" name="inputSector[]" data-id="${row.id}" style="width: 100%" multiple>
             </select>`
 
             output += `</div>`
@@ -167,7 +166,7 @@ const importedVacancyModule = (function() {
 
         $('.admin-approval-sector').select2({
           placeholder: '-- Select vacancy sector --',
-          allowClear: true,
+          // allowClear: true,
           data: Object.values(vacanciesData.approval.options.sector)
         })
 
@@ -211,6 +210,7 @@ const importedVacancyModule = (function() {
         $('#admin-imported-vacancy-approval-table').on('select2:select', 'td .admin-approval-role', changeRole)
         $('#admin-imported-vacancy-approval-table').on('select2:unselect', 'td .admin-approval-role', changeRole)
         $('#admin-imported-vacancy-approval-table').on('select2:clear', 'td .admin-approval-role', changeRole)
+
         $('#admin-imported-vacancy-approval-table').on('select2:select', 'td .admin-approval-sector', changeSector)
         $('#admin-imported-vacancy-approval-table').on('select2:unselect', 'td .admin-approval-sector', changeSector)
         $('#admin-imported-vacancy-approval-table').on('select2:clear', 'td .admin-approval-sector', changeSector)
@@ -325,10 +325,11 @@ const importedVacancyModule = (function() {
 
       $('.admin-approval-sector').select2({
         placeholder: '-- Select vacancy sector --',
-        allowClear: true,
+        // allowClear: true,
         data: Object.values(vacanciesData.approval.options.sector)
       })
 
+      console.log(response.data)
       response.data.forEach((vacancy) => {
         if (vacancy.role && vacancy.role !== undefined && vacancy.role !== null && Array.isArray(vacancy.role)) {
           vacancy.role.forEach((role) => {
@@ -343,10 +344,12 @@ const importedVacancyModule = (function() {
           })
         }
 
+        // console.log(vacancy)
         if (vacancy.sector && vacancy.sector !== undefined && vacancy.sector !== null && Array.isArray(vacancy.sector)) {
+          console.log(vacancy.sector)
           vacancy.sector.forEach((sector) => {
             if ($("#admin-approval-sector-" + vacancy.id).find("option[value='" + sector + "']").length) {
-              $("#admin-approval-sector-" + vacancy.id).val(sector).trigger('change')
+              $("#admin-approval-sector-" + vacancy.id).val(vacancy.sector).trigger('change')
             } else {
               var newOption = new Option(vacanciesData.approval.options.sector[sector].text, vacanciesData.approval.options.sector[sector].id, true, true)
               $("#admin-approval-sector-" + vacancy.id).append(newOption).trigger('change')

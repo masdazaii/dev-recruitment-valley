@@ -231,7 +231,7 @@ class RequestRules
             ],
             'vacancyChangeSector' => [
                 'vacancyID'     => ["required", "exists:post/vacancy/post_id/single"],
-                'inputSector'   => ["exists:term/sector/slug/single"],
+                'inputSector.*'   => ["exists:term/sector/term_id/single"],
                 'nonce'         => ["required"]
             ],
             'vacancyByCompany'    => [
@@ -441,7 +441,7 @@ class RequestRules
             ],
             'vacancyChangeSector' => [
                 'vacancyID'     => "text",
-                'inputSector'   => "text",
+                'inputSector.*' => "text",
                 'nonce'         => "text",
             ],
             'vacancyByCompany'    => [
