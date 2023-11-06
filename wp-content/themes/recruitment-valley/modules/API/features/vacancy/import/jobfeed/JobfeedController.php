@@ -387,6 +387,14 @@ class JobfeedController
                             /** Unset data key */
                             // unset($vacancy->organization_location_name);
                         }
+
+                        /** ACF Imported company_size */
+                        if (isset($vacancy->organization_size)) {
+                            $payload["rv_vacancy_imported_company_total_employees"] = preg_replace('/[\n\t]+/', '', $vacancy->organization_size);
+
+                            /** Unset data key */
+                            // unset($vacancy->organization_size);
+                        }
                     } else if (isset($vacancy->advertiser_name)) {
                         $payload["rv_vacancy_imported_company_name"] = preg_replace('/[\n\t]+/', '', $vacancy->advertiser_name);
 

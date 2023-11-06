@@ -84,6 +84,7 @@ class Vacancy
     private $_acf_imported_company_city_longitude = "rv_vacancy_imported_company_city_longitude";
     private $_acf_imported_company_city_latitude = "rv_vacancy_imported_company_city_latitude";
     private $_acf_imported_company_sector = "rv_vacancy_imported_company_sector";
+    private $_acf_imported_company_total_employees = "rv_vacancy_imported_company_total_employees";
 
     private $_acf_imported_approved_by      = "rv_vacancy_imported_approved_by";
     private $_acf_imported_approved_status  = "rv_vacancy_imported_approval_status";
@@ -884,7 +885,7 @@ class Vacancy
         return $this->getterMeta($this->meta_rv_vacancy_source);
     }
 
-    public function getImportedCompanySector($value)
+    public function getImportedCompanySector()
     {
         $sectors = $this->getProp($this->_acf_imported_company_sector);
         if ($sectors && is_array($sectors)) {
@@ -900,9 +901,8 @@ class Vacancy
                 $result = [];
                 foreach ($terms as $term) {
                     $result[] = [
-                        'id'    => $term->term_id,
-                        'name'  => $term->name,
-                        'slug'  => $term->slug
+                        'value'  => $term->term_id,
+                        'label'  => $term->name,
                     ];
                 }
                 return $result;
@@ -915,6 +915,11 @@ class Vacancy
     public function setImportedCompanySector($value)
     {
         return $this->setProp($this->_acf_imported_company_sector, $value);
+    }
+
+    public function getImportedCompanyTotalEmployees()
+    {
+        return $this->getProp($this->_acf_imported_company_total_employees, true);
     }
 
     /**
