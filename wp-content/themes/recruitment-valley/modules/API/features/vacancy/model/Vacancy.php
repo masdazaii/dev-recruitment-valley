@@ -83,6 +83,7 @@ class Vacancy
     private $_acf_imported_company_email = "rv_vacancy_imported_company_email";
     private $_acf_imported_company_city_longitude = "rv_vacancy_imported_company_city_longitude";
     private $_acf_imported_company_city_latitude = "rv_vacancy_imported_company_city_latitude";
+    private $_acf_imported_company_sector = "rv_vacancy_imported_company_sector";
 
     private $_acf_imported_approved_by      = "rv_vacancy_imported_approved_by";
     private $_acf_imported_approved_status  = "rv_vacancy_imported_approval_status";
@@ -883,6 +884,39 @@ class Vacancy
         return $this->getterMeta($this->meta_rv_vacancy_source);
     }
 
+    public function getImportedCompanySector($value)
+    {
+        $sectors = $this->getProp($this->_acf_imported_company_sector);
+        if ($sectors && is_array($sectors)) {
+            $terms = get_terms([
+                'taxonomy'   => 'sector',
+                'hide_empty' => false,
+                'term_taxonomy_id' => $sectors
+            ]);
+
+            if ($terms instanceof \WP_Error) {
+                throw $terms;
+            } else if ($terms && is_array($terms)) {
+                $result = [];
+                foreach ($terms as $term) {
+                    $result[] = [
+                        'id'    => $term->term_id,
+                        'name'  => $term->name,
+                        'slug'  => $term->slug
+                    ];
+                }
+                return $result;
+            }
+        } else {
+            return $sectors;
+        }
+    }
+
+    public function setImportedCompanySector($value)
+    {
+        return $this->setProp($this->_acf_imported_company_sector, $value);
+    }
+
     /**
      * Get imported vacancy function
      *
@@ -1200,8 +1234,6 @@ class Vacancy
                 return wp_set_post_terms($this->vacancy_id, $value, $taxonomy);
             } else if (!is_object($value)) {
                 $termExist = term_exists($value, $taxonomy);
-                print('<pre>' . print_r($termExist, true) . '</pre>');
-                // print('<pre>' . print_r($value, true) . '</pre>');
                 if ($termExist) {
                     return wp_set_post_terms($this->vacancy_id, $termExist["term_id"], $taxonomy);
                 } else {
