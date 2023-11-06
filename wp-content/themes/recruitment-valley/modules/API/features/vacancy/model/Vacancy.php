@@ -1013,7 +1013,16 @@ class Vacancy
             }
 
             if (array_key_exists('orderBy', $filters)) {
-                $args['orderby'] = $filters['orderBy'];
+                if (is_array($filters['orderBy'])) {
+                    $args['meta_key']   = $filters['orderBy']['key'];
+                    $args['orderby']    = $filters['orderBy']['by'];
+
+                    if (isset($filters['orderBy']['type'])) {
+                        $args['meta_type']  = $filters['orderBy']['type'];
+                    }
+                } else {
+                    $args['orderby'] = $filters['orderBy'];
+                }
             }
 
             if (array_key_exists('sort', $filters)) {

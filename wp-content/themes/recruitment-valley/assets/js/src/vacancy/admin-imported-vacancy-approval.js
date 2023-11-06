@@ -60,7 +60,12 @@ const importedVacancyModule = (function() {
           },
           "sortable" : false
         },
-        { data : "approvalStatus" },
+        { data : "approvalStatus",
+          render : (data, type, row, meta) => {
+            return data
+          },
+          "sortable" : false
+        },
         { data : "paidStatus",
           render : (data, type, row, meta) => {
             if (row.paidStatus) {

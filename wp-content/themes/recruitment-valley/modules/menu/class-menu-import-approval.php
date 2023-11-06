@@ -176,6 +176,8 @@ class ImportMenu
 
     public function vacancyApprovalListAjax()
     {
+        $datatableCol = ['title', 'vacancy_status', 'approval_status', 'is_paid', 'is_imported', 'role', 'sector', 'post_date', 'action'];
+
         try {
             $filters = [
                 'page'          => $_GET['start'] ? ($_GET['start'] / $_GET['length'] + 1) :  1,
@@ -186,7 +188,6 @@ class ImportMenu
             ];
 
             if (isset($_GET['orderBy'])) {
-                // $filters['prderBy'] = $_GET['orderBy'];
                 switch ($_GET['orderBy']) {
                     case 'none':
                         $filters['orderBy'] = 'none';
@@ -242,37 +243,67 @@ class ImportMenu
                     case 'date':
                     case 'post_date':
                     default:
-                        $filters['orderBy'] = 'post_date';
+                        $filters['orderBy'] = 'date';
                         break;
                 }
             } else {
-                $filters['oderBy'] = 'post_date';
+                $filters['orderBy'] = 'date';
             }
 
             if (isset($_GET['order'])) {
                 if (is_array($_GET['order'])) {
+                    /** Set order by for datatable */
+                    $coloumn = isset($_GET['order'][0]['column']) ? $datatableCol[$_GET['order'][0]['column']] : 'post_date';
+                    switch ($coloumn) {
+                        case 'title':
+                            $filters['orderBy'] = 'title';
+                            break;
+                        case 'approval_status':
+                            $filters['orderBy'] = [
+                                'key' => 'rv_vacancy_imported_approval_status',
+                                'by' => 'meta_value',
+                                'type' => 'CHAR'
+                            ];
+                            break;
+                        case 'is_paid':
+                            $filters['orderBy'] = [
+                                'key' => 'is_paid',
+                                'by' => 'meta_value_num'
+                            ];
+                            break;
+                        case 'is_imported':
+                            $filters['orderBy'] = [
+                                'key' => 'rv_vacancy_is_imported',
+                                'by' => 'meta_value_num'
+                            ];
+                            break;
+                        case 'post_date':
+                            $filters['orderBy'] = 'date';
+                            break;
+                    }
+
                     /** Set sort for datatable */
                     switch ($_GET['order'][0]['dir']) {
                         case strtolower('ASC'):
                         case strtolower('ASCENDING'):
-                            $filters['order'] = 'ASC';
+                            $filters['sort'] = 'ASC';
                             break;
                         case strtolower('DESC'):
                         case strtolower('DESCENDING'):
                         default:
-                            $filters['order'] = 'DESC';
+                            $filters['sort'] = 'DESC';
                             break;
                     }
                 } else {
                     switch ($_GET['order']) {
                         case strtolower('ASC'):
                         case strtolower('ASCENDING'):
-                            $filters['order'] = 'ASC';
+                            $filters['sort'] = 'ASC';
                             break;
                         case strtolower('DESC'):
                         case strtolower('DESCENDING'):
                         default:
-                            $filters['order'] = 'DESC';
+                            $filters['sort'] = 'DESC';
                             break;
                     }
                 }
@@ -409,7 +440,7 @@ class ImportMenu
                 'data'              => $vacanciesResponse,
                 'search'            => isset($_GET['search']) ? $_GET['search']['value'] : null,
                 'filters'           => $filters,
-                'query'             => $vacancies->query
+                'query'           => $vacancies->query
             ], 200);
         } catch (\Exception $error) {
             wp_send_json(['message' => $error->getMessage()], 400);
