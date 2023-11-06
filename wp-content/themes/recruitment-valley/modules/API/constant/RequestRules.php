@@ -229,6 +229,11 @@ class RequestRules
                 'inputRole.*'   => ["exists:term/role/term_id/single"],
                 'nonce'         => ["required"]
             ],
+            'vacancyChangeSector' => [
+                'vacancyID'     => ["required", "exists:post/vacancy/post_id/single"],
+                'inputSector'   => ["exists:term/sector/slug/single"],
+                'nonce'         => ["required"]
+            ],
             'vacancyByCompany'    => [
                 'company.*'   => ["required", "exists:user/user/ID"],
                 'result'    => ["in:options,option-value,count,posts"],
@@ -432,6 +437,11 @@ class RequestRules
             'vacancyChangeRole' => [
                 'vacancyID'     => "text",
                 'inputRole.*'   => "text",
+                'nonce'         => "text",
+            ],
+            'vacancyChangeSector' => [
+                'vacancyID'     => "text",
+                'inputSector'   => "text",
                 'nonce'         => "text",
             ],
             'vacancyByCompany'    => [

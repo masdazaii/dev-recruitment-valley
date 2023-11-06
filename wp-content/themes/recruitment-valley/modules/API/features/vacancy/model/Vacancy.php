@@ -1166,6 +1166,8 @@ class Vacancy
                     foreach ($terms as $term) {
                         if ($formatted === 'id') {
                             $result[] = $term->term_id;
+                        } else if ($formatted === 'slug') {
+                            $result[] = $term->slug;
                         } else {
                             $result[] = [
                                 'term_id'   => $term->term_id,
@@ -1189,12 +1191,23 @@ class Vacancy
                 return wp_set_post_terms($this->vacancy_id, $value, $taxonomy);
             } else if (!is_object($value)) {
                 $termExist = term_exists($value, $taxonomy);
+                print('<pre>' . print_r($termExist, true) . '</pre>');
+                // print('<pre>' . print_r($value, true) . '</pre>');
                 if ($termExist) {
                     return wp_set_post_terms($this->vacancy_id, $termExist["term_id"], $taxonomy);
                 } else {
                     return false;
                 }
             }
+        } else {
+            throw new Exception('Taxonomy not found!');
+        }
+    }
+
+    public function setEmptyVacancyTerms($taxonomy, $value)
+    {
+        if (taxonomy_exists($taxonomy)) {
+            return wp_set_post_terms($this->vacancy_id, '', $taxonomy);
         } else {
             throw new Exception('Taxonomy not found!');
         }
@@ -1213,7 +1226,8 @@ class Vacancy
     }
 
     /** 02 11 2023 : Added Function */
-    public function getLanguage() {
+    public function getLanguage()
+    {
         if ($this->vacancy_id) {
             return $this->getProp($this->acf_rv_vacancy_language, true);
         } else {
@@ -1221,7 +1235,8 @@ class Vacancy
         }
     }
 
-    public function setLanguage($value) {
+    public function setLanguage($value)
+    {
         if ($this->vacancy_id) {
             return $this->setProp($this->acf_rv_vacancy_language, $value);
         } else {
