@@ -1,6 +1,6 @@
 <?php
 
-namespace Menu;
+namespace Vacancy;
 
 use Vacancy\Vacancy;
 use Helper\ValidationHelper;
@@ -9,7 +9,7 @@ use WP_Query;
 
 defined('ABSPATH') or die("Direct access not allowed!");
 
-class ImportMenu
+class VacancyApproval
 {
     public $successMessage;
     public $errorMessage;
@@ -23,6 +23,8 @@ class ImportMenu
         add_action('wp_ajax_handle_vacancy_list', [$this, 'vacancyApprovalListAjax']);
         // add_action('wp_ajax_nopriv_handle_vacancy_list', [$this, 'vacancyApprovalListAjax']);
         add_action('wp_ajax_handle_vacancy_role_change', [$this, 'vacancyChangeRoleAjax']);
+        add_action('wp_ajax_handle_vacancy_sector_change', [$this, 'vacancyChangeSectorAjax']);
+        add_action('admin_post_handle_bulk_action', [$this, 'bulkActionHandle']);
     }
 
     public function initMethod()
@@ -175,6 +177,8 @@ class ImportMenu
 
     public function vacancyApprovalListAjax()
     {
+        $datatableCol = ['title', 'title', 'vacancy_status', 'approval_status', 'is_paid', 'is_imported', 'role', 'sector', 'post_date', 'action'];
+
         try {
             $filters = [
                 'page'          => $_GET['start'] ? ($_GET['start'] / $_GET['length'] + 1) :  1,
@@ -185,7 +189,6 @@ class ImportMenu
             ];
 
             if (isset($_GET['orderBy'])) {
-                // $filters['prderBy'] = $_GET['orderBy'];
                 switch ($_GET['orderBy']) {
                     case 'none':
                         $filters['orderBy'] = 'none';
@@ -241,43 +244,79 @@ class ImportMenu
                     case 'date':
                     case 'post_date':
                     default:
-                        $filters['orderBy'] = 'post_date';
+                        $filters['orderBy'] = 'date';
                         break;
                 }
             } else {
-                $filters['oderBy'] = 'post_date';
+                $filters['orderBy'] = 'date';
             }
 
             if (isset($_GET['order'])) {
                 if (is_array($_GET['order'])) {
+                    /** Set order by for datatable */
+                    $coloumn = isset($_GET['order'][0]['column']) ? $datatableCol[$_GET['order'][0]['column']] : 'post_date';
+                    switch ($coloumn) {
+                        case 'title':
+                            $filters['orderBy'] = 'title';
+                            break;
+                        case 'approval_status':
+                            $filters['orderBy'] = [
+                                'key' => 'rv_vacancy_imported_approval_status',
+                                'by' => 'meta_value',
+                                'type' => 'CHAR'
+                            ];
+                            break;
+                        case 'is_paid':
+                            $filters['orderBy'] = [
+                                'key' => 'is_paid',
+                                'by' => 'meta_value_num'
+                            ];
+                            break;
+                        case 'is_imported':
+                            $filters['orderBy'] = [
+                                'key' => 'rv_vacancy_is_imported',
+                                'by' => 'meta_value_num'
+                            ];
+                            break;
+                        case 'post_date':
+                            $filters['orderBy'] = 'date';
+                            break;
+                    }
+
                     /** Set sort for datatable */
                     switch ($_GET['order'][0]['dir']) {
                         case strtolower('ASC'):
                         case strtolower('ASCENDING'):
-                            $filters['order'] = 'ASC';
+                            $filters['sort'] = 'ASC';
                             break;
                         case strtolower('DESC'):
                         case strtolower('DESCENDING'):
                         default:
-                            $filters['order'] = 'DESC';
+                            $filters['sort'] = 'DESC';
                             break;
                     }
                 } else {
                     switch ($_GET['order']) {
                         case strtolower('ASC'):
                         case strtolower('ASCENDING'):
-                            $filters['order'] = 'ASC';
+                            $filters['sort'] = 'ASC';
                             break;
                         case strtolower('DESC'):
                         case strtolower('DESCENDING'):
                         default:
-                            $filters['order'] = 'DESC';
+                            $filters['sort'] = 'DESC';
                             break;
                     }
                 }
             }
 
             $filters['offset']  = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['postPerPage']));
+
+            if (isset($_GET['search'])) {
+                if (isset($_GET['search']['value'])) {
+                    $filters['search'] = sanitize_text_field($_GET['search']['value']);
+                }
+            }
 
             $vacancy = new Vacancy();
 
@@ -389,6 +428,7 @@ class ImportMenu
                         'publishDate'       => $eachVacancy->getPublishDate(),
                         'rowNonce'          => wp_create_nonce('nonce_vacancy_approval'),
                         'role'              => $eachVacancy->getSelectedTerm('role', 'id'),
+                        'sector'            => $eachVacancy->getSelectedTerm('sector', 'id'),
                         'editUrl'           => get_edit_post_link($vacancy->ID),
                         'trashUrl'          => get_delete_post_link($vacancy->ID),
                         'paidStatus'        => $eachVacancy->getIsPaid(),
@@ -407,7 +447,7 @@ class ImportMenu
                 'data'              => $vacanciesResponse,
                 'search'            => isset($_GET['search']) ? $_GET['search']['value'] : null,
                 'filters'           => $filters,
-                'query'             => $vacancies->query
+                // 'query'             => $vacancies->query
             ], 200);
         } catch (\Exception $error) {
             wp_send_json(['message' => $error->getMessage()], 400);
@@ -451,8 +491,13 @@ class ImportMenu
 
                 /** Update vacancy */
                 $vacancy    = new Vacancy($body['vacancyID']);
+                if (isset($body['inputRole']) && !empty($body['inputRole'])) {
+                    $updateRole = $vacancy->setVacancyTerms('role', $body['inputRole']);
+                } else {
+                    $updateRole = $vacancy->setEmptyVacancyTerms('role', $body['inputRole']);
+                }
 
-                if ($vacancy->setVacancyTerms('role', $body['inputRole'])) {
+                if ($updateRole || (!$updateRole && empty($body['inputRole']))) {
                     $wpdb->query("COMMIT");
 
                     wp_send_json([
@@ -494,7 +539,245 @@ class ImportMenu
             }
         }
     }
+
+    public function vacancyChangeSectorAjax()
+    {
+        if (is_admin() && current_user_can('administrator')) {
+            global $wpdb;
+
+            $wpdb->query("START TRANSACTION");
+            try {
+                /** Validate and sanitize request */
+                $validator = new ValidationHelper('vacancyChangeSector', $_POST);
+
+                if (!$validator->tempValidate()) {
+                    $errors = $validator->getErrors();
+                    $message = '';
+                    foreach ($errors as $field => $message) {
+                        $message .= $field . ' : ' . $message . PHP_EOL;
+                    }
+
+                    wp_send_json([
+                        'success' => false,
+                        'message' => $message
+                    ], 400);
+                }
+
+                /** Validate nonce */
+                if (!$validator->validateNonce('nonce_vacancy_approval', $_POST['nonce'])) {
+                    wp_send_json([
+                        'success' => false,
+                        'message' => $validator->getNonceError()
+                    ], 400);
+                }
+
+                /** Sanitize request body */
+                $validator->tempSanitize();
+                $body       = $validator->getData();
+
+                /** Update vacancy */
+                $vacancy    = new Vacancy($body['vacancyID']);
+
+                if (isset($body['inputSector']) && !empty($body['inputSector'])) {
+                    $updateSector = $vacancy->setVacancyTerms('sector', $body['inputSector']);
+                } else {
+                    $updateSector = $vacancy->setEmptyVacancyTerms('sector', $body['inputSector']);
+                }
+
+                /** Change company sector if vacancy is imported */
+                if ($vacancy->checkImported()) {
+                    $vacancy->setImportedCompanySector($body['inputSector']);
+                }
+
+                if ($updateSector || (!$updateSector && empty($body['inputSector']))) {
+                    $wpdb->query("COMMIT");
+
+                    wp_send_json([
+                        'success' => true,
+                        'message' => __('Sector is updated!', THEME_DOMAIN)
+                    ], 200);
+                } else {
+                    $wpdb->query("ROLLBACK");
+
+                    wp_send_json([
+                        'success' => false,
+                        'message' => __('Failed to update sector!', THEME_DOMAIN)
+                    ], 500);
+                }
+            } catch (\WP_Error $err) {
+                $wpdb->query("ROLLBACK");
+                error_log($err->get_error_message());
+
+                wp_send_json([
+                    'success' => false,
+                    'message' => $err->get_error_message()
+                ], 500);
+            } catch (\Exception $e) {
+                $wpdb->query("ROLLBACK");
+                error_log($e->getMessage());
+
+                wp_send_json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ], 500);
+            } catch (\Throwable $th) {
+                $wpdb->query("ROLLBACK");
+                error_log($th->getMessage());
+
+                wp_send_json([
+                    'success' => false,
+                    'message' => $th->getMessage()
+                ], 500);
+            }
+        }
+    }
+
+    public function bulkActionHandle()
+    {
+        if (is_admin() && current_user_can('administrator')) {
+            global $wpdb;
+
+            $wpdb->query("START TRANSACTION");
+            try {
+                switch ($_POST['submit']) {
+                    case 'bulk-status-approval':
+                    default:
+                        $submission = $this->doBulkApproval($_POST);
+                        break;
+                }
+
+                $_SESSION['flash_message'] = [
+                    'status'    => $submission['status'] ?? 'failed',
+                    'message'   => $submission['message'] ?? 'error'
+                ];
+
+                wp_redirect(esc_url(admin_url('admin.php')) . '?page=import-approval&result=failed');
+            } catch (\WP_Error $err) {
+                $wpdb->query("ROLLBACK");
+                error_log($err->get_error_message());
+
+                wp_send_json([
+                    'success' => false,
+                    'message' => $err->get_error_message()
+                ], 500);
+            } catch (\Exception $e) {
+                $wpdb->query("ROLLBACK");
+                error_log($e->getMessage());
+
+                wp_send_json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ], 500);
+            } catch (\Throwable $th) {
+                $wpdb->query("ROLLBACK");
+                error_log($th->getMessage());
+
+                wp_send_json([
+                    'success' => false,
+                    'message' => $th->getMessage()
+                ], 500);
+            }
+        }
+    }
+
+    private function doBulkApproval($request)
+    {
+        /** Validate and sanitize request */
+        $validator = new ValidationHelper('vacancyApprovalBulk', $request);
+
+        if (!$validator->tempValidate()) {
+            $errors = $validator->getErrors();
+            $message = 'Invalid user input!<br>';
+            foreach ($errors as $field => $error) {
+                if ($field == 'submit') {
+                    $message = 'System Error!';
+                    break;
+                } else {
+                    foreach ($error as $errorMessage) {
+                        $errorMessage = str_replace('.*', '', $errorMessage);
+                        $errorMessage = str_replace('inputBulkSelected', 'Vacancy', $errorMessage);
+                        $errorMessage = str_replace('inputBulkStatus', 'Approval Status', $errorMessage);
+
+                        $message .= '- ' . $errorMessage . '<br>';
+                    }
+                }
+            }
+
+            return [
+                'status' => 'failed',
+                'message' => $message
+            ];
+        }
+
+        /** Validate nonce */
+        if (!$validator->validateNonce('nonce_vacancy_approval', $request['nonce'])) {
+            return [
+                'status' => 'failed',
+                'message' => $validator->getNonceError()
+            ];
+        }
+
+        /** Sanitize request body */
+        $validator->tempSanitize();
+        $body       = $validator->getData();
+
+        $failedUpdate = [];
+
+        /** Update Vacancy Approval Status */
+        foreach ($body['inputBulkSelected'] as $vacancyID) {
+            try {
+                $vacancy   = new \Vacancy\Vacancy($vacancyID);
+                $setApproval[]  = $vacancy->setApprovedStatus($body['inputBulkStatus']);
+                $setApproval[]  = $vacancy->setApprovedBy(get_current_user_id());
+                $setApproval[]  = $vacancy->setApprovedAt("now");
+
+                switch ($body['inputBulkStatus']) {
+                    case 'admin-approved':
+                    case 'system-approved':
+                        $setApproval[] = $vacancy->setStatus('open');
+                        $statusText = 'Approved';
+                        break;
+                    case 'rejected':
+                        $setApproval[] = $vacancy->setStatus('declined');
+                        $statusText = 'Rejected / Declined';
+                        break;
+                    case 'waiting':
+                        $setApproval[] = $vacancy->setStatus('processing');
+                        $statusText = 'Waiting Approval';
+                        break;
+                }
+
+                /** Check if one of above method is failed. */
+                if (in_array(false, $setApproval)) {
+                    $failedUpdate[] = $vacancyID;
+                }
+            } catch (\WP_Error $wp_error) {
+                $failedUpdate[] = $vacancyID;
+                error_log('VacancyApproval::doBulkApproval - ' . $vacancyID . ' - wp_error : ' . $wp_error->get_error_message());
+            } catch (\Exception $e) {
+                $failedUpdate[] = $vacancyID;
+                error_log('VacancyApproval::doBulkApproval - ' . $vacancyID . ' - exception : ' . $e->getMessage());
+            } catch (\Throwable $th) {
+                $failedUpdate[] = $vacancyID;
+                error_log('VacancyApproval::doBulkApproval - ' . $vacancyID . ' - throwable : ' . $th->getMessage());
+            }
+        }
+
+        if (!empty($failedUpdate)) {
+            error_log('Failed to update some vacancy : ' . implode(', ', $failedUpdate));
+
+            return [
+                'status' => 'failed',
+                'message' => 'Failed to update some vacancy!'
+            ];
+        } else {
+            return [
+                'status' => 'success',
+                'message' => 'Vacancies is <b>"' . $statusText . '"<b>.'
+            ];
+        }
+    }
 }
 
 // Initialize
-new ImportMenu();
+new VacancyApproval();

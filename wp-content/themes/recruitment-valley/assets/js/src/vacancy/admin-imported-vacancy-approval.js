@@ -2,18 +2,32 @@ const importedVacancyModule = (function() {
   function initialize () {
     var $ = jQuery
     initDatatable()
-    $('#admin-imported-vacancy-approval-table').on('length.dt', resetTablePagination)
-    $('#admin-imported-vacancy-approval-table').on('click', 'td .import-vacancy-aproval-input-role-checkbox', changeRole)
+    $('#admin-imported-vacancy-approval-table').on('length.dt', changeLengthDatatable)
+    $('#admin-imported-vacancy-approval-table').on('draw.dt', drawDatatable)
+    $("#admin-imported-vacancy-approval-table").on('page.dt', pageChangeDatatable)
+
+    $("#import-vacancy-aproval-input-bulk-checkbox-all").on('change', selectAllToggle)
   }
 
-  function initDatatable() {
+  function initDatatable () {
+    console.log('initDatatable')
     var $ = jQuery
 
     let table = new DataTable('#admin-imported-vacancy-approval-table', {
       serverSide: true,
       processing: true,
+      dom: 'lBfrtip',
+      buttons: [
+        {
+          text: 'Submit',
+          action: function ( e, dt, node, config ) {
+            $("#approval-list").trigger('submit')
+          }
+        }
+      ],
       // aLengthMenu: [[1, 50, 75, -1], [1, 50, 75, "All"]],
       // ordering: false,
+      order: [[1, 'asc']],
       ajax: {
         url: vacanciesData.ajaxUrl,
         method: 'GET',
@@ -24,14 +38,38 @@ const importedVacancyModule = (function() {
           return response.data
         }
       },
+      columnDefs: [
+        {
+          "targets": 0,
+          "orderable": false,
+          "checkboxes": true
+        },
+        { "targets": 1, "width": "8%" },
+        { "targets": 2, "width": "10%" },
+        { "targets": 3, "width": "6%" },
+        { "targets": 4, "width": "5%" },
+        { "targets": 5, "width": "15%" },
+        { "targets": 6, "width": "15%" },
+        { "targets": 7, "width": "15%" },
+        { "targets": 8, "width": "10%" },
+        { "targets": 9, "width": "8%" },
+      ],
       columns: [
+        { data : "id",
+          render : (data, type, row, meta) => {
+            let output = `<input type="checkbox" id="import-vacancy-aproval-input-bulk-checkbox-${row.id}" name="inputBulkSelected[]" class="import-vacancy-aproval-input-bulk-checkbox" data-id="${row.id}" value="${row.id}">`
+
+            return output
+          },
+          "sortable" : false
+        },
         { data : "title",
           render : (data, type, row, meta) => `
-            <div style="font-weight: bold; margin: 0 0 0.125rem 0; font-size: small;">
+            <div style="font-weight: bold margin: 0 0 0.125rem 0 font-size: small">
               <a href="${row.editUrl}">${row.title}</a>
             </div>
             <a href="${row.editUrl}">Edit</a>
-            <a href="${row.trashUrl}" style="font-size: small; color: red">Trash</a>`,
+            <a href="${row.trashUrl}" style="color: red">Trash</a>`,
           "sortable" : true
         },
         { data : "vacancyStatus",
@@ -48,7 +86,12 @@ const importedVacancyModule = (function() {
           },
           "sortable" : false
         },
-        { data : "approvalStatus" },
+        { data : "approvalStatus",
+          render : (data, type, row, meta) => {
+            return data
+          },
+          "sortable" : false
+        },
         { data : "paidStatus",
           render : (data, type, row, meta) => {
             if (row.paidStatus) {
@@ -71,26 +114,44 @@ const importedVacancyModule = (function() {
         },
         { data : "role",
           render : (data, type, row, meta) => {
-            let isChecked = false;
+            let isChecked = false
 
             let output = `
             <form id="change-role-form-${row.id}" style="">
             <input type="hidden" name="action" value="${vacanciesData.approval.changeRoleAction}">
-            <input type="hidden" name="nonce" value="${row.rowNonce}">`
+            <input type="hidden" name="nonce" value="${row.rowNonce}">
+            <select id="admin-approval-role-${row.id}" class="admin-approval-role" name="inputRole[]" data-id="${row.id}" style="width: 100%" multiple></select>`
 
-            vacanciesData.list.role.forEach(element => {
-              if (Array.isArray(row.role)) {
-                if (row.role.length !== 0) {
-                  isChecked = row.role.indexOf(element.term_id) > -1 ? true : false
-                }
-              }
+            output += `</div>`
 
-              output += `<div class="input-group">
-                <input type="checkbox" id="${element.slug}" name="inputRole[]" class="import-vacancy-aproval-input-role-checkbox" data-id="${row.id}" value="${element.term_id}" `
-                + ( Array.isArray(row.role) && row.role.length !== 0 && row.role.indexOf(element.term_id) > -1 ? 'checked="checked"' : '') +`>
-                <label for="${element.name}">${element.name}</label>
-              </div>`
-            })
+            /** Set selected role value.
+             * same as the function in initComplete
+             */
+            // data.forEach((role) => {
+            //   if ($("#admin-approval-role-" + row.id).find("option[value='" + role + "']").length) {
+            //     $("#admin-approval-role-" + row.id).val(role).trigger('change')
+            //   } else {
+            //     // Create a DOM Option and pre-select by default
+            //     var newOption = new Option(vacanciesData.approval.options.role[role].text, vacanciesData.approval.options.role[role].id, true, true)
+            //     // Append it to the select
+            //     $("#admin-approval-role-" + row.id).append(newOption).trigger('change')
+            //   }
+            // })
+
+            return output
+          },
+          "sortable" : false
+        },
+        { data : "sector",
+          render : (data, type, row, meta) => {
+            let isChecked = false
+
+            let output = `
+            <form id="change-sector-form-${row.id}" style="">
+            <input type="hidden" name="action" value="${vacanciesData.approval.changeSectorAction}">
+            <input type="hidden" name="nonce" value="${row.rowNonce}">
+            <select id="admin-approval-sector-${row.id}" class="admin-approval-sector" name="inputSector[]" data-id="${row.id}" style="width: 100%" multiple>
+            </select>`
 
             output += `</div>`
 
@@ -120,11 +181,79 @@ const importedVacancyModule = (function() {
           },
           "sortable": false
         },
-      ]
+      ],
+      initComplete: function (settings, response) { // response is ajax response data
+        /** Init select 2 */
+        $('.admin-approval-role').select2({
+          placeholder: '-- Select vacancy role --',
+          // allowClear: true,
+          data: Object.values(vacanciesData.approval.options.role)
+        })
+
+        $('.admin-approval-sector').select2({
+          placeholder: '-- Select vacancy sector --',
+          // allowClear: true,
+          data: Object.values(vacanciesData.approval.options.sector)
+        })
+
+        /** Set selected value
+         * This actualy can set inside coloumn function render, and it worked fine.
+         * BUT, coloumn.render function RUN WHEN DATATABLE INITIALIZATION PROCESS,
+         * while initComplete RUN WHEN INITIALIZATION IS DONE.
+         *
+         * I still think in coloumn.render would be easier.
+         * CMMIIW
+         */
+        response.data.forEach((vacancy) => {
+          if (vacancy.role && vacancy.role !== undefined && vacancy.role !== null && Array.isArray(vacancy.role)) {
+            vacancy.role.forEach((role) => {
+              if ($("#admin-approval-role-" + vacancy.id).find("option[value='" + role + "']").length) {
+                $("#admin-approval-role-" + vacancy.id).val(vacancy.role).trigger('change')
+              } else {
+                // Create a DOM Option and pre-select by default
+                var newOption = new Option(vacanciesData.approval.options.role[role].text, vacanciesData.approval.options.role[role].id, true, true)
+                // Append it to the select
+                $("#admin-approval-role-" + vacancy.id).append(newOption).trigger('change')
+              }
+            })
+          }
+
+          if (vacancy.sector && vacancy.sector !== undefined && vacancy.sector !== null && Array.isArray(vacancy.sector)) {
+            vacancy.sector.forEach((sector) => {
+              if ($("#admin-approval-sector-" + vacancy.id).find("option[value='" + sector + "']").length) {
+                $("#admin-approval-sector-" + vacancy.id).val(sector).trigger('change')
+              } else {
+                var newOption = new Option(vacanciesData.approval.options.sector[sector].text, vacanciesData.approval.options.sector[sector].id, true, true)
+                $("#admin-approval-sector-" + vacancy.id).append(newOption).trigger('change')
+              }
+            })
+          }
+        })
+
+        /** Set event listener for role and sector,
+         * don't put it in module init since when init, multiple "change" event will be triggered.
+         */
+        $('#admin-imported-vacancy-approval-table').on('select2:select', 'td .admin-approval-role', changeRole)
+        $('#admin-imported-vacancy-approval-table').on('select2:unselect', 'td .admin-approval-role', changeRole)
+        $('#admin-imported-vacancy-approval-table').on('select2:clear', 'td .admin-approval-role', changeRole)
+
+        $('#admin-imported-vacancy-approval-table').on('select2:select', 'td .admin-approval-sector', changeSector)
+        $('#admin-imported-vacancy-approval-table').on('select2:unselect', 'td .admin-approval-sector', changeSector)
+        $('#admin-imported-vacancy-approval-table').on('select2:clear', 'td .admin-approval-sector', changeSector)
+      },
     })
   }
 
-  function resetTablePagination(e, settings, len) {
+  /** Event when length is change in Datatable
+   * e (event), settings, len : length
+   *
+   * PLEASE DON'T COMPLAIN ABOUT ABBREVIATION SINCE THIS IS JUST FOLLOWING DATATABLE DOCS.
+   *
+   * why written e : following datatable docs (and other common js practices),
+   * that's why other function using 'e' arguments as a form of uniformity.
+  */
+  function changeLengthDatatable (e, settings, len) {
+    console.log('resetTablePagination')
     let table = new DataTable('#admin-imported-vacancy-approval-table')
     // Get the current page
     var currentPage = table.page()
@@ -137,9 +266,102 @@ const importedVacancyModule = (function() {
       // Go back to the original page
       table.page(currentPage).draw(false)
     }
+
+    var datatableApi = new $.fn.dataTable.Api(table)
+    var response = datatableApi.ajax.json()
+
+    /** Init select 2 */
+    $('.admin-approval-role').select2({
+      placeholder: '-- Select vacancy role --',
+      // allowClear: true,
+      data: Object.values(vacanciesData.approval.options.role)
+    })
+
+    $('.admin-approval-sector').select2({
+      placeholder: '-- Select vacancy sector --',
+      // allowClear: true,
+      data: Object.values(vacanciesData.approval.options.sector)
+    })
+
+    response.data.forEach((vacancy) => {
+      if (vacancy.role && vacancy.role !== undefined && vacancy.role !== null && Array.isArray(vacancy.role)) {
+        vacancy.role.forEach((role) => {
+          if ($("#admin-approval-role-" + vacancy.id).find("option[value='" + role + "']").length) {
+            $("#admin-approval-role-" + vacancy.id).val(vacancy.role).trigger('change')
+          } else {
+            // Create a DOM Option and pre-select by default
+            var newOption = new Option(vacanciesData.approval.options.role[role].text, vacanciesData.approval.options.role[role].id, true, true)
+            // Append it to the select
+            $("#admin-approval-role-" + vacancy.id).append(newOption).trigger('change')
+          }
+        })
+      }
+
+      if (vacancy.sector && vacancy.sector !== undefined && vacancy.sector !== null && Array.isArray(vacancy.sector)) {
+        vacancy.sector.forEach((sector) => {
+          if ($("#admin-approval-sector-" + vacancy.id).find("option[value='" + sector + "']").length) {
+            $("#admin-approval-sector-" + vacancy.id).val(vacancy.sector).trigger('change')
+          } else {
+            var newOption = new Option(vacanciesData.approval.options.sector[sector].text, vacanciesData.approval.options.sector[sector].id, true, true)
+            $("#admin-approval-sector-" + vacancy.id).append(newOption).trigger('change')
+          }
+        })
+      }
+    })
   }
 
-  function changeRole(e) {
+  function drawDatatable (e, settings){
+    /** Get datatable json data */
+    var datatableApi = new $.fn.dataTable.Api(settings)
+    var response = datatableApi.ajax.json()
+
+    /** Init select 2 */
+    $('.admin-approval-role').select2({
+      placeholder: '-- Select vacancy role --',
+      // allowClear: true,
+      data: Object.values(vacanciesData.approval.options.role)
+    })
+
+    $('.admin-approval-sector').select2({
+      placeholder: '-- Select vacancy sector --',
+      // allowClear: true,
+      data: Object.values(vacanciesData.approval.options.sector)
+    })
+
+    response.data.forEach((vacancy) => {
+      if (vacancy.role && vacancy.role !== undefined && vacancy.role !== null && Array.isArray(vacancy.role)) {
+        vacancy.role.forEach((role) => {
+          if ($("#admin-approval-role-" + vacancy.id).find("option[value='" + role + "']").length) {
+            $("#admin-approval-role-" + vacancy.id).val(vacancy.role).trigger('change')
+          } else {
+            // Create a DOM Option and pre-select by default
+            var newOption = new Option(vacanciesData.approval.options.role[role].text, vacanciesData.approval.options.role[role].id, true, true)
+            // Append it to the select
+            $("#admin-approval-role-" + vacancy.id).append(newOption).trigger('change')
+          }
+        })
+      }
+
+      if (vacancy.sector && vacancy.sector !== undefined && vacancy.sector !== null && Array.isArray(vacancy.sector)) {
+        vacancy.sector.forEach((sector) => {
+          if ($("#admin-approval-sector-" + vacancy.id).find("option[value='" + sector + "']").length) {
+            $("#admin-approval-sector-" + vacancy.id).val(vacancy.sector).trigger('change')
+          } else {
+            var newOption = new Option(vacanciesData.approval.options.sector[sector].text, vacanciesData.approval.options.sector[sector].id, true, true)
+            $("#admin-approval-sector-" + vacancy.id).append(newOption).trigger('change')
+          }
+        })
+      }
+    })
+  }
+
+  function pageChangeDatatable (e, settings) {
+    $('input[name="bulkActionAll"]').prop('checked', false)
+  }
+
+  function changeRole (e) {
+    e.preventDefault()
+
     let form = $('#change-role-form-' + $(this).attr('data-id')).serializeArray()
     form.push({
       name: "vacancyID",
@@ -153,8 +375,6 @@ const importedVacancyModule = (function() {
       data: $.param(form),
       beforeSend: function () {
         $('#admin-imported-vacancy-approval-table tbody').hide()
-        var currentPage = table.page()
-        table.ajax.reload().page(currentPage).draw(false)
       },
     })
       .done((response) => {
@@ -164,17 +384,71 @@ const importedVacancyModule = (function() {
           <span class="screen-reader-text">Dismiss this notice.</span>
         </button>
         </div>`)
-        // Get the current page
+
+        $('#admin-imported-vacancy-approval-table tbody').show()
+
+        let table = new DataTable('#admin-imported-vacancy-approval-table')
         var currentPage = table.page()
         table.ajax.reload().page(currentPage).draw(false)
-        $('#admin-imported-vacancy-approval-table tbody').show()
       })
       .fail((response) => {
         $('.update-nag').after('<div class="error notice is-dismissible"><p>' + response.message || response.statusText +'</p></div>')
+
+        $('#admin-imported-vacancy-approval-table tbody').show()
+
+        let table = new DataTable('#admin-imported-vacancy-approval-table')
         var currentPage = table.page()
         table.ajax.reload().page(currentPage).draw(false)
-        $('#admin-imported-vacancy-approval-table tbody').show()
       })
+  }
+
+  function changeSector (e) {
+    let form = $('#change-sector-form-' + $(this).attr('data-id')).serializeArray()
+    form.push({
+      name: "vacancyID",
+      value: $(this).attr('data-id'),
+    })
+
+    let table = new DataTable('#admin-imported-vacancy-approval-table')
+    $.ajax({
+      url: vacanciesData.ajaxUrl,
+      method: "POST",
+      data: $.param(form),
+      beforeSend: function () {
+        $('#admin-imported-vacancy-approval-table tbody').hide()
+      },
+    })
+      .done((response) => {
+        $('.updated notice').remove()
+        $('.update-nag').after(`<div class="updated notice is-dismissible"><p>` + response.message +`</p>
+        <button type="button" class="notice-dismiss">
+          <span class="screen-reader-text">Dismiss this notice.</span>
+        </button>
+        </div>`)
+
+        $('#admin-imported-vacancy-approval-table tbody').show()
+
+        let table = new DataTable('#admin-imported-vacancy-approval-table')
+        var currentPage = table.page()
+        table.ajax.reload().page(currentPage).draw(false)
+      })
+      .fail((response) => {
+        $('.update-nag').after('<div class="error notice is-dismissible"><p>' + response.message || response.statusText +'</p></div>')
+
+        $('#admin-imported-vacancy-approval-table tbody').show()
+
+        let table = new DataTable('#admin-imported-vacancy-approval-table')
+        var currentPage = table.page()
+        table.ajax.reload().page(currentPage).draw(false)
+      })
+  }
+
+  function selectAllToggle(e) {
+    if ($('input[name="bulkActionAll"]:checked')?.length > 0) {
+      $('input[name="inputBulkSelected[]"]').prop("checked", true)
+    } else {
+      $('input[name="inputBulkSelected[]"]').prop("checked", false)
+    }
   }
 
   return {

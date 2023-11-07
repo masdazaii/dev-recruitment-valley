@@ -37,7 +37,8 @@ class CreateFreeJobRequest implements MiRequest
             "employmentType.*" => ["required", "numeric"],
             "externalUrl" => ["url"],
             "experiences.*" => ["numeric"], // Added Line,
-            "countryCode" => [] // Added Line
+            "countryCode" => [], // Added Line
+            "language"  => ["in:nl,en,de,fr,es"] // Added feedback 01 Nov 2023
         ];
     }
 
@@ -59,7 +60,8 @@ class CreateFreeJobRequest implements MiRequest
             "employmentType.*" => "text",
             "externalUrl" => "url",
             "experiences.*" => "text",
-            "countryCode" => "text"
+            "countryCode" => "text",
+            "language"  => "text" // Added feedback 01 Nov 2023
         ];
     }
 

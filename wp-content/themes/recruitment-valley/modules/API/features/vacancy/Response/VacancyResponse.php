@@ -10,6 +10,7 @@ use WP_Post;
 use Helper\StringHelper;
 use Helper\DateHelper;
 use Model\Option;
+use Constant\LanguageConstant;
 
 class VacancyResponse
 {
@@ -58,7 +59,7 @@ class VacancyResponse
                 // "postedDate" => date_format(new DateTime($vacancy->post_date_gmt), "Y-m-d H:i A")
                 "postedDate" => DateHelper::doLocale($vacancy->post_date_gmt, 'nl_NL'),
                 "isNew" => date('Y-m-d') === date('Y-m-d', strtotime($vacancy->post_date_gmt)),
-                "experiences" => $vacancyTaxonomy["experiences"] ?? null,   
+                "experiences" => $vacancyTaxonomy["experiences"] ?? null,
                 "status" => $vacancyTaxonomy["status"] ?? null
             ];
         }, $this->vacancyCollection);
@@ -97,6 +98,17 @@ class VacancyResponse
             $videoUrl = strpos($company->getVideoUrl(), "youtu") ? ["type" => "url", "url" => StringHelper::getYoutubeID($company->getVideoUrl())] : ["type" => "file", "url" => $company->getVideoUrl()]; // Added Line
         }
 
+        /** Addition Feedback 01 Nov 2023 */
+        /** Get language */
+        $languageResponse = $vacancyModel->getLanguage();
+        if ($languageResponse) {
+            $vacancyTaxonomy[] = [
+                'id' => $languageResponse['value'],
+                'name' => LanguageConstant::get('fe', $languageResponse['value'])
+            ];
+        }
+        /** End Addition Feedback 01 Nov 2023 */
+
         /** Changes start here */
         $isImported = $vacancyModel->checkImported();
         if ($isImported) {
@@ -111,19 +123,19 @@ class VacancyResponse
                 "isFavorite" => $candidate ? $candidate->isFavorite($this->vacancyCollection->ID) : false,
                 "company" =>  [
                     "company_id" => $rvAdmin->ID,
-                    "logo" => $company->getThumbnail(),
-                    "name" => $vacancyModel->getImportedCompanyName() ?? $company->getName(),
-                    "about" => $company->getDescription(),
-                    "sector" => $company->getTerms('sector'),
-                    "totalEmployee" => $company->getTotalEmployees(),
-                    "tel" => $company->getPhoneCode() . $company->getPhone(),
+                    "logo" => '',
+                    "name" => $vacancyModel->getImportedCompanyName() ?? '',
+                    "about" => '',
+                    "sector" => $vacancyModel->getImportedCompanySector() ?? '-',
+                    "totalEmployee" => $vacancyModel->getImportedCompanyTotalEmployees() ?? '-',
+                    "tel" => '',
                     "email" => $vacancyModel->getImportedCompanyEmail() ?? '-',
-                    "gallery" => $company->getGallery(true),
-                    "website" => $company->getWebsite(),
-                    "city" => $vacancyModel->getImportedCompanyCity() ?? $company->getCity(),
-                    "country" => $vacancyModel->getImportedCompanyCountry() ?? $company->getCountry(),
-                    "longitude" => $vacancyModel->getImportedCompanyLongitude() ?? $company->getLongitude(),
-                    "latitude" => $vacancyModel->getImportedCompanyLatitude() ?? $company->getLatitude(),
+                    "gallery" => '',
+                    "website" => '',
+                    "city" => $vacancyModel->getImportedCompanyCity() ?? '',
+                    "country" => $vacancyModel->getImportedCompanyCountry() ?? '',
+                    "longitude" => $vacancyModel->getImportedCompanyLongitude() ?? '',
+                    "latitude" => $vacancyModel->getImportedCompanyLatitude() ?? '',
                 ],
                 "socialMedia" => $socialMediaResponse,
                 "contents" => [
@@ -150,7 +162,7 @@ class VacancyResponse
                     "steps" => $vacancyModel->getApplicationProcessStep()
                 ],
                 "longitude" => $vacancyModel->getPlacementAddressLongitude(),
-                "latitude" => $vacancyModel->getPlacementAddressLatitude()
+                "latitude" => $vacancyModel->getPlacementAddressLatitude(),
             ];
         } else {
             /** Anggit's original response (unchanged) */
@@ -214,7 +226,7 @@ class VacancyResponse
                     "title" => $vacancyModel->getApplicationProcessTitle(),
                     "text" => $vacancyModel->getApplicationProcessDescription(),
                     "steps" => $vacancyModel->getApplicationProcessStep()
-                ]
+                ],
             ];
         }
 

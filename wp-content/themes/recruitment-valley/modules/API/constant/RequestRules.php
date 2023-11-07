@@ -110,7 +110,8 @@ class RequestRules
                 "externalUrl" => ["url"],
                 "experiences.*" => ["numeric"],
                 "country" => [],
-                "countryCode" => []
+                "countryCode" => [],
+                "language"  => ["in:nl,en,de,fr,es"] // Added feedback 01 Nov 2023
             ],
             'vacancyCreatePaid' => [
                 "name" => ['required'],
@@ -137,7 +138,8 @@ class RequestRules
                 "twitter" => ["url"],
                 "review" => [],
                 "experiences.*" => ["numeric"], // Added Line
-                "countryCode" => []
+                "countryCode" => [],
+                "language"  => ["in:nl,en,de,fr,es"] // Added feedback 01 Nov 2023
             ],
             'vacancyUpdateFree' => [
                 "description" => ["required"],
@@ -154,7 +156,8 @@ class RequestRules
                 "employmentType.*" => ["required", "numeric", "exists:term/type/term_id/single"],
                 "externalUrl" => ["url"],
                 "experiences.*" => ["numeric", "exists:term/experiences/term_id/single"], // Added Line
-                "countryCode" => []
+                "countryCode" => [],
+                "language"  => ["in:nl,en,de,fr,es"] // Added feedback 01 Nov 2023
             ],
             'vacancyUpdatePaid' => [
                 "city"              => ["required"],
@@ -181,7 +184,8 @@ class RequestRules
                 "applicationProcedureText"  => [],
                 "review"                    => [],
                 "country"                   => ["required"],
-                "countryCode"               => []
+                "countryCode"               => [],
+                "language"  => ["in:nl,en,de,fr,es"] // Added feedback 01 Nov 2023
             ],
             'addFavorite' => [
                 /**
@@ -225,6 +229,11 @@ class RequestRules
                 'inputRole.*'   => ["exists:term/role/term_id/single"],
                 'nonce'         => ["required"]
             ],
+            'vacancyChangeSector' => [
+                'vacancyID'     => ["required", "exists:post/vacancy/post_id/single"],
+                'inputSector.*'   => ["exists:term/sector/term_id/single"],
+                'nonce'         => ["required"]
+            ],
             'vacancyByCompany'    => [
                 'company.*'   => ["required", "exists:user/user/ID"],
                 'result'    => ["in:options,option-value,count,posts"],
@@ -232,6 +241,17 @@ class RequestRules
             'vacancyByRSS'    => [
                 'rss'       => ["required", "exists:post/rss/post_id/single"],
                 'result'    => ["in:options,option-value,count,posts"],
+            ],
+            'vacancyForRSS' => [
+                'company.*' => ["exists:user/user/ID"],
+                'language'  => [],
+                'result'    => ["in:options,option-value,count,posts"],
+            ],
+            'vacancyApprovalBulk' => [
+                'nonce'             => ['required'],
+                'submit'            => ['required', 'in:bulk-status-approval'],
+                'inputBulkStatus'   => ['required', 'in:admin-approved,system-approved,rejected,waiting'],
+                'inputBulkSelected.*'   => ['required']
             ],
             'test' => [
                 'test.*.name' => ["required", "mime:jpg,jpeg,png,bmp,gif,svg,webp"]
@@ -333,7 +353,8 @@ class RequestRules
                 "externalUrl" => "",
                 "experience.*" => "text",
                 "country" => "text",
-                "countryCode" => "text"
+                "countryCode" => "text",
+                "language"  => "text" // Added feedback 01 Nov 2023
             ],
             'vacancyCreatePaid' => [
                 "name" => "text",
@@ -360,7 +381,8 @@ class RequestRules
                 "twitter" => "",
                 "review" => "",
                 "experience.*" => "text",
-                "countryCode" => "text"
+                "countryCode" => "text",
+                "language"  => "text" // Added feedback 01 Nov 2023
             ],
             'vacancyUpdateFree' => [
                 "description"       => "ksespost",
@@ -376,7 +398,8 @@ class RequestRules
                 "employmentType.*"  => "text",
                 "externalUrl"       => "",
                 "experience.*"      => "text",
-                "countryCode"       => "text"
+                "countryCode"       => "text",
+                "language"  => "text" // Added feedback 01 Nov 2023
             ],
             'vacancyUpdatePaid' => [
                 "city"              => "text",
@@ -405,7 +428,8 @@ class RequestRules
                 "galleryJob"                => "",
                 "galleryCompany"            => "",
                 "country"                   => "text",
-                "countryCode"               => "text"
+                "countryCode"               => "text",
+                "language"  => "text" // Added feedback 01 Nov 2023
             ],
             "userChangeEmail" => [
                 'newEmail' => "email"
@@ -421,6 +445,11 @@ class RequestRules
                 'inputRole.*'   => "text",
                 'nonce'         => "text",
             ],
+            'vacancyChangeSector' => [
+                'vacancyID'     => "text",
+                'inputSector.*' => "text",
+                'nonce'         => "text",
+            ],
             'vacancyByCompany'    => [
                 'company.*'   => "text",
                 'result'    => "text",
@@ -428,6 +457,17 @@ class RequestRules
             'vacancyByRSS'    => [
                 'rss'       => "text",
                 'result'    => "text",
+            ],
+            'vacancyForRSS' => [
+                'company.*' => 'text',
+                'language'  => 'text',
+                'result'    => 'text',
+            ],
+            'vacancyApprovalBulk' => [
+                'nonce'             => 'text',
+                'submit'            => 'text',
+                'inputBulkStatus'   => 'text',
+                'inputBulkSelected.*'   => 'text'
             ],
             /** When using rule other than these 2. Please add following sanitize rule in Validator.php. */
             "example" => [
