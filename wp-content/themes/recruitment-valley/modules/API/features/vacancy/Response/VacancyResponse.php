@@ -81,7 +81,6 @@ class VacancyResponse
                 "isNew" => date('Y-m-d') === date('Y-m-d', strtotime($vacancy->post_date_gmt)),
                 "experiences" => $vacancyTaxonomy["experiences"] ?? null,
                 "status" => $vacancyTaxonomy["status"] ?? null,
-                'a' => $vacancyModel->checkIsForAnotherCompany()
             ];
         }, $this->vacancyCollection);
 
