@@ -390,7 +390,7 @@ class JobfeedController
 
                         /** ACF Imported company_size */
                         if (isset($vacancy->organization_size)) {
-                            $payload["rv_vacancy_imported_company_total_employees"] = preg_replace('/[\n\t]+/', '', $vacancy->organization_size);
+                            $payload["rv_vacancy_imported_company_total_employees"] = preg_replace('/[\n\t]+/', '', $vacancy->organization_size->label);
 
                             /** Unset data key */
                             // unset($vacancy->organization_size);

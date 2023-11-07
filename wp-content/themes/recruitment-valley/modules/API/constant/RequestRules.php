@@ -247,6 +247,12 @@ class RequestRules
                 'language'  => [],
                 'result'    => ["in:options,option-value,count,posts"],
             ],
+            'vacancyApprovalBulk' => [
+                'nonce'             => ['required'],
+                'submit'            => ['required', 'in:bulk-status-approval'],
+                'inputBulkStatus'   => ['required', 'in:admin-approved,system-approved,rejected,waiting'],
+                'inputBulkSelected.*'   => ['required']
+            ],
             'test' => [
                 'test.*.name' => ["required", "mime:jpg,jpeg,png,bmp,gif,svg,webp"]
             ]
@@ -456,6 +462,12 @@ class RequestRules
                 'company.*' => 'text',
                 'language'  => 'text',
                 'result'    => 'text',
+            ],
+            'vacancyApprovalBulk' => [
+                'nonce'             => 'text',
+                'submit'            => 'text',
+                'inputBulkStatus'   => 'text',
+                'inputBulkSelected.*'   => 'text'
             ],
             /** When using rule other than these 2. Please add following sanitize rule in Validator.php. */
             "example" => [

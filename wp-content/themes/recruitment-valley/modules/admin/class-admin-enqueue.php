@@ -127,7 +127,8 @@ class AdminEnqueue
                 'approval'  => [
                     'options' => $options,
                     'changeRoleAction'    => 'handle_vacancy_role_change',
-                    'changeSectorAction'    => 'handle_vacancy_sector_change'
+                    'changeSectorAction'    => 'handle_vacancy_sector_change',
+                    'bulkAction'    => 'handle_vacancy_bulk_action'
                 ],
                 'rss'       => $rssData,
                 'postType'  => get_post_type()

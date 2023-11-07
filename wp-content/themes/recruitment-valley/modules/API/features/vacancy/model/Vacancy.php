@@ -1080,6 +1080,12 @@ class Vacancy
             if (array_key_exists('in', $filters)) {
                 $args['post__in'] = $filters['in'];
             }
+
+            if (array_key_exists('search', $filters)) {
+                $args['s'] = $filters['search'];
+            } else if (array_key_exists('s', $filters)) {
+                $args['s'] = $filters['s'];
+            }
         }
 
         return $args;
