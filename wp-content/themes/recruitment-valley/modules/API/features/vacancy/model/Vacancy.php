@@ -96,7 +96,11 @@ class Vacancy
     private $_acf_rv_vacancy_custom_company_logo    = "rv_vacancy_custom_company_logo";
     private $_acf_rv_vacancy_custom_company_name    = "rv_vacancy_custom_company_name";
     private $_acf_rv_vacancy_custom_company_sector  = "rv_vacancy_custom_company_sector";
-    private $_acf_rv_vacancy_custom_company_description    = "rv_vacancy_custom_company_description";
+    private $_acf_rv_vacancy_custom_company_email   = "rv_vacancy_custom_company_email";
+    private $_acf_rv_vacancy_custom_company_phone_code      = "rv_vacancy_custom_company_phone_code";
+    private $_acf_rv_vacancy_custom_company_phone_number    = "rv_vacancy_custom_company_phone_number";
+    private $_acf_rv_vacancy_custom_company_total_employees = "rv_vacancy_custom_company_total_employees";
+    private $_acf_rv_vacancy_custom_company_description     = "rv_vacancy_custom_company_description";
 
     private $_taxonomies = ["sector", "role", "type", "education", "working-hours", "status", "location", "experiences"];
 
@@ -1407,6 +1411,76 @@ class Vacancy
                 }
             } else {
                 return $sectors;
+            }
+        } else {
+            throw new Exception('Please specify the vacancy!');
+        }
+    }
+
+    public function getCustomCompanyEmail()
+    {
+        if ($this->vacancy_id) {
+            return $this->getProp($this->_acf_rv_vacancy_custom_company_email, true);
+        } else {
+            throw new Exception('Please specify the vacancy!');
+        }
+    }
+
+    public function getCustomCompanyPhoneCode($result = 'array')
+    {
+        if ($this->vacancy_id) {
+            $phoneCode = $this->getProp($this->_acf_rv_vacancy_custom_company_phone_code, true);
+            if ($phoneCode) {
+                if ($result == 'label') {
+                    if (is_array($phoneCode)) {
+                        return $phoneCode['label'];
+                    } else {
+                        return $phoneCode;
+                    }
+                } else if ($result == 'value') {
+                    if (is_array($phoneCode)) {
+                        return $phoneCode['value'];
+                    } else {
+                        return $phoneCode;
+                    }
+                } else {
+                    return $phoneCode;
+                }
+            }
+        } else {
+            throw new Exception('Please specify the vacancy!');
+        }
+    }
+
+    public function getCustomCompanyPhoneNumber()
+    {
+        if ($this->vacancy_id) {
+            return $this->getProp($this->_acf_rv_vacancy_custom_company_phone_number, true);
+        } else {
+            throw new Exception('Please specify the vacancy!');
+        }
+    }
+
+    public function getCustomCompanyTotalEmployees($result = 'array')
+    {
+        if ($this->vacancy_id) {
+            $totalEmplooyees = $this->getProp($this->_acf_rv_vacancy_custom_company_total_employees, true);
+            if ($totalEmplooyees) {
+                if ($result == 'label') {
+                    if (is_array($totalEmplooyees)) {
+                        return $totalEmplooyees['label'];
+                    } else {
+                        return $totalEmplooyees;
+                    }
+                } else if ($result == 'value') {
+                    if (is_array($totalEmplooyees)) {
+                        return $totalEmplooyees['value'];
+                    } else {
+                        return $totalEmplooyees;
+                    }
+                } else {
+                    return $totalEmplooyees;
+                }
             }
         } else {
             throw new Exception('Please specify the vacancy!');
