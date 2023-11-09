@@ -12,11 +12,20 @@ $(() => {
 	}
 
 	/** Import script for rss */
-	if (vacanciesData.postType == 'rss') {
+	if (adminData.postType == 'rss') {
 		import('./vacancy/admin-rss.js').then((module) => {
 			const rssModule = module.default // Access the default property
 
 			rssModule.init()
+		})
+	}
+
+	/** Import script for admin vacancy edit page */
+	if (adminData.postType == 'vacancy' && (adminData.screenAction == 'add' || adminData.screenAction == 'edit')) {
+		import('./vacancy/admin-vacancy.js').then((module) => {
+			const vacancyModule = module.default // Access the default property
+
+			vacancyModule.init()
 		})
 	}
 })

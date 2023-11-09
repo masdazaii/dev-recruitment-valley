@@ -29,10 +29,10 @@ const importedVacancyModule = (function() {
       // ordering: false,
       order: [[1, 'asc']],
       ajax: {
-        url: vacanciesData.ajaxUrl,
+        url: adminData.ajaxUrl,
         method: 'GET',
         data: {
-          action: vacanciesData.list.action,
+          action: adminData.list.action,
         },
         dataSrc: (response) => {
           return response.data
@@ -118,7 +118,7 @@ const importedVacancyModule = (function() {
 
             let output = `
             <form id="change-role-form-${row.id}" style="">
-            <input type="hidden" name="action" value="${vacanciesData.approval.changeRoleAction}">
+            <input type="hidden" name="action" value="${adminData.approval.changeRoleAction}">
             <input type="hidden" name="nonce" value="${row.rowNonce}">
             <select id="admin-approval-role-${row.id}" class="admin-approval-role" name="inputRole[]" data-id="${row.id}" style="width: 100%" multiple></select>`
 
@@ -132,7 +132,7 @@ const importedVacancyModule = (function() {
             //     $("#admin-approval-role-" + row.id).val(role).trigger('change')
             //   } else {
             //     // Create a DOM Option and pre-select by default
-            //     var newOption = new Option(vacanciesData.approval.options.role[role].text, vacanciesData.approval.options.role[role].id, true, true)
+            //     var newOption = new Option(adminData.approval.options.role[role].text, adminData.approval.options.role[role].id, true, true)
             //     // Append it to the select
             //     $("#admin-approval-role-" + row.id).append(newOption).trigger('change')
             //   }
@@ -148,7 +148,7 @@ const importedVacancyModule = (function() {
 
             let output = `
             <form id="change-sector-form-${row.id}" style="">
-            <input type="hidden" name="action" value="${vacanciesData.approval.changeSectorAction}">
+            <input type="hidden" name="action" value="${adminData.approval.changeSectorAction}">
             <input type="hidden" name="nonce" value="${row.rowNonce}">
             <select id="admin-approval-sector-${row.id}" class="admin-approval-sector" name="inputSector[]" data-id="${row.id}" style="width: 100%" multiple>
             </select>`
@@ -162,7 +162,7 @@ const importedVacancyModule = (function() {
         { data : "publishDate" },
         { data : "id",
           render : (data, type, row, meta) => {
-            let output = `<form method="POST" action="${vacanciesData.postUrl}">
+            let output = `<form method="POST" action="${adminData.postUrl}">
               <input type="hidden" name="action" value="handle_imported_vacancy_approval">
               <input type="hidden" name="nonce" value="${row.rowNonce}">
               <input type="hidden" name="vacancyID" value="${row.id}">`
@@ -187,13 +187,13 @@ const importedVacancyModule = (function() {
         $('.admin-approval-role').select2({
           placeholder: '-- Select vacancy role --',
           // allowClear: true,
-          data: Object.values(vacanciesData.approval.options.role)
+          data: Object.values(adminData.approval.options.role)
         })
 
         $('.admin-approval-sector').select2({
           placeholder: '-- Select vacancy sector --',
           // allowClear: true,
-          data: Object.values(vacanciesData.approval.options.sector)
+          data: Object.values(adminData.approval.options.sector)
         })
 
         /** Set selected value
@@ -211,7 +211,7 @@ const importedVacancyModule = (function() {
                 $("#admin-approval-role-" + vacancy.id).val(vacancy.role).trigger('change')
               } else {
                 // Create a DOM Option and pre-select by default
-                var newOption = new Option(vacanciesData.approval.options.role[role].text, vacanciesData.approval.options.role[role].id, true, true)
+                var newOption = new Option(adminData.approval.options.role[role].text, adminData.approval.options.role[role].id, true, true)
                 // Append it to the select
                 $("#admin-approval-role-" + vacancy.id).append(newOption).trigger('change')
               }
@@ -223,7 +223,7 @@ const importedVacancyModule = (function() {
               if ($("#admin-approval-sector-" + vacancy.id).find("option[value='" + sector + "']").length) {
                 $("#admin-approval-sector-" + vacancy.id).val(sector).trigger('change')
               } else {
-                var newOption = new Option(vacanciesData.approval.options.sector[sector].text, vacanciesData.approval.options.sector[sector].id, true, true)
+                var newOption = new Option(adminData.approval.options.sector[sector].text, adminData.approval.options.sector[sector].id, true, true)
                 $("#admin-approval-sector-" + vacancy.id).append(newOption).trigger('change')
               }
             })
@@ -274,13 +274,13 @@ const importedVacancyModule = (function() {
     $('.admin-approval-role').select2({
       placeholder: '-- Select vacancy role --',
       // allowClear: true,
-      data: Object.values(vacanciesData.approval.options.role)
+      data: Object.values(adminData.approval.options.role)
     })
 
     $('.admin-approval-sector').select2({
       placeholder: '-- Select vacancy sector --',
       // allowClear: true,
-      data: Object.values(vacanciesData.approval.options.sector)
+      data: Object.values(adminData.approval.options.sector)
     })
 
     response.data.forEach((vacancy) => {
@@ -290,7 +290,7 @@ const importedVacancyModule = (function() {
             $("#admin-approval-role-" + vacancy.id).val(vacancy.role).trigger('change')
           } else {
             // Create a DOM Option and pre-select by default
-            var newOption = new Option(vacanciesData.approval.options.role[role].text, vacanciesData.approval.options.role[role].id, true, true)
+            var newOption = new Option(adminData.approval.options.role[role].text, adminData.approval.options.role[role].id, true, true)
             // Append it to the select
             $("#admin-approval-role-" + vacancy.id).append(newOption).trigger('change')
           }
@@ -302,7 +302,7 @@ const importedVacancyModule = (function() {
           if ($("#admin-approval-sector-" + vacancy.id).find("option[value='" + sector + "']").length) {
             $("#admin-approval-sector-" + vacancy.id).val(vacancy.sector).trigger('change')
           } else {
-            var newOption = new Option(vacanciesData.approval.options.sector[sector].text, vacanciesData.approval.options.sector[sector].id, true, true)
+            var newOption = new Option(adminData.approval.options.sector[sector].text, adminData.approval.options.sector[sector].id, true, true)
             $("#admin-approval-sector-" + vacancy.id).append(newOption).trigger('change')
           }
         })
@@ -319,13 +319,13 @@ const importedVacancyModule = (function() {
     $('.admin-approval-role').select2({
       placeholder: '-- Select vacancy role --',
       // allowClear: true,
-      data: Object.values(vacanciesData.approval.options.role)
+      data: Object.values(adminData.approval.options.role)
     })
 
     $('.admin-approval-sector').select2({
       placeholder: '-- Select vacancy sector --',
       // allowClear: true,
-      data: Object.values(vacanciesData.approval.options.sector)
+      data: Object.values(adminData.approval.options.sector)
     })
 
     response.data.forEach((vacancy) => {
@@ -335,7 +335,7 @@ const importedVacancyModule = (function() {
             $("#admin-approval-role-" + vacancy.id).val(vacancy.role).trigger('change')
           } else {
             // Create a DOM Option and pre-select by default
-            var newOption = new Option(vacanciesData.approval.options.role[role].text, vacanciesData.approval.options.role[role].id, true, true)
+            var newOption = new Option(adminData.approval.options.role[role].text, adminData.approval.options.role[role].id, true, true)
             // Append it to the select
             $("#admin-approval-role-" + vacancy.id).append(newOption).trigger('change')
           }
@@ -347,7 +347,7 @@ const importedVacancyModule = (function() {
           if ($("#admin-approval-sector-" + vacancy.id).find("option[value='" + sector + "']").length) {
             $("#admin-approval-sector-" + vacancy.id).val(vacancy.sector).trigger('change')
           } else {
-            var newOption = new Option(vacanciesData.approval.options.sector[sector].text, vacanciesData.approval.options.sector[sector].id, true, true)
+            var newOption = new Option(adminData.approval.options.sector[sector].text, adminData.approval.options.sector[sector].id, true, true)
             $("#admin-approval-sector-" + vacancy.id).append(newOption).trigger('change')
           }
         })
@@ -370,7 +370,7 @@ const importedVacancyModule = (function() {
 
     let table = new DataTable('#admin-imported-vacancy-approval-table')
     $.ajax({
-      url: vacanciesData.ajaxUrl,
+      url: adminData.ajaxUrl,
       method: "POST",
       data: $.param(form),
       beforeSend: function () {
@@ -411,7 +411,7 @@ const importedVacancyModule = (function() {
 
     let table = new DataTable('#admin-imported-vacancy-approval-table')
     $.ajax({
-      url: vacanciesData.ajaxUrl,
+      url: adminData.ajaxUrl,
       method: "POST",
       data: $.param(form),
       beforeSend: function () {

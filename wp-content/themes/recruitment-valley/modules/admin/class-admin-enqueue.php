@@ -68,9 +68,10 @@ class AdminEnqueue
             'selectedVacancies' => null
         ];
 
-        // $screen = get_current_screen(); // not working in enqueue
-        // if ($screen->parent_base == 'edit') {
-        if (isset($_GET['action']) && $_GET['action'] == 'edit') {
+        $screen = get_current_screen();
+
+        /** GET Rss single data */
+        if (get_post_type() == 'rss' && isset($_GET['action']) && $_GET['action'] == 'edit') {
             try {
                 $rssModel  = new Rss($_GET['post']);
 
@@ -114,9 +115,34 @@ class AdminEnqueue
             }
         }
 
+        $adminVacancyData = null;
+        if (get_post_type() == 'vacancy') {
+            if ($screen->action == 'add' || $screen->action == 'edit' || (isset($_GET['action']) && $_GET['action'] == 'edit')) {
+                $adminVacancyData = [
+                    'optionCityAction' => 'handle_city_list'
+                ];
+            }
+
+            if ($screen->action == 'edit' || (isset($_GET['action']) && $_GET['action'] == 'edit')) {
+
+                try {
+                    $vacancyModel = new Vacancy($_GET['post']);
+
+                    $adminVacancyData['screen']              = 'edit';
+                    $adminVacancyData['selectedCustomCompanyCity']  = $vacancyModel->getCustomCompanyCity('value');
+                } catch (\Exception $e) {
+                    error_log($e->getMessage());
+                }
+            }
+        }
+        $screenAction = $screen->action;
+        if (!$screenAction || empty($screenAction)) {
+            $screenAction = isset($_GET['action']) ? $_GET['action'] : '';
+        }
+
         wp_localize_script(
             'vacancyApprovalScript',
-            'vacanciesData',
+            'adminData',
             [
                 'ajaxUrl'   => admin_url('admin-ajax.php'),
                 'postUrl'   => esc_url(admin_url('admin-post.php')),
@@ -130,8 +156,10 @@ class AdminEnqueue
                     'changeSectorAction'    => 'handle_vacancy_sector_change',
                     'bulkAction'    => 'handle_vacancy_bulk_action'
                 ],
+                'vacancies' => $adminVacancyData,
                 'rss'       => $rssData,
-                'postType'  => get_post_type()
+                'postType'  => get_post_type(),
+                'screenAction' => $screenAction
             ]
         );
 

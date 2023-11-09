@@ -101,6 +101,8 @@ class Vacancy
     private $_acf_rv_vacancy_custom_company_phone_number    = "rv_vacancy_custom_company_phone_number";
     private $_acf_rv_vacancy_custom_company_total_employees = "rv_vacancy_custom_company_total_employees";
     private $_acf_rv_vacancy_custom_company_description     = "rv_vacancy_custom_company_description";
+    private $_acf_rv_vacancy_custom_company_country     = "rv_vacancy_custom_company_country";
+    private $_acf_rv_vacancy_custom_company_city        = "rv_vacancy_custom_company_city";
 
     private $_taxonomies = ["sector", "role", "type", "education", "working-hours", "status", "location", "experiences"];
 
@@ -1481,6 +1483,68 @@ class Vacancy
                 } else {
                     return $totalEmplooyees;
                 }
+            }
+        } else {
+            throw new Exception('Please specify the vacancy!');
+        }
+    }
+
+    /**
+     * Get custom company country function
+     * this acf only return value and
+     * if you can please do not change the return value to array.
+     *
+     * @param string $result
+     * @return mixed
+     */
+    public function getCustomCompanyCountry($result = 'array')
+    {
+        if ($this->vacancy_id) {
+            $value = $this->getProp($this->_acf_rv_vacancy_custom_company_country, true);
+            if ($value) {
+                if ($result == 'label') {
+                    return $value;
+                } else if ($result == 'value') {
+                    return $value;
+                } else {
+                    return [
+                        'value' => $value,
+                        'label' => $value
+                    ];
+                }
+            } else {
+                return $value;
+            }
+        } else {
+            throw new Exception('Please specify the vacancy!');
+        }
+    }
+
+    /**
+     * Get custom company country function
+     * this acf only return value and
+     * if you can please do not change the return value to array.
+     *
+     * @param string $result
+     * @return mixed
+     */
+    public function getCustomCompanyCity($result = 'array')
+    {
+        if ($this->vacancy_id) {
+            $value = $this->getProp($this->_acf_rv_vacancy_custom_company_city, true);
+            if ($value) {
+                if ($result == 'label') {
+                    return $value;
+                } else if ($result == 'value') {
+                    return $value;
+                } else {
+                    return [
+                        'value' => $value,
+                        'label' => $value
+                    ];
+                }
+            } else {
+                return $value;
             }
         } else {
             throw new Exception('Please specify the vacancy!');

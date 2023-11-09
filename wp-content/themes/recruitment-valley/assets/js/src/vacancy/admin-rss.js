@@ -26,13 +26,12 @@ const rssModule = (function () {
 
   function ajaxVacancyOptionValue(company, language) {
     /** Set selected data */
-      if (vacanciesData.rss.selectedCompany !== null) {
-        if (vacanciesData.rss.selectedLanguage == language)
-        vacanciesData.rss.selectedCompany.find((value) => {
+      if (adminData.rss.selectedCompany !== null) {
+        if (adminData.rss.selectedLanguage == language)
+        adminData.rss.selectedCompany.find((value) => {
           if (company.indexOf(value.toString()) !== -1) {
-            // console.log('index : ' + company.indexOf(value.toString()))
-            if (vacanciesData.rss.selectedVacancies !== null) {
-              vacanciesData.rss.selectedVacancies.forEach((option) => {
+            if (adminData.rss.selectedVacancies !== null) {
+              adminData.rss.selectedVacancies.forEach((option) => {
                 if (value.toString() == option.company) {
                   // var newOption = new Option(option.text, option.id, true, true)
                   // $('#metabox-rv_rss_select_vacancy').append(newOption).trigger('change')
@@ -57,11 +56,11 @@ const rssModule = (function () {
       $("*#metabox-rv_rss_select_vacancy").select2({
         ajax: {
           method: "POST",
-          url: vacanciesData.ajaxUrl,
+          url: adminData.ajaxUrl,
           // dataType: 'json',
           data: {
-            action: vacanciesData.rss.action,
-            nonce: vacanciesData.rss.nonce,
+            action: adminData.rss.action,
+            nonce: adminData.rss.nonce,
             company: company || $('*[data-name="rv_rss_select_company"] .acf-input select').val(),
             language: language || $('*[data-name="rv_rss_select_language"] .acf-input select').val(),
             result: "options",
@@ -91,11 +90,11 @@ const rssModule = (function () {
     $("#metabox-rv_rss_select_vacancy").select2({
       ajax: {
         method: "POST",
-        url: vacanciesData.ajaxUrl,
+        url: adminData.ajaxUrl,
         // dataType: 'json',
         data: {
-          action: vacanciesData.rss.action,
-          nonce: vacanciesData.rss.nonce,
+          action: adminData.rss.action,
+          nonce: adminData.rss.nonce,
           company: $(
             '*[data-name="rv_rss_select_company"] .acf-input select'
           ).val(),
