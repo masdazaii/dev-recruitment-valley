@@ -250,11 +250,11 @@ class Vacancy extends RegisterCPT
         switch ($coloumn) {
             case 'status':
                 $status = $vacancyModel->getStatus();
-                if ($status['slug'] == 'open') {
+                if (array_key_exists('slug', $status) && $status['slug'] == 'open') {
                     echo '<span style="color: green; font-weight: bold;">' . $status['name'] . '<span>';
-                } else if ($status['slug'] == 'close') {
+                } else if (array_key_exists('slug', $status) && $status['slug'] == 'close') {
                     echo '<span style="color: red; font-weight: bold;">' . $status['name'] . '<span>';
-                } else if ($status['slug'] == 'declined') {
+                } else if (array_key_exists('slug', $status) && $status['slug'] == 'declined') {
                     echo '<span style="color: orange; font-weight: bold;">' . $status['name'] . '<span>';
                 } else {
                     echo '<span style="color: black; font-weight: bold;">' . $status['name'] . '<span>';

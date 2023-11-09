@@ -15,6 +15,7 @@ class AdminEnqueue
     public function __construct()
     {
         add_action('admin_enqueue_scripts', [$this, 'enqueueAdminScripts']);
+        add_filter('script_loader_tag', [$this, 'filterScriptLoaderTagHandle'], 10, 3);
     }
 
     public function enqueueAdminScripts()
@@ -119,7 +120,8 @@ class AdminEnqueue
         if (get_post_type() == 'vacancy') {
             if ($screen->action == 'add' || $screen->action == 'edit' || (isset($_GET['action']) && $_GET['action'] == 'edit')) {
                 $adminVacancyData = [
-                    'optionCityAction' => 'handle_city_list'
+                    'optionCityAction' => 'handle_city_list',
+                    'countryData'   => \Constant\LocationConstant::countries('', 'all-remap', true, 'value')
                 ];
             }
 
@@ -135,6 +137,7 @@ class AdminEnqueue
                 }
             }
         }
+
         $screenAction = $screen->action;
         if (!$screenAction || empty($screenAction)) {
             $screenAction = isset($_GET['action']) ? $_GET['action'] : '';
@@ -174,6 +177,31 @@ class AdminEnqueue
 
         wp_register_script('select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js');
         wp_enqueue_script('select2');
+
+        if (get_post_type() == 'vacancy') {
+            if ($screen->action == 'add' || $screen->action == 'edit' || (isset($_GET['action']) && $_GET['action'] == 'edit')) {
+                wp_register_script('google', 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDoZGferplQUrXna2-GKtEqBWpwpXj2OJA&libraries=places', [], false, ['strategy' => 'async']);
+                wp_enqueue_script('google');
+            }
+        }
+    }
+
+    public function filterScriptLoaderTagHandle($tag, $handle, $src)
+    {
+        // if ($handle === 'google') {
+
+        //     if (false === stripos($tag, 'async')) {
+
+        //         $tag = str_replace(' src', ' async="async" src', $tag);
+        //     }
+
+        //     if (false === stripos($tag, 'defer')) {
+
+        //         $tag = str_replace('<script ', '<script defer ', $tag);
+        //     }
+        // }
+
+        return $tag;
     }
 }
 
