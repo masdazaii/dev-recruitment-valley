@@ -37,6 +37,25 @@ class VacancyResponse
             $company = new Company($vacancy->post_author);
             $vacancyTaxonomy = $vacancyModel->getTaxonomy(true);
 
+            $thumbnail = null;
+            if ($vacancyModel->checkImported()) {
+                $thumbnail = $option->getDefaultImage('object');
+            } else {
+                if ($vacancyModel->checkIsForAnotherCompany()) {
+                    if ($vacancyModel->checkUseExistingCompany()) {
+                        $selectedCompany = $vacancyModel->getSelectedCompany();
+                        if ($selectedCompany) {
+                            $company = new Company($selectedCompany);
+                            $thumbnail = $company->getThumbnail('object');
+                        }
+                    } else {
+                        $thumbnail = $vacancyModel->getCustomCompanyLogo('object');
+                    }
+                } else {
+                    $thumbnail = $company->getThumbnail('object');
+                }
+            }
+
             return [
                 "id" => $vacancy->ID,
                 "slug" => $vacancy->post_name,
@@ -54,13 +73,14 @@ class VacancyResponse
                 // "salaryRange"=> "2500-3000",
                 "salaryStart" => $vacancyModel->getSalaryStart(),
                 "salaryEnd" => $vacancyModel->getSalaryEnd(),
-                "thumbnail" => $vacancyModel->checkImported() ? $option->getDefaultImage('object') : $company->getThumbnail('object'),
+                // "thumbnail" => $vacancyModel->checkImported() ? $option->getDefaultImage('object') : $company->getThumbnail('object'),
+                "thumbnail" => $thumbnail,
                 "description" => StringHelper::shortenString($vacancyModel->getDescription(), 0, 10000),
                 // "postedDate" => date_format(new DateTime($vacancy->post_date_gmt), "Y-m-d H:i A")
                 "postedDate" => DateHelper::doLocale($vacancy->post_date_gmt, 'nl_NL'),
                 "isNew" => date('Y-m-d') === date('Y-m-d', strtotime($vacancy->post_date_gmt)),
                 "experiences" => $vacancyTaxonomy["experiences"] ?? null,
-                "status" => $vacancyTaxonomy["status"] ?? null
+                "status" => $vacancyTaxonomy["status"] ?? null,
             ];
         }, $this->vacancyCollection);
 
@@ -126,10 +146,10 @@ class VacancyResponse
                     "logo" => '',
                     "name" => $vacancyModel->getImportedCompanyName() ?? '',
                     "about" => '',
-                    "sector" => $vacancyModel->getImportedCompanySector() ?? '-',
-                    "totalEmployee" => $vacancyModel->getImportedCompanyTotalEmployees() ?? '-',
+                    "sector" => $vacancyModel->getImportedCompanySector() ?? [],
+                    "totalEmployee" => $vacancyModel->getImportedCompanyTotalEmployees() ?? '',
                     "tel" => '',
-                    "email" => $vacancyModel->getImportedCompanyEmail() ?? '-',
+                    "email" => $vacancyModel->getImportedCompanyEmail() ?? '',
                     "gallery" => '',
                     "website" => '',
                     "city" => $vacancyModel->getImportedCompanyCity() ?? '',
@@ -165,6 +185,103 @@ class VacancyResponse
                 "latitude" => $vacancyModel->getPlacementAddressLatitude(),
             ];
         } else {
+            if ($vacancyModel->checkIsForAnotherCompany()) {
+                if ($vacancyModel->checkUseExistingCompany()) {
+                    $selectedCompany = $vacancyModel->getSelectedCompany();
+                    if ($selectedCompany) {
+                        $company = new Company($selectedCompany);
+                        $companyData = [
+                            'id'    => $company->user_id,
+                            'name'  => $company->getName(),
+                            'about' => $company->getDescription(),
+                            'logo'  => $company->getThumbnail(),
+                            'sector'    => $company->getTerms('sector'),
+                            'totalEmployee' => $company->getTotalEmployees(),
+                            'tel'   => $company->getPhoneCode() . $company->getPhone(),
+                            'email' => $company->getEmail(),
+                            'gallery'   => $company->getGallery(true),
+                            // 'socialMedia'   =>
+                            //     'facebook' => $company->getFacebook(),
+                            //     'twitter' => $company->getTwitter(),
+                            //     'linkedin' => $company->getLinkedin(),
+                            //     'instagram' => $company->getInstagram(),
+                            // ],
+                            // 'socialMedia'   => $socialMediaResponse,
+                            'website'   => $company->getWebsite(),
+                            // 'maps'  =>
+                            'city'      => $company->getCity(),
+                            'country'   => $company->getCountry(),
+                            'countryCode'   => $company->getCountryCode(),
+                            'longitude' => $company->getLongitude(),
+                            'latitude'  => $company->getLatitude(),
+                        ];
+                    } else {
+                        $companyData = [
+                            'id'    => $vacancyModel->getSelectedCompany(),
+                            'name'  => $vacancyModel->getCustomCompanyName(),
+                            'about' => $vacancyModel->getCustomCompanyDescription(),
+                            'logo'  => $vacancyModel->getCustomCompanyLogo('url'),
+                            'sector'    => $vacancyModel->getCustomCompanySector('array'),
+                            'totalEmployee' => $vacancyModel->getCustomCompanyTotalEmployees('label'),
+                            'tel'   => $vacancyModel->getCustomCompanyPhoneCode('label') . $vacancyModel->getCustomCompanyPhoneNumber(),
+                            'email' => $vacancyModel->getCustomCompanyEmail(),
+                            'gallery'   => '',
+                            'website'   => '',
+                            'city'      => '',
+                            'country'   => '',
+                            'countryCode'   => '',
+                            'longitude' => '',
+                            'latitude'  => '',
+                        ];
+                    }
+                } else {
+                    $companyData = [
+                        'id'    => $vacancyModel->getSelectedCompany(),
+                        'name'  => $vacancyModel->getCustomCompanyName(),
+                        'about' => $vacancyModel->getCustomCompanyDescription(),
+                        'logo'  => $vacancyModel->getCustomCompanyLogo('url'),
+                        'sector'    => $vacancyModel->getCustomCompanySector('array'),
+                        'totalEmployee' => $vacancyModel->getCustomCompanyTotalEmployees('label'),
+                        'tel'   => $vacancyModel->getCustomCompanyPhoneCode('label') . $vacancyModel->getCustomCompanyPhoneNumber(),
+                        'email' => $vacancyModel->getCustomCompanyEmail(),
+                        'gallery'   => '',
+                        'website'   => '',
+                        'city'      => '',
+                        'country'   => '',
+                        'countryCode'   => '',
+                        'longitude' => '',
+                        'latitude'  => '',
+                    ];
+                }
+                // $companyID = $vacancyModel->checkUseExistingCompany() ? $vacancyModel->checkUseExistingCompany() : $company->user_id;
+            } else {
+                $companyData = [
+                    'id'    => $company->user_id,
+                    'name'  => $company->getName(),
+                    'about' => $company->getDescription(),
+                    'logo'  => $company->getThumbnail(),
+                    'sector'    => $company->getTerms('sector'),
+                    "totalEmployee" => $company->getTotalEmployees(),
+                    "tel"   => $company->getPhoneCode() . $company->getPhone(),
+                    "email" => $company->getEmail(),
+                    "gallery"   => $company->getGallery(true),
+                    // "socialMedia"   =>
+                    //     "facebook" => $company->getFacebook(),
+                    //     "twitter" => $company->getTwitter(),
+                    //     "linkedin" => $company->getLinkedin(),
+                    //     "instagram" => $company->getInstagram(),
+                    // ],
+                    // "socialMedia"   => $socialMediaResponse,
+                    "website"   => $company->getWebsite(),
+                    // "maps"  =>
+                    "city"      => $company->getCity(),
+                    "country"   => $company->getCountry(),
+                    "countryCode"   => $company->getCountryCode(),
+                    "longitude" => $company->getLongitude(),
+                    "latitude"  => $company->getLatitude(),
+                ];
+            }
+
             /** Anggit's original response (unchanged) */
             $formattedResponse = [
                 "id" => $this->vacancyCollection->ID,
@@ -174,15 +291,41 @@ class VacancyResponse
                 // "isFavorite" => $candidate ? $candidate->isFavorite($this->vacancyCollection->post_author) : false, // Changed below
                 "isFavorite" => $candidate ? $candidate->isFavorite($this->vacancyCollection->ID) : false,
                 "company" =>  [
-                    "company_id" => $company->user_id,
-                    "logo" => $company->getThumbnail(),
-                    "name" => $company->getName(),
-                    "about" => $company->getDescription(),
-                    "sector" => $company->getTerms('sector'),
-                    "totalEmployee" => $company->getTotalEmployees(),
-                    "tel" => $company->getPhoneCode() . $company->getPhone(),
-                    "email" => $company->getEmail(),
-                    "gallery" => $company->getGallery(true),
+                    /** Anggit's response */
+                    // "company_id" => $company->user_id,
+                    // "logo" => $company->getThumbnail(),
+                    // "name" => $company->getName(),
+                    // "about" => $company->getDescription(),
+                    // "sector" => $company->getTerms('sector'),
+                    // "totalEmployee" => $company->getTotalEmployees(),
+                    // "tel" => $company->getPhoneCode() . $company->getPhone(),
+                    // "email" => $company->getEmail(),
+                    // "gallery" => $company->getGallery(true),
+                    // // "socialMedia" => [
+                    // //     "facebook" => $company->getFacebook(),
+                    // //     "twitter" => $company->getTwitter(),
+                    // //     "linkedin" => $company->getLinkedin(),
+                    // //     "instagram" => $company->getInstagram(),
+                    // // ],
+                    // // "socialMedia" => $socialMediaResponse,
+                    // "website" => $company->getWebsite(),
+                    // // "maps" => "", // not needed - esa feedback 29-08-2023
+                    // "city" => $company->getCity(),
+                    // "country" => $company->getCountry(),
+                    // "countryCode" => $company->getCountryCode(), // Added Line
+                    // "longitude" => $company->getLongitude(),
+                    // "latitude" => $company->getLatitude(),
+
+                    /** Changes after vacancy for other company */
+                    "company_id"    => $companyData['id'],
+                    "logo"      => $companyData['logo'],
+                    "name"      => $companyData['name'],
+                    "about"     => $companyData['about'],
+                    "sector"    => $companyData['sector'],
+                    "totalEmployee" => $companyData['totalEmployee'],
+                    "tel"       => $companyData['tel'],
+                    "email"     => $companyData['email'],
+                    "gallery"   => $companyData['gallery'],
                     // "socialMedia" => [
                     //     "facebook" => $company->getFacebook(),
                     //     "twitter" => $company->getTwitter(),
@@ -190,13 +333,14 @@ class VacancyResponse
                     //     "instagram" => $company->getInstagram(),
                     // ],
                     // "socialMedia" => $socialMediaResponse,
-                    "website" => $company->getWebsite(),
+                    "website"   => $companyData['website'],
                     // "maps" => "", // not needed - esa feedback 29-08-2023
-                    "city" => $company->getCity(),
-                    "country" => $company->getCountry(),
-                    "countryCode" => $company->getCountryCode(), // Added Line
-                    "longitude" => $company->getLongitude(),
-                    "latitude" => $company->getLatitude(),
+                    "city"      => $companyData['city'],
+                    "country"   => $companyData['country'],
+                    "countryCode"   => $companyData['countryCode'],
+                    "longitude"     => $companyData['longitude'],
+                    "latitude"      => $companyData['latitude']
+
                 ], // later get company here
                 "socialMedia" => $socialMediaResponse,
                 "contents" => [
