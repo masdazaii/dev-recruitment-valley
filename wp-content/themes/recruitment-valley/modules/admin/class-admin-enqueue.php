@@ -132,6 +132,7 @@ class AdminEnqueue
 
                     $adminVacancyData['screen']              = 'edit';
                     $adminVacancyData['selectedCustomCompanyCity']  = $vacancyModel->getCustomCompanyCity('value');
+                    $adminVacancyData['selectedVacancyCity'] = $vacancyModel->getCity('value');
                 } catch (\Exception $e) {
                     error_log($e->getMessage());
                 }
