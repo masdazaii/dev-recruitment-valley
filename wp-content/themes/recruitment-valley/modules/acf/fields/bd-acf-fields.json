@@ -4489,7 +4489,20 @@
                 "type": "select",
                 "instructions": "",
                 "required": 0,
-                "conditional_logic": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_6549dc44ff28a",
+                            "operator": "==",
+                            "value": "1"
+                        },
+                        {
+                            "field": "field_6549e6f321f6a",
+                            "operator": "!=",
+                            "value": "1"
+                        }
+                    ]
+                ],
                 "wrapper": {
                     "width": "",
                     "class": "",
@@ -4701,7 +4714,20 @@
                 "type": "select",
                 "instructions": "",
                 "required": 0,
-                "conditional_logic": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_6549dc44ff28a",
+                            "operator": "==",
+                            "value": "1"
+                        },
+                        {
+                            "field": "field_6549e6f321f6a",
+                            "operator": "!=",
+                            "value": "1"
+                        }
+                    ]
+                ],
                 "wrapper": {
                     "width": "",
                     "class": "",

@@ -4530,7 +4530,20 @@ acf_add_local_field_group(array(
 			'type' => 'select',
 			'instructions' => '',
 			'required' => 0,
-			'conditional_logic' => 0,
+			'conditional_logic' => array(
+				array(
+					array(
+						'field' => 'field_6549dc44ff28a',
+						'operator' => '==',
+						'value' => '1',
+					),
+					array(
+						'field' => 'field_6549e6f321f6a',
+						'operator' => '!=',
+						'value' => '1',
+					),
+				),
+			),
 			'wrapper' => array(
 				'width' => '',
 				'class' => '',
@@ -4742,7 +4755,20 @@ acf_add_local_field_group(array(
 			'type' => 'select',
 			'instructions' => '',
 			'required' => 0,
-			'conditional_logic' => 0,
+			'conditional_logic' => array(
+				array(
+					array(
+						'field' => 'field_6549dc44ff28a',
+						'operator' => '==',
+						'value' => '1',
+					),
+					array(
+						'field' => 'field_6549e6f321f6a',
+						'operator' => '!=',
+						'value' => '1',
+					),
+				),
+			),
 			'wrapper' => array(
 				'width' => '',
 				'class' => '',
