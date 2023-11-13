@@ -102,10 +102,10 @@ class Vacancy extends RegisterCPT
 
     public function setExpiredDate($object_id, $terms = [], $tt_ids = [], $taxonomy = '', $append = true, $old_tt_ids = [])
     {
-        $this->wpdb->query("START TRANSACTION");
-
         $post = get_post($object_id, 'object');
         if ($post->post_type == 'vacancy') {
+            $this->wpdb->query("START TRANSACTION");
+
             error_log('class-vacancy - method : setExpiredDate - Before try to update the expired date.');
             error_log('class-vacancy - method : setExpiredDate - post : ' . $object_id . ' - terms : ' . json_encode($terms));
 
