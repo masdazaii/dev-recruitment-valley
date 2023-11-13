@@ -121,6 +121,20 @@ class JobfeedController
             $unusedData = [];
 
             foreach ($vacancies as $vacancy) {
+                $arguments = [
+                    'post_type' => 'vacancy',
+                    'post_status' => 'publish',
+                    'post_author' => $importUser
+                ];
+
+                $payload    = [];
+                $taxonomy   = [];
+
+                /** Map property that not used.
+                 * this will be stored in post meta.
+                 */
+                $unusedData = [];
+
                 /** Decode vacancy */
                 $vacancy = json_decode($vacancy);
 
