@@ -13,7 +13,7 @@ const rssModule = (function () {
     if ($("#metabox-rv_rss_select_vacancy").length) {
       $("#metabox-rv_rss_select_vacancy").select2();
     }
-    // getVacanciesOption()
+    getVacanciesOption()
   }
 
   function ajaxVacancyOptionValueCompany(e) {
@@ -27,7 +27,6 @@ const rssModule = (function () {
   function ajaxVacancyOptionValue(company, language) {
     /** Set selected data */
       if (adminData.rss.selectedCompany !== null) {
-        if (adminData.rss.selectedLanguage == language)
         adminData.rss.selectedCompany.find((value) => {
           if (company.indexOf(value.toString()) !== -1) {
             if (adminData.rss.selectedVacancies !== null) {
@@ -48,6 +47,19 @@ const rssModule = (function () {
             }
           }
         })
+      } else if (adminData.rss.selectedLanguage == language) {
+        if (adminData.rss.selectedVacancies !== null) {
+          adminData.rss.selectedVacancies.forEach((option) => {
+            if ($('#metabox-rv_rss_select_vacancy').find("option[value='" + option.id + "']").length) {
+              $('#metabox-rv_rss_select_vacancy').val(option.id).trigger('change');
+            } else {
+                // Create a DOM Option and pre-select by default
+                var newOption = new Option(option.text, option.id, true, true);
+                // Append it to the select
+                $('#metabox-rv_rss_select_vacancy').append(newOption).trigger('change');
+            }
+          })
+        }
       } else {
         /** Empty selected vacancies */
         $('#metabox-rv_rss_select_vacancy').val(null).trigger('change')

@@ -101,7 +101,12 @@ class Rss
 
     public function getRssVacancies()
     {
-        return maybe_unserialize($this->getter($this->_meta_rss_vacancy, true, 'meta'));
+        return $this->getter($this->_meta_rss_vacancy, true, 'meta');
+        // $metaValue = $this->getter($this->_meta_rss_vacancy, true, 'meta');
+        // error_log('getRssVacancies before maybe_unserialize : '.json_encode($metaValue));
+        // $afterSerialize = maybe_unserialize();
+        // error_log('getRssVacancies after maybe_unserialize : '.json_encode($afterSerialize));
+        // return $afterSerialize;
     }
 
     public function setRssVacancies($value)
@@ -124,11 +129,13 @@ class Rss
         return $this->getter($this->_meta_rss_endpoint_url, true, 'meta');
     }
 
-    public function getRssLanguage() {
+    public function getRssLanguage()
+    {
         return $this->getter($this->_acf_rss_language, true, 'acf');
     }
 
-    public function setRssLanguage($value) {
+    public function setRssLanguage($value)
+    {
         return $this->setter($this->_acf_rss_language, $value, 'acf');
     }
 }
