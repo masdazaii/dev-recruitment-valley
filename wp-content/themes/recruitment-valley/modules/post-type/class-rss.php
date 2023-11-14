@@ -39,8 +39,6 @@ class RssCPT extends RegisterCPT
     {
         if ($post->post_type == 'rss') {
             $this->wpdb->query('START TRANSACTION');
-            // print('<pre>' . print_r($_POST, true) . '</pre>');
-            // die;
             try {
                 $rssModel = new \Model\Rss($post_id);
 

@@ -418,7 +418,11 @@ class PackageController
             // update_user_meta($user_id, 'used_count', );
 
             /** Update coupon meta when coupon is used */
-            if ($transaction_data->metadata->coupon_id) {
+            error_log('meta : ' . json_encode($transaction_data->metadata));
+            error_log('coupon : ' . json_encode($transaction_data->metadata->coupon_id));
+
+            /** Update coupon meta when coupon is used */
+            if ($transaction_data->metadata->coupon_id && $transaction_data->metadata->coupon_id != "false") {
                 try {
                     $coupon = new Coupon($transaction_data->metadata->coupon_id);
 

@@ -107,7 +107,8 @@ class GlobalEndpoint
                 'get_payment_package' => [
                     'url'                   => '/packages',
                     'methods'               => 'GET',
-                    'permission_callback'   => [$authMiddleware, 'authorize_company'],
+                    // 'permission_callback'   => [$authMiddleware, 'authorize_company'], // Disable feedback FE 12 Nov 2023
+                    'permission_callback'   => '__return_true',
                     'callback'              => [$paymentService, 'get']
                 ],
                 'create_payment_package' => [

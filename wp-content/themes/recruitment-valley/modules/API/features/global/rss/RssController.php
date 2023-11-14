@@ -73,35 +73,41 @@ class RssController
         $rssVacancies = $rssModel->getRssVacancies();
 
         $vacancyModel = new Vacancy();
-        $filters = [
-            'in' => array_values($rssVacancies),
-            'meta' => [
-                "relation" => "AND",
-                [
-                    'key' => 'expired_at',
-                    'value' => date("Y-m-d H:i:s"),
-                    'compare' => '>',
-                    'type' => "DATE"
+        if (isset($rssVacancies) && is_array($rssVacancies)) {
+            $filters = [
+                'in' => array_values($rssVacancies),
+                'meta' => [
+                    "relation" => "AND",
+                    [
+                        'key' => 'expired_at',
+                        'value' => date("Y-m-d H:i:s"),
+                        'compare' => '>',
+                        'type' => "DATE"
+                    ],
                 ],
-            ],
-            'taxonomy' => [
-                "relation" => "AND",
-                [
-                    'taxonomy' => 'status',
-                    'field'    => 'slug',
-                    'terms'    => 'open',
-                    'compare'  => 'IN'
-                ],
-            ]
-        ];
-        $vacancies = $vacancyModel->getVacancies($filters);
+                'taxonomy' => [
+                    "relation" => "AND",
+                    [
+                        'taxonomy' => 'status',
+                        'field'    => 'slug',
+                        'terms'    => 'open',
+                        'compare'  => 'IN'
+                    ],
+                ]
+            ];
+            $vacancies = $vacancyModel->getVacancies($filters);
 
-        $response = [
-            'data' => []
-        ];
+            $response = [
+                'data' => []
+            ];
 
-        if ($vacancies && $vacancies->found_posts > 0) {
-            $response['data'] = $vacancies->posts;
+            if ($vacancies && $vacancies->found_posts > 0) {
+                $response['data'] = $vacancies->posts;
+            }
+        } else {
+            $response = [
+                'data' => []
+            ];
         }
 
         echo $this->convert($response);

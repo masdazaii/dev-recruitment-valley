@@ -66,8 +66,8 @@ class VacancyApproval
         if (is_admin() && current_user_can('administrator')) {
             global $wpdb;
 
-            $wpdb->query("START TRANSACTION");
             try {
+                $wpdb->query("START TRANSACTION");
                 /** Validate and sanitize request */
                 $validator = new ValidationHelper('vacancyApproval', $_POST);
 
@@ -459,8 +459,8 @@ class VacancyApproval
         if (is_admin() && current_user_can('administrator')) {
             global $wpdb;
 
-            $wpdb->query("START TRANSACTION");
             try {
+                $wpdb->query("START TRANSACTION");
                 /** Validate and sanitize request */
                 $validator = new ValidationHelper('vacancyChangeRole', $_POST);
 
@@ -545,8 +545,8 @@ class VacancyApproval
         if (is_admin() && current_user_can('administrator')) {
             global $wpdb;
 
-            $wpdb->query("START TRANSACTION");
             try {
+                $wpdb->query("START TRANSACTION");
                 /** Validate and sanitize request */
                 $validator = new ValidationHelper('vacancyChangeSector', $_POST);
 
@@ -637,8 +637,8 @@ class VacancyApproval
         if (is_admin() && current_user_can('administrator')) {
             global $wpdb;
 
-            $wpdb->query("START TRANSACTION");
             try {
+                $wpdb->query("START TRANSACTION");
                 switch ($_POST['submit']) {
                     case 'bulk-status-approval':
                     default:
