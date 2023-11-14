@@ -130,7 +130,7 @@ class RssCPT extends RegisterCPT
                             $vacanciesOption[] = [
                                 'value' => $vacancy->ID,
                                 'label' => $vacancy->post_title,
-                                'selected' => in_array($vacancy->ID, $selectedVacancies)
+                                'selected' => is_array($selectedVacancies) ? in_array($vacancy->ID, $selectedVacancies) : false
                             ];
                         }
                     }

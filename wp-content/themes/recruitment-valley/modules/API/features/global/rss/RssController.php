@@ -71,45 +71,63 @@ class RssController
         /** get rss  */
         $rss = $rssModel->getRssBySlug($request['rss'], 'object');
         $rssVacancies = $rssModel->getRssVacancies();
+        $language = $rssModel->getRssLanguage();
+        $company = $rssModel->getRssCompany();
 
         $vacancyModel = new Vacancy();
-        if (isset($rssVacancies) && is_array($rssVacancies)) {
-            $filters = [
-                'in' => array_values($rssVacancies),
-                'meta' => [
-                    "relation" => "AND",
-                    [
-                        'key' => 'expired_at',
-                        'value' => date("Y-m-d H:i:s"),
-                        'compare' => '>',
-                        'type' => "DATE"
-                    ],
+        $filters = [
+            'meta' => [
+                "relation" => "AND",
+                [
+                    'key' => 'expired_at',
+                    'value' => date("Y-m-d H:i:s"),
+                    'compare' => '>',
+                    'type' => "DATE"
                 ],
-                'taxonomy' => [
-                    "relation" => "AND",
-                    [
-                        'taxonomy' => 'status',
-                        'field'    => 'slug',
-                        'terms'    => 'open',
-                        'compare'  => 'IN'
-                    ],
-                ]
-            ];
-            $vacancies = $vacancyModel->getVacancies($filters);
+            ],
+            'taxonomy' => [
+                "relation" => "AND",
+                [
+                    'taxonomy' => 'status',
+                    'field'    => 'slug',
+                    'terms'    => 'open',
+                    'compare'  => 'IN'
+                ],
+            ]
+        ];
 
-            $response = [
-                'data' => []
-            ];
+        if (isset($rssVacancies) && is_array($rssVacancies)) {
+            $filters['in'] = array_values($rssVacancies);
+        }
 
-            if ($vacancies && $vacancies->found_posts > 0) {
-                $response['data'] = $vacancies->posts;
-            }
-        } else {
-            $response = [
-                'data' => []
+        if (isset($language) && $language) {
+            $filters['meta'][] = [
+                'key' => 'rv_vacancy_language',
+                'value' => $language,
+                'compare' => '='
             ];
         }
 
+        if (isset($company) && $company) {
+            if (is_array($company)) {
+                $filters['author'] = $company;
+            } else {
+                $filters['author'] = [$company];
+            }
+        }
+
+        /** Get vacancies data */
+        $vacancies = $vacancyModel->getVacancies($filters);
+
+        $response = [
+            'data' => []
+        ];
+
+        if ($vacancies && $vacancies->found_posts > 0) {
+            $response['data'] = $vacancies->posts;
+        }
+
+        /** Convert to xml */
         echo $this->convert($response);
     }
 }
