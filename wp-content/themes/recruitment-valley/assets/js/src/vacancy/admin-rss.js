@@ -47,7 +47,7 @@ const rssModule = (function () {
      */
 
     /** Set selected data */
-    if (adminData.rss.selectedCompany !== null) {
+    if (adminData.rss.selectedCompany !== null && adminData.rss.selectedCompany != false && adminData.rss.selectedCompany !== undefined) {
       adminData.rss.selectedCompany.find((value) => {
         if (company.indexOf(value.toString()) !== -1) {
           if (adminData.rss.selectedVacancies !== null) {
@@ -68,7 +68,7 @@ const rssModule = (function () {
           }
         }
       })
-    } else if (adminData.rss.selectedLanguage == language) {
+    } else if (adminData.rss.selectedLanguage != false && adminData.rss.selectedLanguage !== undefined && adminData.rss.selectedLanguage == language) {
       if (adminData.rss.selectedVacancies !== null) {
         adminData.rss.selectedVacancies.forEach((option) => {
           if ($(el.rssMetaboxSelectVacancy).find("option[value='" + option.id + "']").length) {

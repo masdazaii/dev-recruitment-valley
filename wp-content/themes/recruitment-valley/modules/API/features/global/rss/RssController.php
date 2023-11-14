@@ -71,6 +71,8 @@ class RssController
         /** get rss  */
         $rss = $rssModel->getRssBySlug($request['rss'], 'object');
         $rssVacancies = $rssModel->getRssVacancies();
+        $language = $rssModel->getRssLanguage();
+        $company = $rssModel->getRssCompany();
 
         $vacancyModel = new Vacancy();
         $filters = [
@@ -96,6 +98,22 @@ class RssController
 
         if (isset($rssVacancies) && is_array($rssVacancies)) {
             $filters['in'] = array_values($rssVacancies);
+        }
+
+        if (isset($language) && $language) {
+            $filters['meta'][] = [
+                'key' => 'rv_vacancy_language',
+                'value' => $language,
+                'compare' => '='
+            ];
+        }
+
+        if (isset($company) && $company) {
+            if (is_array($company)) {
+                $filters['author'] = $company;
+            } else {
+                $filters['author'] = [$company];
+            }
         }
 
         /** Get vacancies data */
