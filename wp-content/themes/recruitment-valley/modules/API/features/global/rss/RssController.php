@@ -101,11 +101,21 @@ class RssController
         }
 
         if (isset($language) && $language) {
-            $filters['meta'][] = [
-                'key' => 'rv_vacancy_language',
-                'value' => $language,
-                'compare' => '='
-            ];
+            if (is_array($language)) {
+                if (array_key_exists('value', $language)) {
+                    $filters['meta'][] = [
+                        'key' => 'rv_vacancy_language',
+                        'value' => $language['value'],
+                        'compare' => '='
+                    ];
+                }
+            } else {
+                $filters['meta'][] = [
+                    'key' => 'rv_vacancy_language',
+                    'value' => $language,
+                    'compare' => '='
+                ];
+            }
         }
 
         if (isset($company) && $company) {
