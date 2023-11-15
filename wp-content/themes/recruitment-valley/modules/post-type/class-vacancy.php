@@ -6,9 +6,11 @@ use Constant\Message;
 use DateTimeImmutable;
 use Vacancy\Vacancy as VacancyModel;
 use constant\NotificationConstant;
+use DateTime;
 use Global\NotificationService;
 use Global\OptionController;
 use Helper\Maphelper;
+use Model\Term;
 
 class Vacancy extends RegisterCPT
 {
@@ -25,10 +27,13 @@ class Vacancy extends RegisterCPT
         add_action('add_meta_boxes', [$this, 'addVacancyMetaboxes'], 10, 2);
         add_filter('manage_vacancy_posts_columns', [$this, 'vacancyColoumn'], 10, 1);
         add_action('manage_vacancy_posts_custom_column', [$this, 'vacancyCustomColoumn'], 10, 2);
-        $this->_message = new Message();
+        add_action('restrict_manage_posts', [$this, 'vacancyCustomFilterRender'], 10, 2);
+        add_filter('parse_query', [$this, 'vacancyCustomFilterHandle'], 10, 1);
+        // add_action('pre_get_posts', [$this, 'vacancyCustomFilterHandle'], 10, 1);
 
         global $wpdb;
         $this->wpdb = $wpdb;
+        $this->_message = new Message();
         $this->_notification = new NotificationService();
         $this->_notificationConstant = new NotificationConstant();
     }
@@ -265,7 +270,11 @@ class Vacancy extends RegisterCPT
             case 'expired':
                 if ($vacancyModel->checkImported()) {
                     if ($vacancyModel->getImportedSource() == 'jobfeed') {
-                        echo '-';
+                        if ($vacancyModel->checkIfJobfeedExpired()) {
+                            echo $vacancyModel->getExpiredAt('d M Y');
+                        } else {
+                            echo '-';
+                        }
                     } else {
                         echo $vacancyModel->getExpiredAt('d M Y');
                     }
@@ -403,6 +412,115 @@ class Vacancy extends RegisterCPT
             } catch (\Exception $e) {
                 $this->wpdb->query('ROLLBACK');
                 error_log($e->getMessage());
+            }
+        }
+    }
+
+    public function vacancyCustomFilterRender($post_type, $which)
+    {
+        if (is_admin()) {
+            if ($post_type == 'vacancy' && $which == 'top') {
+                try {
+                    /** Get status terms */
+                    $terms = get_terms([
+                        'taxonomy' => 'status',
+                        'hide_emtpy' => false
+                    ]);
+
+                    if ($terms instanceof \WP_Error) {
+                        throw new \Exception($terms->get_error_message());
+                    }
+                    // print('<pre>' . print_r($terms, true) . '</pre>');
+
+                    $filterStatusOption = [];
+                    if (is_array($terms)) {
+                        foreach ($terms as $term) {
+                            $filterStatusOption[$term->slug] = $term->name;
+                        }
+                    }
+
+                    /** Set filter status */
+                    echo '<select name="filterVacancyByStatus">';
+                    echo '<option value="">' . __('All Status ', THEME_DOMAIN) . '</option>';
+
+                    $selectedStatusFilter = isset($_GET['filterVacancyByStatus']) ? $_GET['filterVacancyByStatus'] : '';
+                    foreach ($filterStatusOption as $value => $label) {
+                        printf('<option value="%s"%s>%s</option>', $value, $value == $selectedStatusFilter ? ' selected="selected"' : '', $label);
+                    }
+                    echo '</select>';
+
+                    /** Set filter expired */
+                    $filterExpiredOption = [
+                        'expired'   => 'Expired Vacancy',
+                        'almost'    => 'Almost Expired (7 days)',
+                        'not-expired' => 'Not Expired'
+                    ];
+
+                    echo '<select name="filterVacancyByExpired">';
+                    echo '<option value="">' . __('All Data ', THEME_DOMAIN) . '</option>';
+
+                    $selectedExpiredFilter = isset($_GET['filterVacancyByExpired']) ? $_GET['filterVacancyByExpired'] : '';
+                    foreach ($filterExpiredOption as $value => $label) {
+                        printf('<option value="%s"%s>%s</option>', $value, $value == $selectedExpiredFilter ? ' selected="selected"' : '', $label);
+                    }
+                    echo '</select>';
+                } catch (\Exception $e) {
+                    error_log($e->getMessage());
+                }
+            }
+        }
+    }
+
+    public function vacancyCustomFilterHandle($query)
+    {
+        global $pagenow;
+        if (is_admin()) {
+            if ($query->get('post_type') == 'vacancy' && $pagenow == 'edit.php') {
+                if (isset($_GET['filterVacancyByStatus'])) {
+                    if (!empty($_GET['filterVacancyByStatus'])) {
+                        // } else {
+                        $query->set('tax_query', [
+                            'relation' => 'AND',
+                            [
+                                'taxonomy' => 'status',
+                                'field'    => 'slug',
+                                'terms'    => $_GET['filterVacancyByStatus'],
+                                'compare'  => 'IN'
+                            ]
+                        ]);
+                    }
+                }
+
+                if (isset($_GET['filterVacancyByExpired'])) {
+                    if (!empty($_GET['filterVacancyByExpired'])) {
+                        switch ($_GET['filterVacancyByExpired']) {
+                            case 'expired':
+                                $dateLimit = date("Y-m-d H:i:s");
+                                $compare = '<=';
+                                break;
+                            case 'almost':
+                                $today          = new DateTimeImmutable();
+                                $weekLaterDate  = $today->modify('-7 days');
+                                $dateLimit      = [$today->format('Y-m-d'), $weekLaterDate->format('Y-m-d')];
+                                $compare        = 'BETWEEN';
+                                break;
+                            case 'not-expired':
+                                $dateLimit = date("Y-m-d H:i:s");
+                                $compare = '>=';
+                                break;
+                        }
+
+                        $query->set('meta_query', [
+                            'relation' => 'AND',
+                            [
+                                'key'       => 'expired_at',
+                                'value'     => $dateLimit,
+                                'compare'   => $compare,
+                                'type'      => "DATE"
+                            ]
+                        ]);
+                    }
+                }
             }
         }
     }

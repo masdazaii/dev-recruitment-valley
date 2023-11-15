@@ -114,6 +114,7 @@ class Vacancy
     private $_meta_rv_vacancy_imported_at   = 'rv_vacancy_imported_at';
     public $meta_rv_vacancy_approved_at     = 'rv_vacancy_approved_at';
     public $meta_rv_vacancy_source        = 'rv_vacancy_source';
+    public $meta_rv_vacancy_jobfeed_is_expired = 'rv_vacancy_jobfeed_is_expired';
 
     public function __construct($vacancy_id = false)
     {
@@ -972,6 +973,12 @@ class Vacancy
     public function getImportedCompanyTotalEmployees()
     {
         return $this->getProp($this->_acf_imported_company_total_employees, true);
+    }
+
+    public function checkIfJobfeedExpired()
+    {
+        $isExpired = $this->getterMeta($this->meta_rv_vacancy_jobfeed_is_expired, true);
+        return $isExpired;
     }
 
     /**
