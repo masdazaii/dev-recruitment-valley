@@ -464,6 +464,23 @@ class Vacancy extends RegisterCPT
                         printf('<option value="%s"%s>%s</option>', $value, $value == $selectedExpiredFilter ? ' selected="selected"' : '', $label);
                     }
                     echo '</select>';
+
+                    /** Set filter Source */
+                    $filterSourceOption = [
+                        'paid'      => 'Paid Job',
+                        'free'      => 'Free Job',
+                        'flexfeed'  => 'Brightwave / Flexparency',
+                        'jobfeed'   => 'Textkernel Jobfeed'
+                    ];
+
+                    echo '<select name="filterVacancyBySource">';
+                    echo '<option value="">' . __('All Data ', THEME_DOMAIN) . '</option>';
+
+                    $selectedSourceFilter = isset($_GET['filterVacancyBySource']) ? $_GET['filterVacancyBySource'] : '';
+                    foreach ($filterSourceOption as $value => $label) {
+                        printf('<option value="%s"%s>%s</option>', $value, $value == $selectedSourceFilter ? ' selected="selected"' : '', $label);
+                    }
+                    echo '</select>';
                 } catch (\Exception $e) {
                     error_log($e->getMessage());
                 }
@@ -476,6 +493,7 @@ class Vacancy extends RegisterCPT
         global $pagenow;
         if (is_admin()) {
             if ($query->get('post_type') == 'vacancy' && $pagenow == 'edit.php') {
+                /** Handle filter by status */
                 if (isset($_GET['filterVacancyByStatus'])) {
                     if (!empty($_GET['filterVacancyByStatus'])) {
                         // } else {
@@ -491,6 +509,12 @@ class Vacancy extends RegisterCPT
                     }
                 }
 
+                $metaQuery = [
+                    'relation' => 'AND'
+                ];
+                $setNewMeta = false;
+
+                /** Handle filter by expired */
                 if (isset($_GET['filterVacancyByExpired'])) {
                     if (!empty($_GET['filterVacancyByExpired'])) {
                         switch ($_GET['filterVacancyByExpired']) {
@@ -510,17 +534,123 @@ class Vacancy extends RegisterCPT
                                 break;
                         }
 
-                        $query->set('meta_query', [
-                            'relation' => 'AND',
-                            [
-                                'key'       => 'expired_at',
-                                'value'     => $dateLimit,
-                                'compare'   => $compare,
-                                'type'      => "DATE"
-                            ]
-                        ]);
+                        /** Changes 17 Nov 2023 */
+                        // $query->set('meta_query', [
+                        //     'relation' => 'AND',
+                        //     [
+                        //         'key'       => 'expired_at',
+                        //         'value'     => $dateLimit,
+                        //         'compare'   => $compare,
+                        //         'type'      => "DATE"
+                        //     ]
+                        // ]);
+                        $setNewMeta     = true;
+                        $metaQuery[]    = [
+                            'key'       => 'expired_at',
+                            'value'     => $dateLimit,
+                            'compare'   => $compare,
+                            'type'      => "DATE"
+                        ];
                     }
                 }
+
+                /** Handle filter by source */
+                if (isset($_GET['filterVacancyBySource'])) {
+                    if (!empty($_GET['filterVacancyBySource'])) {
+                        $addMetaQuery = [];
+                        switch ($_GET['filterVacancyBySource']) {
+                            case 'paid':
+                                $addMetaQuery = [
+                                    'key'   => 'is_paid',
+                                    'value' => 1,
+                                    'compare'   => '='
+                                ];
+                                break;
+                            case 'free':
+                                $addMetaQuery = [
+                                    'relation' => 'AND',
+                                    [
+                                        'relation' => 'OR',
+                                        [
+                                            'key'   => 'is_paid',
+                                            'value' => 0,
+                                            'compare'   => '='
+                                        ],
+                                        // [
+                                        //     'key'   => 'is_paid',
+                                        //     'value' => NULL,
+                                        //     'compare'   => '='
+                                        // ],
+                                        // [
+                                        //     'key'   => 'is_paid',
+                                        //     'value' => "",
+                                        //     'compare'   => '='
+                                        // ],
+                                        [
+                                            'key'   => 'is_paid',
+                                            'value' => NULL,
+                                            'compare'   => 'NOT EXISTS'
+                                        ]
+                                    ],
+                                    [
+                                        'relation'  => 'OR',
+                                        [
+                                            'relation'  => 'AND',
+                                            [
+                                                'key'   => 'rv_vacancy_source',
+                                                'value' => 'flexfeed',
+                                                'compare'   => '!='
+                                            ],
+                                            [
+                                                'key'   => 'rv_vacancy_source',
+                                                'value' => 'jobfeed',
+                                                'compare'   => '!='
+                                            ],
+                                        ],
+                                        // [
+                                        //     'key'   => 'rv_vacancy_source',
+                                        //     'value' => NULL,
+                                        //     'compare'   => '='
+                                        // ],
+                                        // [
+                                        //     'key'   => 'rv_vacancy_source',
+                                        //     'value' => '',
+                                        //     'compare'   => '='
+                                        // ],
+                                        [
+                                            'key'   => 'rv_vacancy_source',
+                                            'value' => '',
+                                            'compare'   => 'NOT EXISTS'
+                                        ]
+                                    ]
+                                ];
+                                break;
+                            case 'flexfeed':
+                                $addMetaQuery = [
+                                    'key'   => 'rv_vacancy_source',
+                                    'value' => 'flexfeed',
+                                    'compare'   => '='
+                                ];
+                                break;
+                            case 'jobfeed':
+                                $addMetaQuery = [
+                                    'key'   => 'rv_vacancy_source',
+                                    'value' => 'jobfeed',
+                                    'compare'   => '='
+                                ];
+                        }
+
+                        $setNewMeta     = true;
+                        $metaQuery[] = $addMetaQuery;
+                    }
+                }
+
+                /** Set meta_query */
+                if ($setNewMeta) {
+                    $query->set('meta_query', $metaQuery);
+                }
+                // print('<pre>' . print_r($setNewMeta ? 'asddddddddasddddddddddddddddddddd' : 'asasdddddddddddddddddddddddddddddddddd', true) . '</pre>');
+                // print('<pre>' . print_r($metaQuery, true) . '</pre>');
             }
         }
     }
