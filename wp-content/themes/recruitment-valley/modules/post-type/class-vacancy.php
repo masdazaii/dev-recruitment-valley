@@ -561,9 +561,46 @@ class Vacancy extends RegisterCPT
                         switch ($_GET['filterVacancyBySource']) {
                             case 'paid':
                                 $addMetaQuery = [
-                                    'key'   => 'is_paid',
-                                    'value' => 1,
-                                    'compare'   => '='
+                                    'relation'  => 'AND',
+                                    [
+                                        'key'   => 'is_paid',
+                                        'value' => 1,
+                                        'compare'   => '='
+                                    ],
+                                    [
+                                        'relation'  => 'OR',
+                                        [
+                                            'relation'  => 'AND',
+                                            [
+                                                'key'   => 'rv_vacancy_source',
+                                                'value' => 'flexfeed',
+                                                'compare'   => '!='
+                                            ],
+                                            [
+                                                'key'   => 'rv_vacancy_source',
+                                                'value' => 'jobfeed',
+                                                'compare'   => '!='
+                                            ],
+                                        ],
+                                        [
+                                            'relation' => 'OR',
+                                            [
+                                                'key'   => 'rv_vacancy_imported_at',
+                                                'value' => 0,
+                                                'compare'   => '='
+                                            ],
+                                            [
+                                                'key'   => 'rv_vacancy_imported_at',
+                                                'value' => NULL,
+                                                'compare'   => '='
+                                            ],
+                                            [
+                                                'key'   => 'rv_vacancy_imported_at',
+                                                'value' => NULL,
+                                                'compare'   => 'NOT EXISTS'
+                                            ]
+                                        ]
+                                    ]
                                 ];
                                 break;
                             case 'free':
@@ -593,33 +630,20 @@ class Vacancy extends RegisterCPT
                                         ]
                                     ],
                                     [
-                                        'relation'  => 'OR',
+                                        'relation' => 'OR',
                                         [
-                                            'relation'  => 'AND',
-                                            [
-                                                'key'   => 'rv_vacancy_source',
-                                                'value' => 'flexfeed',
-                                                'compare'   => '!='
-                                            ],
-                                            [
-                                                'key'   => 'rv_vacancy_source',
-                                                'value' => 'jobfeed',
-                                                'compare'   => '!='
-                                            ],
+                                            'key'   => 'rv_vacancy_imported_at',
+                                            'value' => 0,
+                                            'compare'   => '='
                                         ],
-                                        // [
-                                        //     'key'   => 'rv_vacancy_source',
-                                        //     'value' => NULL,
-                                        //     'compare'   => '='
-                                        // ],
-                                        // [
-                                        //     'key'   => 'rv_vacancy_source',
-                                        //     'value' => '',
-                                        //     'compare'   => '='
-                                        // ],
                                         [
-                                            'key'   => 'rv_vacancy_source',
-                                            'value' => '',
+                                            'key'   => 'rv_vacancy_imported_at',
+                                            'value' => NULL,
+                                            'compare'   => '='
+                                        ],
+                                        [
+                                            'key'   => 'rv_vacancy_imported_at',
+                                            'value' => NULL,
                                             'compare'   => 'NOT EXISTS'
                                         ]
                                     ]
