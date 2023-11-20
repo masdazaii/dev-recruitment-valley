@@ -255,8 +255,6 @@ class VacancyCrudService
         }
     }
 
-
-
     /**
      * repostJob
      *

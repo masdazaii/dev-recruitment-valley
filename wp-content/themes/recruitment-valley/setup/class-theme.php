@@ -14,6 +14,8 @@ defined('ABSPATH') || die("Can't access directly");
 class Theme
 {
 
+	public $settings;
+
 	/**
 	 * A dummy constructor to ensure the class is only initialized once
 	 */

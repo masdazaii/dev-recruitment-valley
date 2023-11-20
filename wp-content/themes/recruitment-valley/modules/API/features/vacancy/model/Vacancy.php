@@ -960,8 +960,9 @@ class Vacancy
                 $result = [];
                 foreach ($terms as $term) {
                     $result[] = [
-                        'value'  => $term->term_id,
-                        'label'  => $term->name,
+                        'value' => $term->term_id,
+                        'slug'  => $term->slug,
+                        'label' => $term->name,
                     ];
                 }
                 return $result;
@@ -980,6 +981,11 @@ class Vacancy
     {
         return $this->getProp($this->_acf_imported_company_total_employees, true);
     }
+
+    // public function getImportedUnusedData()
+    // {
+    //     return $this->getterMeta($this->_meta_rv_vacancy_unused_data);
+    // }
 
     public function checkIfJobfeedExpired()
     {
@@ -1186,7 +1192,7 @@ class Vacancy
 
     public function getApprovedBy()
     {
-        return $this->getProp($this->_acf_imported_approved_by);
+        return $this->getProp($this->_acf_imported_approved_by, true);
     }
 
     public function getApprovedAt($format = 'Y-m-d H:i:s')
@@ -1444,7 +1450,6 @@ class Vacancy
                     ];
                 }
                 return $logo;
-                // return $logo;
             }
         } else {
             throw new Exception('Please specify the vacancy!');
