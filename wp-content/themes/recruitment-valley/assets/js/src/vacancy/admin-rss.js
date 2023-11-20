@@ -13,6 +13,9 @@ const rssModule = (function () {
       /** Initiate select2 */
       if ($(el.rssMetaboxSelectVacancy).length) {
         // $(el.rssMetaboxSelectVacancy).select2();
+        // console.log($(el.rssSelectCompany).val())
+        // console.log($(el.rssSelectLanguage).val())
+        // console.log($(el.rssSelectPaidStatus).val())
         doPrepareVacancyOption($(el.rssSelectCompany).val(), $(el.rssSelectLanguage).val(), $(el.rssSelectPaidStatus).val(), el)
       }
     } catch (exception) {
@@ -55,7 +58,7 @@ const rssModule = (function () {
     /** Set selected data */
     $(el.rssMetaboxSelectVacancy).val(null).trigger('change')
 
-    if (adminData.rss.selectedCompany !== null && adminData.rss.selectedCompany != false && adminData.rss.selectedCompany !== undefined) {
+    if (company !== null && adminData.rss.selectedCompany !== null && adminData.rss.selectedCompany != false && adminData.rss.selectedCompany !== undefined) {
       adminData.rss.selectedCompany.find((value) => {
         if (company.indexOf(value.toString()) !== -1) {
           if (adminData.rss.selectedVacancies !== null) {
@@ -80,7 +83,7 @@ const rssModule = (function () {
       $(el.rssMetaboxSelectVacancy).val(null).trigger('change')
     }
 
-    if (adminData.rss.selectedLanguage != false && adminData.rss.selectedLanguage !== undefined && adminData.rss.selectedLanguage.value == language) {
+    if (language !== null && adminData.rss.selectedLanguage != null && adminData.rss.selectedLanguage != false && adminData.rss.selectedLanguage !== undefined && adminData.rss.selectedLanguage.value == language) {
       if (adminData.rss.selectedVacancies !== null) {
         adminData.rss.selectedVacancies.forEach((option) => {
           if (option.language == language) {
@@ -99,7 +102,7 @@ const rssModule = (function () {
       $(el.rssMetaboxSelectVacancy).val(null).trigger('change')
     }
 
-    if (adminData.rss.selectedPaidStatus != false && adminData.rss.selectedLanguage !== undefined && (adminData.rss.selectedPaidStatus.value == paidStatus || paidStatus == 'both')) {
+    if (paidStatus !== null && adminData.rss.selectedPaidStatus != null && adminData.rss.selectedPaidStatus != false && adminData.rss.selectedLanguage !== undefined && (adminData.rss.selectedPaidStatus.value == paidStatus || paidStatus == 'both')) {
       if (adminData.rss.selectedPaidStatus.value !== null) {
         adminData.rss.selectedVacancies.forEach((option) => {
           if (adminData.rss.selectedPaidStatus.value !== 'both') {

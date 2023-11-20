@@ -71,8 +71,9 @@ class RssController
         /** get rss  */
         $rss = $rssModel->getRssBySlug($request['rss'], 'object');
         $rssVacancies = $rssModel->getRssVacancies();
-        $language = $rssModel->getRssLanguage();
-        $company = $rssModel->getRssCompany();
+        $language   = $rssModel->getRssLanguage();
+        $company    = $rssModel->getRssCompany();
+        $paidStatus = $rssModel->getRssPaidStatus();
 
         $vacancyModel = new Vacancy();
         $filters = [
@@ -100,6 +101,7 @@ class RssController
             $filters['in'] = array_values($rssVacancies);
         }
 
+        /** Filter by language meta */
         if (isset($language) && $language) {
             if (is_array($language)) {
                 if (array_key_exists('value', $language)) {
@@ -118,11 +120,39 @@ class RssController
             }
         }
 
+        /** Filter by vacancy's author */
         if (isset($company) && $company) {
             if (is_array($company)) {
                 $filters['author'] = $company;
             } else {
                 $filters['author'] = [$company];
+            }
+        }
+
+        /** Filter by is_paid meta */
+        if ($paidStatus && isset($paidStatus) && !empty($paidStatus)) {
+            if (array_key_exists('value', $paidStatus)) {
+                if ($paidStatus['value'] !== 'both') {
+                    $filters['meta'][] = [
+                        'key'       => 'is_paid',
+                        'value'     => $paidStatus['value'] == 'paid' ? 1 : 0,
+                        'compare'   => '='
+                    ];
+                } else { // this can be removed to show all vacancy, but I want only vancancy that has meta_key is_paid.
+                    $filters['meta'][] = [
+                        'relation'  => 'OR',
+                        [
+                            'key'       => 'is_paid',
+                            'value'     => 1,
+                            'compare'   => '='
+                        ],
+                        [
+                            'key'       => 'is_paid',
+                            'value'     => 0,
+                            'compare'   => '='
+                        ]
+                    ];
+                }
             }
         }
 
