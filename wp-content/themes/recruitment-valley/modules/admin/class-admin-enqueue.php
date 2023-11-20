@@ -78,6 +78,7 @@ class AdminEnqueue
 
                 $selectedLanguage   = $rssModel->getRssLanguage();
                 $selectedCompany    = $rssModel->getRssCompany();
+                $selectedPaidStatus = $rssModel->getRssPaidStatus();
 
                 $rssVacancies   = $rssModel->getRssVacancies();
                 $selectedVacancy = [];
@@ -98,7 +99,9 @@ class AdminEnqueue
                                         $selectedVacancy[] = [
                                             'id'    => $vacancy,
                                             'text'  => $vacancyModel->getTitle(),
-                                            'company' => $vacancyModel->getAuthor()
+                                            'company'   => $vacancyModel->getAuthor(),
+                                            'language'  => $vacancyModel->getLanguage() !== null ? $vacancyModel->getLanguage()['value'] : null,
+                                            'isPaid'    => $vacancyModel->getIsPaid()
                                         ];
                                     }
                                 }
@@ -110,6 +113,7 @@ class AdminEnqueue
                 $rssData['screen']              = 'edit';
                 $rssData['selectedCompany']     = $selectedCompany;
                 $rssData['selectedLanguage']    = $selectedLanguage;
+                $rssData['selectedPaidStatus']  = $selectedPaidStatus;
                 $rssData['selectedVacancies']   = $selectedVacancy;
             } catch (\Exception $e) {
                 error_log($e->getMessage());
