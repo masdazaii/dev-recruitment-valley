@@ -245,6 +245,7 @@ class RequestRules
             'vacancyForRSS' => [
                 'company.*' => ["exists:user/user/ID"],
                 'language'  => [],
+                'paidStatus'    => ["in:paid,free,both"],
                 'result'    => ["in:options,option-value,count,posts"],
             ],
             'vacancyApprovalBulk' => [
@@ -461,6 +462,7 @@ class RequestRules
             'vacancyForRSS' => [
                 'company.*' => 'text',
                 'language'  => 'text',
+                'paidStatus'    => 'text',
                 'result'    => 'text',
             ],
             'vacancyApprovalBulk' => [
