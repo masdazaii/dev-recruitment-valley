@@ -1961,6 +1961,33 @@ acf_add_local_field_group(array(
 			'ajax' => 0,
 			'placeholder' => '',
 		),
+		array(
+			'key' => 'field_655ac0aab6dbe',
+			'label' => 'Select Paid Status',
+			'name' => 'rv_rss_select_paid_status',
+			'aria-label' => '',
+			'type' => 'select',
+			'instructions' => '',
+			'required' => 0,
+			'conditional_logic' => 0,
+			'wrapper' => array(
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'choices' => array(
+				'paid' => 'Paid vacancy only',
+				'free' => 'Free vacancy only',
+				'both' => 'Both vacancy',
+			),
+			'default_value' => 'both',
+			'return_format' => 'array',
+			'multiple' => 0,
+			'allow_null' => 1,
+			'ui' => 1,
+			'ajax' => 0,
+			'placeholder' => '',
+		),
 	),
 	'location' => array(
 		array(

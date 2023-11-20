@@ -1929,6 +1929,33 @@
                 "ui": 1,
                 "ajax": 0,
                 "placeholder": ""
+            },
+            {
+                "key": "field_655ac0aab6dbe",
+                "label": "Select Paid Status",
+                "name": "rv_rss_select_paid_status",
+                "aria-label": "",
+                "type": "select",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "paid": "Paid vacancy only",
+                    "free": "Free vacancy only",
+                    "both": "Both vacancy"
+                },
+                "default_value": "both",
+                "return_format": "array",
+                "multiple": 0,
+                "allow_null": 1,
+                "ui": 1,
+                "ajax": 0,
+                "placeholder": ""
             }
         ],
         "location": [

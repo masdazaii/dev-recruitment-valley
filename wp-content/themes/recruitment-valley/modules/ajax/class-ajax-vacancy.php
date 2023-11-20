@@ -18,7 +18,7 @@ class AjaxVacancy
         // add_action('wp_ajax_nopriv_get_vacancies_by_rss', [$this, 'getVacancyByRSS']);
         add_action('wp_ajax_get_vacancies_for_rss', [$this, 'getVacanciesForRSS']);
 
-        add_filter("acf/load_field/key=rv_rss_select_vacancy", 'filter_field', 10, 1);
+        // add_filter("acf/load_field/key=rv_rss_select_vacancy", 'filter_field', 10, 1);
     }
 
     public function getVacancyByCompany()
@@ -165,6 +165,7 @@ class AjaxVacancy
 
             $vacancyModel   = new Vacancy();
 
+            /** Filter by author */
             if (isset($body['company']) && !empty($body['company'])) {
                 if (is_array($body['company'])) {
                     $filters = [
@@ -195,6 +196,7 @@ class AjaxVacancy
                 ],
             ];
 
+            /** Filter by language meta */
             if (isset($body['language']) && !empty($body['language'])) {
                 if (is_array($body['language'])) {
                     $filterLanguage = $body['language'];
@@ -207,6 +209,31 @@ class AjaxVacancy
                     'value'     => $filterLanguage,
                     'compare'   => 'IN'
                 ];
+            }
+
+            /** Filter by is_paid meta */
+            if (isset($body['paidStatus']) && !empty($body['paidStatus'])) {
+                if ($body['paidStatus'] !== 'both') {
+                    $filters['meta'][] = [
+                        'key'       => 'is_paid',
+                        'value'     => $body['paidStatus'] == 'paid' ? 1 : 0,
+                        'compare'   => '='
+                    ];
+                } else { // this can be removed to show all vacancy, but I want only vancancy that has meta_key is_paid.
+                    $filters['meta'][] = [
+                        'relation'  => 'OR',
+                        [
+                            'key'       => 'is_paid',
+                            'value'     => 1,
+                            'compare'   => '='
+                        ],
+                        [
+                            'key'       => 'is_paid',
+                            'value'     => 0,
+                            'compare'   => '='
+                        ]
+                    ];
+                }
             }
 
             $vacancies      = $vacancyModel->getVacancies($filters, []);
@@ -234,7 +261,7 @@ class AjaxVacancy
             wp_send_json([
                 'success'   => true,
                 'message'   => 'Success get values',
-                'data'      => $optionValues
+                'data'      => $optionValues,
             ], 200);
         } catch (\Exception $e) {
             error_log($e->getMessage());
