@@ -548,6 +548,7 @@ class Vacancy
             $tempTax = $tax->taxonomy;
             $taxField = [
                 "id" => $tax->term_id,
+                "slug" => $tax->slug,
                 "name" => html_entity_decode($tax->name)
             ];
 
@@ -938,6 +939,11 @@ class Vacancy
         return $this->getterMeta($this->meta_rv_vacancy_source);
     }
 
+    public function getImportedSourceID()
+    {
+        return $this->getProp($this->_acf_imported_vacancy_source_id);
+    }
+
     public function getImportedCompanySector()
     {
         $sectors = $this->getProp($this->_acf_imported_company_sector);
@@ -1178,6 +1184,11 @@ class Vacancy
         return $this->setProp($this->_acf_imported_approved_by, $value);
     }
 
+    public function getApprovedBy()
+    {
+        return $this->getProp($this->_acf_imported_approved_by);
+    }
+
     public function getApprovedAt($format = 'Y-m-d H:i:s')
     {
         $approvedAt = $this->getterMeta($this->meta_rv_vacancy_approved_at);
@@ -1223,6 +1234,11 @@ class Vacancy
         } else {
             throw new Exception('Please specify vacancy!');
         }
+    }
+
+    public function getImportedUnusedData()
+    {
+        return $this->getterMeta($this->_meta_rv_vacancy_unused_data, true);
     }
     /** Method for related to imported vacancy end here */
 
@@ -1420,11 +1436,14 @@ class Vacancy
                 }
             } else {
                 $logo = $this->getProp($this->_acf_rv_vacancy_custom_company_logo, true);
-                return [
-                    'id' => $logo['id'],
-                    'title' => $logo['title'],
-                    'url' => $logo['url'],
-                ];
+                if ($logo) {
+                    return [
+                        'id' => $logo['id'],
+                        'title' => $logo['title'],
+                        'url' => $logo['url'],
+                    ];
+                }
+                return $logo;
                 // return $logo;
             }
         } else {

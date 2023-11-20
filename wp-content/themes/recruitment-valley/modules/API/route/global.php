@@ -268,6 +268,12 @@ class GlobalEndpoint
                     'permission_callback'   => '__return_true',
                     'callback'              => [$importService, 'jobfeedExpire']
                 ],
+                'flexfeed_export' => [
+                    'url'                   => 'export/flexfeed',
+                    'methods'               => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$crudVacancyService, 'export']
+                ],
                 'list_coupon' => [
                     'url'                   => 'coupons',
                     'methods'               => 'GET',

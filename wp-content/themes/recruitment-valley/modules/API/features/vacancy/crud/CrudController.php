@@ -1295,4 +1295,140 @@ class VacancyCrudController
             error_log($e->getMessage());
         }
     }
+
+    public function export($request)
+    {
+        $vacancyModel = new Vacancy();
+        $filters = [
+            'meta' => [
+                'relation' => 'AND',
+                [
+                    'key'   => 'rv_vacancy_is_imported',
+                    'value' => 1,
+                    'compare'   => '='
+                ],
+            ],
+            // 'taxonomy' => [
+            //     "relation" => "AND",
+            //     [
+            //         'taxonomy' => 'status',
+            //         'field'    => 'slug',
+            //         'terms'    => 'open',
+            //         'compare'  => 'IN'
+            //     ],
+            // ]
+        ];
+
+        $vacancies = $vacancyModel->getVacancies($filters, []);
+
+        $mappedVacancies = [];
+        global $wpdb;
+        if ($vacancies && $vacancies->found_posts > 0) {
+            foreach ($vacancies->posts as $vacancy) {
+                $eachVacancyModel = new Vacancy($vacancy->ID);
+
+                $terms = $eachVacancyModel->getTaxonomy(true);
+                $author = get_user_by('id', $vacancy->post_author);
+
+                $mappedVacancy = [
+                    'vacancy_post_id'    => $vacancy->ID,
+                    'vacancy_post_title' => $vacancy->post_title,
+                    'vacancy_post_slug'  => $vacancy->post_name,
+                    'vacancy_post_status'    => $vacancy->post_status,
+                    'vacancy_post_date' => $vacancy->post_date,
+                    'author_name'   => $author->display_name,
+                    'author_login'  => $author->user_login,
+                    'author_email'  => $author->user_email,
+                    'author_role'   => $author->roles[0],
+                    'description'   => $eachVacancyModel->getDescription(),
+                    'term'  => $eachVacancyModel->getTerm(),
+                    'apply_from_this_platform'  => $eachVacancyModel->getApplyFromThisPlatform() ? 1 : 0,
+                    'video_url' => $eachVacancyModel->getVideoUrl(),
+                    'facebook_url'  => $eachVacancyModel->getFacebookUrl(),
+                    'linkedin_url'  => $eachVacancyModel->getLinkedinUrl(),
+                    'instagram_url' => $eachVacancyModel->getInstagramUrl(),
+                    'twitter_url'   => $eachVacancyModel->getTwitterUrl(),
+                    'gallery'   => serialize($eachVacancyModel->getGallery()),
+                    'reviews'   => serialize($eachVacancyModel->getReviews()),
+                    'is_paid'   => $eachVacancyModel->getIsPaid(),
+                    'salary_start'  => $eachVacancyModel->getSalaryStart(),
+                    'salary_end'    => $eachVacancyModel->getSalaryEnd(),
+                    'external_url'  => $eachVacancyModel->getExternalUrl(),
+                    'expired_at'    => $eachVacancyModel->getExpiredAt(),
+                    'country'       => $eachVacancyModel->getCountry(),
+                    'country_code'  => $eachVacancyModel->getCountryCode(),
+                    'placement_city'    => $eachVacancyModel->getCity(),
+                    'city_latitude' => $eachVacancyModel->getCityLongLat('latitude'),
+                    'city_longitude'    => $eachVacancyModel->getCityLongLat('longitude'),
+                    'placement_address' => $eachVacancyModel->getPlacementAddress(),
+                    'placement_address_longitude'   => $eachVacancyModel->getPlacementAddressLongitude(),
+                    'placement_address_latitude'    => $eachVacancyModel->getPlacementAddressLatitude(),
+                    'distance_from_city'    => $eachVacancyModel->getDistance(),
+                    'rv_vacancy_language'   => $eachVacancyModel->getLanguage(),
+
+                    'application_process_title' => $eachVacancyModel->getApplicationProcessTitle(),
+                    'application_process_description'   => $eachVacancyModel->getApplicationProcessDescription(),
+                    'application_process_step'  => serialize($eachVacancyModel->getApplicationProcessStep()),
+
+                    'rv_is_for_another_company' => $eachVacancyModel->checkIsForAnotherCompany() ? 1 : 0,
+                    'rv_vacancy_use_existing_company'   => $eachVacancyModel->checkUseExistingCompany() ? 1 : 0,
+                    'rv_vacancy_selected_company'   => $eachVacancyModel->getSelectedCompany(),
+                    'rv_vacancy_custom_company_name'    => $eachVacancyModel->getCustomCompanyName(),
+                    'rv_vacancy_custom_company_logo'    => $eachVacancyModel->getCustomCompanyLogo(),
+                    'rv_vacancy_custom_company_email'   => $eachVacancyModel->getCustomCompanyEmail(),
+                    'rv_vacancy_custom_company_phone_code'  => $eachVacancyModel->getCustomCompanyPhoneCode(),
+                    'rv_vacancy_custom_company_phone_number'    => $eachVacancyModel->getCustomCompanyPhoneNumber(),
+                    'rv_vacancy_custom_company_sector'  => $eachVacancyModel->getCustomCompanySector(),
+                    'rv_vacancy_custom_company_total_employees' => $eachVacancyModel->getCustomCompanyTotalEmployees(),
+                    'rv_vacancy_custom_company_description' => $eachVacancyModel->getCustomCompanyDescription(),
+                    'rv_vacancy_custom_company_country' => $eachVacancyModel->getCustomCompanyCountry(),
+                    'rv_vacancy_custom_company_city'    => $eachVacancyModel->getCustomCompanyCity(),
+                    'rv_vacancy_custom_company_address' => $eachVacancyModel->getCustomCompanyAddress(),
+                    'rv_vacancy_custom_company_longitude'   => $eachVacancyModel->getCustomCompanyCoordinate('longitude'),
+                    'rv_vacancy_custom_company_latitude'    => $eachVacancyModel->getCustomCompanyCoordinate('latitude'),
+
+                    'rv_vacancy_is_imported'            => $eachVacancyModel->checkImported() ? 1 : 0,
+                    'rv_vacancy_imported_source'        => $eachVacancyModel->getImportedSource(),
+                    'rv_vacancy_imported_source_id'     => $eachVacancyModel->getImportedSourceID(),
+                    'rv_vacancy_imported_company_name'  => $eachVacancyModel->getImportedCompanyName(),
+                    'rv_vacancy_imported_company_email' => $eachVacancyModel->getImportedCompanyEmail(),
+                    'rv_vacancy_imported_company_sector'    => serialize($eachVacancyModel->getImportedCompanySector()),
+                    'rv_vacancy_imported_company_total_employees'   => $eachVacancyModel->getImportedCompanyTotalEmployees(),
+                    'rv_vacancy_imported_company_country'   => $eachVacancyModel->getImportedCompanyCountry(),
+                    'rv_vacancy_imported_company_city'      => $eachVacancyModel->getImportedCompanyCity(),
+                    'rv_vacancy_imported_company_city_longitude'    => $eachVacancyModel->getImportedCompanyLongitude(),
+                    'rv_vacancy_imported_company_city_latitude'     => $eachVacancyModel->getImportedCompanyLatitude(),
+                    'rv_vacancy_imported_at' => $eachVacancyModel->getImportedAt(),
+                    'rv_vacancy_unused_data' => serialize($eachVacancyModel->getImportedUnusedData()),
+
+                    /** Taxonomy */
+                    'status_terms'    => isset($terms['status']) ? serialize($terms['status']) : null,
+                    'sector_terms'    => isset($terms['sector']) ? serialize($terms['sector']) : null,
+                    'role_terms'      => isset($terms['role']) ? serialize($terms['role']) : null,
+                    'type_terms'      => isset($terms['type']) ? serialize($terms['type']) : null,
+                    'education_terms' => isset($terms['education']) ? serialize($terms['education']) : null,
+                    'working_hours_terms' => isset($terms['working-hours']) ? serialize($terms['working-hours']) : null,
+                    'status_terms'    => isset($terms['status']) ? serialize($terms['status']) : null,
+                    'location_terms'  => isset($terms['location']) ? serialize($terms['location']) : null,
+                    'working_experience_terms'    => isset($terms['experiences']) ? serialize($terms['experiences']) : null,
+
+                    'rv_vacancy_approved_by'       => $eachVacancyModel->getApprovedBy(),
+                    'rv_vacancy_approval_status'   => $eachVacancyModel->getApprovedStatus(),
+                ];
+
+                $mappedVacancies[] = $mappedVacancy;
+
+                $wpdb->insert('rv_backup_vacancy', $mappedVacancy);
+            }
+        }
+
+        return [
+            'status'    => 200,
+            'message'   => 'exported',
+            'data'      => [
+                'count' => $vacancies->found_posts,
+                'vacancies' => $mappedVacancies,
+            ]
+        ];
+    }
 }
