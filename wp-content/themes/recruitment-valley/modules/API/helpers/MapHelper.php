@@ -18,7 +18,7 @@ class Maphelper
      */
     public static function generateLongLat(string $location)
     {
-        $locationtUrl = "https://maps.googleapis.com/maps/api/geocode/json?address=" . urlencode($location) . "&key=" . static::$map_api_key;
+        $locationtUrl = "https://maps.googleapis.com/maps/api/geocode/json?address=" . urlencode($location) . "&key=" . static::$map_api_key . "&language=nl";
 
         $res = file_get_contents($locationtUrl);
         $response = json_decode($res, true);

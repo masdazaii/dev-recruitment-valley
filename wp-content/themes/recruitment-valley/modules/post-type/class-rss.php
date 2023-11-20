@@ -39,8 +39,6 @@ class RssCPT extends RegisterCPT
     {
         if ($post->post_type == 'rss') {
             $this->wpdb->query('START TRANSACTION');
-            // print('<pre>' . print_r($_POST, true) . '</pre>');
-            // die;
             try {
                 $rssModel = new \Model\Rss($post_id);
 
@@ -132,7 +130,7 @@ class RssCPT extends RegisterCPT
                             $vacanciesOption[] = [
                                 'value' => $vacancy->ID,
                                 'label' => $vacancy->post_title,
-                                'selected' => in_array($vacancy->ID, $selectedVacancies)
+                                'selected' => is_array($selectedVacancies) ? in_array($vacancy->ID, $selectedVacancies) : false
                             ];
                         }
                     }

@@ -2,6 +2,8 @@
 
 namespace Model;
 
+use Exception;
+
 defined("ABSPATH") or die("Direct Access not allowed!");
 
 class Rss
@@ -12,9 +14,9 @@ class Rss
 
     private $_acf_rss_company   = 'rv_rss_select_company';
     private $_acf_rss_language  = 'rv_rss_select_language';
+    private $_acf_rss_paid_status   = 'rv_rss_select_paid_status';
 
-    public $_meta_rss_vacancy = 'rv_rss_select_vacancy';
-
+    public $_meta_rss_vacancy       = 'rv_rss_select_vacancy';
     private $_meta_rss_endpoint_url = 'rv_rss_endpoint_url';
 
     private $_property = [];
@@ -101,7 +103,12 @@ class Rss
 
     public function getRssVacancies()
     {
-        return maybe_unserialize($this->getter($this->_meta_rss_vacancy, true, 'meta'));
+        return $this->getter($this->_meta_rss_vacancy, true, 'meta');
+        // $metaValue = $this->getter($this->_meta_rss_vacancy, true, 'meta');
+        // error_log('getRssVacancies before maybe_unserialize : '.json_encode($metaValue));
+        // $afterSerialize = maybe_unserialize();
+        // error_log('getRssVacancies after maybe_unserialize : '.json_encode($afterSerialize));
+        // return $afterSerialize;
     }
 
     public function setRssVacancies($value)
@@ -124,11 +131,31 @@ class Rss
         return $this->getter($this->_meta_rss_endpoint_url, true, 'meta');
     }
 
-    public function getRssLanguage() {
+    public function getRssLanguage()
+    {
         return $this->getter($this->_acf_rss_language, true, 'acf');
     }
 
-    public function setRssLanguage($value) {
+    public function setRssLanguage($value)
+    {
         return $this->setter($this->_acf_rss_language, $value, 'acf');
+    }
+
+    public function getRssPaidStatus()
+    {
+        if ($this->_rssID) {
+            return $this->getter($this->_acf_rss_paid_status, true, 'acf');
+        } else {
+            throw new Exception('Please specify rss!');
+        }
+    }
+
+    public function setRssPaidStatus($value)
+    {
+        if ($this->_rssID) {
+            return $this->setter($this->_acf_rss_paid_status, $value, 'acf');
+        } else {
+            throw new Exception('Please specify rss!');
+        }
     }
 }

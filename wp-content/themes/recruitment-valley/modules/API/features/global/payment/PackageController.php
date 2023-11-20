@@ -230,7 +230,8 @@ class PackageController
 
         $transaction->setTransactionStripeId($session->id);
 
-        EmailHelper::sendPaymentConfirmation($transactionId); //temporary disable
+        /** Disbaled in feedback 13 November 2023 and moved to after payment success! */
+        // EmailHelper::sendPaymentConfirmation($transactionId);
 
         /** Create notification : payment confirmation */
         $this->_notification->write($this->_notificationConstant::PAYMENT_CONFIRMATION, $company->getId(), [
@@ -418,7 +419,11 @@ class PackageController
             // update_user_meta($user_id, 'used_count', );
 
             /** Update coupon meta when coupon is used */
-            if ($transaction_data->metadata->coupon_id) {
+            error_log('meta : ' . json_encode($transaction_data->metadata));
+            error_log('coupon : ' . json_encode($transaction_data->metadata->coupon_id));
+
+            /** Update coupon meta when coupon is used */
+            if ($transaction_data->metadata->coupon_id && $transaction_data->metadata->coupon_id != "false") {
                 try {
                     $coupon = new Coupon($transaction_data->metadata->coupon_id);
 
@@ -447,24 +452,31 @@ class PackageController
                 }
             }
 
-            $args = [
-                'client.name' => $user->display_name,
-                'price.total' => $transaction->getTotalAmount(),
-                'transaction.number' => $transaction->getTransactionStripeId(),
-                'transaction.package' => $transaction->getPackageName(),
-                'transaction.date'  => DateHelper::doLocale(strtotime($transaction->getDate()), 'nl_NL', 'd MMMM yyyy'), // DateHelper::doLocale(strtotime($transaction->getDate()), 'nl_NL', 'j F Y'),
-                'transaction.numberFormatted' => substr($transaction->getTransactionStripeId(), 0, 15) . "...",
-                'price.totalFormatted' => "€ " . number_format($transaction->getTotalAmount(), 2),
-                'transaction.toestand' => $transaction->getStatus()
-            ];
+            /** I BEG YOU TO READ THIS FIRST!
+             * Disbaled for feedback 13 November 2023, changed to payment confirmation! */
+            // $args = [
+            //     'client.name' => $user->display_name,
+            //     'price.total' => $transaction->getTotalAmount(),
+            //     'transaction.number' => $transaction->getTransactionStripeId(),
+            //     'transaction.package' => $transaction->getPackageName(),
+            //     'transaction.date'  => DateHelper::doLocale(strtotime($transaction->getDate()), 'nl_NL', 'd MMMM yyyy'), // DateHelper::doLocale(strtotime($transaction->getDate()), 'nl_NL', 'j F Y'),
+            //     'transaction.numberFormatted' => substr($transaction->getTransactionStripeId(), 0, 15) . "...",
+            //     'price.totalFormatted' => "€ " . number_format($transaction->getTotalAmount(), 2),
+            //     'transaction.toestand' => $transaction->getStatus()
+            // ];
 
-            $site_title = get_bloginfo('name');
-            Email::send(
-                $user->user_email,
-                sprintf(__('Betaling gelukt - %s', "THEME_DOMAIN"), $site_title),
-                $args,
-                'payment-package-success.php'
-            );
+            // $site_title = get_bloginfo('name');
+            // Email::send(
+            //     $user->user_email,
+            //     sprintf(__('Betaling gelukt - %s', "THEME_DOMAIN"), $site_title),
+            //     $args,
+            //     'payment-package-success.php'
+            // );
+
+            /** Feedback 13 November 2023 Start Here */
+            if (isset($transaction_data->metadata->transaction_id) && $transaction_data->metadata->transaction_id != "false") {
+                EmailHelper::sendPaymentConfirmation($transaction_data->metadata->transaction_id);
+            }
 
             /** Create notification : payment success */
             $this->_notification->write($this->_notificationConstant::PAYMENT_SUCCESSFULL, $company->getId(), [

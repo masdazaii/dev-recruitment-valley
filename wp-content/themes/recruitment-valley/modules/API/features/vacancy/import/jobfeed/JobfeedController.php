@@ -121,6 +121,20 @@ class JobfeedController
             $unusedData = [];
 
             foreach ($vacancies as $vacancy) {
+                $arguments = [
+                    'post_type' => 'vacancy',
+                    'post_status' => 'publish',
+                    'post_author' => $importUser
+                ];
+
+                $payload    = [];
+                $taxonomy   = [];
+
+                /** Map property that not used.
+                 * this will be stored in post meta.
+                 */
+                $unusedData = [];
+
                 /** Decode vacancy */
                 $vacancy = json_decode($vacancy);
 
@@ -677,6 +691,7 @@ class JobfeedController
                         update_post_meta($post, 'rv_vacancy_unused_data', $unusedData);
                         update_post_meta($post, 'rv_vacancy_source', 'jobfeed');
                         update_post_meta($post, 'rv_vacancy_imported_at', $now->format('Y-m-d H:i:s'));
+                        update_post_meta($post, 'rv_vacancy_jobfeed_is_expired', 0); // 0 for false 1 for true
 
 
                         /** IF MAP API IS ENABLED */
@@ -862,11 +877,12 @@ class JobfeedController
 
                     error_log('[Expired Jobfeed] - Vacancy exists. Vacancy_id : ' . $validate . ' - JobID : ' . (isset($vacancy->job_id) ? $vacancy->job_id : 'No_job_id_found') . '. Expiration Date : ' . (isset($vacancy->expiration_date) ? $vacancy->expiration_date : 'no_expiration_date_found') . ' - index : ' . $i);
                     /** Set expired_at */
-                    $payload['expired_at']  = $vacancy->expiration_date;
                     $taxonomy['status']     = $this->_findStatus('close');
+                    $payload['expired_at']  = $vacancy->expiration_date;
 
                     $vacancyModel = new Vacancy($validate);
                     $vacancyModel->setTaxonomy($taxonomy);
+                    update_post_meta($validate, 'rv_vacancy_jobfeed_is_expired', 1); // 0 for false 1 for true
 
                     foreach ($payload as $acf_field => $acfValue) {
                         $vacancyModel->setProp($acf_field, $acfValue, is_array($acfValue));

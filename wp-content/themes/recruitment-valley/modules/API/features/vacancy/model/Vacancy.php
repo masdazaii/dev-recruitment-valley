@@ -101,6 +101,11 @@ class Vacancy
     private $_acf_rv_vacancy_custom_company_phone_number    = "rv_vacancy_custom_company_phone_number";
     private $_acf_rv_vacancy_custom_company_total_employees = "rv_vacancy_custom_company_total_employees";
     private $_acf_rv_vacancy_custom_company_description     = "rv_vacancy_custom_company_description";
+    private $_acf_rv_vacancy_custom_company_country     = "rv_vacancy_custom_company_country";
+    private $_acf_rv_vacancy_custom_company_city        = "rv_vacancy_custom_company_city";
+    private $_acf_rv_vacancy_custom_company_address     = "rv_vacancy_custom_company_address";
+    private $_acf_vacancy_custom_company_longitude      = "rv_vacancy_custom_company_longitude";
+    private $_acf_vacancy_custom_company_latitude       = "rv_vacancy_custom_company_latitude";
 
     private $_taxonomies = ["sector", "role", "type", "education", "working-hours", "status", "location", "experiences"];
 
@@ -109,6 +114,7 @@ class Vacancy
     private $_meta_rv_vacancy_imported_at   = 'rv_vacancy_imported_at';
     public $meta_rv_vacancy_approved_at     = 'rv_vacancy_approved_at';
     public $meta_rv_vacancy_source        = 'rv_vacancy_source';
+    public $meta_rv_vacancy_jobfeed_is_expired = 'rv_vacancy_jobfeed_is_expired';
 
     public function __construct($vacancy_id = false)
     {
@@ -629,12 +635,36 @@ class Vacancy
     public function setCityLongLat(string $city, Bool $withCompanyAsWell = false)
     {
         $coordinat = Maphelper::generateLongLat($city);
-        $this->setProp($this->acf_city_latitude, $coordinat["lat"]);
-        $this->setProp($this->acf_city_longitude, $coordinat["long"]);
+        $lat  = $this->setProp($this->acf_city_latitude, $coordinat["lat"]);
+        $long = $this->setProp($this->acf_city_longitude, $coordinat["long"]);
 
         if ($withCompanyAsWell) {
             $this->setProp($this->_acf_imported_company_city_latitude, $coordinat["lat"]);
             $this->setProp($this->_acf_imported_company_city_longitude, $coordinat["long"]);
+        }
+
+        if ($lat && $long) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function getCityLongLat(String $result = 'all')
+    {
+        if ($this->vacancy_id) {
+            if ($result == 'latitude') {
+                return $this->getProp($this->acf_city_latitude);
+            } else if ($result == 'longitude') {
+                return $this->getProp($this->acf_city_longitude);
+            } else {
+                return [
+                    'latitude'  => $this->getProp($this->acf_city_latitude),
+                    'longitude' => $this->getProp($this->acf_city_longitude)
+                ];
+            }
+        } else {
+            throw new Exception('Please specify vacancy');
         }
     }
 
@@ -673,6 +703,15 @@ class Vacancy
         $distance = Maphelper::calculateDistance($cityCoordinat, $placementAddressCoordinat);
 
         return $this->setProp($this->acf_distance_from_city, $distance);
+    }
+
+    public function getDistance()
+    {
+        if ($this->vacancy_id) {
+            return $this->getProp($this->acf_distance_from_city);
+        } else {
+            throw new Exception("Please specify vacancy!");
+        }
     }
 
     /**
@@ -840,6 +879,7 @@ class Vacancy
     public function setCoordinateDistance($cityCoordinate, $placementAddressCoordinate)
     {
         $distance = Maphelper::calculateDistance($cityCoordinate, $placementAddressCoordinate);
+        error_log(json_encode($distance));
 
         return $this->setProp($this->acf_distance_from_city, $distance);
     }
@@ -933,6 +973,12 @@ class Vacancy
     public function getImportedCompanyTotalEmployees()
     {
         return $this->getProp($this->_acf_imported_company_total_employees, true);
+    }
+
+    public function checkIfJobfeedExpired()
+    {
+        $isExpired = $this->getterMeta($this->meta_rv_vacancy_jobfeed_is_expired, true);
+        return $isExpired;
     }
 
     /**
@@ -1337,8 +1383,8 @@ class Vacancy
     public function checkUseExistingCompany()
     {
         if ($this->vacancy_id) {
-            // return $this->getProp($this->_acf_rv_vacancy_use_existing_company, true) == 1 ? true : false;
-            return $this->getProp($this->_acf_rv_vacancy_use_existing_company, true);
+            return $this->getProp($this->_acf_rv_vacancy_use_existing_company, true) == 1 ? true : false;
+            // return $this->getProp($this->_acf_rv_vacancy_use_existing_company, true);
         } else {
             throw new Exception('Please specify the vacancy!');
         }
@@ -1484,6 +1530,113 @@ class Vacancy
             }
         } else {
             throw new Exception('Please specify the vacancy!');
+        }
+    }
+
+    /**
+     * Get custom company country function
+     * this acf only return value and
+     * if you can please do not change the return value to array.
+     *
+     * @param string $result
+     * @return mixed
+     */
+    public function getCustomCompanyCountry($result = 'array')
+    {
+        if ($this->vacancy_id) {
+            $value = $this->getProp($this->_acf_rv_vacancy_custom_company_country, true);
+            if ($value) {
+                if ($result == 'label') {
+                    return $value;
+                } else if ($result == 'value') {
+                    return $value;
+                } else {
+                    return [
+                        'value' => $value,
+                        'label' => $value
+                    ];
+                }
+            } else {
+                return $value;
+            }
+        } else {
+            throw new Exception('Please specify the vacancy!');
+        }
+    }
+
+    /**
+     * Get custom company country function
+     * this acf only return value and
+     * if you can please do not change the return value to array.
+     *
+     * @param string $result
+     * @return mixed
+     */
+    public function getCustomCompanyCity($result = 'array')
+    {
+        if ($this->vacancy_id) {
+            $value = $this->getProp($this->_acf_rv_vacancy_custom_company_city, true);
+            if ($value) {
+                if ($result == 'label') {
+                    return $value;
+                } else if ($result == 'value') {
+                    return $value;
+                } else {
+                    return [
+                        'value' => $value,
+                        'label' => $value
+                    ];
+                }
+            } else {
+                return $value;
+            }
+        } else {
+            throw new Exception('Please specify the vacancy!');
+        }
+    }
+
+    public function getCustomCompanyAddress()
+    {
+        if ($this->vacancy_id) {
+            return $this->getProp($this->_acf_rv_vacancy_custom_company_address, true);
+        } else {
+            throw new Exception('Please specify vacancy!');
+        }
+    }
+
+    public function getCustomCompanyCoordinate($result = 'all')
+    {
+        if ($this->vacancy_id) {
+            if ($result == 'latitude') {
+                return $this->getProp($this->_acf_vacancy_custom_company_latitude, true);
+            } else if ($result == 'longitude') {
+                return $this->getProp($this->_acf_vacancy_custom_company_longitude, true);
+            } else {
+                return [
+                    'latitude' => $this->getProp($this->_acf_vacancy_custom_company_latitude, true),
+                    'longitude' => $this->getProp($this->_acf_vacancy_custom_company_longitude, true)
+                ];
+            }
+        } else {
+            throw new Exception('Please specify vacancy!');
+        }
+    }
+
+    public function setCustomCompanyLatitude($value)
+    {
+        if ($this->vacancy_id) {
+            return $this->setProp($this->_acf_vacancy_custom_company_longitude, $value);
+        } else {
+            throw new Exception('Please specify vacancy!');
+        }
+    }
+
+    public function setCustomCompanyLongitude($value)
+    {
+        if ($this->vacancy_id) {
+            return $this->setProp($this->_acf_vacancy_custom_company_latitude, $value);
+        } else {
+            throw new Exception('Please specify vacancy!');
         }
     }
 }

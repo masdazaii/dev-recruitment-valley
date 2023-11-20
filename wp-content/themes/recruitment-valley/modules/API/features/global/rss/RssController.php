@@ -71,10 +71,12 @@ class RssController
         /** get rss  */
         $rss = $rssModel->getRssBySlug($request['rss'], 'object');
         $rssVacancies = $rssModel->getRssVacancies();
+        $language   = $rssModel->getRssLanguage();
+        $company    = $rssModel->getRssCompany();
+        $paidStatus = $rssModel->getRssPaidStatus();
 
         $vacancyModel = new Vacancy();
         $filters = [
-            'in' => array_values($rssVacancies),
             'meta' => [
                 "relation" => "AND",
                 [
@@ -94,6 +96,67 @@ class RssController
                 ],
             ]
         ];
+
+        if (isset($rssVacancies) && is_array($rssVacancies)) {
+            $filters['in'] = array_values($rssVacancies);
+        }
+
+        /** Filter by language meta */
+        if (isset($language) && $language) {
+            if (is_array($language)) {
+                if (array_key_exists('value', $language)) {
+                    $filters['meta'][] = [
+                        'key' => 'rv_vacancy_language',
+                        'value' => $language['value'],
+                        'compare' => '='
+                    ];
+                }
+            } else {
+                $filters['meta'][] = [
+                    'key' => 'rv_vacancy_language',
+                    'value' => $language,
+                    'compare' => '='
+                ];
+            }
+        }
+
+        /** Filter by vacancy's author */
+        if (isset($company) && $company) {
+            if (is_array($company)) {
+                $filters['author'] = $company;
+            } else {
+                $filters['author'] = [$company];
+            }
+        }
+
+        /** Filter by is_paid meta */
+        if ($paidStatus && isset($paidStatus) && !empty($paidStatus)) {
+            if (array_key_exists('value', $paidStatus)) {
+                if ($paidStatus['value'] !== 'both') {
+                    $filters['meta'][] = [
+                        'key'       => 'is_paid',
+                        'value'     => $paidStatus['value'] == 'paid' ? 1 : 0,
+                        'compare'   => '='
+                    ];
+                } else { // this can be removed to show all vacancy, but I want only vancancy that has meta_key is_paid.
+                    $filters['meta'][] = [
+                        'relation'  => 'OR',
+                        [
+                            'key'       => 'is_paid',
+                            'value'     => 1,
+                            'compare'   => '='
+                        ],
+                        [
+                            'key'       => 'is_paid',
+                            'value'     => 0,
+                            'compare'   => '='
+                        ]
+                    ];
+                }
+            }
+        }
+
+        /** Get vacancies data */
         $vacancies = $vacancyModel->getVacancies($filters);
 
         $response = [
@@ -104,6 +167,7 @@ class RssController
             $response['data'] = $vacancies->posts;
         }
 
+        /** Convert to xml */
         echo $this->convert($response);
     }
 }

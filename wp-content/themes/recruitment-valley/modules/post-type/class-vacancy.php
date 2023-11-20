@@ -6,8 +6,11 @@ use Constant\Message;
 use DateTimeImmutable;
 use Vacancy\Vacancy as VacancyModel;
 use constant\NotificationConstant;
+use DateTime;
 use Global\NotificationService;
 use Global\OptionController;
+use Helper\Maphelper;
+use Model\Term;
 
 class Vacancy extends RegisterCPT
 {
@@ -19,14 +22,18 @@ class Vacancy extends RegisterCPT
     public function __construct()
     {
         add_action('init', [$this, 'RegisterVacancyCPT']);
+        add_action('save_post', [$this, 'vacancySubmitHandle'], 10, 3);
         add_action('set_object_terms', [$this, 'setExpiredDate'], 10, 5);
         add_action('add_meta_boxes', [$this, 'addVacancyMetaboxes'], 10, 2);
         add_filter('manage_vacancy_posts_columns', [$this, 'vacancyColoumn'], 10, 1);
         add_action('manage_vacancy_posts_custom_column', [$this, 'vacancyCustomColoumn'], 10, 2);
-        $this->_message = new Message();
+        add_action('restrict_manage_posts', [$this, 'vacancyCustomFilterRender'], 10, 2);
+        add_filter('parse_query', [$this, 'vacancyCustomFilterHandle'], 10, 1);
+        // add_action('pre_get_posts', [$this, 'vacancyCustomFilterHandle'], 10, 1);
 
         global $wpdb;
         $this->wpdb = $wpdb;
+        $this->_message = new Message();
         $this->_notification = new NotificationService();
         $this->_notificationConstant = new NotificationConstant();
     }
@@ -100,10 +107,10 @@ class Vacancy extends RegisterCPT
 
     public function setExpiredDate($object_id, $terms = [], $tt_ids = [], $taxonomy = '', $append = true, $old_tt_ids = [])
     {
-        $this->wpdb->query("START TRANSACTION");
-
         $post = get_post($object_id, 'object');
         if ($post->post_type == 'vacancy') {
+            $this->wpdb->query("START TRANSACTION");
+
             error_log('class-vacancy - method : setExpiredDate - Before try to update the expired date.');
             error_log('class-vacancy - method : setExpiredDate - post : ' . $object_id . ' - terms : ' . json_encode($terms));
 
@@ -250,11 +257,11 @@ class Vacancy extends RegisterCPT
         switch ($coloumn) {
             case 'status':
                 $status = $vacancyModel->getStatus();
-                if ($status['slug'] == 'open') {
+                if (array_key_exists('slug', $status) && $status['slug'] == 'open') {
                     echo '<span style="color: green; font-weight: bold;">' . $status['name'] . '<span>';
-                } else if ($status['slug'] == 'close') {
+                } else if (array_key_exists('slug', $status) && $status['slug'] == 'close') {
                     echo '<span style="color: red; font-weight: bold;">' . $status['name'] . '<span>';
-                } else if ($status['slug'] == 'declined') {
+                } else if (array_key_exists('slug', $status) && $status['slug'] == 'declined') {
                     echo '<span style="color: orange; font-weight: bold;">' . $status['name'] . '<span>';
                 } else {
                     echo '<span style="color: black; font-weight: bold;">' . $status['name'] . '<span>';
@@ -263,7 +270,11 @@ class Vacancy extends RegisterCPT
             case 'expired':
                 if ($vacancyModel->checkImported()) {
                     if ($vacancyModel->getImportedSource() == 'jobfeed') {
-                        echo '-';
+                        if ($vacancyModel->checkIfJobfeedExpired()) {
+                            echo $vacancyModel->getExpiredAt('d M Y');
+                        } else {
+                            echo '-';
+                        }
                     } else {
                         echo $vacancyModel->getExpiredAt('d M Y');
                     }
@@ -274,6 +285,397 @@ class Vacancy extends RegisterCPT
             case 'approvedat':
                 echo $vacancyModel->getApprovedAt('d M Y H:i:s');
                 break;
+        }
+    }
+
+    public function vacancySubmitHandle($post_id, $post, $update)
+    {
+        if ($post->post_type == 'vacancy') {
+            $this->wpdb->query('START TRANSACTION');
+            try {
+                $vacancyModel = new VacancyModel($post_id);
+                $vacancyData = [];
+
+                /** Calculate Vacancy City Coordiante */
+                // Check if city is not empty,
+                $vacancyData['city'] = $vacancyModel->getCity();
+                $vacancyData['city_latitude'] = $vacancyModel->getCityLongLat('latitude');
+                $vacancyData['city_longitude'] = $vacancyModel->getCityLongLat('longitude');
+                error_log(json_encode($vacancyData));
+
+                if ($vacancyData['city']) {
+                    if (!$vacancyData['city_longitude'] || empty($vacancyData['city_longitude']) || !$vacancyData['city_longitude'] || empty($vacancyData['city_longitude'])) {
+                        /** Calculate Coordinate */
+                        $vacancyModel->setCityLongLat($vacancyData['city']);
+                        $vacancyData['city_latitude'] = $vacancyModel->getCityLongLat('latitude');
+                        $vacancyData['city_longitude'] = $vacancyModel->getCityLongLat('longitude');
+                    }
+                }
+
+                /** Vacancy Placement Address Coordinatee */
+                $vacancyData['placement_address'] = $vacancyModel->getPlacementAddress();
+
+                /** Check if placement address is not empty */
+                if (isset($vacancyData['placement_address']) && !empty($vacancyData['placement_address'])) {
+                    $vacancyData['placement_address_latitude']   = $vacancyModel->getPlacementAddressLatitude();
+                    $vacancyData['placement_address_longitude']  = $vacancyModel->getPlacementAddressLongitude();
+                    if (!$vacancyData['placement_address_latitude'] || !$vacancyData['placement_address_longitude']) {
+                        /** Calculate Coordinate */
+                        $vacancyModel->setPlacementAddressLongitude($vacancyData['placement_address']);
+
+                        $vacancyData['placement_address_latitude']   = $vacancyModel->getPlacementAddressLatitude();
+                        $vacancyData['placement_address_longitude']  = $vacancyModel->getPlacementAddressLongitude();
+                    }
+                }
+
+                /** Set Distance */
+                error_log('the distance : ' . json_encode($vacancyModel->getDistance()));
+                if (!$vacancyModel->getDistance()) {
+                    error_log($post_id . ' - no distance');
+                    if ($vacancyData['city_latitude'] && $vacancyData['city_longitude'] && $vacancyData['placement_address_latitude'] && $vacancyData['placement_address_longitude']) {
+                        error_log($post_id . ' - setCoordinateDistance');
+                        $setCD = $vacancyModel->setCoordinateDistance([
+                            'lat' => $vacancyData['city_latitude'],
+                            'long' => $vacancyData['city_longitude']
+                        ], [
+                            'lat' => $vacancyData['placement_address_latitude'],
+                            'long' => $vacancyData['placement_address_longitude']
+                        ]);
+                        error_log($post_id . ' - setCoordinateDistance. ' . json_encode($setCD));
+                    } else if ($vacancyData['city'] && $vacancyData['placement_address']) {
+                        error_log($post_id . ' - setDistance');
+                        $setCD = $vacancyModel->setDistance($vacancyData["placement_city"], $vacancyData["placement_city"] . " " . $vacancyData["placement_address"]);
+                        error_log($post_id . ' - setDistance. ' . json_encode($setCD));
+                    }
+                }
+
+                /** Custom Company Address Coordinate */
+                /** Check if is_for_another_company */
+                if ($vacancyModel->checkIsForAnotherCompany()) {
+                    /** Check if not use_existing_company */
+                    if (!$vacancyModel->checkUseExistingCompany()) {
+                        $companyData['address_longitude'] = $vacancyModel->getCustomCompanyCoordinate('longitude');
+                        $companyData['address_latitude'] = $vacancyModel->getCustomCompanyCoordinate('latitude');
+                        $companyData['address'] = $vacancyModel->getCustomCompanyAddress();
+
+                        if (!$companyData['address_longitude'] || !$companyData['address_latitude']) {
+                            if ($companyData['address']) {
+                                $coordinat = Maphelper::generateLongLat($companyData['address']);
+                                $vacancyModel->setCustomCompanyLatitude($coordinat["lat"]);
+                                $vacancyModel->setCustomCompanyLongitude($coordinat["long"]);
+                            }
+                        }
+                    }
+                }
+
+                $this->wpdb->query('COMMIT');
+
+                /** Set status
+                 * IF free vacancy :
+                 *   - if new vacancy & if no status : set to processing.
+                 * IF paid vacancy :
+                 *   - if new vacancy & if no status : set to open.
+                 *
+                 * IF UPDATE then skip.
+                 *  */
+                if (!$update || !wp_is_post_revision($post)) {
+                    if ($vacancyModel->getIsPaid()) {
+                        /** if vacancy has no status, set to open */
+                        $vacancyStatus = $vacancyModel->getStatus();
+                        if (isset($vacancyStatus) && is_array($vacancyStatus)) {
+                            if (!empty($vacancyStatus['name'])) {
+                                if ($vacancyStatus['name'] !== 'open') {
+                                    $test = $vacancyModel->setStatus('open');
+                                }
+                            } else {
+                                $test = $vacancyModel->setStatus('open');
+                            }
+                        } else {
+                            $vacancyModel->setStatus('open');
+                        }
+                    } else {
+                        $vacancyStatus = $vacancyModel->getStatus();
+
+                        if (isset($vacancyStatus) && is_array($vacancyStatus)) {
+                            if (!empty($vacancyStatus['name'])) {
+                                if ($vacancyStatus['name'] !== 'processing') {
+                                    $vacancyModel->setStatus('processing');
+                                }
+                            } else {
+                                $vacancyModel->setStatus('processing');
+                            }
+                        } else {
+                            $vacancyModel->setStatus('processing');
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                $this->wpdb->query('ROLLBACK');
+                error_log($e->getMessage());
+            }
+        }
+    }
+
+    public function vacancyCustomFilterRender($post_type, $which)
+    {
+        if (is_admin()) {
+            if ($post_type == 'vacancy' && $which == 'top') {
+                try {
+                    /** Get status terms */
+                    $terms = get_terms([
+                        'taxonomy' => 'status',
+                        'hide_emtpy' => false
+                    ]);
+
+                    if ($terms instanceof \WP_Error) {
+                        throw new \Exception($terms->get_error_message());
+                    }
+                    // print('<pre>' . print_r($terms, true) . '</pre>');
+
+                    $filterStatusOption = [];
+                    if (is_array($terms)) {
+                        foreach ($terms as $term) {
+                            $filterStatusOption[$term->slug] = $term->name;
+                        }
+                    }
+
+                    /** Set filter status */
+                    echo '<select name="filterVacancyByStatus">';
+                    echo '<option value="">' . __('All Status ', THEME_DOMAIN) . '</option>';
+
+                    $selectedStatusFilter = isset($_GET['filterVacancyByStatus']) ? $_GET['filterVacancyByStatus'] : '';
+                    foreach ($filterStatusOption as $value => $label) {
+                        printf('<option value="%s"%s>%s</option>', $value, $value == $selectedStatusFilter ? ' selected="selected"' : '', $label);
+                    }
+                    echo '</select>';
+
+                    /** Set filter expired */
+                    $filterExpiredOption = [
+                        'expired'   => 'Expired Vacancy',
+                        'almost'    => 'Almost Expired (7 days)',
+                        'not-expired' => 'Not Expired'
+                    ];
+
+                    echo '<select name="filterVacancyByExpired">';
+                    echo '<option value="">' . __('All Data ', THEME_DOMAIN) . '</option>';
+
+                    $selectedExpiredFilter = isset($_GET['filterVacancyByExpired']) ? $_GET['filterVacancyByExpired'] : '';
+                    foreach ($filterExpiredOption as $value => $label) {
+                        printf('<option value="%s"%s>%s</option>', $value, $value == $selectedExpiredFilter ? ' selected="selected"' : '', $label);
+                    }
+                    echo '</select>';
+
+                    /** Set filter Source */
+                    $filterSourceOption = [
+                        'paid'      => 'Paid Job',
+                        'free'      => 'Free Job',
+                        'flexfeed'  => 'Brightwave / Flexparency',
+                        'jobfeed'   => 'Textkernel Jobfeed'
+                    ];
+
+                    echo '<select name="filterVacancyBySource">';
+                    echo '<option value="">' . __('All Data ', THEME_DOMAIN) . '</option>';
+
+                    $selectedSourceFilter = isset($_GET['filterVacancyBySource']) ? $_GET['filterVacancyBySource'] : '';
+                    foreach ($filterSourceOption as $value => $label) {
+                        printf('<option value="%s"%s>%s</option>', $value, $value == $selectedSourceFilter ? ' selected="selected"' : '', $label);
+                    }
+                    echo '</select>';
+                } catch (\Exception $e) {
+                    error_log($e->getMessage());
+                }
+            }
+        }
+    }
+
+    public function vacancyCustomFilterHandle($query)
+    {
+        global $pagenow;
+        if (is_admin()) {
+            if ($query->get('post_type') == 'vacancy' && $pagenow == 'edit.php') {
+                /** Handle filter by status */
+                if (isset($_GET['filterVacancyByStatus'])) {
+                    if (!empty($_GET['filterVacancyByStatus'])) {
+                        // } else {
+                        $query->set('tax_query', [
+                            'relation' => 'AND',
+                            [
+                                'taxonomy' => 'status',
+                                'field'    => 'slug',
+                                'terms'    => $_GET['filterVacancyByStatus'],
+                                'compare'  => 'IN'
+                            ]
+                        ]);
+                    }
+                }
+
+                $metaQuery = [
+                    'relation' => 'AND'
+                ];
+                $setNewMeta = false;
+
+                /** Handle filter by expired */
+                if (isset($_GET['filterVacancyByExpired'])) {
+                    if (!empty($_GET['filterVacancyByExpired'])) {
+                        switch ($_GET['filterVacancyByExpired']) {
+                            case 'expired':
+                                $dateLimit = date("Y-m-d H:i:s");
+                                $compare = '<=';
+                                break;
+                            case 'almost':
+                                $today          = new DateTimeImmutable();
+                                $weekLaterDate  = $today->modify('-7 days');
+                                $dateLimit      = [$today->format('Y-m-d'), $weekLaterDate->format('Y-m-d')];
+                                $compare        = 'BETWEEN';
+                                break;
+                            case 'not-expired':
+                                $dateLimit = date("Y-m-d H:i:s");
+                                $compare = '>=';
+                                break;
+                        }
+
+                        /** Changes 17 Nov 2023 */
+                        // $query->set('meta_query', [
+                        //     'relation' => 'AND',
+                        //     [
+                        //         'key'       => 'expired_at',
+                        //         'value'     => $dateLimit,
+                        //         'compare'   => $compare,
+                        //         'type'      => "DATE"
+                        //     ]
+                        // ]);
+                        $setNewMeta     = true;
+                        $metaQuery[]    = [
+                            'key'       => 'expired_at',
+                            'value'     => $dateLimit,
+                            'compare'   => $compare,
+                            'type'      => "DATE"
+                        ];
+                    }
+                }
+
+                /** Handle filter by source */
+                if (isset($_GET['filterVacancyBySource'])) {
+                    if (!empty($_GET['filterVacancyBySource'])) {
+                        $addMetaQuery = [];
+                        switch ($_GET['filterVacancyBySource']) {
+                            case 'paid':
+                                $addMetaQuery = [
+                                    'relation'  => 'AND',
+                                    [
+                                        'key'   => 'is_paid',
+                                        'value' => 1,
+                                        'compare'   => '='
+                                    ],
+                                    [
+                                        'relation'  => 'OR',
+                                        [
+                                            'relation'  => 'AND',
+                                            [
+                                                'key'   => 'rv_vacancy_source',
+                                                'value' => 'flexfeed',
+                                                'compare'   => '!='
+                                            ],
+                                            [
+                                                'key'   => 'rv_vacancy_source',
+                                                'value' => 'jobfeed',
+                                                'compare'   => '!='
+                                            ],
+                                        ],
+                                        [
+                                            'relation' => 'OR',
+                                            [
+                                                'key'   => 'rv_vacancy_imported_at',
+                                                'value' => 0,
+                                                'compare'   => '='
+                                            ],
+                                            [
+                                                'key'   => 'rv_vacancy_imported_at',
+                                                'value' => NULL,
+                                                'compare'   => '='
+                                            ],
+                                            [
+                                                'key'   => 'rv_vacancy_imported_at',
+                                                'value' => NULL,
+                                                'compare'   => 'NOT EXISTS'
+                                            ]
+                                        ]
+                                    ]
+                                ];
+                                break;
+                            case 'free':
+                                $addMetaQuery = [
+                                    'relation' => 'AND',
+                                    [
+                                        'relation' => 'OR',
+                                        [
+                                            'key'   => 'is_paid',
+                                            'value' => 0,
+                                            'compare'   => '='
+                                        ],
+                                        // [
+                                        //     'key'   => 'is_paid',
+                                        //     'value' => NULL,
+                                        //     'compare'   => '='
+                                        // ],
+                                        // [
+                                        //     'key'   => 'is_paid',
+                                        //     'value' => "",
+                                        //     'compare'   => '='
+                                        // ],
+                                        [
+                                            'key'   => 'is_paid',
+                                            'value' => NULL,
+                                            'compare'   => 'NOT EXISTS'
+                                        ]
+                                    ],
+                                    [
+                                        'relation' => 'OR',
+                                        [
+                                            'key'   => 'rv_vacancy_imported_at',
+                                            'value' => 0,
+                                            'compare'   => '='
+                                        ],
+                                        [
+                                            'key'   => 'rv_vacancy_imported_at',
+                                            'value' => NULL,
+                                            'compare'   => '='
+                                        ],
+                                        [
+                                            'key'   => 'rv_vacancy_imported_at',
+                                            'value' => NULL,
+                                            'compare'   => 'NOT EXISTS'
+                                        ]
+                                    ]
+                                ];
+                                break;
+                            case 'flexfeed':
+                                $addMetaQuery = [
+                                    'key'   => 'rv_vacancy_source',
+                                    'value' => 'flexfeed',
+                                    'compare'   => '='
+                                ];
+                                break;
+                            case 'jobfeed':
+                                $addMetaQuery = [
+                                    'key'   => 'rv_vacancy_source',
+                                    'value' => 'jobfeed',
+                                    'compare'   => '='
+                                ];
+                        }
+
+                        $setNewMeta     = true;
+                        $metaQuery[] = $addMetaQuery;
+                    }
+                }
+
+                /** Set meta_query */
+                if ($setNewMeta) {
+                    $query->set('meta_query', $metaQuery);
+                }
+                // print('<pre>' . print_r($setNewMeta ? 'asddddddddasddddddddddddddddddddd' : 'asasdddddddddddddddddddddddddddddddddd', true) . '</pre>');
+                // print('<pre>' . print_r($metaQuery, true) . '</pre>');
+            }
         }
     }
 }
