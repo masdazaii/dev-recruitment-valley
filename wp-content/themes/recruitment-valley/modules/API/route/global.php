@@ -268,6 +268,12 @@ class GlobalEndpoint
                     'permission_callback'   => '__return_true',
                     'callback'              => [$importService, 'jobfeedExpire']
                 ],
+                'feed_export' => [
+                    'url'                   => 'export',
+                    'methods'               => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$crudVacancyService, 'export']
+                ],
                 'list_coupon' => [
                     'url'                   => 'coupons',
                     'methods'               => 'GET',

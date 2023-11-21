@@ -548,6 +548,7 @@ class Vacancy
             $tempTax = $tax->taxonomy;
             $taxField = [
                 "id" => $tax->term_id,
+                "slug" => $tax->slug,
                 "name" => html_entity_decode($tax->name)
             ];
 
@@ -938,6 +939,11 @@ class Vacancy
         return $this->getterMeta($this->meta_rv_vacancy_source);
     }
 
+    public function getImportedSourceID()
+    {
+        return $this->getProp($this->_acf_imported_vacancy_source_id);
+    }
+
     public function getImportedCompanySector()
     {
         $sectors = $this->getProp($this->_acf_imported_company_sector);
@@ -954,8 +960,9 @@ class Vacancy
                 $result = [];
                 foreach ($terms as $term) {
                     $result[] = [
-                        'value'  => $term->term_id,
-                        'label'  => $term->name,
+                        'value' => $term->term_id,
+                        'slug'  => $term->slug,
+                        'label' => $term->name,
                     ];
                 }
                 return $result;
@@ -973,6 +980,11 @@ class Vacancy
     public function getImportedCompanyTotalEmployees()
     {
         return $this->getProp($this->_acf_imported_company_total_employees, true);
+    }
+
+    public function getImportedUnusedData()
+    {
+        return $this->getterMeta($this->_meta_rv_vacancy_unused_data);
     }
 
     public function checkIfJobfeedExpired()
@@ -1176,6 +1188,11 @@ class Vacancy
     public function setApprovedBy($value)
     {
         return $this->setProp($this->_acf_imported_approved_by, $value);
+    }
+
+    public function getApprovedBy()
+    {
+        return $this->getProp($this->_acf_imported_approved_by, true);
     }
 
     public function getApprovedAt($format = 'Y-m-d H:i:s')
@@ -1420,12 +1437,14 @@ class Vacancy
                 }
             } else {
                 $logo = $this->getProp($this->_acf_rv_vacancy_custom_company_logo, true);
-                return [
-                    'id' => $logo['id'],
-                    'title' => $logo['title'],
-                    'url' => $logo['url'],
-                ];
-                // return $logo;
+                if ($logo) {
+                    return [
+                        'id' => $logo['id'],
+                        'title' => $logo['title'],
+                        'url' => $logo['url'],
+                    ];
+                }
+                return $logo;
             }
         } else {
             throw new Exception('Please specify the vacancy!');
