@@ -255,8 +255,6 @@ class VacancyCrudService
         }
     }
 
-
-
     /**
      * repostJob
      *
@@ -267,6 +265,13 @@ class VacancyCrudService
     {
         $params = $request->get_params();
         $response = $this->vacancyCrudController->repost($params);
+        return ResponseHelper::build($response);
+    }
+
+    public function export(WP_REST_Request $request)
+    {
+        $params = $request->get_params();
+        $response = $this->vacancyCrudController->export($params);
         return ResponseHelper::build($response);
     }
 }
