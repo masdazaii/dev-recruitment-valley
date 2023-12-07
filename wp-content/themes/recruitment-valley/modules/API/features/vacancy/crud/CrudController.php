@@ -1299,7 +1299,6 @@ class VacancyCrudController
     public function export($request)
     {
         $vacancyModel = new Vacancy();
-
         $filters = [
             'meta' => [
                 'relation' => 'AND',

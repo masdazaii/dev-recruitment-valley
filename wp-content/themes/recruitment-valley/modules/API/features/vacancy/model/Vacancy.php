@@ -982,10 +982,10 @@ class Vacancy
         return $this->getProp($this->_acf_imported_company_total_employees, true);
     }
 
-    public function getImportedUnusedData()
-    {
-        return $this->getterMeta($this->_meta_rv_vacancy_unused_data);
-    }
+    // public function getImportedUnusedData()
+    // {
+    //     return $this->getterMeta($this->_meta_rv_vacancy_unused_data);
+    // }
 
     public function checkIfJobfeedExpired()
     {
@@ -1240,6 +1240,11 @@ class Vacancy
         } else {
             throw new Exception('Please specify vacancy!');
         }
+    }
+
+    public function getImportedUnusedData()
+    {
+        return $this->getterMeta($this->_meta_rv_vacancy_unused_data, true);
     }
     /** Method for related to imported vacancy end here */
 

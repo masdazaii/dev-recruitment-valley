@@ -90,8 +90,10 @@ class Rss
 
                 if ($result == 'id') {
                     return $this->_rssID;
-                } else {
+                } else if ($result == 'object') {
                     return $this->_post;
+                } else {
+                    return new self($this->_rssID);
                 }
             }
 

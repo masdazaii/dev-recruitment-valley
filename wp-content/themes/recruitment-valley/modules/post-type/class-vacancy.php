@@ -131,6 +131,7 @@ class Vacancy extends RegisterCPT
                                 /** Update options "job_expires" */
                                 $optionController       = new OptionController();
                                 $updateOptionJobExpires = $optionController->updateExpiredOptions($object_id, $vacancyExpiredDate, 'class-vacancy.php', 'setExpiredDate');
+                                error_log("[IMPORT][flexfeed][{$object_id}] Set expired date option : is updated : " . $updateOptionJobExpires . " - updated data : " . json_encode(get_option("job_expires")) . " - Logged By Vacancy::setExpiredDate");
                             }
                         } else {
                             /** Update the expired date */
@@ -144,6 +145,7 @@ class Vacancy extends RegisterCPT
                                 /** Update options "job_expires" */
                                 $optionController       = new OptionController();
                                 $updateOptionJobExpires = $optionController->updateExpiredOptions($object_id, $vacancyExpiredDate, 'class-vacancy.php', 'setExpiredDate');
+                                error_log("[SUBMITED][{$object_id}] Set expired date option : is updated : " . $updateOptionJobExpires . " - updated data : " . json_encode(get_option('job_expires')) . " - Logged By Vacancy::setExpiredDate");
                             }
                         }
 
