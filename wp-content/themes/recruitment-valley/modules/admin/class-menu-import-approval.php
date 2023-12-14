@@ -51,9 +51,9 @@ class VacancyApproval
     {
         /** Get imported vacancies */
         $vacancy = new Vacancy();
-        $importedVacancies = $vacancy->getImportedVacancy();
+        // $importedVacancies = $vacancy->getImportedVacancy();
 
-        extract(['vacancies' => $importedVacancies]);
+        // extract(['vacancies' => $importedVacancies]);
 
         ob_start();
         include __DIR__ . '/imported-vacancy-approval-page.php';
