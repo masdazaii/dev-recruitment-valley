@@ -19,6 +19,7 @@ use Global\NotificationService;
 use Global\CouponService;
 use Global\Rss\RssService;
 use Global\FAQ\FaqService;
+use Middleware\DevMiddleware;
 
 class GlobalEndpoint
 {
@@ -51,6 +52,7 @@ class GlobalEndpoint
         $couponService = new CouponService;
         $rssService = new RssService;
         $faqService = new FaqService;
+        $devMiddleware = new DevMiddleware; // Middleware to handle endpoint that only for Developer
 
         $endpoint = [
             'path' => '',
@@ -268,12 +270,20 @@ class GlobalEndpoint
                     'permission_callback'   => '__return_true',
                     'callback'              => [$importService, 'jobfeedExpire']
                 ],
+                /** Start : This is mean to be endpoint for dev only */
                 'feed_export' => [
                     'url'                   => 'export',
                     'methods'               => 'GET',
                     'permission_callback'   => '__return_true',
                     'callback'              => [$crudVacancyService, 'export']
                 ],
+                'flexfeed_default_type' => [
+                    'url'                   => 'flexfeed/set-type',
+                    'methods'               => 'POST',
+                    'permission_callback'   => [$devMiddleware, 'check_dev_key'],
+                    'callback'              => [$importService, 'flexFeedSetType']
+                ],
+                /** END : This is mean to be endpoint for dev only */
                 'list_coupon' => [
                     'url'                   => 'coupons',
                     'methods'               => 'GET',
