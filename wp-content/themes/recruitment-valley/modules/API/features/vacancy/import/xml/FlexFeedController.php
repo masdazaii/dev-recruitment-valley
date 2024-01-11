@@ -7,6 +7,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Error;
 use Exception;
+use Throwable;
 use Vacancy\Vacancy;
 use WP_Error;
 use Helper\StringHelper;
@@ -15,6 +16,8 @@ use Model\Option;
 use Model\Term;
 use BD\Emails\Email;
 use Constant\Message;
+use MI\Base\Controller\BaseHandlerController;
+use Log;
 
 class FlexFeedController
 {
@@ -26,6 +29,7 @@ class FlexFeedController
     private $_terms;
     private $_keywords;
     private $_message;
+    protected const source = 'flexfeed';
 
     public function __construct($source)
     {
@@ -116,6 +120,19 @@ class FlexFeedController
 
                     $payload    = [];
                     $taxonomy   = [];
+
+                    /** Add default term as default selected type.
+                     * Feedback 09 January 2024.
+                     */
+                    $defaultTerms = [
+                        'type' => 'interim'
+                    ];
+                    foreach ($defaultTerms as $key => $defaultTerm) {
+                        $term = $this->_findTerm($key, $defaultTerm, false);
+                        if ($term) {
+                            $taxonomy[$key][] = $term;
+                        }
+                    }
 
                     /** Map property that not used.
                      * this will be stored in post meta.
@@ -412,7 +429,7 @@ class FlexFeedController
                             /** store unused to post meta */
                             $now = new DateTimeImmutable("now");
                             update_post_meta($post, 'rv_vacancy_unused_data', $unusedData);
-                            update_post_meta($post, 'rv_vacancy_source', 'flexfeed');
+                            update_post_meta($post, 'rv_vacancy_source', self::source ?? 'flexfeed');
                             update_post_meta($post, 'rv_vacancy_imported_at', $now->format('Y-m-d H:i:s'));
 
                             /** Increase imported count */
@@ -728,6 +745,55 @@ class FlexFeedController
         }
     }
 
+    private function _findTerm($taxonomy, $fetchValue, $createNew = false)
+    {
+        $terms = $this->_terms[$taxonomy];
+        $alternative = strtolower(preg_replace('/\s+/', '-', $fetchValue));
+        $alternative = strtolower(preg_replace('/(-+)/', '-', $alternative));
+
+        foreach ($terms as $key => $value) {
+            switch ($value) {
+                case $value['name'] == strtolower($fetchValue):
+                case $value['slug'] == strtolower($fetchValue):
+                case $value['name'] == strtolower($alternative):
+                case $value['slug'] == strtolower($alternative):
+                    return $value['term_id'];
+            }
+        }
+
+        /** Check using term_exists query */
+        $termExists = term_exists(strtolower(preg_replace('/\s+/', '-', $fetchValue)), 'education');
+        if ($termExists) {
+            if (is_array($termExists)) {
+                return $termExists['term_id'];
+            }
+            return $termExists;
+        } else {
+            /** Check the alternative */
+            $termExists = term_exists(strtolower($alternative), 'education');
+            if ($termExists) {
+                return $termExists;
+            }
+
+            /** If not found */
+            /** If create New is true */
+            if ($createNew) {
+                $newTerm = wp_insert_term($fetchValue, 'education', []);
+
+                if ($newTerm instanceof WP_Error) {
+                    if (array_key_exists('term_exists', $newTerm->error_data)) {
+                        return $newTerm->error_data['term_exists'];
+                    }
+                    return null;
+                } else {
+                    return $newTerm['term_id'];
+                }
+            } else {
+                return false;
+            }
+        }
+    }
+
     /**
      * Get Mapped Keyword function
      *
@@ -772,4 +838,121 @@ class FlexFeedController
             error_log($exception->getMessage());
         }
     }
+
+    /** Start : Function only for developer */
+    public function setTerm(array $request)
+    {
+        global $wpdb;
+
+        /** Log Attempt */
+        $logData = [
+            "request"   => $request
+        ];
+        Log::info("Dev Endpoint { /flexfeed/set-term } Attempt.", $logData, date('Y_m_d') . '_dev_log_flexfeed_set_term', true);
+
+        $wpdb->query("START TRANSACTION");
+        try {
+            /** Get All flexfeed / flexparency / brightwave vacancy. */
+            $vacancyModel   = new Vacancy();
+
+            /** Prepare term */
+            $this->_getTerms();
+            if (is_array($request['term'])) {
+                $requestedTerms = $request['term'];
+            } else if (is_string($request['term'])) {
+                $requestedTerms = explode(',', $request['term']);
+                print('<pre>' . print_r($requestedTerms, true) . '</pre>');
+            } else {
+                $wpdb->query("ROLLBACK");
+
+                /** Log attempt */
+                $logData['message'] = 'Wrong type of parameter "term"';
+                Log::error("Dev Endpoint { /flexfeed/set-term } Attempt.", $logData, date('Y_m_d') . '_dev_log_flexfeed_set_term', true);
+
+                return [
+                    "status"    => 400,
+                    "message"   => "Term should be array or string with comma separated."
+                ];
+            }
+
+            $requestedTermIDs = [];
+            foreach ($requestedTerms as $requestTerm) {
+                $term = $this->_findTerm($request['taxonomy'], $requestTerm, false);
+                print('<pre>' . print_r($term, true) . '</pre>');
+                if ($term) {
+                    $requestedTermIDs[] = $term;
+                }
+            }
+            print('<pre>' . print_r($requestedTermIDs, true) . '</pre>');
+
+            $filters    = [
+                'meta'  => [
+                    "relation" => "AND",
+                    [
+                        'key'       => $vacancyModel->_acf_is_imported,
+                        'value'     => 1,
+                        'compare'   => '=',
+                    ],
+                    [
+                        'key'       => $vacancyModel->meta_rv_vacancy_source,
+                        'value'     => self::source ?? 'flexfeed',
+                        'compare'   => '=',
+                    ],
+                ]
+            ];
+
+            $vacancies  = $vacancyModel->getVacancies($filters, []);
+            if ($vacancies->found_posts > 0) {
+                /** Loop through id */
+                foreach ($vacancies->posts as $vacancy) {
+                    $vacancyModel = new Vacancy($vacancy->ID);
+
+                    /** Get current Term */
+                    $currentTerm = $vacancyModel->getSelectedTerm($request['taxonomy'], 'id');
+                    $currentTerm = $currentTerm && is_array($currentTerm) ? $currentTerm : [];
+
+                    /** Set term */
+                    $newTerm = array_merge($currentTerm, $requestedTermIDs);
+                    $updateTerm = $vacancyModel->setTaxonomy([
+                        $request['taxonomy']  => array_unique($newTerm)
+                    ]);
+
+                    /** Log Data */
+                    $logData[$request['taxonomy'] . 'BeforeUpdate'][$vacancy->ID]  = $currentTerm;
+                    $logData[$request['taxonomy'] . 'AfterUpdate'][$vacancy->ID]   = $updateTerm;
+                }
+            }
+            $wpdb->query("COMMIT");
+
+            /** Log Attempt */
+            $logData['message'] = 'Vacancy updated!';
+            Log::info("Dev Endpoint { /flexfeed/set-term } Attempt.", $logData, date('Y_m_d') . '_dev_log_flexfeed_set_term', true);
+
+            return [
+                "status"    => 200,
+                "message"   => "Set",
+                "data"      => $vacancies->posts,
+                "meta"      => [
+                    "total" => $vacancies->found_posts,
+                    'query' => $vacancies->request
+                ]
+            ];
+        } catch (WP_Error $wp_error) {
+            $wpdb->query("ROLLBACK");
+
+            $handlerController = new BaseHandlerController();
+            return $handlerController->handleError($wp_error, __CLASS__, __METHOD__, $logData, 'dev_log_flexfeed_set_term');
+        } catch (Exception $e) {
+            $wpdb->query("ROLLBACK");
+
+            $handlerController = new BaseHandlerController();
+            return $handlerController->handleError($e, __CLASS__, __METHOD__, $logData, 'dev_log_flexfeed_set_term');
+        } catch (Throwable $th) {
+            $wpdb->query("ROLLBACK");
+
+            $handlerController = new BaseHandlerController();
+            return $handlerController->handleError($th, __CLASS__, __METHOD__, $logData, 'dev_log_flexfeed_set_term');
+        }
+    }
+    /** End : Function only for developer */
 }

@@ -51,9 +51,9 @@ class VacancyApproval
     {
         /** Get imported vacancies */
         $vacancy = new Vacancy();
-        $importedVacancies = $vacancy->getImportedVacancy();
+        // $importedVacancies = $vacancy->getImportedVacancy();
 
-        extract(['vacancies' => $importedVacancies]);
+        // extract(['vacancies' => $importedVacancies]);
 
         ob_start();
         include __DIR__ . '/imported-vacancy-approval-page.php';
@@ -177,7 +177,7 @@ class VacancyApproval
 
     public function vacancyApprovalListAjax()
     {
-        $datatableCol = ['title', 'title', 'vacancy_status', 'approval_status', 'is_paid', 'is_imported', 'role', 'sector', 'post_date', 'action'];
+        $datatableCol = ['title', 'title', 'vacancy_status', 'approval_status', 'is_paid', 'is_imported', 'role', 'sector', 'imported_date', 'post_date', 'action'];
 
         try {
             $filters = [
@@ -243,12 +243,23 @@ class VacancyApproval
                         break;
                     case 'date':
                     case 'post_date':
-                    default:
                         $filters['orderBy'] = 'date';
+                        break;
+                    default:
+                        $filters['orderBy'] = [
+                            'key' => 'rv_vacancy_imported_at',
+                            'by' => 'meta_value',
+                            'type' => 'DATE'
+                        ];
                         break;
                 }
             } else {
-                $filters['orderBy'] = 'date';
+                // $filters['orderBy'] = 'date';
+                $filters['orderBy'] = [
+                    'key' => 'rv_vacancy_imported_at',
+                    'by' => 'meta_value',
+                    'type' => 'DATE'
+                ];
             }
 
             if (isset($_GET['order'])) {
@@ -280,6 +291,14 @@ class VacancyApproval
                             break;
                         case 'post_date':
                             $filters['orderBy'] = 'date';
+                            break;
+                        case 'imported_date':
+                        default:
+                            $filters['orderBy'] = [
+                                'key' => 'rv_vacancy_imported_at',
+                                'by' => 'meta_value',
+                                'type' => 'DATE'
+                            ];
                             break;
                     }
 
@@ -344,7 +363,7 @@ class VacancyApproval
                 "posts_per_page"    => $filters['postPerPage'] ?? 10,
                 "offset"            => $filters['offset'] ?? 0,
                 "orderby"           => $filters['orderBy'] ?? "date",
-                "order"             => $filters['sort'] ?? 'ASC',
+                "order"             => $filters['sort'] ?? 'DESC',
                 "post_status"       => "publish",
                 "meta_query"        => [
                     "relation"      => 'AND',
@@ -425,7 +444,8 @@ class VacancyApproval
                         'title'             => $eachVacancy->getTitle(),
                         'vacancyStatus'     => $eachVacancy->getStatus()['name'],
                         'approvalStatus'    => !empty($eachVacancyApprovalStatus) ? $eachVacancyApprovalStatus['label'] : 'waiting approval',
-                        'publishDate'       => $eachVacancy->getPublishDate(),
+                        'importedDate'      => $eachVacancy->getImportedAt('Y-m-d'),
+                        'publishDate'       => $eachVacancy->getPublishDate('Y-m-d'),
                         'rowNonce'          => wp_create_nonce('nonce_vacancy_approval'),
                         'role'              => $eachVacancy->getSelectedTerm('role', 'id'),
                         'sector'            => $eachVacancy->getSelectedTerm('sector', 'id'),
@@ -447,6 +467,8 @@ class VacancyApproval
                 'data'              => $vacanciesResponse,
                 'search'            => isset($_GET['search']) ? $_GET['search']['value'] : null,
                 'filters'           => $filters,
+                'order'             => $_GET['orderBy'],
+                'order2'            => $_GET['order']
                 // 'query'             => $vacancies->query
             ], 200);
         } catch (\Exception $error) {

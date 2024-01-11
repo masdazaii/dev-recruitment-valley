@@ -27,7 +27,7 @@ const importedVacancyModule = (function() {
       ],
       // aLengthMenu: [[1, 50, 75, -1], [1, 50, 75, "All"]],
       // ordering: false,
-      order: [[1, 'asc']],
+      order: [[8, 'desc']],
       ajax: {
         url: adminData.ajaxUrl,
         method: 'GET',
@@ -52,6 +52,7 @@ const importedVacancyModule = (function() {
         { "targets": 6, "width": "15%" },
         { "targets": 7, "width": "15%" },
         { "targets": 8, "width": "10%" },
+        // { "targets": 9, "width": "7%" }, // Disable published date : feedback 13 Dec 2023
         { "targets": 9, "width": "10%" },
       ],
       columns: [
@@ -159,7 +160,8 @@ const importedVacancyModule = (function() {
           },
           "sortable" : false
         },
-        { data : "publishDate" },
+        { data : "importedDate" },
+        // { data : "publishDate" },  // Disable published date : feedback 13 Dec 2023
         { data : "id",
           render : (data, type, row, meta) => {
             let output = `<form method="POST" action="${adminData.postUrl}">

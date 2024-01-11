@@ -27,6 +27,7 @@ class Vacancy extends RegisterCPT
         add_action('add_meta_boxes', [$this, 'addVacancyMetaboxes'], 10, 2);
         add_filter('manage_vacancy_posts_columns', [$this, 'vacancyColoumn'], 10, 1);
         add_action('manage_vacancy_posts_custom_column', [$this, 'vacancyCustomColoumn'], 10, 2);
+        add_filter('manage_edit-vacancy_sortable_columns', [$this, 'vacancyCustomColoumnSortable'], 10, 1);
         add_action('restrict_manage_posts', [$this, 'vacancyCustomFilterRender'], 10, 2);
         add_filter('parse_query', [$this, 'vacancyCustomFilterHandle'], 10, 1);
         // add_action('pre_get_posts', [$this, 'vacancyCustomFilterHandle'], 10, 1);
@@ -131,6 +132,7 @@ class Vacancy extends RegisterCPT
                                 /** Update options "job_expires" */
                                 $optionController       = new OptionController();
                                 $updateOptionJobExpires = $optionController->updateExpiredOptions($object_id, $vacancyExpiredDate, 'class-vacancy.php', 'setExpiredDate');
+                                error_log("[IMPORT][flexfeed][{$object_id}] Set expired date option : is updated : " . $updateOptionJobExpires . " - updated data : " . json_encode(get_option("job_expires")) . " - Logged By Vacancy::setExpiredDate");
                             }
                         } else {
                             /** Update the expired date */
@@ -144,6 +146,7 @@ class Vacancy extends RegisterCPT
                                 /** Update options "job_expires" */
                                 $optionController       = new OptionController();
                                 $updateOptionJobExpires = $optionController->updateExpiredOptions($object_id, $vacancyExpiredDate, 'class-vacancy.php', 'setExpiredDate');
+                                error_log("[SUBMITED][{$object_id}] Set expired date option : is updated : " . $updateOptionJobExpires . " - updated data : " . json_encode(get_option('job_expires')) . " - Logged By Vacancy::setExpiredDate");
                             }
                         }
 
@@ -244,6 +247,7 @@ class Vacancy extends RegisterCPT
         $coloumn['status']      = __('Status');
         $coloumn['expired']     = __('Expired Date');
         $coloumn['approvedat']  = __('Approval Date');
+        $coloumn['importedat']  = __('Imported At'); // Feedback 13 Dec 2023
         $coloumn['author']      = __('Author');
         $coloumn['date']        = __('Submitted On');
 
@@ -285,7 +289,16 @@ class Vacancy extends RegisterCPT
             case 'approvedat':
                 echo $vacancyModel->getApprovedAt('d M Y H:i:s');
                 break;
+            case 'importedat':
+                echo $vacancyModel->getImportedAt('d M Y H:i:s');
+                break;
         }
+    }
+
+    public function vacancyCustomColoumnSortable($columns)
+    {
+        $columns['importedat'] = 'importedat';
+        return $columns;
     }
 
     public function vacancySubmitHandle($post_id, $post, $update)
@@ -673,8 +686,14 @@ class Vacancy extends RegisterCPT
                 if ($setNewMeta) {
                     $query->set('meta_query', $metaQuery);
                 }
-                // print('<pre>' . print_r($setNewMeta ? 'asddddddddasddddddddddddddddddddd' : 'asasdddddddddddddddddddddddddddddddddd', true) . '</pre>');
-                // print('<pre>' . print_r($metaQuery, true) . '</pre>');
+
+                /** set order */
+                $orderBy = $query->get('orderby');
+                if ($orderBy == 'importedat') {
+                    $query->set('meta_key', 'rv_vacancy_imported_at');
+                    $query->set('orderby', 'meta_value');
+                    $query->set('meta_type', 'DATE');
+                }
             }
         }
     }

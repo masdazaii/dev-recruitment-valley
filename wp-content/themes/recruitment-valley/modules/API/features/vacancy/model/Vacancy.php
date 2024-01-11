@@ -75,7 +75,7 @@ class Vacancy
     private $acf_rv_vacancy_language = "rv_vacancy_language";
 
     /** ACF for imported vacancy */
-    private $_acf_is_imported = "rv_vacancy_is_imported";
+    public $_acf_is_imported = "rv_vacancy_is_imported";
     private $_acf_imported_vacancy_source_id = "rv_vacancy_imported_source_id";
     private $_acf_imported_company_name = "rv_vacancy_imported_company_name";
     private $_acf_imported_company_city = "rv_vacancy_imported_company_city";
@@ -739,7 +739,7 @@ class Vacancy
                 "posts_per_page" => $filters['postPerPage'] ?? -1,
                 "offset" => $filters['offset'] ?? 0,
                 "orderby" => $filters['orderBy'] ?? "date",
-                "order" => $filters['sort'] ?? ($filters['orderBy'] && $filters['orderBy'] == 'title' ? 'aaaaa' : 'dddddd'),
+                "order" => $filters['sort'] ?? 'ASC',
                 "post_status" => "publish",
                 "meta_query" => [
                     "relation" => "AND",
@@ -982,10 +982,10 @@ class Vacancy
         return $this->getProp($this->_acf_imported_company_total_employees, true);
     }
 
-    public function getImportedUnusedData()
-    {
-        return $this->getterMeta($this->_meta_rv_vacancy_unused_data);
-    }
+    // public function getImportedUnusedData()
+    // {
+    //     return $this->getterMeta($this->_meta_rv_vacancy_unused_data);
+    // }
 
     public function checkIfJobfeedExpired()
     {
@@ -1240,6 +1240,11 @@ class Vacancy
         } else {
             throw new Exception('Please specify vacancy!');
         }
+    }
+
+    public function getImportedUnusedData()
+    {
+        return $this->getterMeta($this->_meta_rv_vacancy_unused_data, true);
     }
     /** Method for related to imported vacancy end here */
 

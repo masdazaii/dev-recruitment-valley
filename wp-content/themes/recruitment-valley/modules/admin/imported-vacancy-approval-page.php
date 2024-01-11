@@ -35,7 +35,12 @@ use Vacancy\Vacancy;
                         <th>Imported</th>
                         <th>Role</th>
                         <th>Sector</th>
-                        <th>Published Date</th>
+                        <!-- Feedback 13 December 2023 : Change Default Sort published date
+                        Adding 1 new column : Imported Date
+                        Disable Published Date
+                        -->
+                        <th>Imported Date</th>
+                        <!-- <th>Published Date</th> -->
                         <th>Action</th>
                     </thead>
                 </table>
