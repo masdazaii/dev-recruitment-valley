@@ -68,9 +68,9 @@ class ImportService
     }
 
     /** Start : Function only for developer */
-    public function flexFeedSetType(WP_REST_Request $request)
+    public function flexFeedSetTerm(WP_REST_Request $request)
     {
-        $response = $this->_flexFeedController->setType($request->get_params());
+        $response = $this->_flexFeedController->setTerm($request->get_params());
         return ResponseHelper::build($response);
     }
     /** End : Function only for developer */

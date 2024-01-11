@@ -65,7 +65,8 @@ class DevelopersOptionPage
 
         if ($_POST['dev-select-source'] == 'flexfeed') {
             $flexfeedController = new FlexFeedController(FLEXFEED_API_URL ?? NULL);
-            $response = $flexfeedController->setType($request);
+            $response = $flexfeedController->setTerm($request);
+            print('<pre>' . print_r($response, true) . '</pre>');
 
             $_SESSION['flash_message'] = [
                 'status'    => $response['status'] == 200 ? 'success' : 'failed',
@@ -73,7 +74,7 @@ class DevelopersOptionPage
             ];
         } else if ($_POST['dev-select-source'] == 'textkernel') {
             $flexfeedController = new JobfeedController();
-            $response = $flexfeedController->setType($request);
+            $response = $flexfeedController->setTerm($request);
 
             $_SESSION['flash_message'] = [
                 'status'    => $response['status'] == 200 ? 'success' : 'failed',
@@ -87,7 +88,7 @@ class DevelopersOptionPage
         }
 
         $url = admin_url('admin.php?page=dev-only-settings');
-        wp_redirect(esc_url(admin_url('admin.php')) . '?page=dev-only-settings&result=' . ($response['status'] == 200 ? 'success' : 'failed'));
+        // wp_redirect(esc_url(admin_url('admin.php')) . '?page=dev-only-settings&result=' . ($response['status'] == 200 ? 'success' : 'failed'));
         die();
     }
 }

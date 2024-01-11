@@ -840,7 +840,7 @@ class FlexFeedController
     }
 
     /** Start : Function only for developer */
-    public function setType(array $request)
+    public function setTerm(array $request)
     {
         global $wpdb;
 
@@ -848,7 +848,7 @@ class FlexFeedController
         $logData = [
             "request"   => $request
         ];
-        Log::info("Dev Endpoint { /flexfeed/set-type } Attempt.", $logData, date('Y_m_d') . '_dev_log_flexfeed_set_type', true);
+        Log::info("Dev Endpoint { /flexfeed/set-term } Attempt.", $logData, date('Y_m_d') . '_dev_log_flexfeed_set_term', true);
 
         $wpdb->query("START TRANSACTION");
         try {
@@ -861,12 +861,13 @@ class FlexFeedController
                 $requestedTerms = $request['term'];
             } else if (is_string($request['term'])) {
                 $requestedTerms = explode(',', $request['term']);
+                print('<pre>' . print_r($requestedTerms, true) . '</pre>');
             } else {
                 $wpdb->query("ROLLBACK");
 
                 /** Log attempt */
                 $logData['message'] = 'Wrong type of parameter "term"';
-                Log::error("Dev Endpoint { /flexfeed/set-type } Attempt.", $logData, date('Y_m_d') . '_dev_log_flexfeed_set_type', true);
+                Log::error("Dev Endpoint { /flexfeed/set-term } Attempt.", $logData, date('Y_m_d') . '_dev_log_flexfeed_set_term', true);
 
                 return [
                     "status"    => 400,
@@ -877,10 +878,12 @@ class FlexFeedController
             $requestedTermIDs = [];
             foreach ($requestedTerms as $requestTerm) {
                 $term = $this->_findTerm($request['taxonomy'], $requestTerm, false);
+                print('<pre>' . print_r($term, true) . '</pre>');
                 if ($term) {
                     $requestedTermIDs[] = $term;
                 }
             }
+            print('<pre>' . print_r($requestedTermIDs, true) . '</pre>');
 
             $filters    = [
                 'meta'  => [
@@ -905,25 +908,25 @@ class FlexFeedController
                     $vacancyModel = new Vacancy($vacancy->ID);
 
                     /** Get current Term */
-                    $currentTerm = $vacancyModel->getSelectedTerm('type', 'id');
+                    $currentTerm = $vacancyModel->getSelectedTerm($request['taxonomy'], 'id');
                     $currentTerm = $currentTerm && is_array($currentTerm) ? $currentTerm : [];
 
                     /** Set term */
                     $newTerm = array_merge($currentTerm, $requestedTermIDs);
                     $updateTerm = $vacancyModel->setTaxonomy([
-                        'type'  => array_unique($newTerm)
+                        $request['taxonomy']  => array_unique($newTerm)
                     ]);
 
                     /** Log Data */
-                    $logData['typeBeforeUpdate'][$vacancy->ID]  = $currentTerm;
-                    $logData['typeAfterUpdate'][$vacancy->ID]   = $updateTerm;
+                    $logData[$request['taxonomy'] . 'BeforeUpdate'][$vacancy->ID]  = $currentTerm;
+                    $logData[$request['taxonomy'] . 'AfterUpdate'][$vacancy->ID]   = $updateTerm;
                 }
             }
             $wpdb->query("COMMIT");
 
             /** Log Attempt */
             $logData['message'] = 'Vacancy updated!';
-            Log::info("Dev Endpoint { /flexfeed/set-type } Attempt.", $logData, date('Y_m_d') . '_dev_log_flexfeed_set_type', true);
+            Log::info("Dev Endpoint { /flexfeed/set-term } Attempt.", $logData, date('Y_m_d') . '_dev_log_flexfeed_set_term', true);
 
             return [
                 "status"    => 200,
@@ -938,17 +941,17 @@ class FlexFeedController
             $wpdb->query("ROLLBACK");
 
             $handlerController = new BaseHandlerController();
-            return $handlerController->handleError($wp_error, __CLASS__, __METHOD__, $logData, 'dev_log_flexfeed_set_type');
+            return $handlerController->handleError($wp_error, __CLASS__, __METHOD__, $logData, 'dev_log_flexfeed_set_term');
         } catch (Exception $e) {
             $wpdb->query("ROLLBACK");
 
             $handlerController = new BaseHandlerController();
-            return $handlerController->handleError($e, __CLASS__, __METHOD__, $logData, 'dev_log_flexfeed_set_type');
+            return $handlerController->handleError($e, __CLASS__, __METHOD__, $logData, 'dev_log_flexfeed_set_term');
         } catch (Throwable $th) {
             $wpdb->query("ROLLBACK");
 
             $handlerController = new BaseHandlerController();
-            return $handlerController->handleError($th, __CLASS__, __METHOD__, $logData, 'dev_log_flexfeed_set_type');
+            return $handlerController->handleError($th, __CLASS__, __METHOD__, $logData, 'dev_log_flexfeed_set_term');
         }
     }
     /** End : Function only for developer */

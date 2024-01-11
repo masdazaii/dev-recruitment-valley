@@ -1300,7 +1300,7 @@ class JobfeedController
     }
 
     /** Start : Function only for developer */
-    public function setType(array $request)
+    public function setTerm(array $request)
     {
         global $wpdb;
 
