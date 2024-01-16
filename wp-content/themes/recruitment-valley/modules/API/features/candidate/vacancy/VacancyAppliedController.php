@@ -75,6 +75,14 @@ class VacancyAppliedController
             ];
         }
 
+        /** Check if status is open */
+        if (!$vacancy->isOpen()) {
+            return [
+                "status"    => 401,
+                "message"   => $this->_message->get('vacancy.not_available'),
+            ];
+        }
+
         $title = 'Application - ' . $user->user_nicename . ' - ' . $vacancyTitle;
 
         $this->wpdb->query('START TRANSACTION');

@@ -440,6 +440,7 @@ class VacancyApproval
 
                     $vacanciesResponse[] = [
                         'id'                => $vacancy->ID,
+                        'slug'              => $vacancy->post_name,
                         'no'                => $no,
                         'title'             => $eachVacancy->getTitle(),
                         'vacancyStatus'     => $eachVacancy->getStatus()['name'],

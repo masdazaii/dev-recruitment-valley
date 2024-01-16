@@ -164,7 +164,7 @@ const importedVacancyModule = (function() {
         // { data : "publishDate" },  // Disable published date : feedback 13 Dec 2023
         { data : "id",
           render : (data, type, row, meta) => {
-            let output = `<form method="POST" action="${adminData.postUrl}">
+            let output = `<form method="POST" action="${adminData.postUrl}" style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 0.125rem;">
               <input type="hidden" name="action" value="handle_imported_vacancy_approval">
               <input type="hidden" name="nonce" value="${row.rowNonce}">
               <input type="hidden" name="vacancyID" value="${row.id}">`
@@ -176,6 +176,7 @@ const importedVacancyModule = (function() {
               output += `<button name="approval" value="approved">Approve</button>
               <button name="approval" value="rejected">Reject</button>`
             }
+            output += `<a href="${adminData.approval.previewUrl + '/' + row.slug}" target="_blank" style="border-style: solid; border-width: .5px; border-radius: 0.15rem; border-color: rgba(31, 41, 55, 1); background-color: rgba(243, 244, 246, 1); padding: 0.15rem 0.5rem 0.15rem 0.5rem; font-weight: 400; color: black; text-decoration-line: none;">Preview</button>`
 
             output += `</form>`
 

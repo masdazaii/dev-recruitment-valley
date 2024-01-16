@@ -160,6 +160,7 @@ class Message
                 "get_application_success"   => __("Succes krijg sollicitatie vacature.", THEME_DOMAIN),
                 "get_application_not_found" => __("Sollicitatie niet gevonden.", THEME_DOMAIN),
                 "approval_subject"  => __("Approval requested - RecruitmentValley", THEME_DOMAIN),
+                "not_available" => __("Solliciteer niet, er is nog geen vacature beschikbaar", THEME_DOMAIN)
             ],
             'candidate' => [
                 "profile" => [
