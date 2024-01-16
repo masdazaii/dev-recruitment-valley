@@ -123,6 +123,7 @@ class Vacancy
     {
         if ($vacancy_id) {
             $this->vacancy_id = $vacancy_id;
+            $this->vacancy = get_post($vacancy_id);
         }
     }
 
