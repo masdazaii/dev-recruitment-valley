@@ -506,6 +506,11 @@ class JobfeedController
                                 /** Unset used key */
                                 unset($vacancy->education_level);
                             }
+                        } else if (is_object($vacancy->education_level) && property_exists($vacancy->education_level, 'label')) {
+                            $taxonomy['education'] = $this->_findEducation($vacancy->education_level->label);
+
+                            /** Unset used key */
+                            unset($vacancy->education_level);
                         }
                     }
 
@@ -518,6 +523,11 @@ class JobfeedController
                                 /** Unset used key */
                                 unset($vacancy->experience_level);
                             }
+                        } else if (is_object($vacancy->experience_level) && property_exists($vacancy->experience_level, 'label')) {
+                            $taxonomy['experiences'] = $this->_findEducation($vacancy->experience_level->label);
+
+                            /** Unset used key */
+                            unset($vacancy->experience_level);
                         }
                     }
 
@@ -530,6 +540,11 @@ class JobfeedController
                                 /** Unset used key */
                                 unset($vacancy->employment_type);
                             }
+                        } else if (is_object($vacancy->employment_type) && property_exists($vacancy->employment_type, 'label')) {
+                            $taxonomy['type'] = $this->_findEducation($vacancy->employment_type->label);
+
+                            /** Unset used key */
+                            unset($vacancy->employment_type);
                         }
                     }
 
@@ -673,6 +688,16 @@ class JobfeedController
                     foreach ($vacancy as $propertyKey => $propertyValue) {
                         $unusedData[$propertyKey] = $propertyValue;
                     }
+
+                    /** Log data */
+                    $logData = [
+                        'index'     => $i,
+                        'source_id' => $vacancy->job_id,
+                        'arguments' => $arguments,
+                        'taxonomy'  => $taxonomy,
+                        'payload'   => $payload,
+                    ];
+                    Log::info('About to import data.', $logData, date('Y_m_d') . '_log_import_textkernel_jobfeed');
 
                     /** Insert data */
                     try {
