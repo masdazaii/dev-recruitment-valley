@@ -19,6 +19,7 @@ use Transaction;
 use WP_REST_Request;
 use constant\NotificationConstant;
 use Global\NotificationService;
+use Log;
 use Model\Coupon;
 
 require_once(get_template_directory() . '/vendor/autoload.php');
@@ -92,6 +93,12 @@ class PackageController
 
     public function createPaymentUrl(WP_REST_Request $request)
     {
+        /** Log attempt */
+        $logData = [
+            'request' => $request
+        ];
+        Log::info('Create payment url attempt.', $logData, date('Y_m_d') . '_log_create_payment_url');
+        error_log('Create payment url attempt : ' . json_encode($logData));
 
         $packageId = $request["packageId"];
         $userId = $request["user_id"];
@@ -123,17 +130,41 @@ class PackageController
 
                 $packagePrice = (float)$packagePrice - $discount;
                 $couponID = $coupon->couponID;
+
+                /** Log Attempt */
+                $logData['coupon'] = [
+                    'couponID'      => $couponID,
+                    'discountType'  => $discounType,
+                    'newPrice'      => $packagePrice
+                ];
+                Log::info('Use coupon attempt.', $logData, date('Y_m_d') . '_log_create_payment_url');
+                error_log('Use coupon attempt : ' . json_encode($logData));
             } catch (\WP_Error $error) {
+                /** Log Attempt */
+                $logData['message'] = $error->get_error_message();
+                Log::error('Fail Use coupon attempt.', $logData, date('Y_m_d') . '_log_create_payment_url');
+                error_log('Fail Use coupon attempt : ' . json_encode($logData));
+
                 return [
                     "status"    => 400,
                     "message"   => $error->get_error_message()
                 ];
             } catch (\Exception $e) {
+                /** Log Attempt */
+                $logData['message'] = $e->getMessage();
+                Log::error('Fail Use coupon attempt.', $logData, date('Y_m_d') . '_log_create_payment_url');
+                error_log('Fail Use coupon attempt : ' . json_encode($logData));
+
                 return [
                     "status"    => 400,
                     "message"   => $e->getMessage()
                 ];
             } catch (\Throwable $throw) {
+                /** Log Attempt */
+                $logData['message'] = $throw->getMessage();
+                Log::error('Fail Use coupon attempt.', $logData, date('Y_m_d') . '_log_create_payment_url');
+                error_log('Fail Use coupon attempt : ' . json_encode($logData));
+
                 return [
                     "status"    => 400,
                     "message"   => $throw->getMessage()
@@ -154,26 +185,48 @@ class PackageController
         $transactionId = $transaction->storePost(["title" => $transactionTitle]);
 
         if (is_wp_error($transactionId) || !$transactionId) {
+            /** Log Attempt */
+            if (is_wp_error($transactionId)) {
+                $logData['message'] = 'System Fail';
+            } else {
+                $logData['message'] = 'System Fail! ' . $transactionId->get_error_message();
+            }
+            Log::error('Fail Use coupon attempt.', $logData, date('Y_m_d') . '_log_create_payment_url');
+            error_log('Fail Use coupon attempt : ' . json_encode($logData));
+
             return [
                 "status" => 500,
                 "message" => "er is een fout opgetreden bij het aanmaken van de betaling"
             ];
         }
 
-        $transaction->setUserName($company->getName());
-        $transaction->setPackageName($package->getTitle());
-        $transaction->setTransactionAmount($amount / 100);
-        $transaction->setUserId($company->getId());
-        $transaction->setPackageId($package->getPackageId());
+        /** Set transaction data */
+        $setUserName    = $transaction->setUserName($company->getName());
+        $setPackageName = $transaction->setPackageName($package->getTitle());
+        $setTransactionAmount   = $transaction->setTransactionAmount($amount / 100);
+        $setUserId      = $transaction->setUserId($company->getId());
+        $setPackageId   = $transaction->setPackageId($package->getPackageId());
+
+        /** Log Data */
+        $logData['transaction']['amount']           = $amount;
+        $logData['transaction']['setUserName']      = $setUserName;
+        $logData['transaction']['setPackageName']   = $setPackageName;
+        $logData['transaction']['setTransactionAmount'] = $setTransactionAmount;
+        $logData['transaction']['setUserId']            = $setUserId;
+        $logData['transaction']['setPackageId']         = $setPackageId;
 
         if (isset($request['coupon'])) {
-            $transaction->setTransactionAmountBeforeCoupon($packagePriceBeforeCoupon);
-            $transaction->setCouponData([
+            $setTransactionAmountBeforeCoupon = $transaction->setTransactionAmountBeforeCoupon($packagePriceBeforeCoupon);
+            $setCouponData = $transaction->setCouponData([
                 'title' => $coupon->getTitle(),
                 'code'  => $coupon->getCode(),
                 'discount_type'     => $coupon->getDiscountType(),
                 'discount_value'    => $coupon->getDiscountValue()
             ]);
+
+            /** Log Data */
+            $logData['transaction']['setCouponData']    = $setCouponData;
+            $logData['transaction']['setTransactionAmountBeforeCoupon'] = $setTransactionAmountBeforeCoupon;
         }
 
         $encodedTransactionID = JWTHelper::generate(
@@ -228,19 +281,33 @@ class PackageController
             ],
         ]);
 
-        $transaction->setTransactionStripeId($session->id);
+        /** Set stripe id */
+        $setTransactionStripeId = $transaction->setTransactionStripeId($session->id);
+
+        /** Log Data */
+        $logData['stripe']['metadata']  = $stripeMetadata;
+        $logData['stripe']['session']   = json_encode($session->id);
+        $logData['stripe']['setTransactionStripeId']    = $setTransactionStripeId;
 
         /** Disbaled in feedback 13 November 2023 and moved to after payment success! */
         // EmailHelper::sendPaymentConfirmation($transactionId);
 
         /** Create notification : payment confirmation */
-        $this->_notification->write($this->_notificationConstant::PAYMENT_CONFIRMATION, $company->getId(), [
+        $writeNotification = $this->_notification->write($this->_notificationConstant::PAYMENT_CONFIRMATION, $company->getId(), [
             'id' => $transactionId,
             'payment_url' => $session->url,
             'expired_at' => $session->expires_at
         ]);
 
-        $transaction->setStatus("pending");
+        $setStatus = $transaction->setStatus("pending");
+
+        /** Log Data */
+        $logData['transaction']['setStatus'] = $setStatus;
+        $logData['notificaiton'] = $writeNotification;
+
+        /** Log Attempt */
+        Log::info('Success Create payment url attempt.', $logData, date('Y_m_d') . '_log_create_payment_url');
+        error_log('Success Create payment url attempt : ' . json_encode($logData));
 
         return [
             "status" => 200,
@@ -321,6 +388,12 @@ class PackageController
 
         $event = null;
 
+        /** Log Attempt */
+        $logData = [
+            'request'   => json_encode($payload)
+        ];
+        Log::info('Webhook attempt.', $logData, date('Y_m_d') . '_log_webhook_stripe');
+
         try {
             $event = \Stripe\Webhook::constructEvent(
                 $payload,
@@ -334,6 +407,9 @@ class PackageController
                 "message" => $e->getMessage()
             ];
 
+            /** Log attempt */
+            $logData['message'] = $e->getMessage();
+            Log::error('Fail Webhook attempt.', $logData, date('Y_m_d') . '_log_webhook_stripe');
             error_log(json_encode($response));
 
             return $response;
@@ -344,11 +420,19 @@ class PackageController
                 "message" => $e->getMessage()
             ];
 
+            /** Log attempt */
+            $logData['message'] = $e->getMessage();
+            Log::error('Fail Webhook attempt.', $logData, date('Y_m_d') . '_log_webhook_stripe');
             error_log(json_encode($response));
 
             return $response;
         }
 
+
+        /** Log attempt */
+        $logData['event'] = $event->type;
+        Log::error('Fail Webhook attempt.', $logData, date('Y_m_d') . '_log_webhook_stripe');
+        error_log('onWebhookTrigger event type : ' . $event->type);
         error_log($event->type);
 
         switch ($event->type) {
@@ -507,7 +591,8 @@ class PackageController
         $transaction->setStatus("failed");
 
         return [
-            "status" => 400,
+            // "status" => 400, // Stripe error 22 January 2024
+            "status" => 200,
             "message" => $this->_message->get("package.payment.trigger_fail")
         ];
     }
