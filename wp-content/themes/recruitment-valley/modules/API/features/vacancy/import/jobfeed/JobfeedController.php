@@ -140,6 +140,13 @@ class JobfeedController
                  */
                 $unusedData = [];
 
+                /** Map property that will assign to taxonomy / term
+                 * this will be stored in post meta : rv_vacancy_original_api_term.
+                 *
+                 * array key should follow taxonomy slug.
+                 */
+                $apiTerms = [];
+
                 /** Decode vacancy */
                 $vacancy = json_decode($vacancy);
 
@@ -462,7 +469,13 @@ class JobfeedController
 
                     /** Taxonomy Working-hours */
                     if (isset($vacancy->hours_per_week_from)) {
+                        /** Set Meta */
+                        $apiTerms['working-hours']['from'] = $vacancy->hours_per_week_from;
+
                         if (isset($vacancy->hours_per_week_to)) {
+                            /** Set Meta */
+                            $apiTerms['working-hours']['to'] = $vacancy->hours_per_week_to;
+
                             if ((int)$vacancy->hours_per_week_from < (int)$vacancy->hours_per_week_to) {
                                 // $taxonomy['working-hours'] = $this->_findWorkingHours($vacancy->hours_per_week_from . '-' . $vacancy->hours_per_week_to);
 
@@ -481,17 +494,17 @@ class JobfeedController
                                     if ($termByWorkingHour) {
                                         $taxonomy['working-hours'] = $termByWorkingHour;
                                     } else {
-                                        $termByWorkingHour = $this->_findWorkingHours($vacancy->hours_per_week_from . '-' . $vacancy->hours_per_week_to);
+                                        $termByWorkingHour = $this->_findWorkingHours($vacancy->hours_per_week_from . '-' . $vacancy->hours_per_week_to, false);
                                     }
                                 }
                             } else {
-                                $taxonomy['working-hours'] = $this->_findWorkingHours($vacancy->hours_per_week_from);
+                                $taxonomy['working-hours'] = $this->_findWorkingHours($vacancy->hours_per_week_from, false);
                             }
 
                             /** Unset used key */
                             // unset($vacancy->hours_per_week_to);
                         } else {
-                            $taxonomy['working-hours'] = $this->_findWorkingHours($vacancy->hours_per_week_from);
+                            $taxonomy['working-hours'] = $this->_findWorkingHours($vacancy->hours_per_week_from, false);
                         }
 
                         /** Unset used key */
@@ -501,6 +514,12 @@ class JobfeedController
                     /** Taxonomy Education */
                     if (isset($vacancy->education_level)) {
                         if (is_array($vacancy->education_level)) {
+                            /** Set Meta */
+                            $apiTerms['education'] = [
+                                'value' => array_key_exists('value', $vacancy->education_level) ? $vacancy->education_level['value'] : '',
+                                'label' => array_key_exists('label', $vacancy->education_level) ? $vacancy->education_level['label'] : ''
+                            ];
+
                             if (array_key_exists('label', $vacancy->education_level)) {
                                 if (strpos($vacancy->education_level['label'], '/')) {
                                     $values = explode('/', $vacancy->education_level['label']);
@@ -516,6 +535,12 @@ class JobfeedController
                                 unset($vacancy->education_level);
                             }
                         } else if (is_object($vacancy->education_level) && property_exists($vacancy->education_level, 'label')) {
+                            /** Set Meta */
+                            $apiTerms['education'] = [
+                                'value' => property_exists($vacancy->education_level, 'value') ? $vacancy->education_level->value : '',
+                                'label' => property_exists($vacancy->education_level, 'label') ? $vacancy->education_level->label : ''
+                            ];
+
                             // $taxonomy['education'] = $this->_findEducation($vacancy->education_level->label);
                             if (strpos($vacancy->education_level->label, '/')) {
                                 $values = explode('/', $vacancy->education_level->label);
@@ -535,6 +560,14 @@ class JobfeedController
                     /** Taxonomy Experiences */
                     if (isset($vacancy->experience_level)) {
                         if (is_array($vacancy->experience_level)) {
+                            /** Set Meta
+                             * Stored as array to accomodate the data from flexfeed that receive as array list
+                             */
+                            $apiTerms['experiences'][] = [
+                                'value' => array_key_exists('value', $vacancy->experience_level) ? $vacancy->experience_level['value'] : '',
+                                'label' => array_key_exists('label', $vacancy->experience_level) ? $vacancy->experience_level['label'] : ''
+                            ];
+
                             if (array_key_exists('label', $vacancy->experience_level)) {
                                 $taxonomy['experiences'] = $this->_findExperience($vacancy->experience_level['label']);
 
@@ -542,6 +575,14 @@ class JobfeedController
                                 unset($vacancy->experience_level);
                             }
                         } else if (is_object($vacancy->experience_level) && property_exists($vacancy->experience_level, 'label')) {
+                            /** Set Meta
+                             * Stored as array to accomodate the data from flexfeed that receive as array list
+                             */
+                            $apiTerms['experiences'][] = [
+                                'value' => property_exists($vacancy->experience_level, 'value') ? $vacancy->experience_level->value : '',
+                                'label' => property_exists($vacancy->experience_level, 'label') ? $vacancy->experience_level->label : ''
+                            ];
+
                             $taxonomy['experiences'] = $this->_findEducation($vacancy->experience_level->label);
 
                             /** Unset used key */
@@ -552,6 +593,12 @@ class JobfeedController
                     /** Taxonomy Job Type */
                     if (isset($vacancy->employment_type)) {
                         if (is_array($vacancy->employment_type)) {
+                            /** Set Meta */
+                            $apiTerms['type'] = [
+                                'value' => array_key_exists('value', $vacancy->employment_type) ? $vacancy->employment_type['value'] : '',
+                                'label' => array_key_exists('label', $vacancy->employment_type) ? $vacancy->employment_type['label'] : ''
+                            ];
+
                             if (array_key_exists('label', $vacancy->employment_type)) {
                                 $taxonomy['type'] = $this->_findEmploymentType($vacancy->employment_type['label']);
 
@@ -559,6 +606,12 @@ class JobfeedController
                                 unset($vacancy->employment_type);
                             }
                         } else if (is_object($vacancy->employment_type) && property_exists($vacancy->employment_type, 'label')) {
+                            /** Set Meta */
+                            $apiTerms['type'] = [
+                                'value' => property_exists($vacancy->employment_type, 'value') ? $vacancy->employment_type->value : '',
+                                'label' => property_exists($vacancy->employment_type, 'label') ? $vacancy->employment_type->label : ''
+                            ];
+
                             $taxonomy['type'] = $this->_findEducation($vacancy->employment_type->label);
 
                             /** Unset used key */
@@ -571,45 +624,92 @@ class JobfeedController
 
                     if (isset($vacancy->profession)) {
                         if (is_array($vacancy->profession) && array_key_exists('label', $vacancy->profession)) {
+                            /** Set Meta */
+                            $apiTerms['role'] = [
+                                'value' => array_key_exists('value', $vacancy->profession) ? $vacancy->profession['value'] : '',
+                                'label' => array_key_exists('label', $vacancy->profession) ? $vacancy->profession['label'] : ''
+                            ];
+
                             /** Get closest role */
                             $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession['label'])), 5, 1, 1, 1, 'array');
 
                             /** Unset used key */
                             // unset($vacancy->profession);
                         } else if (is_object($vacancy->profession) && property_exists($vacancy->profession, 'label')) {
+                            /** Set Meta */
+                            $apiTerms['role'] = [
+                                'value' => property_exists($vacancy->profession, 'value') ? $vacancy->profession->value : '',
+                                'label' => property_exists($vacancy->profession, 'label') ? $vacancy->profession->label : ''
+                            ];
+
                             $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession->label)), 5, 1, 1, 1, 'array');
                         }
                     } else if (isset($vacancy->profession_group)) {
                         if (is_array($vacancy->profession_group) && array_key_exists('label', $vacancy->profession_group)) {
+                            /** Set Meta */
+                            $apiTerms['role'] = [
+                                'value' => array_key_exists('value', $vacancy->profession_group) ? $vacancy->profession_group['value'] : '',
+                                'label' => array_key_exists('label', $vacancy->profession_group) ? $vacancy->profession_group['label'] : ''
+                            ];
+
                             /** Get closest role */
                             $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_group['label'])), 5, 1, 1, 1, 'array');
 
                             /** Unset used key */
                             // unset($vacancy->profession_group);
                         } else if (is_object($vacancy->profession_group) && property_exists($vacancy->profession, 'label')) {
+                            /** Set Meta */
+                            $apiTerms['role'] = [
+                                'value' => property_exists($vacancy->profession_group, 'value') ? $vacancy->profession_group->value : '',
+                                'label' => property_exists($vacancy->profession_group, 'label') ? $vacancy->profession_group->label : ''
+                            ];
+
                             $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_group->label)), 5, 1, 1, 1, 'array');
                         }
                     } else if (isset($vacancy->profession_class)) {
                         if (is_array($vacancy->profession_class) && array_key_exists('label', $vacancy->profession_class)) {
+                            /** Set Meta */
+                            $apiTerms['role'] = [
+                                'value' => array_key_exists('value', $vacancy->profession_class) ? $vacancy->profession_class['value'] : '',
+                                'label' => array_key_exists('label', $vacancy->profession_class) ? $vacancy->profession_class['label'] : ''
+                            ];
+
                             /** Get closest role */
                             $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_class['label'])), 5, 1, 1, 1, 'array');
 
                             /** Unset used key */
                             // unset($vacancy->profession_class);
                         } else if (is_object($vacancy->profession_class) && property_exists($vacancy->profession_class, 'label')) {
+                            /** Set Meta */
+                            $apiTerms['role'] = [
+                                'value' => property_exists($vacancy->profession_class, 'value') ? $vacancy->profession_class->value : '',
+                                'label' => property_exists($vacancy->profession_class, 'label') ? $vacancy->profession_class->label : ''
+                            ];
+
                             $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_class->label)), 5, 1, 1, 1, 'array');
                         }
                     }
 
-                    /** Set the role */
+                    /** Set the role
+                     *
+                     * update 23 January 2024
+                     * if empty or not match the mapping, don't create new category
+                     *
+                     * */
                     if (isset($taxonomy['role']) && $taxonomy['role'] != false) {
                         /** If calculation return empty role,
                          * if not set the role,
-                         * if empty create new role */
-                        if (empty($taxonomy['role'])) {
-                            $termModel = new Term();
-                            $taxonomy['role'] = $termModel->createTerm('role', $taxonomy['role'], []);
-                        } else {
+                         * if empty create new role
+                         *
+                         * update 23 January 2024
+                         * if empty or not match the mapping, don't create new category
+                         *
+                         * */
+                        // if (empty($taxonomy['role'])) {
+                        //     $termModel = new Term();
+                        //     $taxonomy['role'] = $termModel->createTerm('role', $taxonomy['role'], []);
+                        // } else {
+                        if (!empty($taxonomy['role'])) {
                             $option     = new Option(true);
                             $limitRole  = $option->getImportNumberRoleToSet();
 
@@ -625,54 +725,78 @@ class JobfeedController
                             }
                             $taxonomy['role'] = $tempRole;
                         }
-                    } else {
-                        $termModel = new Term();
-                        if (isset($vacancy->profession)) {
-                            if (is_array($vacancy->profession) && array_key_exists('label', $vacancy->profession)) {
-                                $newRole = $vacancy->profession['label'];
-                            } else if (is_object($vacancy->profession) && property_exists($vacancy->profession, 'label')) {
-                                $newRole = $vacancy->profession->label;
-                            }
-                        } else if (isset($vacancy->profession_group)) {
-                            if (is_array($vacancy->profession_group) && array_key_exists('label', $vacancy->profession_group)) {
-                                $newRole = $vacancy->profession_group['label'];
-                            } else if (is_object($vacancy->profession_group) && property_exists($vacancy->profession_group, 'label')) {
-                                $newRole = $vacancy->profession_group->label;
-                            }
-                        } else if (isset($vacancy->profession_class)) {
-                            if (is_array($vacancy->profession_class) && array_key_exists('label', $vacancy->profession_class)) {
-                                $newRole = $vacancy->profession_class['label'];
-                            } else if (is_object($vacancy->profession_class) && property_exists($vacancy->profession_class, 'label')) {
-                                $newRole = $vacancy->profession_class->label;
-                            }
-                        }
-                        $taxonomy['role'] = $termModel->createTerm('role', $newRole, []);
                     }
+                    //  else {
+                    //     $termModel = new Term();
+                    //     if (isset($vacancy->profession)) {
+                    //         if (is_array($vacancy->profession) && array_key_exists('label', $vacancy->profession)) {
+                    //             $newRole = $vacancy->profession['label'];
+                    //         } else if (is_object($vacancy->profession) && property_exists($vacancy->profession, 'label')) {
+                    //             $newRole = $vacancy->profession->label;
+                    //         }
+                    //     } else if (isset($vacancy->profession_group)) {
+                    //         if (is_array($vacancy->profession_group) && array_key_exists('label', $vacancy->profession_group)) {
+                    //             $newRole = $vacancy->profession_group['label'];
+                    //         } else if (is_object($vacancy->profession_group) && property_exists($vacancy->profession_group, 'label')) {
+                    //             $newRole = $vacancy->profession_group->label;
+                    //         }
+                    //     } else if (isset($vacancy->profession_class)) {
+                    //         if (is_array($vacancy->profession_class) && array_key_exists('label', $vacancy->profession_class)) {
+                    //             $newRole = $vacancy->profession_class['label'];
+                    //         } else if (is_object($vacancy->profession_class) && property_exists($vacancy->profession_class, 'label')) {
+                    //             $newRole = $vacancy->profession_class->label;
+                    //         }
+                    //     }
+                    //     $taxonomy['role'] = $termModel->createTerm('role', $newRole, []);
+                    // }
 
                     /** Taxonomy Sector */
                     $taxonomy['sector'] = false;
 
                     if (isset($vacancy->organization_industry)) {
                         if (is_array($vacancy->organization_industry) && array_key_exists('label', $vacancy->organization_industry)) {
+                            /** Set Meta */
+                            $apiTerms['sector'] = [
+                                'value' => array_key_exists('value', $vacancy->organization_industry) ? $vacancy->organization_industry['value'] : '',
+                                'label' => array_key_exists('label', $vacancy->organization_industry) ? $vacancy->organization_industry['label'] : ''
+                            ];
+
                             /** Get closest role */
                             $taxonomy['sector'] = CalculateHelper::calcLevenshteinCost($this->_keywords['sector'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->organization_industry['label'])), 5, 1, 1, 1, 'array');
 
                             /** Unset used key */
                             // unset($vacancy->organization_industry);
                         } else if (is_object($vacancy->organization_industry) && property_exists($vacancy->organization_industry, 'label')) {
+                            /** Set Meta */
+                            $apiTerms['sector'] = [
+                                'value' => property_exists($vacancy->organization_industry, 'value') ? $vacancy->organization_industry->value : '',
+                                'label' => property_exists($vacancy->organization_industry, 'label') ? $vacancy->organization_industry->label : ''
+                            ];
+
                             $taxonomy['sector'] = CalculateHelper::calcLevenshteinCost($this->_keywords['sector'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->organization_industry->label)), 5, 1, 1, 1, 'array');
                         }
                     }
 
-                    /** Set the sector */
+                    /** Set the sector
+                     *
+                     * update 23 January 2024
+                     * if empty or not match the mapping, don't create new category
+                     *
+                     * */
                     if (isset($taxonomy['sector']) && $taxonomy['sector'] != false) {
                         /** If calculation return empty sector,
                          * if not set the sector,
-                         * if empty create new sector */
-                        if (empty($taxonomy['sector'])) {
-                            $termModel = new Term();
-                            $taxonomy['sector'] = $termModel->createTerm('sector', $taxonomy['sector'], []);
-                        } else {
+                         * if empty create new sector
+                         *
+                         * update 23 January 2024
+                         * if empty or not match the mapping, don't create new category
+                         *
+                         * */
+                        // if (empty($taxonomy['sector'])) {
+                        //     $termModel = new Term();
+                        //     $taxonomy['sector'] = $termModel->createTerm('sector', $taxonomy['sector'], []);
+                        // } else {
+                        if (!empty($taxonomy['sector'])) {
                             $option     = new Option(true);
                             $limitSector  = $option->getImportNumberRoleToSet();
 
@@ -689,18 +813,19 @@ class JobfeedController
                             $taxonomy['sector'] = $tempSector;
                             $payload['rv_vacancy_imported_company_sector'] = $tempSector[0];
                         }
-                    } else {
-                        $termModel = new Term();
-                        if (isset($vacancy->organization_industry)) {
-                            if (is_array($vacancy->organization_industry) && array_key_exists('label', $vacancy->organization_industry)) {
-                                $newSector = $termModel->createTerm('sector', $vacancy->organization_industry['label'], []);
-                            } else if (is_object($vacancy->organization_industry) && property_exists($vacancy->organization_industry, 'label')) {
-                                $newSector = $termModel->createTerm('sector', $vacancy->organization_industry->label, []);
-                            }
-                        }
-                        $taxonomy['sector'] = $newSector;
-                        $payload['rv_vacancy_imported_company_sector'] = $newSector;
                     }
+                    // else {
+                    //     $termModel = new Term();
+                    //     if (isset($vacancy->organization_industry)) {
+                    //         if (is_array($vacancy->organization_industry) && array_key_exists('label', $vacancy->organization_industry)) {
+                    //             $newSector = $termModel->createTerm('sector', $vacancy->organization_industry['label'], []);
+                    //         } else if (is_object($vacancy->organization_industry) && property_exists($vacancy->organization_industry, 'label')) {
+                    //             $newSector = $termModel->createTerm('sector', $vacancy->organization_industry->label, []);
+                    //         }
+                    //     }
+                    //     $taxonomy['sector'] = $newSector;
+                    //     $payload['rv_vacancy_imported_company_sector'] = $newSector;
+                    // }
 
                     /** Mapping Unused data */
                     foreach ($vacancy as $propertyKey => $propertyValue) {
@@ -723,14 +848,19 @@ class JobfeedController
 
                         if (is_wp_error($post)) {
                             error_log(json_encode($post->get_error_messages()));
+
+                            /** Log Attempt */
+                            $logData['message'] = 'System Error! ' . $post->get_error_message();
+                            $logData['wpErrorMessages'] = json_encode($post->get_error_messages());
+                            Log::error('After to import data.', $logData, date('Y_m_d') . '_log_import_textkernel_jobfeed');
                         }
 
-                        $vacancy = new Vacancy($post);
+                        $vacancyModel = new Vacancy($post);
 
-                        $vacancy->setTaxonomy($taxonomy);
+                        $vacancyModel->setTaxonomy($taxonomy);
 
                         foreach ($payload as $acf_field => $acfValue) {
-                            $vacancy->setProp($acf_field, $acfValue, is_array($acfValue));
+                            $vacancyModel->setProp($acf_field, $acfValue, is_array($acfValue));
                         }
 
                         /** store unused to post meta */
@@ -740,6 +870,12 @@ class JobfeedController
                         update_post_meta($post, 'rv_vacancy_imported_at', $now->format('Y-m-d H:i:s'));
                         update_post_meta($post, 'rv_vacancy_jobfeed_is_expired', 0); // 0 for false 1 for true
 
+                        /** Store property original api term that will assign to taxonomy / term */
+                        // update_post_meta($post, 'rv_vacancy_original_api_term', $apiTerms);
+                        print('<pre>' . print_r($post, true) . '</pre>' . PHP_EOL);
+                        print('<pre>' . print_r($apiTerms, true) . '</pre>' . PHP_EOL);
+                        print('<pre>' . print_r('------------------------------------------', true) . '</pre>' . PHP_EOL);
+                        $setOriginalValue = $vacancyModel->setVacancyOriginalCategory($apiTerms);
 
                         /** IF MAP API IS ENABLED */
                         if (defined('ENABLE_MAP_API') && ENABLE_MAP_API == true) {
@@ -776,6 +912,10 @@ class JobfeedController
                                 $vacancy->setImportedCompanyCityLongLat($payload["rv_vacancy_imported_company_city"]);
                             }
                         }
+
+                        /** Log Attempt */
+                        $logData['setOriginalApiTerm'] = $setOriginalValue;
+                        Log::info('After to import data.', $logData, date('Y_m_d') . '_log_import_textkernel_jobfeed');
 
                         /** Increase imported count */
                         $imported++;
@@ -1081,7 +1221,7 @@ class JobfeedController
         }
     }
 
-    private function _findWorkingHours($fetchValue, $createNew = true)
+    private function _findWorkingHours($fetchValue, $createNew = false)
     {
         $terms = $this->_terms['working-hours'];
         $alternative = strtolower(preg_replace('/\s+/', '', $fetchValue));
@@ -1134,15 +1274,19 @@ class JobfeedController
                     return $termExists;
                 }
 
-                $newTerm = wp_insert_term($fetchValue, 'working-hours', []);
+                if ($createNew) {
+                    $newTerm = wp_insert_term($fetchValue, 'working-hours', []);
 
-                if ($newTerm instanceof WP_Error) {
-                    if (array_key_exists('term_exists', $newTerm->error_data)) {
-                        return $newTerm->error_data['term_exists'];
+                    if ($newTerm instanceof WP_Error) {
+                        if (array_key_exists('term_exists', $newTerm->error_data)) {
+                            return $newTerm->error_data['term_exists'];
+                        }
+                        return null;
+                    } else {
+                        return $newTerm['term_id'];
                     }
-                    return null;
                 } else {
-                    return $newTerm['term_id'];
+                    return null;
                 }
             }
         } else {
@@ -1150,7 +1294,7 @@ class JobfeedController
         }
     }
 
-    private function _findEducation($jsonValue)
+    private function _findEducation($jsonValue, $createNew = false)
     {
         $terms = $this->_terms['education'];
         $alternative = strtolower(preg_replace('/\s+/', '-', $jsonValue));

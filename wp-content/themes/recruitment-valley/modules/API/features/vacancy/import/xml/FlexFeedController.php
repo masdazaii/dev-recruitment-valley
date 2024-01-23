@@ -139,6 +139,13 @@ class FlexFeedController
                      */
                     $unusedData = [];
 
+                    /** Map property that will assign to taxonomy / term
+                     * this will be stored in post meta : rv_vacancy_original_api_term.
+                     *
+                     * array key should follow taxonomy slug.
+                     */
+                    $apiTerms = [];
+
                     /** Loop through array data */
                     $imported = 0;
                     $jobs = $response->source->job;
@@ -327,6 +334,12 @@ class FlexFeedController
                         if (property_exists($jobs[$i], 'hoursPerWeek') && !empty($jobs[$i]->hoursPerWeek)) {
                             $taxonomy['working-hours'] = $this->_findWorkingHours(preg_replace('/[\n\t]+/', '', $jobs[$i]->hoursPerWeek));
 
+                            /** Set Meta
+                             * This to accommodate the imported data from text kernel structure which is to and form is separated
+                             */
+                            $apiTerms['working-hours']['from']  = $jobs[$i]->hoursPerWeek;
+                            $apiTerms['working-hours']['to']    = $jobs[$i]->hoursPerWeek;
+
                             /** Unset used key */
                             // unset($jobs[$i]->hoursPerWeek);
                         }
@@ -335,13 +348,44 @@ class FlexFeedController
                         if (property_exists($jobs[$i], 'education') && !empty($jobs[$i]->education)) {
                             $taxonomy['education'] = $this->_findEducation($this->_taxonomyKey['education'], preg_replace('/[\n\t]+/', '', $jobs[$i]->education));
 
+                            /** Set Meta
+                             * This to accommodate the imported data from text kernel structure which is label-value
+                             */
+                            $apiTerms['education']['value'] = $jobs[$i]->education;
+                            $apiTerms['education']['label'] = $jobs[$i]->education;
+
                             /** Unset used key */
                             unset($jobs[$i]->education);
                         }
 
                         /** Taxonomy experience */
                         if (property_exists($jobs[$i], 'experience') && !empty($jobs[$i]->experience) && $jobs[$i]->experience[0] !== 'NotSpecified') {
-                            $taxonomy['experiences'] = $this->_findExperiences(preg_replace('/[\n\t]+/', '', $jobs[$i]->experience[0]));
+                            if (count($jobs[$i]->experience) > 1) {
+                                $experiences = [];
+
+                                foreach ($jobs[$i]->experience as $value) {
+                                    $experiences[] = $this->_findExperiences(preg_replace('/[\n\t]+/', '', $value), false);
+
+                                    /** Set Meta
+                                     * This to accommodate the imported data from text kernel structure which is label-value
+                                     */
+                                    $apiTerms['experiences'][] = [
+                                        'value' => $value,
+                                        'label' => $value
+                                    ];
+                                }
+                                $taxonomy['experiences'] = implode(',', array_unique($experiences));
+                            } else {
+                                $taxonomy['experiences'] = $this->_findExperiences(preg_replace('/[\n\t]+/', '', $jobs[$i]->experience[0]));
+
+                                /** Set Meta
+                                 * This to accommodate the imported data from text kernel structure which is label-value
+                                 */
+                                $apiTerms['experiences'][] = [
+                                    'value' => $jobs[$i]->experience[0],
+                                    'label' => $jobs[$i]->experience[0]
+                                ];
+                            }
 
                             /** Unset used key */
                             unset($jobs[$i]->experience);
@@ -357,14 +401,26 @@ class FlexFeedController
                             /** Get closest role */
                             $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords, strtolower(preg_replace('/[\n\t]+/', '', $jobs[$i]->category)), 5, 1, 1, 1, 'array');
 
+                            /** Set Role
+                             *
+                             * update 23 January 2024
+                             * if empty or not match the mapping, don't create new category
+                             *
+                             */
                             if ($taxonomy['role'] !== false) {
                                 /** If calculation return empty role,
                                  * if not set the role,
-                                 * if empty create new role */
-                                if (empty($taxonomy['role'])) {
-                                    $termModel = new Term();
-                                    $taxonomy['role'] = $termModel->createTerm('role', $jobs[$i]->category, []);
-                                } else {
+                                 * if empty create new role
+                                 *
+                                 * update 23 January 2024
+                                 * if empty or not match the mapping, don't create new category
+                                 *
+                                 *  */
+                                // if (empty($taxonomy['role'])) {
+                                //     $termModel = new Term();
+                                //     $taxonomy['role'] = $termModel->createTerm('role', $jobs[$i]->category, []);
+                                // } else {
+                                if (!empty($taxonomy['role'])) {
                                     $option     = new Option(true);
                                     $limitRole  = $option->getImportNumberRoleToSet();
 
@@ -380,10 +436,11 @@ class FlexFeedController
                                     }
                                     $taxonomy['role'] = $tempRole;
                                 }
-                            } else {
-                                $termModel = new Term();
-                                $taxonomy['role'] = $termModel->createTerm('role', $taxonomy['role'], []);
                             }
+                            //  else {
+                            //     $termModel = new Term();
+                            //     $taxonomy['role'] = $termModel->createTerm('role', $taxonomy['role'], []);
+                            // }
 
                             /** Unset used key */
                             // unset($jobs[$i]->category);
@@ -404,33 +461,37 @@ class FlexFeedController
                                 error_log(json_encode($post->get_error_messages()));
                             }
 
-                            $vacancy = new Vacancy($post);
+                            $vacancyModel = new Vacancy($post);
 
-                            $vacancy->setTaxonomy($taxonomy);
+                            $vacancyModel->setTaxonomy($taxonomy);
 
                             foreach ($payload as $acf_field => $acfValue) {
-                                $vacancy->setProp($acf_field, $acfValue, is_array($acfValue));
+                                $vacancyModel->setProp($acf_field, $acfValue, is_array($acfValue));
                             }
 
                             /** IF MAP API IS ENABLED */
                             if (defined('ENABLE_MAP_API') && ENABLE_MAP_API == true) {
                                 /** Calc coordinate */
                                 if (isset($payload["placement_city"]) && isset($payload["placement_address"])) {
-                                    $vacancy->setCityLongLat($payload["placement_city"], true);
-                                    $vacancy->setAddressLongLat($payload["placement_address"]);
-                                    $vacancy->setDistance($payload["placement_city"], $payload["placement_city"] . " " . $payload["placement_address"]);
+                                    $vacancyModel->setCityLongLat($payload["placement_city"], true);
+                                    $vacancyModel->setAddressLongLat($payload["placement_address"]);
+                                    $vacancyModel->setDistance($payload["placement_city"], $payload["placement_city"] . " " . $payload["placement_address"]);
                                 }
                             }
 
                             /** Set approval data */
-                            $vacancy->setApprovedStatus('waiting');
-                            $vacancy->setApprovedBy(null);
+                            $vacancyModel->setApprovedStatus('waiting');
+                            $vacancyModel->setApprovedBy(null);
 
                             /** store unused to post meta */
                             $now = new DateTimeImmutable("now");
                             update_post_meta($post, 'rv_vacancy_unused_data', $unusedData);
                             update_post_meta($post, 'rv_vacancy_source', self::source ?? 'flexfeed');
                             update_post_meta($post, 'rv_vacancy_imported_at', $now->format('Y-m-d H:i:s'));
+
+                            /** Store property original api term that will assign to taxonomy / term */
+                            // update_post_meta($post, 'rv_vacancy_original_api_term', $apiTerms);
+                            $vacancyModel->setVacancyOriginalCategory($apiTerms);
 
                             /** Increase imported count */
                             $imported++;
@@ -530,7 +591,7 @@ class FlexFeedController
         }
     }
 
-    private function _findWorkingHours($fetchValue)
+    private function _findWorkingHours($fetchValue, $createNew = false)
     {
         $terms = $this->_terms['working-hours'];
         $alternative = strtolower(preg_replace('/\s+/', '', $fetchValue));
