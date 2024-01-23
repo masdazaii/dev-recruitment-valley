@@ -133,6 +133,7 @@ class JobfeedController
 
                 $payload    = [];
                 $taxonomy   = [];
+                $educations = [];
 
                 /** Map property that not used.
                  * this will be stored in post meta.
@@ -204,7 +205,7 @@ class JobfeedController
                     /** ACF Job_id */
                     $payload['rv_vacancy_imported_source_id']   = $vacancy->job_id;
                     /** Unset used key : job_id */
-                    unset($vacancy->job_id);
+                    // unset($vacancy->job_id);
 
                     /** Post Data Title */
                     if (isset($vacancy->job_title)) {
@@ -501,13 +502,30 @@ class JobfeedController
                     if (isset($vacancy->education_level)) {
                         if (is_array($vacancy->education_level)) {
                             if (array_key_exists('label', $vacancy->education_level)) {
-                                $taxonomy['education'] = $this->_findEducation($vacancy->education_level['label']);
+                                if (strpos($vacancy->education_level['label'], '/')) {
+                                    $values = explode('/', $vacancy->education_level['label']);
+                                    foreach ($values as $label) {
+                                        $educations[] = $this->_findEducation($label);
+                                    }
+                                    $taxonomy['education'] = implode(',', array_unique($educations));
+                                } else {
+                                    $taxonomy['education'] = $this->_findEducation($vacancy->education_level['label']);
+                                }
 
                                 /** Unset used key */
                                 unset($vacancy->education_level);
                             }
                         } else if (is_object($vacancy->education_level) && property_exists($vacancy->education_level, 'label')) {
-                            $taxonomy['education'] = $this->_findEducation($vacancy->education_level->label);
+                            // $taxonomy['education'] = $this->_findEducation($vacancy->education_level->label);
+                            if (strpos($vacancy->education_level->label, '/')) {
+                                $values = explode('/', $vacancy->education_level->label);
+                                foreach ($values as $label) {
+                                    $educations[] = $this->_findEducation($label);
+                                }
+                                $taxonomy['education'] = implode(',', array_unique($educations));
+                            } else {
+                                $taxonomy['education'] = $this->_findEducation($vacancy->education_level->label);
+                            }
 
                             /** Unset used key */
                             unset($vacancy->education_level);
@@ -999,15 +1017,17 @@ class JobfeedController
 
             /** Get keywords options and set each keyword to lowercase */
             $keywordOption = get_field('import_api_mapping_sector', 'option');
-            foreach ($keywordOption as $keyword) {
-                if (is_array($keyword)) {
-                    if (array_key_exists('import_api_mapping_sector_term', $keyword) && array_key_exists('import_api_mapping_sector_keywords', $keyword)) {
-                        foreach ($keyword['import_api_mapping_sector_keywords'] as $word) {
-                            if (is_array($word)) {
-                                if (array_key_exists('import_api_mapping_sector_eachword', $word))
-                                    $this->_keywords['sector'][$keyword['import_api_mapping_sector_term']][] = strtolower($word['import_api_mapping_sector_eachword']);
-                            } else if (is_string($word)) {
-                                $this->_keywords['sector'][$keyword['import_api_mapping_sector_term']][] = strtolower($word);
+            if (is_array($keywordOption)) {
+                foreach ($keywordOption as $keyword) {
+                    if (is_array($keyword)) {
+                        if (array_key_exists('import_api_mapping_sector_term', $keyword) && array_key_exists('import_api_mapping_sector_keywords', $keyword)) {
+                            foreach ($keyword['import_api_mapping_sector_keywords'] as $word) {
+                                if (is_array($word)) {
+                                    if (array_key_exists('import_api_mapping_sector_eachword', $word))
+                                        $this->_keywords['sector'][$keyword['import_api_mapping_sector_term']][] = strtolower($word['import_api_mapping_sector_eachword']);
+                                } else if (is_string($word)) {
+                                    $this->_keywords['sector'][$keyword['import_api_mapping_sector_term']][] = strtolower($word);
+                                }
                             }
                         }
                     }
@@ -1434,6 +1454,229 @@ class JobfeedController
 
             $handlerController = new BaseHandlerController();
             return $handlerController->handleError($th, __CLASS__, __METHOD__, $logData, 'textkernel_jobfeed_set_type');
+        }
+    }
+
+    public function updateData(array $request)
+    {
+        /** Get Mapped Keyword from option */
+        $this->_getMappedKeyword();
+
+        $this->_getTerms();
+
+        $parameter  = $request;
+        $date       = new \DateTime($parameter['date'] ?? "now");
+        $parameter['date'] = $date->format('Y-m-d');
+
+        try {
+            $dateNow = $parameter['date'] ?? date('Y-m-d');
+
+            if (isset($parameter['test']) && $parameter['test'] == true) {
+                error_log('Jobfeed test! ' . $parameter['date']);
+                $fileName = wp_upload_dir()["basedir"] . '/aws/job/new/' . $dateNow . '.gz';
+                error_log(json_encode(wp_upload_dir()));
+
+                // Raising this value may increase performance
+                $out_file_name = str_replace('.gz', '.jsonl', $fileName);
+                $vacancies = file_get_contents($out_file_name);
+                $vacancies = explode("\n", $vacancies);
+            } else {
+                error_log('Jobfeed live! ' . $parameter['date']);
+                $s3 = new \Aws\S3\S3Client([
+                    'region' => 'eu-central-1',
+                    'version' => 'latest',
+                    'credentials' => [
+                        'key' => get_field('aws_key_id', 'option'),
+                        'secret' => get_field('aws_secret_key', 'option'),
+                    ]
+                ]);
+
+                $key = "NL/daily/" . $dateNow . "/jobs_new.0.jsonl.gz";
+                $fileName = wp_upload_dir()["basedir"] . '/aws/job/new/' . $dateNow . '.gz';
+                error_log(json_encode(wp_upload_dir()));
+
+                $result = $s3->getObject([
+                    'Bucket' => 'jobfeed-intelligence-group',
+                    'Key'    => $key,
+                    'SaveAs' => $fileName,
+                ]);
+
+                // Raising this value may increase performance
+                $buffer_size = 4096000; // read 4kb at a time
+                $out_file_name = str_replace('.gz', '.jsonl', $fileName);
+
+                // Open our files (in binary mode)
+                $file = gzopen($fileName, 'rb');
+                $out_file = fopen($out_file_name, 'wb');
+
+                // Keep repeating until the end of the input file
+                while (!gzeof($file)) {
+                    // Read buffer-size bytes
+                    // Both fwrite and gzread and binary-safe
+                    fwrite($out_file, gzread($file, $buffer_size));
+                }
+
+                // Files are done, close files
+                fclose($out_file);
+                gzclose($file);
+
+                $vacancies = file_get_contents($out_file_name);
+                $vacancies = explode("\n", $vacancies);
+            }
+
+            $i = 0;
+            $updated = 0;
+
+            /** Get RV Administrator User data */
+            $rvAdmin = get_user_by('email', 'adminjob@recruitmentvalley.com');
+            $importUser = get_field('import_api_user_to_import', 'option') ?? $rvAdmin->ID;
+
+            /** wp_insert_post arguments */
+            $arguments = [
+                'post_type' => 'vacancy',
+                'post_status' => 'publish',
+                'post_author' => $importUser
+            ];
+
+            $payload    = [];
+            $taxonomy   = [];
+
+            foreach ($vacancies as $vacancy) {
+                $taxonomy   = [];
+                $educations = [];
+                $vacancy = json_decode($vacancy);
+
+                if (isset($vacancy)) {
+                    /** Validate - check if data id is exists */
+                    if (!isset($vacancy->job_id)) {
+                        error_log('Vacancy didn\'t has job id');
+                        $i++;
+                        continue;
+                    }
+
+
+                    /** Get Post */
+                    $args = [
+                        'post_type'     => 'vacancy',
+                        'post_status'   => 'publish',
+                        'tax_query'     => [
+                            'taxonomy'  => 'status',
+                            'field'     => 'slug',
+                            'terms'     => 'processing',
+                            'compare'   => '='
+                        ],
+                        'meta_query'    => [
+                            [
+                                'key'       => 'rv_vacancy_imported_source_id',
+                                'value'     => $vacancy->job_id,
+                                'compare'   => '=',
+                            ]
+                        ]
+                    ];
+                    $query = new \WP_Query($args);
+
+                    /** Skip if not found */
+                    if ($query->post_count <= 0) {
+                        continue;
+                    }
+
+                    /** Set education term */
+                    if (isset($vacancy->education_level)) {
+                        if (is_array($vacancy->education_level)) {
+                            if (array_key_exists('label', $vacancy->education_level)) {
+
+                                print('<pre>' . print_r($vacancy->education_level['label'], true) . '</pre>' . PHP_EOL);
+
+                                if (strpos($vacancy->education_level['label'], '/')) {
+                                    $values = explode('/', $vacancy->education_level['label']);
+
+                                    foreach ($values as $label) {
+                                        $educations[] = $this->_findEducation($label);
+                                    }
+
+                                    $taxonomy['education'] = implode(',', array_unique($educations));
+                                } else {
+                                    $taxonomy['education'] = $this->_findEducation($vacancy->education_level['label']);
+                                }
+                            }
+                        } else if (is_object($vacancy->education_level) && property_exists($vacancy->education_level, 'label')) {
+                            // $taxonomy['education'] = $this->_findEducation($vacancy->education_level->label);
+
+                            print('<pre>' . print_r($vacancy->education_level->label, true) . '</pre>' . PHP_EOL);
+
+                            if (strpos($vacancy->education_level->label, '/')) {
+                                $values = explode('/', $vacancy->education_level->label);
+                                foreach ($values as $label) {
+                                    $educations[] = $this->_findEducation($label);
+                                }
+
+                                $taxonomy['education'] = implode(',', array_unique($educations));
+                            } else {
+                                $taxonomy['education'] = $this->_findEducation($vacancy->education_level->label);
+                            }
+                        }
+                    }
+
+
+                    /** Log data */
+                    $logData = [
+                        'index'     => $i,
+                        'source_id' => $vacancy->job_id,
+                        'arguments' => $arguments,
+                        'taxonomy'  => $taxonomy,
+                        'payload'   => $payload,
+                    ];
+                    Log::info('About to import data.', $logData, date('Y_m_d') . '_log_update_textkernel_jobfeed');
+
+                    /** Insert data */
+                    try {
+                        $vacancyID      = $query->posts[0]->ID;
+
+                        $vacancyModel   = new Vacancy($query->posts[0]->ID);
+                        $setTaxonomy    = $vacancyModel->setTaxonomy($taxonomy);
+
+                        if ($setTaxonomy) {
+                            $logData['update'][$query->posts[0]->ID] = [
+                                'id'        => $query->posts[0]->ID,
+                                'taxonomy'  => $taxonomy
+                            ];
+                        }
+                        Log::info('About to import data.', $logData, date('Y_m_d') . '_log_update_textkernel_jobfeed');
+
+                        print('<pre>' . print_r($query->posts[0]->ID, true) . '</pre>' . PHP_EOL);
+                        print('<pre>' . print_r($taxonomy, true) . '</pre>' . PHP_EOL);
+                        print('<pre>' . print_r('-------------------------------------------------------------', true) . '</pre>' . PHP_EOL);
+
+                        // foreach ($payload as $acf_field => $acfValue) {
+                        //     $vacancyModel->setProp($acf_field, $acfValue, is_array($acfValue));
+                        // }
+
+                        /** Increase updated count */
+                        $updated++;
+                    } catch (\WP_Error $wperror) {
+                        error_log($wperror->get_error_message());
+                    } catch (\Exception $error) {
+                        error_log($error->getMessage());
+                    } catch (\Throwable $th) {
+                        error_log($th->getMessage());
+                    }
+                    $i++;
+                }
+            }
+
+            return [
+                'status'    => 200,
+                'message'   => 'Updated',
+                'data'      => [
+                    'update'    => $updated
+                ]
+            ];
+        } catch (AwsException $e) {
+            error_log('Exception in fetch AWS S3 Bucket - Update data - ' . $e->getMessage());
+        } catch (\Exception $e) {
+            error_log('Exception in fetch AWS S3 Bucket - Update data - ' . $e->getMessage());
+        } catch (\Throwable $throw) {
+            error_log('All thrown exception in fetch AWS S3 Bucket - Update data - ' . $throw->getMessage());
         }
     }
     /** End : Function only for developer */

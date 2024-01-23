@@ -73,5 +73,11 @@ class ImportService
         $response = $this->_flexFeedController->setTerm($request->get_params());
         return ResponseHelper::build($response);
     }
+
+    public function jobfeedUpdate(WP_REST_Request $request)
+    {
+        $response = $this->_jobfeedController->updateData($request->get_params());
+        return ResponseHelper::build($response);
+    }
     /** End : Function only for developer */
 }
