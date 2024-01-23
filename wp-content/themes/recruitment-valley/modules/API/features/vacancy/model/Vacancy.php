@@ -109,6 +109,9 @@ class Vacancy
 
     private $_taxonomies = ["sector", "role", "type", "education", "working-hours", "status", "location", "experiences"];
 
+    private const status_slug_open          = 'open';
+    private const status_slug_processing    = 'processing';
+
     /** Vacancy Meta */
     private $_meta_rv_vacancy_unused_data   = 'rv_vacancy_unused_data';
     private $_meta_rv_vacancy_imported_at   = 'rv_vacancy_imported_at';
@@ -120,6 +123,7 @@ class Vacancy
     {
         if ($vacancy_id) {
             $this->vacancy_id = $vacancy_id;
+            $this->vacancy = get_post($vacancy_id);
         }
     }
 
@@ -1659,6 +1663,28 @@ class Vacancy
     {
         if ($this->vacancy_id) {
             return $this->setProp($this->_acf_vacancy_custom_company_latitude, $value);
+        } else {
+            throw new Exception('Please specify vacancy!');
+        }
+    }
+
+    public function isOpen()
+    {
+        if ($this->vacancy_id) {
+            $status = $this->getStatus();
+            if ($status) {
+                if (isset($status['slug'])) {
+                    if ($status['slug'] == self::status_slug_open) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
         } else {
             throw new Exception('Please specify vacancy!');
         }

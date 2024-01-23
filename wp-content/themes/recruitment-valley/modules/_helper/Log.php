@@ -94,9 +94,9 @@ class Log
         }
 
         if ($devLog) {
-            $log_path = self::$log_path . '/' . date('Y-m-d');
-        } else {
             $log_path = self::$log_path . "/devs/" . date('Y-m-d');
+        } else {
+            $log_path = self::$log_path . '/' . date('Y-m-d');
         }
 
         $log_message = sprintf("[%s][%s] %s \n", $current_time, $type, $message);

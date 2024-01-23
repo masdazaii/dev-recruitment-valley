@@ -11,6 +11,7 @@ use Global\NotificationService;
 use Global\OptionController;
 use Helper\Maphelper;
 use Model\Term;
+use WP_Error;
 
 class Vacancy extends RegisterCPT
 {
@@ -18,6 +19,10 @@ class Vacancy extends RegisterCPT
     private $_notification;
     private $_notificationConstant;
     public $wpdb;
+
+    public const vacancy_post_type_slug = 'vacancy';
+    private const status_slug_open          = 'open';
+    private const status_slug_processing    = 'processing';
 
     public function __construct()
     {
@@ -31,6 +36,8 @@ class Vacancy extends RegisterCPT
         add_action('restrict_manage_posts', [$this, 'vacancyCustomFilterRender'], 10, 2);
         add_filter('parse_query', [$this, 'vacancyCustomFilterHandle'], 10, 1);
         // add_action('pre_get_posts', [$this, 'vacancyCustomFilterHandle'], 10, 1);
+        add_filter('post_row_actions', [$this, 'vacancyQuickAction'], 10, 2);
+        add_action('edit_form_after_title', [$this, 'vacancyPreviewOnEdit'], 10, 1);
 
         global $wpdb;
         $this->wpdb = $wpdb;
@@ -697,5 +704,60 @@ class Vacancy extends RegisterCPT
             }
         }
     }
+
+    public function vacancyQuickAction($actions, $post)
+    {
+        if ($post->post_type == self::vacancy_post_type_slug) {
+            $vacancyModel = new VacancyModel($post->ID);
+            // print('<pre>' . print_r($vacancyModel->vacancy, true) . '</pre>');
+            if ($vacancyModel->vacancy) {
+                if (!$vacancyModel->vacancy instanceof WP_Error) {
+                    $status = $vacancyModel->getStatus();
+                    if ($status) {
+                        if (isset($status['slug'])) {
+                            if ($status['slug'] == self::status_slug_open) {
+                                $actions['preview'] = '<a href="' . FRONTEND_VACANCY_PATH . '/' . $vacancyModel->vacancy->post_name . '">Show Vacancy</a>';
+                            } else if ($status['slug'] == self::status_slug_processing) {
+                                $actions['preview'] = '<a href="' . FRONTEND_VACANCY_PATH . '/' . $vacancyModel->vacancy->post_name . '">Preview</a>';
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $actions;
+    }
+
+    public function vacancyPreviewOnEdit($post)
+    {
+        if ($post->post_type === self::vacancy_post_type_slug) {
+            $vacancyModel = new VacancyModel($post->ID);
+
+            $output = '';
+
+            if ($vacancyModel->vacancy) {
+                if (!$vacancyModel->vacancy instanceof WP_Error) {
+                    $status = $vacancyModel->getStatus();
+                    if ($status) {
+                        if (isset($status['slug'])) {
+                            if ($status['slug'] == self::status_slug_open) {
+                                $output .= '<div style="margin-top: 10px;">';
+                                $output .= '<a class="button button-primary" href="' . FRONTEND_VACANCY_PATH . '/' . $vacancyModel->vacancy->post_name . '">Show Vacancy</a>';
+                                $output .= '</div>';
+                            } else if ($status['slug'] == self::status_slug_processing) {
+                                $output .= '<div style="margin-top: 10px;">';
+                                $output .= '<a class="button button-primary" href="' . FRONTEND_VACANCY_PATH . '/' . $vacancyModel->vacancy->post_name . '">Preview as client</a>';
+                                $output .= '</div>';
+                            }
+                        }
+                    }
+                }
+            }
+
+            echo $output;
+        }
+    }
 }
+
 new Vacancy();

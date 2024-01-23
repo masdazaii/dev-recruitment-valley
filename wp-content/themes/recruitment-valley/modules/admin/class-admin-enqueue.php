@@ -162,7 +162,8 @@ class AdminEnqueue
                     'options' => $options,
                     'changeRoleAction'    => 'handle_vacancy_role_change',
                     'changeSectorAction'    => 'handle_vacancy_sector_change',
-                    'bulkAction'    => 'handle_vacancy_bulk_action'
+                    'bulkAction'    => 'handle_vacancy_bulk_action',
+                    'previewUrl'    => FRONTEND_VACANCY_PATH
                 ],
                 'vacancies' => $adminVacancyData,
                 'rss'       => $rssData,
