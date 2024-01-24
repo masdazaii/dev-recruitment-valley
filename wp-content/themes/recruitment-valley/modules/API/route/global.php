@@ -270,6 +270,12 @@ class GlobalEndpoint
                     'permission_callback'   => '__return_true',
                     'callback'              => [$importService, 'jobfeedExpire']
                 ],
+                'jobfeed_update' => [
+                    'url'                   => 'import/jobfeed/update',
+                    'methods'               => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$importService, 'jobfeedUpdate']
+                ],
                 /** Start : This is mean to be endpoint for dev only */
                 'feed_export' => [
                     'url'                   => 'export',
