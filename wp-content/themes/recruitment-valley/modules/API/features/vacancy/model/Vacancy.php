@@ -1710,4 +1710,19 @@ class Vacancy
             throw new Exception('Please specify vacancy!');
         }
     }
+
+    /**
+     * Get property original api term that will assign to taxonomy / term function
+     *
+     * @param array $data
+     * @return mixed
+     */
+    public function getVacancyOriginalCategory($single = true): mixed
+    {
+        if ($this->vacancy_id) {
+            return $this->getterMeta($this->meta_rv_vacancy_original_api_term, $single);
+        } else {
+            throw new Exception('Please specify vacancy!');
+        }
+    }
 }
