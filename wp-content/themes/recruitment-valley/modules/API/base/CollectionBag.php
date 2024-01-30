@@ -305,7 +305,7 @@ class CollectionBag
 
             return new self($this->data);
         } else {
-            throw new Exception('Data must be array associative');
+            throw new Exception('Data must be array list');
         }
     }
 

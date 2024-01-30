@@ -231,6 +231,7 @@ class Message
                     "get_success" => __("Alle pakketten succesvol ingeladen.", THEME_DOMAIN),
                     "show_success" => __("Pakket succesvol ingeladen.", THEME_DOMAIN),
                     "show_not_found" => __("Pakket met deze url slug is niet gevonden.", THEME_DOMAIN),
+                    "not_found" => __("Pakket niet gevonden.", THEME_DOMAIN),
                     "something_error" => __("er is een fout opgetreden bij het aanmaken van de betaling", THEME_DOMAIN),
                     "trx_not_found" => __("Transactie niet gevonden", THEME_DOMAIN),
                     "success_grant" => __("Succes met het verlenen van krediet", THEME_DOMAIN),

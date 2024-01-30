@@ -295,7 +295,7 @@ class Vacancy extends RegisterCPT
             if ($apiTerms) {
                 $apiTerms   = maybe_unserialize($apiTerms);
             } else {
-                $apiTerms   = maybe_unserialize($apiTerms);
+                $apiTerms   = [];
             }
 
             $output     = '<div style="display: flex; flex-direction: column; gap: 0.5rem;">';

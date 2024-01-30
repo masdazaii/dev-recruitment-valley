@@ -106,6 +106,12 @@ class PackageController
         $user = get_user_by('id', $userId);
 
         $package = new Package($packageId);
+        if (!$package->package) {
+            return [
+                "status" => 400,
+                "message" => 'Pakket niet gevonden.'
+            ];
+        }
         $packagePrice = $package->getPrice();
         $pacakgeDescription = $package->getDescription();
 
@@ -444,8 +450,9 @@ class PackageController
                 return $this->onPaymentFail($event);
             default:
                 return [
-                    "status" => 400,
-                    "message" => $this->_message->get("package.webhook.event_not_registered")
+                    "status" => 200,
+                    // "message" => $this->_message->get("package.webhook.event_not_registered")
+                    "message" => json_encode($event, JSON_PRETTY_PRINT)
                 ];
         }
     }
@@ -575,7 +582,7 @@ class PackageController
         }
 
         return [
-            "status" => 400,
+            "status" => 200,
             "message" => $this->_message->get("package.payment.payment_fail")
         ];
     }
