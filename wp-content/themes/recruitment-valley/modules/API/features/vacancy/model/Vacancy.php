@@ -118,6 +118,7 @@ class Vacancy
     public $meta_rv_vacancy_approved_at     = 'rv_vacancy_approved_at';
     public $meta_rv_vacancy_source        = 'rv_vacancy_source';
     public $meta_rv_vacancy_jobfeed_is_expired = 'rv_vacancy_jobfeed_is_expired';
+    public $meta_rv_vacancy_original_api_term = 'rv_vacancy_original_api_term';
 
     public function __construct($vacancy_id = false)
     {
@@ -1668,6 +1669,11 @@ class Vacancy
         }
     }
 
+    /**
+     * Check if vacancy status is open function
+     *
+     * @return boolean
+     */
     public function isOpen()
     {
         if ($this->vacancy_id) {
@@ -1685,6 +1691,36 @@ class Vacancy
             } else {
                 return false;
             }
+        } else {
+            throw new Exception('Please specify vacancy!');
+        }
+    }
+
+    /**
+     * Set property original api term that will assign to taxonomy / term function
+     *
+     * @param array $data
+     * @return mixed
+     */
+    public function setVacancyOriginalCategory(array $data): mixed
+    {
+        if ($this->vacancy_id) {
+            return $this->setterMeta($this->meta_rv_vacancy_original_api_term, $data);
+        } else {
+            throw new Exception('Please specify vacancy!');
+        }
+    }
+
+    /**
+     * Get property original api term that will assign to taxonomy / term function
+     *
+     * @param array $data
+     * @return mixed
+     */
+    public function getVacancyOriginalCategory($single = true): mixed
+    {
+        if ($this->vacancy_id) {
+            return $this->getterMeta($this->meta_rv_vacancy_original_api_term, $single);
         } else {
             throw new Exception('Please specify vacancy!');
         }

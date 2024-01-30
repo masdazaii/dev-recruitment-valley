@@ -10,6 +10,7 @@ use DateTime;
 use Global\NotificationService;
 use Global\OptionController;
 use Helper\Maphelper;
+use MI\Base\Bag\CollectionBag;
 use Model\Term;
 use WP_Error;
 
@@ -23,6 +24,16 @@ class Vacancy extends RegisterCPT
     public const vacancy_post_type_slug = 'vacancy';
     private const status_slug_open          = 'open';
     private const status_slug_processing    = 'processing';
+    private const taxonomy = [
+        'working-hours' => 'Working Hours',
+        'education'     => 'Educations',
+        'type'          => 'Employment Type',
+        'experiences'   => 'Working Experiences',
+        'sector'        => 'Sector',
+        'role'          => 'Role',
+        'location'      => 'Location',
+        'status'        => 'Status'
+    ];
 
     public function __construct()
     {
@@ -199,6 +210,13 @@ class Vacancy extends RegisterCPT
         }
     }
 
+    /**
+     * Adding metabox to vacancy edit screen function
+     *
+     * @param mixed $post_type
+     * @param WP_POST $post
+     * @return void
+     */
     public function addVacancyMetaboxes($post_type, $post)
     {
         add_meta_box(
@@ -213,10 +231,22 @@ class Vacancy extends RegisterCPT
 
         $vacancyModel = new VacancyModel($post->ID);
         if ($vacancyModel->getImportedAt()) {
+            /** Add metabox when vacancy is imported at */
             add_meta_box(
                 'imported_vacancies_metaboxes',
                 'Vacancies Imported At',
                 [$this, 'vacancyImportedAtRenderMetabox'],
+                'vacancy',
+                'advanced',
+                'default',
+                ['post_id' => $post->ID, 'meta' => []]
+            );
+
+            /** Add metabox original term */
+            add_meta_box(
+                'imported_vacancies_original_term_metaboxes',
+                'Vacancies Original Category',
+                [$this, 'vacancyImportedOriginalCategoryRenderMetabox'],
                 'vacancy',
                 'advanced',
                 'default',
@@ -245,6 +275,79 @@ class Vacancy extends RegisterCPT
         echo '<input style="width: 100%; border: 1px solid rgba(209, 213, 219, 1); padding: 0.375rem 0.5rem; font-size: 1rem; line-height: 1.5rem; font-weight: 400;" type="text" id="rss-url-endpoint" readonly disabled value="' . $vacancy->getImportedAt('d F Y H:i:s') . '"/>';
         echo '</div>';
         echo '</div>';
+    }
+
+    /**
+     * Render category from API function
+     *
+     * @param WP_Post $post
+     * @param array $callback_arguments
+     * @return void
+     */
+    public function vacancyImportedOriginalCategoryRenderMetabox($post, $callback_arguments = [])
+    {
+        $vacancy    = new VacancyModel($post->ID);
+
+        /** Only run if vacancy is imported */
+        if ($vacancy->checkImported()) {
+            $apiTerms   = $vacancy->getVacancyOriginalCategory(true);
+
+            if ($apiTerms) {
+                $apiTerms   = maybe_unserialize($apiTerms);
+            } else {
+                $apiTerms   = [];
+            }
+
+            $output     = '<div style="display: flex; flex-direction: column; gap: 0.5rem;">';
+
+            /** Loop through taxonomy */
+            foreach (self::taxonomy as $slug => $label) {
+                $taxonomyData   = get_taxonomy($slug);
+                $values         = null;
+
+                if (array_key_exists($slug, $apiTerms) && isset($apiTerms[$slug])) {
+                    if (!empty($apiTerms)) {
+                        switch ($slug) {
+                            case 'working-hours':
+                                $values = $apiTerms[$slug]['from'] . ' - ' . $apiTerms[$slug]['to'];
+                                break;
+                            default:
+                                if (array_is_list($apiTerms[$slug])) {
+                                    $values = CollectionBag::collect($apiTerms[$slug])->column('label')->toArray();
+                                } else {
+                                    $values = CollectionBag::collect($apiTerms[$slug])->child('label')->toArray();
+                                }
+                                break;
+                        }
+                    } else {
+                        $values = '';
+                    }
+                } else {
+                    $values = '';
+                }
+
+                $output     .= '<div class="cs-flex cs-flex-col cs-flex-nowrap cs-items-start cs-gap-2">';
+                $output     .= '<label style="display: block; font-weight: bold; color: rgba(0, 0, 0, 1);" for="rv_vacancy_original_terms">' . $taxonomyData->label ?? $label . '</label>';
+
+                if (is_string($values)) {
+                    $output     .= '<input style="width: 100%; border: 1px solid rgba(209, 213, 219, 1); padding: 0.375rem 0.5rem; font-size: 1rem; line-height: 1.5rem; font-weight: bold;" type="text" id="rv_vacancy_original_terms" readonly disabled value="' . $values . '"/>';
+                } else if (is_array($values)) {
+                    $value      = '';
+                    foreach ($values as $val) {
+                        $value  .= '<span style="background: rgba(209, 213, 220, 1); padding: 0.125rem 0.25rem 0.125rem 0.25rem; font-size: 0.75rem; border-radius: 0.25rem;">' . $val . '</span>';
+                    }
+                    $output     .= '<div style="width: 100%; border: 1px solid rgba(209, 213, 219, 1); padding: 0.375rem 0.5rem; font-size: 1rem; line-height: 1.5rem; font-weight: bold; display: flex; gap: 0.25rem;" type="text" id="rv_vacancy_original_terms"/>';
+                    $output     .= $value;
+                    $output     .= '</div>';
+                }
+
+                $output     .= '</div>';
+            }
+
+            $output     .= '</div>';
+
+            echo $output;
+        }
     }
 
     public function vacancyColoumn($coloumn)
