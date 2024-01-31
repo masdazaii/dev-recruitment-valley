@@ -11,7 +11,6 @@ class DevelopersOptionPage
 {
     public function __construct()
     {
-        error_log('construct');
         add_action('admin_menu', [$this, 'menuDevOnlyPage']);
         add_action('admin_post_set_vacancy_type', [$this, 'actionSetJobType']);
     }
