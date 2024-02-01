@@ -3,7 +3,9 @@
 namespace MI\Role;
 
 use BD\Emails\Email;
-use MI\API\Model\Recruiter;
+use Log;
+use Model\Recruiter;
+use WP_User;
 
 defined('ABSPATH') || die("Can't access directly");
 
@@ -20,8 +22,8 @@ class RecruiterRole
         // add_filter("wp_pre_insert_user_data", [$this, 'interceptRecruiterUser'], 10, 4);
 
         /** Override the email function for case : Send link to change password. */
-        remove_action('register_new_user', 'wp_send_new_user_notifications');
-        add_action('register_new_user', [$this, 'customWPUserNotification']);
+        add_filter('wp_new_user_notification_email', [$this, 'customWPUserNotificationEmail'], 10, 3);
+        // add_filter('wp_new_user_notification_email_admin', [$this, 'customAdminWPUserNotificationEmail'], 10, 3);
     }
 
     public function addRecruiterRole()
@@ -56,56 +58,39 @@ class RecruiterRole
     // {
     //     return $data;
     // }
-    public function customWPUserNotification($user_id, $deprecated = null, $notify = '')
+
+    public function customWPUserNotificationEmail(array $wp_new_user_notification_email, WP_User $user, string $blogname)
     {
-        if ($deprecated !== null) {
-            _deprecated_argument(__FUNCTION__, '4.3.1');
-        }
-
-        global $wpdb;
-
-        /** Get user data */
-        // $user = get_userdata($user_id);
-        $user = Recruiter::find('id', $user_id);
-
-        /** Set Subject */
-        $site_title = get_bloginfo('name') ?? 'Recruitment Valley';
-        $subject    = "{$site_title} - Recruiters Account";
-
-        /** Send Email to User */
-        $args = [
-            'email'             => NULL,
-            'setPasswordURL'    => NULL,
+        /** Log attempt */
+        $logData = [
+            'request'   => [
+                'userNotifEmail'    => $wp_new_user_notification_email,
+                'user'              => $user->ID,
+                'blogname'          => $blogname
+            ],
+            'currentUserID' => get_current_user_id(),
         ];
 
-        $sendMail = Email::send(NULL, $subject, $args, 'new-recruiter-registered-email.php');
+        /** Set reset password key. */
+        $key    = wp_generate_uuid4();
+        $setKey = update_user_meta($user->ID, "reset_password_key", $key);
+        $reset_password_token = base64_encode($user->user_login . "_" . $key);
 
-        // Customize the email message
-        $message = "Hello " . $user->display_name . ",\n\n";
-        $message .= "Welcome to our site!\n\n";
-        $message .= "Your username: " . $user->user_login . "\n\n";
-        $message .= "You can log in at " . site_url('wp-login.php') . "\n\n";
-        $message .= "Thank you for joining us.";
+        /** Log Data */
+        $logData['isTokenSet'] = $setKey;
+        Log::info('Notification New Recruiter Account.', $logData, date('Y_m_d') . '_log_new_recruiter_registered', false);
 
-        // Set up email headers
-        $headers = 'From: ' . get_option('admin_email') . "\r\n";
-        $headers .= 'Content-Type: text/plain; charset=utf-8';
+        $args = [
+            'site_name'         => $blogname ?? get_bloginfo('name') ?? 'Recruitment Valley',
+            'user_email'        => isset($user->user_email) ? $user->user_email : '',
+            'set_password_url'  => FRONTEND_RESET_PASSWORD_PATH . "?key={$reset_password_token}",
+        ];
 
-        // Send the email to the user
-        wp_mail($user->user_email, $subject, $message, $headers);
+        $site_title = $blogname ?? get_bloginfo('name') ?? 'Recruitment Valley';
+        $wp_new_user_notification_email['subject']  = "{$site_title} - Recruiters Account";
+        $wp_new_user_notification_email['message']  = Email::render_html_email('new-recruiter-registered-email.php', $args);
 
-        // Send notification to admin
-        if ('admin' === $notify || empty($notify)) {
-            // Customize the admin email subject and message
-            $admin_subject = 'New User Registration: ' . $user->user_login;
-            $admin_message = "A new user has registered on your site:\n\n";
-            $admin_message .= "Username: " . $user->user_login . "\n";
-            $admin_message .= "Email: " . $user->user_email . "\n\n";
-            $admin_message .= "You can view and manage the user in the admin dashboard.";
-
-            // Send the email to the admin
-            wp_mail(get_option('admin_email'), $admin_subject, $admin_message, $headers);
-        }
+        return $wp_new_user_notification_email;
     }
 }
 

@@ -13,39 +13,42 @@ class Company
     public $user;
     public $vacancyModel;
 
-    private $dateOfBirth = "ucma_date_of_birth";
-    private $phone = "ucma_phone";
-    private $phoneCode = "ucma_phone_code";
-    private $country = "ucma_country";
-    private $city = "ucma_city";
-    private $isFullRegistered = "ucma_is_full_registered";
-    private $image = "ucma_image";
-    private $name = "ucma_company_name";
-    private $description = "ucma_short_decription";
-    private $totalEmployee = "ucma_employees";
-    private $website = "ucma_website_url";
+    protected $dateOfBirth = "ucma_date_of_birth";
+    protected $phone = "ucma_phone";
+    protected $phoneCode = "ucma_phone_code";
+    protected $country = "ucma_country";
+    protected $city = "ucma_city";
+    protected $isFullRegistered = "ucma_is_full_registered";
+    protected $image = "ucma_image";
+    protected $name = "ucma_company_name";
+    protected $description = "ucma_short_decription";
+    protected $totalEmployee = "ucma_employees";
+    protected $website = "ucma_website_url";
 
-    private $facebook = "ucma_facebook_url";
-    private $twitter = "ucma_twitter_url";
-    private $instagram = "ucma_instagram_url";
-    private $linkedin = "ucma_linkedin_url";
+    protected $facebook = "ucma_facebook_url";
+    protected $twitter = "ucma_twitter_url";
+    protected $instagram = "ucma_instagram_url";
+    protected $linkedin = "ucma_linkedin_url";
 
-    private $videoUrl = "ucma_company_video_url";
-    private $gallery = "ucma_gallery_photo";
+    protected $videoUrl = "ucma_company_video_url";
+    protected $gallery = "ucma_gallery_photo";
 
-    private $credit = "company_credit";
+    protected $credit = "company_credit";
 
-    private $secondaryEmploymentCondition = "ucma_benefit";
+    protected $secondaryEmploymentCondition = "ucma_benefit";
 
-    private $_isOnUnlimited = "company_on_unlimited";
-    private $_unlimitedExpiredDate = "company_unlimited_expired_date";
+    protected $_isOnUnlimited = "company_on_unlimited";
+    protected $_unlimitedExpiredDate = "company_unlimited_expired_date";
 
-    private $_companyLatitude = "ucma_company_latitude";
-    private $_companyLongitude = "ucma_company_longitude";
+    protected $_companyLatitude = "ucma_company_latitude";
+    protected $_companyLongitude = "ucma_company_longitude";
 
     /** Added Line */
-    private $_acfSector = "ucma_sector";
-    private $_acfCountryCode = "ucma_company_country_code";
+    protected $_acfSector = "ucma_sector";
+    protected $_acfCountryCode = "ucma_company_country_code";
+
+    /** Indicate if current initialization is for child company */
+    protected $isChild = false;
 
     public function __construct($userId = false)
     {
@@ -199,7 +202,7 @@ class Company
         return $this->getProp($this->videoUrl) ?? "";
     }
 
-    public function getProp($acf_field, $single = false)
+    public function getProp(String $acf_field, Bool $single = false, String $type = 'acf')
     {
         return get_field($acf_field, "user_" . $this->user_id, $single);
     }
@@ -350,5 +353,21 @@ class Company
     public function getCountryCode()
     {
         return $this->getProp($this->_acfCountryCode, true);
+    }
+
+    /**
+     * Check ID function
+     *
+     * Check if current initialization is already specify ID or not.
+     * This method should call for model that connected or belong to another stronger entity.
+     * e.g : user meta, post meta, term meta, etc.
+     *
+     * @return void
+     */
+    public function checkID()
+    {
+        if (!isset($this->user_id) || empty($this->user_id)) {
+            throw new Exception('Please specify the ID!');
+        }
     }
 }

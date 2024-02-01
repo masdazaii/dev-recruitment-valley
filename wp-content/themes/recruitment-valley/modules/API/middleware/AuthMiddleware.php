@@ -155,6 +155,27 @@ class AuthMiddleware
         return true;
     }
 
+    public function authorize_company_recruiter(WP_REST_Request $request)
+    {
+        $allowed        = ["recruiter"];
+        $handleToken    = $this->_handle_token($request);
+
+        if (is_wp_error($handleToken)) {
+            return $handleToken;
+        }
+
+        $request->set_param('user_id', $handleToken->user_id);
+        $user = get_user_by('ID', $handleToken->user_id);
+
+        if ($user === false) return new WP_Error("rest_forbidden", $this->_message->get('auth.unauthenticate'), array("status" => 403));
+
+        if (!in_array(strtolower($user->roles[0]), $allowed)) {
+            return new WP_Error("rest_forbidden", $this->_message->get('auth.unauthenticate'), array("status" => 403));
+        }
+
+        return true;
+    }
+
     public function authorize_both(WP_REST_Request $request)
     {
         $allowed = ['candidate', 'company'];

@@ -1,6 +1,6 @@
 <?php
 
-namespace MI\Base\Controller;
+namespace Controller;
 
 defined("ABSPATH") or die("Direct access not allowed!");
 

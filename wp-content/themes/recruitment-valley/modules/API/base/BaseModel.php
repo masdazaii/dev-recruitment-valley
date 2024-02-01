@@ -1,6 +1,6 @@
 <?php
 
-namespace MI\API\Model;
+namespace Model;
 
 use Exception;
 
@@ -31,16 +31,23 @@ abstract class BaseModel
      * @param String $key   : Meta / ACF Key without the prefix.
      * @param mixed $value  : Value to set.
      * @param string $type  : Type of meta. Value must be : acf | meta | option
+     * @param boolean $autoload  : Is option autoload
      * @return Mixed
      */
-    public function set(String $key, mixed $value, String $type = 'acf')
+    public function set(String $key, mixed $value, String $type = 'acf', Bool $autoload = false)
     {
         /** Get current initialized object. */
         $this->model = get_class($this);
 
+        if ($this->selector !== 'option') {
+            $this->checkID();
+        }
+
         if ($type == 'meta') {
-            if (in_array(strtolower($this->model), ["RecruiterModel"])) {
+            if ($this->selector == 'user_' || $this->selector == 'user') {
                 return update_user_meta($this->id, $this->prefix . $key, $value);
+            } else if ($this->selector == 'option') {
+                return update_option($this->prefix . $key, $value, $autoload);
             } else {
                 return update_post_meta($this->id, $this->prefix . $key, $value);
             }
@@ -63,6 +70,10 @@ abstract class BaseModel
      */
     public function get(String $key, bool $result = true, String $type = 'meta')
     {
+        if ($this->selector !== 'option') {
+            $this->checkID();
+        }
+
         if ($type == 'meta') {
             if (strpos($this->selector, 'user') !== false) {
                 return get_user_meta($this->id, $this->prefix . $key, $result);

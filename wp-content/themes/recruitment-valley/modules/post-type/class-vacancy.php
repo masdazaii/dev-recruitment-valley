@@ -541,7 +541,7 @@ class Vacancy extends RegisterCPT
 
     public function vacancyCustomFilterRender($post_type, $which)
     {
-        if (is_admin()) {
+        if (is_admin() && current_user_can('administrator')) {
             if ($post_type == 'vacancy' && $which == 'top') {
                 try {
                     /** Get status terms */
