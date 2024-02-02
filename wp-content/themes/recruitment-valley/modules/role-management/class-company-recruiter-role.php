@@ -3,20 +3,27 @@
 namespace MI\Role;
 
 use BD\Emails\Email;
+use Exception;
 use Log;
+use Model\CompanyRecruiter;
 use Model\Recruiter;
+use WP_Error;
 use WP_User;
 
 defined('ABSPATH') || die("Can't access directly");
 
 class RecruiterRole
 {
+    private const role = 'recruiter';
     public function __construct()
     {
-        add_action('admin_init', [$this, 'addRecruiterRole']);
+        add_action('admin_init', [$this, 'addCompanyRecruiterRole']);
 
         // When theme is deactived
         add_action('switch_theme', [$this, 'themeDeactivated'], 10, 3);
+
+        /** Add meta after user with this role is registered */
+        add_action('user_register', [$this, 'addCompanyRecruiterMeta'], 10, 2);
 
         /** Intercept user new registration for case : Send real generated password to email. */
         // add_filter("wp_pre_insert_user_data", [$this, 'interceptRecruiterUser'], 10, 4);
@@ -26,10 +33,10 @@ class RecruiterRole
         // add_filter('wp_new_user_notification_email_admin', [$this, 'customAdminWPUserNotificationEmail'], 10, 3);
     }
 
-    public function addRecruiterRole()
+    public function addCompanyRecruiterRole()
     {
-        remove_role('recruiter');
-        add_role('recruiter', 'Recruiter', []);
+        remove_role(self::role);
+        add_role(self::role, 'Recruiter', []);
     }
 
     /**
@@ -42,7 +49,7 @@ class RecruiterRole
      */
     public function theme_deactivated($new_name, $new_theme, $old_theme)
     {
-        remove_role('recruiter');
+        remove_role(self::role);
     }
 
     /**
@@ -59,12 +66,20 @@ class RecruiterRole
     //     return $data;
     // }
 
-    public function customWPUserNotificationEmail(array $wp_new_user_notification_email, WP_User $user, string $blogname)
+    /**
+     * Override Email Notification function
+     *
+     * @param array $newUserNotificationEmail
+     * @param WP_User $user
+     * @param string $blogname
+     * @return void
+     */
+    public function customWPUserNotificationEmail(array $newUserNotificationEmail, WP_User $user, string $blogname)
     {
         /** Log attempt */
         $logData = [
             'request'   => [
-                'userNotifEmail'    => $wp_new_user_notification_email,
+                'userNotifEmail'    => $newUserNotificationEmail,
                 'user'              => $user->ID,
                 'blogname'          => $blogname
             ],
@@ -87,10 +102,40 @@ class RecruiterRole
         ];
 
         $site_title = $blogname ?? get_bloginfo('name') ?? 'Recruitment Valley';
-        $wp_new_user_notification_email['subject']  = "{$site_title} - Recruiters Account";
-        $wp_new_user_notification_email['message']  = Email::render_html_email('new-recruiter-registered-email.php', $args);
+        $newUserNotificationEmail['subject']  = "{$site_title} - Recruiters Account";
+        $newUserNotificationEmail['message']  = Email::render_html_email('new-recruiter-registered-email.php', $args);
 
-        return $wp_new_user_notification_email;
+        return $newUserNotificationEmail;
+    }
+
+    public function addCompanyRecruiterMeta(Int $userID, array $userdata = [])
+    {
+        /** Log attempt */
+        $logData = [
+            'request'   => [
+                'user'      => $userID,
+                'userData'  => $userdata
+            ],
+            'currentUserID' => get_current_user_id(),
+        ];
+        Log::info('After New Recruiter Account Registered.', $logData, date('Y_m_d') . '_log_new_recruiter_registered', false);
+
+        if (is_admin() && current_user_can('administrator')) {
+            if ($userID) {
+                $user = get_user_by('id', $userID);
+                if ($user && $user instanceof WP_User) {
+                    if ($user->roles[0] == self::role) {
+                        $companyRecruiter = CompanyRecruiter::find("id", $userID);
+
+                        $set['otp'] = $companyRecruiter->setOTPIsVerified(true);
+
+                        /** Log attempt */
+                        $logData['set'] = $set;
+                        Log::info('After New Recruiter Account Registered.', json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_new_recruiter_registered', false);
+                    }
+                }
+            }
+        }
     }
 }
 

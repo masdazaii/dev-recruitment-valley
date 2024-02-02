@@ -49,7 +49,7 @@ class Log
      * @param  string $fileName by default we save the log into debug.log file
      * @return void
      */
-    public static function error(string $message, array $data = null, string $fileName = 'debug', $devLog = false): void
+    public static function error(string $message, Mixed $data = null, string $fileName = 'debug', Bool $devLog = false): void
     {
         self::print('error', $message, $data, $fileName, $devLog);
     }
@@ -65,7 +65,7 @@ class Log
      * @param  string $fileName by default we save the log into debug.log file
      * @return void
      */
-    public static function info($message, $data = null, $fileName = 'debug', $devLog = false): void
+    public static function info(String $message, Mixed $data = null, String $fileName = 'debug', Bool $devLog = false): void
     {
         self::print('info', $message, $data, $fileName, $devLog);
     }

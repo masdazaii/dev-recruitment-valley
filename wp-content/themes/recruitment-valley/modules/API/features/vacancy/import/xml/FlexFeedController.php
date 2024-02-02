@@ -16,7 +16,7 @@ use Model\Option;
 use Model\Term;
 use BD\Emails\Email;
 use Constant\Message;
-use MI\Base\Controller\BaseHandlerController;
+use Controller\BaseHandlerController;
 use Log;
 
 class FlexFeedController

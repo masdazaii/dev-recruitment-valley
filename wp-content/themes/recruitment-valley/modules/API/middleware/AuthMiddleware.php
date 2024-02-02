@@ -116,7 +116,7 @@ class AuthMiddleware
         // $request->set_param('user_id', $request->user_id); // this will take the user_id of the currently logged in user
         $request->set_param('user_id', $handleToken->user_id);
         $request->set_param('email', $handleToken->user_email);
-        return true;
+        return $request;
     }
 
     public function authorize_company(WP_REST_Request $request)
@@ -152,7 +152,7 @@ class AuthMiddleware
             return new WP_Error("rest_forbidden", $this->_message->get('auth.unauthenticate'), array("status" => 403));
         }
 
-        return true;
+        return $request;
     }
 
     public function authorize_company_recruiter(WP_REST_Request $request)
@@ -173,7 +173,7 @@ class AuthMiddleware
             return new WP_Error("rest_forbidden", $this->_message->get('auth.unauthenticate'), array("status" => 403));
         }
 
-        return true;
+        return $request;
     }
 
     public function authorize_both(WP_REST_Request $request)

@@ -15,7 +15,7 @@ use Constant\Message;
 use Vacancy\Vacancy;
 use WP_Error;
 use Aws\Exception\AwsException;
-use MI\Base\Controller\BaseHandlerController;
+use Controller\BaseHandlerController;
 use Log;
 use Throwable;
 

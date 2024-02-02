@@ -29,7 +29,7 @@ class CompanyRecruiterEndpoint
                     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
                     'callback'              => [$companyRecruiterService, 'setup']
                 ],
-                'get_my_profile'            => [
+                'get_recruiter_profile'     => [
                     'url'                   => 'profile',
                     'methods'               => 'GET',
                     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
@@ -53,17 +53,17 @@ class CompanyRecruiterEndpoint
                     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
                     'callback'              => [$companyRecruiterService, 'storeInformation']
                 ],
-                'delete_profile_gallery'    => [
-                    'url'                   => 'profile/gallery/(?P<id>[-\w]+)',
-                    'methods'               => 'DELETE',
-                    'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
-                    'args' => [
-                        'id' => [
-                            'type'        => 'string',
-                        ]
-                    ],
-                    'callback'              =>  [$companyRecruiterService, 'deleteGalleryItem']
-                ],
+                // 'delete_profile_gallery'    => [
+                //     'url'                   => 'profile/gallery/(?P<id>[-\w]+)',
+                //     'methods'               => 'DELETE',
+                //     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
+                //     'args' => [
+                //         'id' => [
+                //             'type'        => 'string',
+                //         ]
+                //     ],
+                //     'callback'              =>  [$companyRecruiterService, 'deleteGalleryItem']
+                // ],
             ]
 
         ];

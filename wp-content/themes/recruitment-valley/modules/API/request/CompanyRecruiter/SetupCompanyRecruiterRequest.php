@@ -10,7 +10,7 @@ class SetupCompanyRecruitmentRequest extends BaseRequest
 {
     public function __construct(WP_REST_Request $request)
     {
-        parent::__construct();
+        parent::__construct($request);
         $this->request      = $request;
         $this->validator    = Validator::make($this->request->get_params(), self::rules(), self::messages(), self::sanitizer());
     }

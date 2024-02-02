@@ -63,22 +63,25 @@ class Message
                 'registration_success' => __("We hebben de OTP code naar je email verzonden.", THEME_DOMAIN),
                 'not_registered' => __("Een gebruiker met het opgegeven email adres is nog niet geregistreerd.", THEME_DOMAIN)
             ],
-            'profile' => [
+            'profile'   => [
                 'setup' => [
-                    'success' =>  __("Profiel success bewerkt", THEME_DOMAIN),
-                    'failed' =>  __("Profiel is niet met success bewerkt", THEME_DOMAIN),
+                    'success'   =>  __("Profiel success bewerkt", THEME_DOMAIN),
+                    'failed'    =>  __("Profiel is niet met success bewerkt!%s", THEME_DOMAIN),
                 ],
-                'update' => [
-                    'success' =>  __("Profel is succesvol bewerkt", THEME_DOMAIN),
-                    'photo' => [
-                        "success" => __("Profiel foto is succesvol geupdate", THEME_DOMAIN)
+                'update'        => [
+                    'success'       =>  __("Profel is succesvol bewerkt", THEME_DOMAIN),
+                    'photo'         => [
+                        "success"   => __("Profiel foto is succesvol geupdate", THEME_DOMAIN)
                     ],
-                    'cv' => [
-                        "success" =>  __("CV is succesvol geupdate", THEME_DOMAIN)
+                    'cv'        => [
+                        "success"   =>  __("CV is succesvol geupdate", THEME_DOMAIN)
                     ],
-                    'phone' => [
+                    'phone'     => [
                         "already_exists" => __("Telefoonnummer is al geregistreerd.", THEME_DOMAIN)
                     ]
+                ],
+                'get'       => [
+                    'success'   => __("Succes gegevensprofiel ophalen!%s", THEME_DOMAIN)
                 ],
                 'delete' => [
                     "success" => __("Succes, wachtwoord is gewijzigd", THEME_DOMAIN),
@@ -249,7 +252,7 @@ class Message
                 ]
             ],
             'system' => [
-                'overall_failed' => __('Systeemfout.', THEME_DOMAIN),
+                'overall_failed' => __('Systeemfout!%s', THEME_DOMAIN),
             ],
             'option' => [
                 "company" => [
@@ -308,14 +311,23 @@ class Message
         ];
     }
 
-    public function get($message_location): string|array
+    public function get($message_location, $messages = []): string|array
     {
         $keys = explode('.', $message_location);
         $message = $this->list;
 
         foreach ($keys as $key) {
             if (isset($message[$key])) {
-                $message = $message[$key];
+                // $message = $message[$key];
+                if (is_string($message[$key])) {
+                    if (!empty($messages)) {
+                        $message    = vsprintf($message[$key], $messages);
+                    } else {
+                        $message    = $message[$key];
+                    }
+                } else {
+                    $message    = $message[$key];
+                }
             } else {
                 return ""; // Key not found, return null or any other default value you prefer.
             }

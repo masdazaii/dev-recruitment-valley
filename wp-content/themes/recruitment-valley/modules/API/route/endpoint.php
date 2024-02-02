@@ -88,7 +88,7 @@ class Endpoint
 
         /** v3 */
         $this->_run_list_endpoint($this->API, $this->versionThree, $companyRecruiter['path'], $companyRecruiter['endpoints']);
-        $this->_run_list_endpoint($this->API, $this->versionThree, $childCompanyRecruiter['path'], $childCompanyRecruiter['endpoints']);
+        // $this->_run_list_endpoint($this->API, $this->versionThree, $childCompanyRecruiter['path'], $childCompanyRecruiter['endpoints']);
     }
 
     /**

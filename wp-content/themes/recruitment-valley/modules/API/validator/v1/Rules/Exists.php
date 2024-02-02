@@ -16,7 +16,7 @@ class ExistsRule implements Rule
             $type = $params[1];
             $column = $params[2];
 
-            if (strpos($field, '.*') !== false) {
+            if (is_array($value)) {
                 $checkValue = [];
                 foreach ($value as $key => $values) {
                     $checkValue[$key] = $this->check($values, $table, $type, $column);
