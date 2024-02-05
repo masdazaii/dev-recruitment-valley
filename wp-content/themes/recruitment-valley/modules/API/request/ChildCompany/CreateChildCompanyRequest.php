@@ -1,12 +1,12 @@
 <?php
 
-namespace Request\CompanyRecruiter;
+namespace Request\ChildCompany;
 
 use Request\BaseRequest;
 use ValidifyMI\Validator;
 use WP_REST_Request;
 
-class SetupCompanyRecruitmentRequest extends BaseRequest
+class CreateChildCompanyRequest extends BaseRequest
 {
     public function __construct(WP_REST_Request $request)
     {
@@ -38,7 +38,7 @@ class SetupCompanyRecruitmentRequest extends BaseRequest
             "shortDescription"              => [],
             "secondaryEmploymentConditions" => [],
             "companyVideo"                  => ["max_file_size:2000000"],
-            "image"                         => [],
+            "image"                         => ["max_file_size:2000000"],
             "longitude"                     => [],
             "latitude"                      => [],
             "countryCode"                   => []
@@ -60,6 +60,7 @@ class SetupCompanyRecruitmentRequest extends BaseRequest
             "city.required"         => __("City is required!", THEME_DOMAIN),
             "street.required"       => __("Street is required!", THEME_DOMAIN),
             "postCode.required"     => __("Post Code is required!", THEME_DOMAIN),
+            "image.max_file_size"   => __("Max file size is 2MB", THEME_DOMAIN),
             "companyVideo.max_file_size"    => __("Max file size is 2MB", THEME_DOMAIN)
         ];
     }

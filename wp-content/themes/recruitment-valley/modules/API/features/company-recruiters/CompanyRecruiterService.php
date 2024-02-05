@@ -3,11 +3,11 @@
 namespace Service;
 
 use Controller\CompanyRecruiterController;
-use Request\SetupCompanyRecruitmentRequest;
-use Request\StoreAddressCompanyRecruitmentRequest;
-use Request\StoreDetailCompanyRecruitmentRequest;
-use Request\StoreSocialCompanyRecruitmentRequest;
-use Request\StoreInformationCompanyRecruiterRequest;
+use Request\CompanyRecruiter\SetupCompanyRecruitmentRequest;
+use Request\CompanyRecruiter\StoreAddressCompanyRecruitmentRequest;
+use Request\CompanyRecruiter\StoreDetailCompanyRecruitmentRequest;
+use Request\CompanyRecruiter\StoreSocialCompanyRecruitmentRequest;
+use Request\CompanyRecruiter\StoreInformationCompanyRecruiterRequest;
 use ResponseHelper;
 use WP_REST_Request;
 

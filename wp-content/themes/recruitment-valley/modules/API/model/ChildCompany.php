@@ -41,6 +41,21 @@ class ChildCompany extends Company
         }
     }
 
+    public static function insert(array $data): self
+    {
+        $postModel      = new PostModel();
+        $childCompany   = $postModel->create($data);
+        if ($childCompany) {
+            if ($childCompany instanceof WP_Error) {
+                throw $childCompany;
+            }
+
+            return new self($childCompany);
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Getter acf value function
      *
@@ -68,13 +83,29 @@ class ChildCompany extends Company
      *
      * @param String $acf_field
      * @param boolean $single
-     * @return void
+     * @return mixed Int|Bool on false
      */
-    public function setProp($acf_field, $value, $repeater = false)
+    public function setProp($acf_field, $value, $repeater = false, $type = 'acf'): mixed
     {
         $this->checkID();
 
-        return update_field($acf_field, $value, $this->user_id);
+        if ($type == 'meta') {
+            return update_post_meta($this->user_id, $acf_field, $value);
+        } else {
+            return update_field($acf_field, $value, $this->user_id);
+        }
+    }
+
+    /**
+     * Set Child Company Name function.
+     *
+     * Override method in Company Model with same name.
+     *
+     * @return mixed Int|Bool on false
+     */
+    public function setName(String $value): mixed
+    {
+        return $this->setProp($this->name, $value, false);
     }
 
     /**
@@ -82,7 +113,7 @@ class ChildCompany extends Company
      *
      * Override method in Company Model with same name.
      *
-     * @return void
+     * @return mixed
      */
     public function getName()
     {
@@ -94,7 +125,7 @@ class ChildCompany extends Company
      *
      * Override method in Company Model with same name.
      *
-     * @return void
+     * @return mixed
      */
     public function getEmail()
     {
@@ -141,7 +172,7 @@ class ChildCompany extends Company
     /**
      * Get Company Recruiter name function
      *
-     * @return void
+     * @return mixed
      */
     public function getRecruiterCompanyOwner()
     {

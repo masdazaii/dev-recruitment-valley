@@ -3,11 +3,13 @@
 namespace Route;
 
 use Middleware\AuthMiddleware;
+use Service\ChildCompanyService;
 use Service\CompanyRecruiterService;
 
 class CompanyRecruiterEndpoint
 {
     private $endpoint = [];
+    private const uri_child_company = "/child-company";
 
     public function __construct()
     {
@@ -18,6 +20,7 @@ class CompanyRecruiterEndpoint
     {
         $authMiddleware             = new AuthMiddleware();
         $companyRecruiterService    = new CompanyRecruiterService();
+        $childCompanyService        = new ChildCompanyService();
 
         $endpoint = [
             'path' => 'company-recruiter',
@@ -63,6 +66,64 @@ class CompanyRecruiterEndpoint
                 //         ]
                 //     ],
                 //     'callback'              =>  [$companyRecruiterService, 'deleteGalleryItem']
+                // ],
+
+                /** Child Company Endpoint - Start Here */
+                'create_child_company'      => [
+                    'url'                   => self::uri_child_company,
+                    'methods'               => 'POST',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
+                    'callback'              => [$childCompanyService, 'createChildCompany']
+                ],
+                // 'list_child_company'        => [
+                //     'url'                   => self::uri_child_company,
+                //     'methods'               => 'GET',
+                //     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
+                //     'callback'              => [$childCompanyService, 'list']
+                // ],
+                // 'show_child_company'        => [
+                //     'url'                   => self::uri_child_company . "/(?P<childCompany>[-\w]+)",
+                //     'methods'               => 'GET',
+                //     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
+                //     'args' => [
+                //         'childCompany'      => [
+                //             'type'          => 'string',
+                //         ]
+                //     ],
+                //     'callback'              => [$childCompanyService, 'show']
+                // ],
+                // 'update_post_child_company' => [
+                //     'url'                   => self::uri_child_company . "/(?P<childCompany>[-\w]+)",
+                //     'methods'               => 'POST',
+                //     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
+                //     'args' => [
+                //         'childCompany'      => [
+                //             'type'          => 'string',
+                //         ]
+                //     ],
+                //     'callback'              => [$childCompanyService, 'update']
+                // ],
+                // 'update_put_child_company'  => [
+                //     'url'                   => self::uri_child_company . "/(?P<childCompany>[-\w]+)",
+                //     'methods'               => 'PUT',
+                //     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
+                //     'args' => [
+                //         'childCompany'      => [
+                //             'type'          => 'string',
+                //         ]
+                //     ],
+                //     'callback'              => [$childCompanyService, 'update']
+                // ],
+                // 'delete_child_company'      => [
+                //     'url'                   => self::uri_child_company . "/(?P<childCompany>[-\w]+)",
+                //     'methods'               => 'DELETE',
+                //     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
+                //     'args' => [
+                //         'childCompany'      => [
+                //             'type'          => 'string',
+                //         ]
+                //     ],
+                //     'callback'              => [$childCompanyService, 'delete']
                 // ],
             ]
 

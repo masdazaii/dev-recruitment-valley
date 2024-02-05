@@ -1,6 +1,6 @@
 <?php
 
-namespace Request;
+namespace Request\CompanyRecruiter;
 
 use Request\BaseRequest;
 use ValidifyMI\Validator;

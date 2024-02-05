@@ -21,7 +21,6 @@ class Endpoint
     private $sitemapEndpoint = [];
     private $webhookEndpoint = [];
     private $companyRecruiterEndpoint       = [];
-    private $childCompanyRecruiterEndpoint  = [];
 
     /**
      * __construct
@@ -54,9 +53,6 @@ class Endpoint
         $companyRecruiterEndpoint       = new CompanyRecruiterEndpoint();
         $this->companyRecruiterEndpoint = $companyRecruiterEndpoint->get();
 
-        // $childCompanyRecruiterEndpoint          = new Endpoint();
-        // $this->childCompanyRecruiterEndpoint    = $childCompanyRecruiterEndpoint->get();
-
         add_action('rest_api_init', [$this, 'register_endpoint']);
     }
 
@@ -76,7 +72,6 @@ class Endpoint
         $sitemap = $this->sitemapEndpoint;
         $webhook = $this->webhookEndpoint;
         $companyRecruiter       = $this->companyRecruiterEndpoint;
-        $childCompanyRecruiter  = $this->childCompanyRecruiterEndpoint;
 
         $this->_run_list_endpoint($this->API, $this->version, $vacancy["path"], $vacancy["endpoints"]);
         $this->_run_list_endpoint($this->API, $this->version, $candidate["path"], $candidate["endpoints"]);
@@ -88,7 +83,6 @@ class Endpoint
 
         /** v3 */
         $this->_run_list_endpoint($this->API, $this->versionThree, $companyRecruiter['path'], $companyRecruiter['endpoints']);
-        // $this->_run_list_endpoint($this->API, $this->versionThree, $childCompanyRecruiter['path'], $childCompanyRecruiter['endpoints']);
     }
 
     /**
