@@ -12,14 +12,15 @@ class ExistsRule implements Rule
             return true;
         } else {
             $params = explode('/', $parameters[0]);
-            $table = $params[0];
-            $type = $params[1];
+            $table  = $params[0];
+            $type   = $params[1];
             $column = $params[2];
+            $key    = isset($params[3]) ? $params[3] : null;
 
             if (is_array($value)) {
                 $checkValue = [];
                 foreach ($value as $key => $values) {
-                    $checkValue[$key] = $this->check($values, $table, $type, $column);
+                    $checkValue[$key] = $this->check($values, $table, $type, $column, $key);
                 }
 
                 return in_array(false, $checkValue) ? false : true;
@@ -30,7 +31,7 @@ class ExistsRule implements Rule
         }
     }
 
-    public function check($value, $table, $type, $column): bool
+    public function check($value, $table, $type, $column, $key = null): bool
     {
         switch ($table) {
             case 'user':
@@ -62,10 +63,20 @@ class ExistsRule implements Rule
 
                 switch ($column) {
                     case 'post_id':
-                        $args['post__in'] = [$value];
+                        $args['post__in']   = is_array($value) ? $value : [$value];
                         break;
                     case 'post_name':
-                        $args['name'] = $value;
+                        $args['name']       = $value;
+                        break;
+                    case 'meta':
+                        $args['meta_query'] = [
+                            'relation'      => 'AND',
+                            [
+                                'key'       => $key,
+                                'value'     => $value,
+                                'compare'   => '='
+                            ]
+                        ];
                         break;
                 }
 

@@ -47,6 +47,9 @@ class ChildCompanyController extends BaseController
             ];
             $childCompany   = ChildCompany::insert($data);
 
+            /** Log Data */
+            $logData['childCompanyID']  = $childCompany->user_id;
+
             /** Set ACF / Meta */
 
             /** Set recruiter owner */
@@ -56,7 +59,8 @@ class ChildCompanyController extends BaseController
             $setup['uuid']          = $childCompany->setUUID($uuid);
 
             /** Required */
-            $setup['childCompanyName'] = $childCompany->setName($request['companyName']);
+            $setup['childCompanyName']  = $childCompany->setName($request['companyName']);
+            $setup['childCompanyEmail'] = $childCompany->setEmail($request['companyEmail']);
             $setup['country']       = $childCompany->setCountry($request['country']);
             $setup['countryCode']   = $childCompany->setCountryCode($request['countryCode']);
             $setup['city']          = $childCompany->setCity($request['city']);
@@ -192,7 +196,7 @@ class ChildCompanyController extends BaseController
 
                 return [
                     "status"    => 500,
-                    "message"   => $this->message->get("registration.overall_failed", ['Failed store user data.']),
+                    "message"   => $this->message->get("system.overall_failed", [' Failed store child company data.']),
                 ];
             }
 
@@ -284,14 +288,77 @@ class ChildCompanyController extends BaseController
                 ]
             ];
         } catch (\WP_Error $wp_error) {
-
             return $this->handleError($wp_error, __CLASS__, __METHOD__, $logData, 'log_store_child_company');
         } catch (Exception $e) {
-
             return $this->handleError($e, __CLASS__, __METHOD__, $logData, 'log_store_child_company');
         } catch (Throwable $th) {
-
             return $this->handleError($th, __CLASS__, __METHOD__, $logData, 'log_store_child_company');
+        }
+    }
+
+    /**
+     * Show Single child company function
+     *
+     * @param array $request
+     * @return array
+     */
+    public function show(array $request): array
+    {
+        /** Log Attempt */
+        $logData = [
+            'request'   => $request
+        ];
+        Log::info("Show Child Company attempt.", json_encode($logData, JSON_PRETTY_PRINT), date("Y_m_d") . "_log_show_child_company");
+
+        try {
+            if (is_numeric($request['childCompany'])) {
+                $childCompanyModel = ChildCompany::find('id', $request['childCompany']);
+            } else if (is_string($request['childCompany']) && (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $request['childCompany']) == 1)) {
+                $childCompanyModel = ChildCompany::find('uuid', $request['childCompany']);
+            } else if (strpos($request['childCompany'], '-') != false) {
+                $childCompanyModel = ChildCompany::find('slug', $request['childCompany']);
+            } else {
+                $childCompanyModel = ChildCompany::find('slug', $request['childCompany']);
+            }
+
+            if ($childCompanyModel->user) {
+                $owner = $childCompanyModel->getChildCompanyOwner();
+                if ($owner->ID == $request['user_id']) {
+                    /** Log Attempt */
+                    $logData['message'] = 'SUCCESS!';
+                    Log::info("END Child Company attempt.", json_encode($logData, JSON_PRETTY_PRINT), date("Y_m_d") . "_log_show_child_company");
+
+                    return [
+                        "status"    => 200,
+                        "message"   => $this->message->get("company_recruiter.child_company.show_success", [""]),
+                        "data"      => ChildCompanyResource::single($childCompanyModel->user)
+                    ];
+                } else {
+                    /** Log Attempt */
+                    $logData['message'] = 'UNAUTHORIZED!';
+                    Log::error("Fail Child Company attempt.", json_encode($logData, JSON_PRETTY_PRINT), date("Y_m_d") . "_log_show_child_company");
+
+                    return [
+                        "status"    => 403,
+                        "message"   => $this->message->get("auth.unauthorize", [""]),
+                    ];
+                }
+            } else {
+                /** Log Attempt */
+                $logData['message'] = 'NOT FOUND!';
+                Log::error("Fail Child Company attempt.", json_encode($logData, JSON_PRETTY_PRINT), date("Y_m_d") . "_log_show_child_company");
+
+                return [
+                    "status"    => 404,
+                    "message"   => $this->message->get("company_recruiter.child_company.show_not_found", [""]),
+                ];
+            }
+        } catch (\WP_Error $wp_error) {
+            return $this->handleError($wp_error, __CLASS__, __METHOD__, $logData, 'log_show_child_company');
+        } catch (Exception $e) {
+            return $this->handleError($e, __CLASS__, __METHOD__, $logData, 'log_show_child_company');
+        } catch (Throwable $th) {
+            return $this->handleError($th, __CLASS__, __METHOD__, $logData, 'log_show_child_company');
         }
     }
 }

@@ -52,6 +52,7 @@ class Company
     protected $_acfStreet       = "ucma_street";
     protected $_acfKvkNumber    = "ucma_kvk_number";
     protected $_acfBtwNumber    = "ucma_btw_number";
+    protected $_acfCompanyEmail = "ucma_company_email";
 
     /** Indicate if current initialization is for child company */
     protected $isChild  = false;
@@ -149,7 +150,7 @@ class Company
      */
     public function setShortDescription(String $value): mixed
     {
-        $this->setProp($this->description, $value, false, 'acf');
+        return $this->setProp($this->description, $value, false, 'acf');
     }
 
     public function getPhone()
@@ -441,6 +442,41 @@ class Company
     }
 
     /**
+     * Set Sector ACF function
+     *
+     * @param Mixed $value : most likely is array of numeric string
+     * @return mixed Int|Bool on false
+     */
+    public function getSector(): mixed
+    {
+        $value  = $this->getProp($this->_acfSector, true, 'acf');
+        if ($value) {
+            if (is_array($value)) {
+                $terms  = get_terms([
+                    'taxonomy'      => 'sector',
+                    'include'       => $value ?? [],
+                    'hide_empty'    => false
+                ]);
+
+                $termsResponse = [];
+
+                foreach ($terms as $term) {
+                    $termsResponse[] = [
+                        'label' => $term->name,
+                        'value' => $term->term_id,
+                    ];
+                }
+
+                return $termsResponse;
+            } else {
+                return $value;
+            }
+        } else {
+            return $value;
+        }
+    }
+
+    /**
      * Get Company City ACF function
      *
      * @return void
@@ -599,7 +635,7 @@ class Company
      */
     public function setPostCode(String $value): mixed
     {
-        return $this->getProp($this->_acfPostcode, $value, false, 'acf');
+        return $this->setProp($this->_acfPostcode, $value, false, 'acf');
     }
 
     /**
@@ -620,7 +656,7 @@ class Company
      */
     public function setStreet(String $value): mixed
     {
-        return $this->getProp($this->_acfStreet, $value, false, 'acf');
+        return $this->setProp($this->_acfStreet, $value, false, 'acf');
     }
 
     /**

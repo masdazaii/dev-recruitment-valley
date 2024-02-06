@@ -2,6 +2,7 @@
 
 defined('ABSPATH') || die("Can't access directly");
 
+require_once __DIR__ . '/PostModel.php';
 require_once __DIR__ . '/Applicant.php';
 require_once __DIR__ . '/Company.php';
 require_once __DIR__ . '/CompanyRecruiter.php';

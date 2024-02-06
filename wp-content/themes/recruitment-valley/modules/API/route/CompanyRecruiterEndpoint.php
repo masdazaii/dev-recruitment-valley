@@ -79,52 +79,32 @@ class CompanyRecruiterEndpoint
                     'url'                   => self::uri_child_company,
                     'methods'               => 'GET',
                     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
-                    'callback'              => [$childCompanyService, 'list']
+                    'callback'              => [$childCompanyService, 'listChildCompany']
                 ],
-                // 'show_child_company'        => [
-                //     'url'                   => self::uri_child_company . "/(?P<childCompany>[-\w]+)",
-                //     'methods'               => 'GET',
-                //     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
-                //     'args' => [
-                //         'childCompany'      => [
-                //             'type'          => 'string',
-                //         ]
-                //     ],
-                //     'callback'              => [$childCompanyService, 'show']
-                // ],
-                // 'update_post_child_company' => [
-                //     'url'                   => self::uri_child_company . "/(?P<childCompany>[-\w]+)",
-                //     'methods'               => 'POST',
-                //     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
-                //     'args' => [
-                //         'childCompany'      => [
-                //             'type'          => 'string',
-                //         ]
-                //     ],
-                //     'callback'              => [$childCompanyService, 'update']
-                // ],
-                // 'update_put_child_company'  => [
-                //     'url'                   => self::uri_child_company . "/(?P<childCompany>[-\w]+)",
-                //     'methods'               => 'PUT',
-                //     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
-                //     'args' => [
-                //         'childCompany'      => [
-                //             'type'          => 'string',
-                //         ]
-                //     ],
-                //     'callback'              => [$childCompanyService, 'update']
-                // ],
-                // 'delete_child_company'      => [
-                //     'url'                   => self::uri_child_company . "/(?P<childCompany>[-\w]+)",
-                //     'methods'               => 'DELETE',
-                //     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
-                //     'args' => [
-                //         'childCompany'      => [
-                //             'type'          => 'string',
-                //         ]
-                //     ],
-                //     'callback'              => [$childCompanyService, 'delete']
-                // ],
+                'show_child_company'        => [
+                    'url'                   => self::uri_child_company . "/(?P<childCompany>[-\w]+)",
+                    'methods'               => 'GET',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
+                    'callback'              => [$childCompanyService, 'showChildCompany']
+                ],
+                'update_post_child_company' => [
+                    'url'                   => self::uri_child_company . "/(?P<childCompany>[-\w]+)",
+                    'methods'               => 'POST',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
+                    'callback'              => [$childCompanyService, 'updateChildCompany']
+                ],
+                'update_put_child_company'  => [
+                    'url'                   => self::uri_child_company . "/(?P<childCompany>[-\w]+)",
+                    'methods'               => 'PUT',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
+                    'callback'              => [$childCompanyService, 'updateChildCompany']
+                ],
+                'delete_child_company'      => [
+                    'url'                   => self::uri_child_company . "/(?P<childCompany>[-\w]+)",
+                    'methods'               => 'DELETE',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
+                    'callback'              => [$childCompanyService, 'delete']
+                ],
             ]
 
         ];

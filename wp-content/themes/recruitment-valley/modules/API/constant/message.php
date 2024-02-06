@@ -229,6 +229,11 @@ class Message
                     'repost_no_permission' => __("Gebruiker heeft geen toestemming om deze vacature opnieuw te plaatsen.", THEME_DOMAIN)
                 ]
             ],
+            'company_recruiter' => [
+                "child_company" => [
+                    "show_not_found"    => __("Child Company not found!", THEME_DOMAIN),
+                ],
+            ],
             'package' => [
                 "package" => [
                     "get_success" => __("Alle pakketten succesvol ingeladen.", THEME_DOMAIN),

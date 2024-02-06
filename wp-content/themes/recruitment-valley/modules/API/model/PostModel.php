@@ -32,15 +32,15 @@ class PostModel extends BaseModel
                 'comment_status'    => 'closed',
             ];
 
-            if ($data['title']) {
+            if (array_key_exists('title', $data)) {
                 $args['post_title']    = $data['title'];
-            } else if ($data['post_title']) {
+            } else if (array_key_exists('post_title', $data)) {
                 $args['post_title']    = $data['post_title'];
             }
 
-            if ($data['slug']) {
+            if (array_key_exists('slug', $data)) {
                 $args['post_name']     = $data['slug'];
-            } else if ($data['post_name']) {
+            } else if (array_key_exists('post_name', $data)) {
                 $args['post_name']    = $data['post_name'];
             }
         }

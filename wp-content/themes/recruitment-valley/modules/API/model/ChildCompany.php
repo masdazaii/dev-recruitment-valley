@@ -87,7 +87,7 @@ class ChildCompany extends Company
      * @param array $args
      * @return array
      */
-    private function setArguments(array $filters = [], array $args = []): array
+    private static function setArguments(array $filters = [], array $args = []): array
     {
         if (empty($args)) {
             $args = [
@@ -113,6 +113,12 @@ class ChildCompany extends Company
                 $args['search'] = $filters['search'];
             } else if (array_key_exists('s', $filters)) {
                 $args['search'] = $filters['s'];
+            }
+
+            if (array_key_exists('name', $filters)) {
+                $args['post_name'] = $filters['name'];
+            } else if (array_key_exists('post_name', $filters)) {
+                $args['post_name'] = $filters['post_name'];
             }
 
             if (array_key_exists('search_columns', $filters)) {
@@ -240,14 +246,26 @@ class ChildCompany extends Company
             $user = get_post($clue);
             return new self($user);
         } else if (in_array($by, ["slug", "uuid"])) {
-            $childCompany = new ChildCompany();
             if ($by == 'slug') {
+                $filter = [
+                    'name'  => $clue
+                ];
             } else if ($by == 'uuid') {
-                $filter = [];
+                $filter = [
+                    "meta"  => [
+                        "relation"  => "AND",
+                        [
+                            "key"       => self::acf_child_company_uuid,
+                            "compare"   => "=",
+                            "value"     => $clue
+                        ]
+                    ]
+                ];
             }
+
             $user = self::select($filter, []);
-            if ($user->get_total() > 0) {
-                return new self($user->get_results()[0]);
+            if ($user->found_posts > 0) {
+                return new self($user->posts[0]);
             } else {
                 return new self();
             }
@@ -305,7 +323,7 @@ class ChildCompany extends Company
      */
     public function setName(String $value): mixed
     {
-        return $this->setProp($this->name, $value, false);
+        return $this->setProp($this->name, $value, false, 'acf');
     }
 
     /**
@@ -317,7 +335,20 @@ class ChildCompany extends Company
      */
     public function getName()
     {
-        return $this->user->title;
+        // return $this->user->title;
+        return $this->getProp($this->name, true, 'acf');
+    }
+
+    /**
+     * Set Child Company Name function.
+     *
+     * Override method in Company Model with same name.
+     *
+     * @return mixed Int|Bool on false
+     */
+    public function setEmail(String $value): mixed
+    {
+        return $this->setProp($this->_acfCompanyEmail, $value, false, 'acf');
     }
 
     /**
