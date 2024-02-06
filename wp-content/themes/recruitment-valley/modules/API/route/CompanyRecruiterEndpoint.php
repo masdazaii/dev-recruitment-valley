@@ -75,12 +75,12 @@ class CompanyRecruiterEndpoint
                     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
                     'callback'              => [$childCompanyService, 'createChildCompany']
                 ],
-                // 'list_child_company'        => [
-                //     'url'                   => self::uri_child_company,
-                //     'methods'               => 'GET',
-                //     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
-                //     'callback'              => [$childCompanyService, 'list']
-                // ],
+                'list_child_company'        => [
+                    'url'                   => self::uri_child_company,
+                    'methods'               => 'GET',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
+                    'callback'              => [$childCompanyService, 'list']
+                ],
                 // 'show_child_company'        => [
                 //     'url'                   => self::uri_child_company . "/(?P<childCompany>[-\w]+)",
                 //     'methods'               => 'GET',

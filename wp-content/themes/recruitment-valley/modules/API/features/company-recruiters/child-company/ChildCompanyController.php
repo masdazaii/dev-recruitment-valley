@@ -8,6 +8,7 @@ use Helper\Maphelper;
 use Helper\StringHelper;
 use Model\ChildCompany;
 use Model\ModelHelper;
+use Resource\ChildCompanyResource;
 use Throwable;
 use WP_Error;
 
@@ -47,6 +48,13 @@ class ChildCompanyController extends BaseController
             $childCompany   = ChildCompany::insert($data);
 
             /** Set ACF / Meta */
+
+            /** Set recruiter owner */
+            $setup['recruiter']     = $childCompany->setChildCompanyOwner($request['user_id']);
+
+            /** Set UUID */
+            $setup['uuid']          = $childCompany->setUUID($uuid);
+
             /** Required */
             $setup['childCompanyName'] = $childCompany->setName($request['companyName']);
             $setup['country']       = $childCompany->setCountry($request['country']);
@@ -226,39 +234,64 @@ class ChildCompanyController extends BaseController
         ];
         Log::info("List Child Company attempt.", json_encode($logData, JSON_PRETTY_PRINT), date("Y_m_d") . "_log_list_child_company");
 
-        // try {
-        //     /** Set Filters */
-        //     $filters = [
-        //         "meta"  => []
-        //     ];
+        try {
+            $childCompanyModel = new ChildCompany();
 
-        //     $childCompanies = ChildCompany::select();
-        // }
+            /** Set Filters */
+            $filters = [
+                "owner"     => $request['user_id'],
+                'page'      => isset($request['page']) ? (int)$request['page'] : 1,
+                'perPage'   => isset($request['perPage']) ? (int)$request['perPage'] : -1,
+            ];
 
-        return [
-            "status"    => 200,
-            "message"   => "Dummy Response",
-            "data"      => [
-                [
-                    "ID"            => "123123-123213-123123",
-                    "recruiterID"   => 1,
-                    "companyName"   => "Task Force 141",
+            if (isset($request['orderBy'])) {
+                $filters['orderBy']   = $request['orderBy'];
+            }
+
+            if (isset($request['sort'])) {
+                $filters['order']     = $request['sort'];
+            }
+
+            $filters['offset'] = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['perPage']));
+
+            $childCompanies     = ChildCompany::select($filters, []);
+            $childCompaniesResponse = [
+                'data'  => [],
+                'meta'  => [
+                    "max_posts" => 0,
+                    "max_pages" => 0
                 ],
-                [
-                    "ID"            => "234234-234234-234234",
-                    "recruiterID"   => 1,
-                    "companyName"   => "Shadow Corp.",
-                ],
-                [
-                    "ID"            => "345345-345345-345345",
-                    "recruiterID"   => 1,
-                    "companyName"   => "El Sin Nombre",
+            ];
+
+            if ($childCompanies) {
+                $childCompaniesResponse['meta']['max_posts']  = (int)$childCompanies->found_posts;
+                $childCompaniesResponse['meta']['max_pages']  = (int)$childCompanies->max_num_pages;
+
+                if ($childCompanies->found_posts > 0) {
+                    $childCompaniesResponse['data'] = ChildCompanyResource::format($childCompanies->posts);
+                }
+            }
+
+            return [
+                "status"    => 200,
+                "message"   => "Dummy Response",
+                "data"      => $childCompaniesResponse['data'],
+                "meta"      => [
+                    "page"      => (int)$filters['page'],
+                    "perPage"   => $filters['perPage'] == -1 ? 'all' : (int)$filters['perPage'],
+                    "totalPage" => $childCompaniesResponse['meta']['max_pages'],
+                    "totalData" => $childCompaniesResponse['meta']['max_posts']
                 ]
-            ],
-            "meta"      => [
-                "totalResults"  => 3,
-                "totalFiltered" => 3
-            ]
-        ];
+            ];
+        } catch (\WP_Error $wp_error) {
+
+            return $this->handleError($wp_error, __CLASS__, __METHOD__, $logData, 'log_store_child_company');
+        } catch (Exception $e) {
+
+            return $this->handleError($e, __CLASS__, __METHOD__, $logData, 'log_store_child_company');
+        } catch (Throwable $th) {
+
+            return $this->handleError($th, __CLASS__, __METHOD__, $logData, 'log_store_child_company');
+        }
     }
 }

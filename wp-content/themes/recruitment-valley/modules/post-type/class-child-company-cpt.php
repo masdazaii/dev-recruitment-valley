@@ -96,7 +96,7 @@ class ChildCompanyCPT extends RegisterCPT
     public function childCompanyCustomColoumn($coloumn, $post_id)
     {
         $childCompanyModel  = new ChildCompanyModel($post_id);
-        $recruiterModel     = new CompanyRecruiter($childCompanyModel->getRecruiterCompanyOwner());
+        $recruiterModel     = new CompanyRecruiter($childCompanyModel->getChildCompanyOwner());
 
         switch ($coloumn) {
             case 'title':
