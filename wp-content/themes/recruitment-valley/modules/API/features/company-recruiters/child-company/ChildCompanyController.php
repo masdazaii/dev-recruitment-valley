@@ -361,4 +361,229 @@ class ChildCompanyController extends BaseController
             return $this->handleError($th, __CLASS__, __METHOD__, $logData, 'log_show_child_company');
         }
     }
+
+    /**
+     * Update child company function
+     *
+     * @param array $request
+     * @return array
+     */
+    public function update(array $request): array
+    {
+        /** Log Attempt */
+        $logData        = [
+            "request"   => $request
+        ];
+        Log::info("Update Child Company attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . "_log_update_child_company");
+
+        $this->wpdb->query('START TRANSACTION');
+        try {
+            if (is_numeric($request['childCompany'])) {
+                $childCompany = ChildCompany::find('id', $request['childCompany']);
+            } else if (is_string($request['childCompany']) && (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $request['childCompany']) == 1)) {
+                $childCompany = ChildCompany::find('uuid', $request['childCompany']);
+            } else if (strpos($request['childCompany'], '-') != false) {
+                $childCompany = ChildCompany::find('slug', $request['childCompany']);
+            } else {
+                $childCompany = ChildCompany::find('slug', $request['childCompany']);
+            }
+
+            if ($childCompany->user) {
+                $owner = $childCompany->getChildCompanyOwner();
+                if ($owner->ID == $request['user_id']) {
+                    /** Set ACF / Meta */
+                    /** Rule is Required */
+
+                    if (array_key_exists('companyName', $request)) {
+                        $update['childCompanyName']  = $childCompany->setName($request['companyName']);
+                    }
+
+                    if (array_key_exists('companyEmail', $request)) {
+                        $update['childCompanyEmail'] = $childCompany->setEmail($request['companyEmail']);
+                    }
+
+                    if (array_key_exists('country', $request)) {
+                        $update['country']       = $childCompany->setCountry($request['country']);
+                    }
+
+                    if (array_key_exists('countryCode', $request)) {
+                        $update['countryCode']   = $childCompany->setCountryCode($request['countryCode']);
+                    }
+
+                    if (array_key_exists('city', $request)) {
+                        $update['city']          = $childCompany->setCity($request['city']);
+                    }
+
+                    if (array_key_exists('street', $request)) {
+                        $update['street']        = $childCompany->setStreet($request['street']);
+                    }
+
+                    if (array_key_exists('postCode', $request)) {
+                        $update['postCode']      = $childCompany->setPostCode($request['postCode']);
+                    }
+
+                    if (!isset($request['longitude']) || !isset($request['latitude'])) {
+                        if (isset($request['street'])) {
+                            /** IF MAP API IS ENABLED */
+                            if (defined('ENABLE_MAP_API') && ENABLE_MAP_API == true) {
+                                $coordinate = Maphelper::generateLongLat($request['street']);
+                                $request['latitude']    = $coordinate["lat"];
+                                $request['longitude']   = $coordinate["long"];
+                            } else {
+                                $request['latitude']    = '';
+                                $request['longitude']   = '';
+                            }
+                        } else if (isset($request['city'])) {
+                            /** IF MAP API IS ENABLED */
+                            if (defined('ENABLE_MAP_API') && ENABLE_MAP_API == true) {
+                                $coordinate = Maphelper::generateLongLat($request['city']);
+                                $request['latitude']    = $coordinate["lat"];
+                                $request['longitude']   = $coordinate["long"];
+                            } else {
+                                $request['latitude']    = '';
+                                $request['longitude']   = '';
+                            }
+                        }
+                    }
+
+                    if (array_key_exists('longitude', $request)) {
+                        $update['longitude']     = $childCompany->setLongitude($request['longitude']);
+                    }
+
+                    if (array_key_exists('latitude', $request)) {
+                        $update['latitude']      = $childCompany->setLatitude($request['latitude']);
+                    }
+
+                    if (array_key_exists('sector', $request)) {
+                        $update['sector']        = $childCompany->setSector($request['sector']);
+                    }
+
+                    if (array_key_exists('shortDescription', $request)) {
+                        $update['shortDescription']  = $childCompany->setShortDescription($request['shortDescription']);
+                    }
+                    /** Rules is required End */
+
+                    /** Upload Gallery */
+                    if (isset($request['gallery']) || isset($_FILES['gallery'])) {
+                        $galleries = ModelHelper::handle_uploads('gallery', $request['user_id']);
+
+                        // $currentGallery = maybe_unserialize(get_user_meta($request['user_id'], $childCompany::acf_childCompany_gallery_photo));
+                        $currentGallery = maybe_unserialize($childCompany->getGallery('raw'));
+                        $currentGallery = isset($currentGallery[0]) ? $currentGallery[0] : [];
+                        if (isset($galleries)) {
+                            $galleryIDs = $currentGallery;
+                            foreach ($galleries as $key => $gallery) {
+                                $galleryIDs[]   = wp_insert_attachment($gallery['attachment'], $gallery['file']);
+                            }
+
+                            // update_field($childCompany::acf_childCompany_gallery_photo, $galleryIDs, 'user_' . $request['user_id']);
+                            $update['gallery']  = $childCompany->setGallery($galleryIDs);
+                        }
+                    }
+
+                    /** Upload Image */
+                    if (isset($request['image']) || isset($_FILES['image'])) {
+                        $image = ModelHelper::handle_upload('image');
+                        if ($image) {
+                            $imageID            = wp_insert_attachment($image['image']['attachment'], $image['image']['file']);
+                            // update_field('ucma_image', $imageID, 'user_' . $request['user_id']);
+                            $update['image']    = $childCompany->setImage($imageID);
+                        }
+                    }
+
+                    /** Set Video File or URL */
+                    if (isset($_FILES['companyVideo']['name'])) {
+                        $video = ModelHelper::handle_upload('companyVideo');
+                        $update['videoUrl'] = $childCompany->setVideoUrl($video);
+                    } else {
+                        $update['videoUrl'] = $childCompany->setVideoUrl($request['companyVideo']);
+                    }
+
+                    if (isset($request['phoneNumberCode']) && array_key_exists('phoneNumberCode', $request)) {
+                        $update['phoneNumberCode']  = $childCompany->setPhoneCode($request['phoneNumberCode']);
+                    }
+
+                    if (isset($request['phoneNumber']) && array_key_exists('phoneNumber', $request)) {
+                        $update['phoneNumber']  = $childCompany->setPhoneNumber($request['phoneNumber']);
+                    }
+
+                    if (isset($request['employeesTotal']) && array_key_exists('employeesTotal', $request)) {
+                        $update['employeesTotal']   = $childCompany->setTotalEmployees($request['employeesTotal']);
+                    }
+
+                    if (isset($request['kvkNumber']) && array_key_exists('kvkNumber', $request)) {
+                        $update['kvkNumber']        = $childCompany->setKvkNumber($request['kvkNumber']);
+                    }
+
+                    if (isset($request['btwNumber']) && array_key_exists('btwNumber', $request)) {
+                        $update['btwNumber']        = $childCompany->setBtwNumber($request['btwNumber']);
+                    }
+
+                    if (isset($request['website']) && array_key_exists('website', $request)) {
+                        $update['website']          = $childCompany->setWebsite($request['website']);
+                    }
+
+                    if (isset($request['linkedin']) && array_key_exists('linkedin', $request)) {
+                        $update['linkedin']         = $childCompany->setLinkedin($request['linkedin']);
+                    }
+
+                    if (isset($request['facebook']) && array_key_exists('facebook', $request)) {
+                        $update['facebook']         = $childCompany->setFacebook($request['facebook']);
+                    }
+
+                    if (isset($request['instagram']) && array_key_exists('instagram', $request)) {
+                        $update['instagram']        = $childCompany->setInstagram($request['instagram']);
+                    }
+
+                    if (isset($request['twitter']) && array_key_exists('twitter', $request)) {
+                        $update['twitter']          = $childCompany->setTwitter($request['twitter']);
+                    }
+
+                    if (isset($request['secondaryEmploymentConditions']) && array_key_exists('secondaryEmploymentConditions', $request)) {
+                        /** Set Benefit or secondary employment conditions */
+                        $update['benefit']          = $childCompany->setSecondaryEmploymentCondition($request['secondaryEmploymentConditions']);
+                    }
+
+                    $update['isFullRegistered'] = $childCompany->setIsFullRegistered(1);
+
+                    /** Log Data  */
+                    $logData['update']   = $update;
+
+                    /** Log Attempt */
+                    Log::info("End Update Child Company attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . "_log_update_child_company");
+
+                    $this->wpdb->query('COMMIT');
+
+                    return [
+                        'status'    => 200,
+                        'message'   => $this->message->get("profile.setup.success"),
+                    ];
+                } else {
+                    /** Log Attempt */
+                    $logData['message'] = 'UNAUTHORIZED!';
+                    Log::error("Fail Update Child Company attempt.", json_encode($logData, JSON_PRETTY_PRINT), date("Y_m_d") . "_log_update_child_company");
+
+                    return [
+                        "status"    => 403,
+                        "message"   => $this->message->get("auth.unauthorize", [""]),
+                    ];
+                }
+            } else {
+                /** Log Attempt */
+                $logData['message'] = 'NOT FOUND!';
+                Log::error("Fail Update Child Company attempt.", json_encode($logData, JSON_PRETTY_PRINT), date("Y_m_d") . "_log_update_child_company");
+
+                return [
+                    "status"    => 404,
+                    "message"   => $this->message->get("company_recruiter.child_company.show_not_found", [""]),
+                ];
+            }
+        } catch (\WP_Error $wp_error) {
+            return $this->handleError($wp_error, __CLASS__, __METHOD__, $logData, 'log_update_child_company');
+        } catch (Exception $e) {
+            return $this->handleError($e, __CLASS__, __METHOD__, $logData, 'log_update_child_company');
+        } catch (Throwable $th) {
+            return $this->handleError($th, __CLASS__, __METHOD__, $logData, 'log_update_child_company');
+        }
+    }
 }

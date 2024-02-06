@@ -5,6 +5,7 @@ namespace Service;
 use Controller\ChildCompanyController;
 use Request\ChildCompany\CreateChildCompanyRequest;
 use Request\ChildCompany\ShowChildCompanyRequest;
+use Request\ChildCompany\UpdateChildCompanyRequest;
 use ResponseHelper;
 use WP_REST_Request;
 
@@ -66,6 +67,26 @@ class ChildCompanyService
         }
 
         $response = $this->childCompanyController->show($showChildCompanyRequest->sanitized());
+        return ResponseHelper::build($response);
+    }
+
+    /**
+     * Update Child Company Recruiter service
+     *
+     * @param WP_REST_Request $request
+     * @return void
+     */
+    public function updateChildCompany(WP_REST_Request $request)
+    {
+        $updateChildCompanyRequest = new UpdateChildCompanyRequest($request);
+        if (!$updateChildCompanyRequest->validate()) {
+            return ResponseHelper::build([
+                'status'    => 400,
+                'message'   => $updateChildCompanyRequest->getFirstError(),
+            ]);
+        }
+
+        $response = $this->childCompanyController->store($updateChildCompanyRequest->sanitized());
         return ResponseHelper::build($response);
     }
 }
