@@ -11,7 +11,7 @@ use WP_User_Query;
 class CompanyRecruiter extends BaseModel
 {
     public $user;
-    private const allowed_role = ["recruiter"];
+    private const allowed_role = ["recruiter", "company-recruiter"];
 
     public const acf_recruiter_name     = "rv_urecruiter_name";
     // public const acf_recruiter_email    = "rv_urecruiter_email";
@@ -201,7 +201,7 @@ class CompanyRecruiter extends BaseModel
                 "offset"    => $filters['offset'] ?? 0,
                 "orderby"   => $filters['orderBy'] ?? "login",
                 "order"     => $filters['sort'] ?? 'ASC',
-                "role"      => 'recruiter'
+                "role"      => 'company-recruiter'
             ];
         }
 

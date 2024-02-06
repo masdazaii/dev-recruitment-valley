@@ -14,7 +14,7 @@ defined('ABSPATH') || die("Can't access directly");
 
 class RecruiterRole
 {
-    private const role = 'recruiter';
+    private const role = 'company-recruiter';
     public function __construct()
     {
         add_action('admin_init', [$this, 'addCompanyRecruiterRole']);

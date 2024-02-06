@@ -5,6 +5,7 @@ namespace Route;
 use Middleware\AuthMiddleware;
 use Service\ChildCompanyService;
 use Service\CompanyRecruiterService;
+use Vacancy\VacancyCrudService;
 
 class CompanyRecruiterEndpoint
 {
@@ -21,6 +22,7 @@ class CompanyRecruiterEndpoint
         $authMiddleware             = new AuthMiddleware();
         $companyRecruiterService    = new CompanyRecruiterService();
         $childCompanyService        = new ChildCompanyService();
+        $vacancyCrudService         = new VacancyCrudService();
 
         $endpoint = [
             'path' => 'company-recruiter',
@@ -99,11 +101,19 @@ class CompanyRecruiterEndpoint
                     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
                     'callback'              => [$childCompanyService, 'updateChildCompany']
                 ],
-                'delete_child_company'      => [
-                    'url'                   => self::uri_child_company . "/(?P<childCompany>[-\w]+)",
-                    'methods'               => 'DELETE',
-                    'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
-                    'callback'              => [$childCompanyService, 'delete']
+                // 'delete_child_company'      => [
+                //     'url'                   => self::uri_child_company . "/(?P<childCompany>[-\w]+)",
+                //     'methods'               => 'DELETE',
+                //     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
+                //     'callback'              => [$childCompanyService, 'delete']
+                // ],
+
+                /** Vacancy */
+                'create_paid_job' => [
+                    'url'                   =>  'vacancy/paid',
+                    'methods'               =>  'POST',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company_both'],
+                    'callback'              =>  [$vacancyCrudService, 'createPaidJob']
                 ],
             ]
 
