@@ -1,9 +1,6 @@
 <?php
-// require_once './Rule.php';
 
-// require_once './Rules/Required.php';
-// require_once './Rules/Email.php';
-// require_once './Rules/Min.php';
-// require_once './Rules/Max.php';
-// require_once './Rules/Numeric.php';
-// require_once './Rules/Validator.php';
+defined("ABSPATH") or die("Direct access not allowed!");
+
+require_once __DIR__ . '/early-access/autoload.php';
+require_once __DIR__ . '/v1/autoload.php';

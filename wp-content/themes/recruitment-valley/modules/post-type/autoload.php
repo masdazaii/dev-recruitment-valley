@@ -18,3 +18,4 @@ require_once __DIR__ . '/class-job-alert.php';
 require_once __DIR__ . '/class-coupon.php';
 require_once __DIR__ . '/class-rss.php'; // disabled for fix expired 25-10-2023
 require_once __DIR__ . '/class-faq.php';
+require_once __DIR__ . '/class-child-company-cpt.php';

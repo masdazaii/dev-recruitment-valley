@@ -11,6 +11,7 @@ class Endpoint
 {
     private $API        = "mi";
     private $version    = "v1";
+    private $versionThree   = "v3";
 
     private $candidateEndpoint = [];
     private $companyEndpoint = [];
@@ -19,6 +20,7 @@ class Endpoint
     private $vacancyEndpoint = [];
     private $sitemapEndpoint = [];
     private $webhookEndpoint = [];
+    private $companyRecruiterEndpoint       = [];
 
     /**
      * __construct
@@ -48,6 +50,9 @@ class Endpoint
         $webhookEndpoint = new WebhookEndpoint;
         $this->webhookEndpoint = $webhookEndpoint->get();
 
+        $companyRecruiterEndpoint       = new CompanyRecruiterEndpoint();
+        $this->companyRecruiterEndpoint = $companyRecruiterEndpoint->get();
+
         add_action('rest_api_init', [$this, 'register_endpoint']);
     }
 
@@ -66,6 +71,7 @@ class Endpoint
         $vacancy = $this->vacancyEndpoint;
         $sitemap = $this->sitemapEndpoint;
         $webhook = $this->webhookEndpoint;
+        $companyRecruiter       = $this->companyRecruiterEndpoint;
 
         $this->_run_list_endpoint($this->API, $this->version, $vacancy["path"], $vacancy["endpoints"]);
         $this->_run_list_endpoint($this->API, $this->version, $candidate["path"], $candidate["endpoints"]);
@@ -74,6 +80,9 @@ class Endpoint
         $this->_run_list_endpoint($this->API, $this->version, $auth["path"], $auth["endpoints"]);
         $this->_run_list_endpoint($this->API, $this->version, $sitemap['path'], $sitemap["endpoints"]);
         $this->_run_list_endpoint($this->API, $this->version, $webhook['path'], $webhook["endpoints"]);
+
+        /** v3 */
+        $this->_run_list_endpoint($this->API, $this->versionThree, $companyRecruiter['path'], $companyRecruiter['endpoints']);
     }
 
     /**

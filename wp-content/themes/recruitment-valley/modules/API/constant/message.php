@@ -63,22 +63,25 @@ class Message
                 'registration_success' => __("We hebben de OTP code naar je email verzonden.", THEME_DOMAIN),
                 'not_registered' => __("Een gebruiker met het opgegeven email adres is nog niet geregistreerd.", THEME_DOMAIN)
             ],
-            'profile' => [
+            'profile'   => [
                 'setup' => [
-                    'success' =>  __("Profiel success bewerkt", THEME_DOMAIN),
-                    'failed' =>  __("Profiel is niet met success bewerkt", THEME_DOMAIN),
+                    'success'   =>  __("Profiel success bewerkt", THEME_DOMAIN),
+                    'failed'    =>  __("Profiel is niet met success bewerkt!%s", THEME_DOMAIN),
                 ],
-                'update' => [
-                    'success' =>  __("Profel is succesvol bewerkt", THEME_DOMAIN),
-                    'photo' => [
-                        "success" => __("Profiel foto is succesvol geupdate", THEME_DOMAIN)
+                'update'        => [
+                    'success'       =>  __("Profel is succesvol bewerkt", THEME_DOMAIN),
+                    'photo'         => [
+                        "success"   => __("Profiel foto is succesvol geupdate", THEME_DOMAIN)
                     ],
-                    'cv' => [
-                        "success" =>  __("CV is succesvol geupdate", THEME_DOMAIN)
+                    'cv'        => [
+                        "success"   =>  __("CV is succesvol geupdate", THEME_DOMAIN)
                     ],
-                    'phone' => [
+                    'phone'     => [
                         "already_exists" => __("Telefoonnummer is al geregistreerd.", THEME_DOMAIN)
                     ]
+                ],
+                'get'       => [
+                    'success'   => __("Succes gegevensprofiel ophalen!%s", THEME_DOMAIN)
                 ],
                 'delete' => [
                     "success" => __("Succes, wachtwoord is gewijzigd", THEME_DOMAIN),
@@ -160,7 +163,10 @@ class Message
                 "get_application_success"   => __("Succes krijg sollicitatie vacature.", THEME_DOMAIN),
                 "get_application_not_found" => __("Sollicitatie niet gevonden.", THEME_DOMAIN),
                 "approval_subject"  => __("Approval requested - RecruitmentValley", THEME_DOMAIN),
-                "not_available" => __("Solliciteer niet, er is nog geen vacature beschikbaar", THEME_DOMAIN)
+                "not_available"     => __("Solliciteer niet, er is nog geen vacature beschikbaar", THEME_DOMAIN),
+                "company_recruiter" => [
+                    "child_company_required"    => __("Child Company is required for Company Recruiter's Vacancy!", THEME_DOMAIN)
+                ]
             ],
             'candidate' => [
                 "profile" => [
@@ -226,6 +232,14 @@ class Message
                     'repost_no_permission' => __("Gebruiker heeft geen toestemming om deze vacature opnieuw te plaatsen.", THEME_DOMAIN)
                 ]
             ],
+            'company_recruiter' => [
+                "child_company" => [
+                    "list_success"      => __("Show %s data of child company!", THEME_DOMAIN),
+                    "show_not_found"    => __("Child Company not found!", THEME_DOMAIN),
+                    "show_success"      => __("Success Child Company data!", THEME_DOMAIN),
+                    "show_unauthorized" => __("Your Child Company not found!", THEME_DOMAIN),
+                ],
+            ],
             'package' => [
                 "package" => [
                     "get_success" => __("Alle pakketten succesvol ingeladen.", THEME_DOMAIN),
@@ -249,7 +263,7 @@ class Message
                 ]
             ],
             'system' => [
-                'overall_failed' => __('Systeemfout.', THEME_DOMAIN),
+                'overall_failed' => __('Systeemfout!%s', THEME_DOMAIN),
             ],
             'option' => [
                 "company" => [
@@ -308,14 +322,23 @@ class Message
         ];
     }
 
-    public function get($message_location): string|array
+    public function get($message_location, $messages = []): string|array
     {
         $keys = explode('.', $message_location);
         $message = $this->list;
 
         foreach ($keys as $key) {
             if (isset($message[$key])) {
-                $message = $message[$key];
+                // $message = $message[$key];
+                if (is_string($message[$key])) {
+                    if (!empty($messages)) {
+                        $message    = vsprintf($message[$key], $messages);
+                    } else {
+                        $message    = $message[$key];
+                    }
+                } else {
+                    $message    = $message[$key];
+                }
             } else {
                 return ""; // Key not found, return null or any other default value you prefer.
             }
