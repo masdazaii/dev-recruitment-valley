@@ -588,6 +588,12 @@ class ChildCompanyController extends BaseController
         }
     }
 
+    /**
+     * Get Child company data for vacacny default value function
+     *
+     * @param array $request
+     * @return array
+     */
     public function getVacancyDefaultValue(array $request): array
     {
         /** Log Attempt */

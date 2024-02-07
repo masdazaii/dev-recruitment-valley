@@ -522,7 +522,7 @@ class VacancyCrudController
                     $logData['company-recruiter']['childCompany'] = $validateChildCompany;
 
                     if ($validateChildCompany['validate']) {
-                        $payload['rv_vacancy_is_from_company_recruiter']    = true;
+                        $payload["rv_vacancy_is_from_company_recruiter"]    = true;
                         $payload["rv_vacancy_assigned_child_company"]       = $request["assignedChildCompany"];
                     } else {
                         /** Log Attempt */

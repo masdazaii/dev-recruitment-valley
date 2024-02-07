@@ -11,6 +11,7 @@ use Helper\StringHelper;
 use Helper\DateHelper;
 use Model\Option;
 use Constant\LanguageConstant;
+use Model\ChildCompany;
 
 class VacancyResponse
 {
@@ -41,6 +42,7 @@ class VacancyResponse
             if ($vacancyModel->checkImported()) {
                 $thumbnail = $option->getDefaultImage('object');
             } else {
+                /** Check if inputed by Admin for another company */
                 if ($vacancyModel->checkIsForAnotherCompany()) {
                     if ($vacancyModel->checkUseExistingCompany()) {
                         $selectedCompany = $vacancyModel->getSelectedCompany();
@@ -51,6 +53,20 @@ class VacancyResponse
                     } else {
                         $thumbnail = $vacancyModel->getCustomCompanyLogo('object');
                     }
+                } else if ($vacancyModel->checkIsBelongToCompanyRecruiter()) {
+                    $assignedChildCompany = $vacancyModel->getAssignedChildCompany();
+
+                    if (is_numeric($assignedChildCompany)) {
+                        $childCompanyModel = ChildCompany::find('id', $assignedChildCompany);
+                    } else if (is_string($assignedChildCompany) && (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $assignedChildCompany) == 1)) {
+                        $childCompanyModel = ChildCompany::find('uuid', $assignedChildCompany);
+                    } else if (strpos($assignedChildCompany, '-') != false) {
+                        $childCompanyModel = ChildCompany::find('slug', $assignedChildCompany);
+                    } else {
+                        $childCompanyModel = ChildCompany::find('slug', $assignedChildCompany);
+                    }
+
+                    $thumbnail = $childCompanyModel->getThumbnail('object');
                 } else {
                     $thumbnail = $company->getThumbnail('object');
                 }
@@ -254,13 +270,43 @@ class VacancyResponse
                     ];
                 }
                 // $companyID = $vacancyModel->checkUseExistingCompany() ? $vacancyModel->checkUseExistingCompany() : $company->user_id;
+            } else if ($vacancyModel->checkIsBelongToCompanyRecruiter()) {
+                $assignedChildCompany = $vacancyModel->getAssignedChildCompany();
+
+                if (is_numeric($assignedChildCompany)) {
+                    $childCompanyModel = ChildCompany::find('id', $assignedChildCompany);
+                } else if (is_string($assignedChildCompany) && (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $assignedChildCompany) == 1)) {
+                    $childCompanyModel = ChildCompany::find('uuid', $assignedChildCompany);
+                } else if (strpos($assignedChildCompany, '-') != false) {
+                    $childCompanyModel = ChildCompany::find('slug', $assignedChildCompany);
+                } else {
+                    $childCompanyModel = ChildCompany::find('slug', $assignedChildCompany);
+                }
+
+                $companyData = [
+                    'id'    => $childCompanyModel->user->user_id,
+                    'name'  => $childCompanyModel->user->getName(),
+                    'about' => $childCompanyModel->user->getDescription(),
+                    'logo'  => $childCompanyModel->getThumbnail(),
+                    'sector'        => $childCompanyModel->getTerms('sector'),
+                    "totalEmployee" => $childCompanyModel->getTotalEmployees(),
+                    "tel"           => $childCompanyModel->getPhoneNumber('full'),
+                    "email"         => $childCompanyModel->getEmail(),
+                    "gallery"       => $childCompanyModel->getGallery(true),
+                    "website"       => $childCompanyModel->getWebsite(),
+                    "city"          => $childCompanyModel->getCity(),
+                    "country"       => $childCompanyModel->getCountry(),
+                    "countryCode"   => $childCompanyModel->getCountryCode(),
+                    "longitude"     => $childCompanyModel->getLongitude(),
+                    "latitude"      => $childCompanyModel->getLatitude(),
+                ];
             } else {
                 $companyData = [
                     'id'    => $company->user_id,
                     'name'  => $company->getName(),
                     'about' => $company->getDescription(),
                     'logo'  => $company->getThumbnail(),
-                    'sector'    => $company->getTerms('sector'),
+                    'sector'        => $company->getTerms('sector'),
                     "totalEmployee" => $company->getTotalEmployees(),
                     "tel"   => $company->getPhoneCode() . $company->getPhone(),
                     "email" => $company->getEmail(),

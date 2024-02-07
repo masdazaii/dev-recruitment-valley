@@ -112,6 +112,9 @@ class Vacancy
     private const status_slug_open          = 'open';
     private const status_slug_processing    = 'processing';
 
+    public const _acf_is_from_company_recruiter = 'rv_vacancy_is_from_company_recruiter';
+    public const _acf_assigned_child_company    = 'rv_vacancy_assigned_child_company';
+
     /** Vacancy Meta */
     private $_meta_rv_vacancy_unused_data   = 'rv_vacancy_unused_data';
     private $_meta_rv_vacancy_imported_at   = 'rv_vacancy_imported_at';
@@ -1751,5 +1754,15 @@ class Vacancy
 
         $vacancies = new WP_Query($args);
         return $vacancies;
+    }
+
+    public function checkIsBelongToCompanyRecruiter()
+    {
+        return $this->getProp(self::_acf_is_from_company_recruiter, true);
+    }
+
+    public function getAssignedChildCompany()
+    {
+        return $this->getProp(self::_acf_assigned_child_company, true);
     }
 }
