@@ -1725,4 +1725,31 @@ class Vacancy
             throw new Exception('Please specify vacancy!');
         }
     }
+
+    /**
+     * Select vacancy by status and userID function
+     *
+     * @param String $status
+     * @param Int $userID
+     * @return mixed
+     */
+    public function selectVacancyByStatus(String $status, Int $userID): mixed
+    {
+        $args = [
+            "post_type"     => $this->vacancy,
+            "author__in"    => [$userID],
+            "posts_per_page" => -1,
+            "tax_query" => [
+                [
+                    'taxonomy'  => 'status',
+                    'field'     => 'slug',
+                    'terms'     => array($status),
+                    'operator'  => 'IN'
+                ],
+            ],
+        ];
+
+        $vacancies = new WP_Query($args);
+        return $vacancies;
+    }
 }
