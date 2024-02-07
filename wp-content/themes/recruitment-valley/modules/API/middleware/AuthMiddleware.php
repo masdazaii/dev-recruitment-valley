@@ -11,6 +11,7 @@ use Helper\UserHelper;
 use UnexpectedValueException;
 use WP_Error;
 use WP_REST_Request;
+use WP_User;
 use WpOrg\Requests\Response;
 
 class AuthMiddleware
@@ -139,6 +140,9 @@ class AuthMiddleware
         /** Change start here */
         $request->set_param('user_id', $handleToken->user_id);
         $user = get_user_by('ID', $handleToken->user_id);
+        if ($user && $user instanceof WP_User) {
+            $request->set_param('user_role', $user->roles[0]);
+        }
 
         /** Check if user already verify the OTP */
         $isVerified = get_user_meta($user->ID, 'otp_is_verified', true);
@@ -166,6 +170,9 @@ class AuthMiddleware
 
         $request->set_param('user_id', $handleToken->user_id);
         $user = get_user_by('ID', $handleToken->user_id);
+        if ($user && $user instanceof WP_User) {
+            $request->set_param('user_role', $user->roles[0]);
+        }
 
         if ($user === false) return new WP_Error("rest_forbidden", $this->_message->get('auth.unauthenticate'), array("status" => 403));
 

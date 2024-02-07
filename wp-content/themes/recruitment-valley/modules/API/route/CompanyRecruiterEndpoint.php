@@ -109,11 +109,17 @@ class CompanyRecruiterEndpoint
                 // ],
 
                 /** Vacancy */
+                // 'create_free_job' => [
+                //     'url'                   => 'vacancy/free',
+                //     'methods'               => 'POST',
+                //     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
+                //     'callback'              => [$vacancyCrudService, 'createFreeJob']
+                // ],
                 'create_paid_job' => [
-                    'url'                   =>  'vacancy/paid',
-                    'methods'               =>  'POST',
-                    'permission_callback'   => [$authMiddleware, 'authorize_company_both'],
-                    'callback'              =>  [$vacancyCrudService, 'createPaidJob']
+                    'url'                   => 'vacancy/paid',
+                    'methods'               => 'POST',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
+                    'callback'              => [$vacancyCrudService, 'createPaidJob']
                 ],
             ]
 

@@ -116,9 +116,9 @@ class ChildCompany extends Company
             }
 
             if (array_key_exists('name', $filters)) {
-                $args['post_name'] = $filters['name'];
+                $args['name'] = $filters['name'];
             } else if (array_key_exists('post_name', $filters)) {
-                $args['post_name'] = $filters['post_name'];
+                $args['name'] = $filters['post_name'];
             }
 
             if (array_key_exists('search_columns', $filters)) {

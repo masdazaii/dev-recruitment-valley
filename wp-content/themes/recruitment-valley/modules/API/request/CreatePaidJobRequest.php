@@ -50,7 +50,8 @@ class CreatePaidJobRequest implements MiRequest
             "galleryCompany.*" => [], // Added Line
             "country" => ["required"], // Added Line
             "countryCode" => [], // Added Line
-            "language"  => ["in:nl,en,de,fr,es"] // Added feedback 01 Nov 2023
+            "language"  => ["in:nl,en,de,fr,es"], // Added feedback 01 Nov 2023
+            "assignedChildCompany"  => [] // Added new role : Company recruiter
         ];
     }
 
@@ -83,7 +84,8 @@ class CreatePaidJobRequest implements MiRequest
             "experiences.*" => "text",
             "country" => "text",
             "countryCode" => "text",
-            "language"  => "text" // Added feedback 01 Nov 2023
+            "language"  => "text", // Added feedback 01 Nov 2023
+            "assignedChildCompany"  => "text" // Added new role : Company recruiter
         ];
     }
 

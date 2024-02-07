@@ -163,7 +163,10 @@ class Message
                 "get_application_success"   => __("Succes krijg sollicitatie vacature.", THEME_DOMAIN),
                 "get_application_not_found" => __("Sollicitatie niet gevonden.", THEME_DOMAIN),
                 "approval_subject"  => __("Approval requested - RecruitmentValley", THEME_DOMAIN),
-                "not_available" => __("Solliciteer niet, er is nog geen vacature beschikbaar", THEME_DOMAIN)
+                "not_available"     => __("Solliciteer niet, er is nog geen vacature beschikbaar", THEME_DOMAIN),
+                "company_recruiter" => [
+                    "child_company_required"    => __("Child Company is required for Company Recruiter's Vacancy!", THEME_DOMAIN)
+                ]
             ],
             'candidate' => [
                 "profile" => [
@@ -231,7 +234,10 @@ class Message
             ],
             'company_recruiter' => [
                 "child_company" => [
+                    "list_success"      => __("Show %s data of child company!", THEME_DOMAIN),
                     "show_not_found"    => __("Child Company not found!", THEME_DOMAIN),
+                    "show_success"      => __("Success Child Company data!", THEME_DOMAIN),
+                    "show_unauthorized" => __("Your Child Company not found!", THEME_DOMAIN),
                 ],
             ],
             'package' => [

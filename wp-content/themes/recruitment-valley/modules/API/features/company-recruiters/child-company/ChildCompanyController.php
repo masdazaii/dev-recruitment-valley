@@ -268,8 +268,9 @@ class ChildCompanyController extends BaseController
             ];
 
             if ($childCompanies) {
-                $childCompaniesResponse['meta']['max_posts']  = (int)$childCompanies->found_posts;
-                $childCompaniesResponse['meta']['max_pages']  = (int)$childCompanies->max_num_pages;
+                $childCompaniesResponse['meta']['max_posts']    = (int)$childCompanies->found_posts;
+                $childCompaniesResponse['meta']['max_pages']    = (int)$childCompanies->max_num_pages;
+                $childCompaniesResponse['meta']['show_posts']   = (int)count($childCompanies->posts);
 
                 if ($childCompanies->found_posts > 0) {
                     $childCompaniesResponse['data'] = ChildCompanyResource::format($childCompanies->posts);
@@ -278,7 +279,7 @@ class ChildCompanyController extends BaseController
 
             return [
                 "status"    => 200,
-                "message"   => "Dummy Response",
+                "message"   => $this->message->get("company_recruiter.child_company.list_success", ["{$childCompaniesResponse['meta']['show_posts']}"]),
                 "data"      => $childCompaniesResponse['data'],
                 "meta"      => [
                     "page"      => (int)$filters['page'],
@@ -288,11 +289,11 @@ class ChildCompanyController extends BaseController
                 ]
             ];
         } catch (\WP_Error $wp_error) {
-            return $this->handleError($wp_error, __CLASS__, __METHOD__, $logData, 'log_store_child_company');
+            return $this->handleError($wp_error, __CLASS__, __METHOD__, $logData, 'log_list_child_company');
         } catch (Exception $e) {
-            return $this->handleError($e, __CLASS__, __METHOD__, $logData, 'log_store_child_company');
+            return $this->handleError($e, __CLASS__, __METHOD__, $logData, 'log_list_child_company');
         } catch (Throwable $th) {
-            return $this->handleError($th, __CLASS__, __METHOD__, $logData, 'log_store_child_company');
+            return $this->handleError($th, __CLASS__, __METHOD__, $logData, 'log_list_child_company');
         }
     }
 
@@ -339,8 +340,8 @@ class ChildCompanyController extends BaseController
                     Log::error("Fail Child Company attempt.", json_encode($logData, JSON_PRETTY_PRINT), date("Y_m_d") . "_log_show_child_company");
 
                     return [
-                        "status"    => 403,
-                        "message"   => $this->message->get("auth.unauthorize", [""]),
+                        "status"    => 400,
+                        "message"   => $this->message->get("company_recruiter.child_company.show_unauthorized", [""]),
                     ];
                 }
             } else {
@@ -564,8 +565,8 @@ class ChildCompanyController extends BaseController
                     Log::error("Fail Update Child Company attempt.", json_encode($logData, JSON_PRETTY_PRINT), date("Y_m_d") . "_log_update_child_company");
 
                     return [
-                        "status"    => 403,
-                        "message"   => $this->message->get("auth.unauthorize", [""]),
+                        "status"    => 400,
+                        "message"   => $this->message->get("company_recruiter.child_company.show_unauthorized", [""]),
                     ];
                 }
             } else {
