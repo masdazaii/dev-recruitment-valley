@@ -85,6 +85,12 @@ class CompanyRecruiterEndpoint
                     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
                     'callback'              => [$childCompanyService, 'listChildCompany']
                 ],
+                'create-paid-vacancy-default-value' => [
+                    'url'                   => self::uri_child_company . "/(?P<childCompany>[-\w]+)/create-paid-vacancy-default-value",
+                    'methods'               => 'GET',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
+                    'callback'              => [$childCompanyService, 'getCreatePaidVacancyDefaultValue']
+                ],
                 'show_child_company'        => [
                     'url'                   => self::uri_child_company . "/(?P<childCompany>[-\w]+)",
                     'methods'               => 'GET',
