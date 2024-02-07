@@ -310,6 +310,12 @@ class VacancyCrudController
 
     public function createFree($request)
     {
+        /** Log Attempt */
+        $logData        = [
+            'request'   => $request
+        ];
+        Log::info("Create Free Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_create_free_vancancy');
+
         $payload = [
             "title" => $request["name"],
             "country" => $request['country'], // Added Line
@@ -404,6 +410,12 @@ class VacancyCrudController
         }
     }
 
+    /**
+     * Create paid vacancy function
+     *
+     * @param array $request
+     * @return array
+     */
     public function createPaid($request)
     {
         /** Log Attempt */
@@ -634,20 +646,37 @@ class VacancyCrudController
                 ],
                 "message" => $this->_message->get("vacancy.create.paid.success"),
             ];
+        } catch (\WP_Error $wp) {
+            /** Log Attempt */
+            $logData['message'] = $wp->get_error_message();
+            Log::error("FAIL Paid Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_create_paid_vancancy');
+
+            $wpdb->query('ROLLBACK');
+            return [
+                "status" => 500,
+                "message" => $wp->get_error_message(),
+                // "message" => $this->_message->get("vacancy.create.paid.fail"),
+            ];
+        } catch (\Exception $e) {
+            /** Log Attempt */
+            $logData['message'] = $e->getMessage();
+            Log::error("FAIL Paid Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_create_paid_vancancy');
+
+            $wpdb->query('ROLLBACK');
+            return [
+                "status"    => 500,
+                "message"   => $e->getMessage(),
+            ];
         } catch (\Throwable $th) {
+            /** Log Attempt */
+            $logData['message'] = $th->getMessage();
+            Log::error("FAIL Paid Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_create_paid_vancancy');
+
             $wpdb->query('ROLLBACK');
             return [
                 "status" => 500,
                 // "message" => $this->_message->get("vacancy.create.paid.fail"),
                 "message" => $th->getMessage(),
-
-            ];
-        } catch (\WP_Error $e) {
-            $wpdb->query('ROLLBACK');
-            return [
-                "status" => 500,
-                "message" => $e->get_error_message(),
-                // "message" => $this->_message->get("vacancy.create.paid.fail"),
             ];
         }
     }
@@ -688,6 +717,12 @@ class VacancyCrudController
 
     public function update($request)
     {
+        /** Log Attempt */
+        $logData        = [
+            'request'   => $request
+        ];
+        Log::info("Update Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_update_vancancy');
+
         $vacancy_id = $request["vacancy_id"];
         $vacancyModel = new Vacancy($vacancy_id);
 
@@ -711,6 +746,12 @@ class VacancyCrudController
 
     public function updateFree($request)
     {
+        /** Log Attempt */
+        $logData        = [
+            'request'   => $request
+        ];
+        Log::info("Update Free Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_update_free_vancancy');
+
         $vacancy_id = $request["vacancy_id"];
 
         /** Anggit's syntax start here */
@@ -812,8 +853,20 @@ class VacancyCrudController
         ];
     }
 
+    /**
+     * Update paid vacancy function
+     *
+     * @param Array $request
+     * @return array
+     */
     public function updatePaid($request)
     {
+        /** Log Attempt */
+        $logData        = [
+            'request'   => $request
+        ];
+        Log::info("Update Paid Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_update_paid_vancancy');
+
         $vacancy_id = $request["vacancy_id"];
         global $wpdb;
 
@@ -823,11 +876,14 @@ class VacancyCrudController
             $vacancyModel = new Vacancy($vacancy_id);
             $payload = $this->createPaidVacancyPayload($request);
 
-            $vacancyModel->setTaxonomy($payload["taxonomy"]);
+            /** Log Data */
+            $logData['payload'] = $payload;
+
+            $update['taxonomy'] = $vacancyModel->setTaxonomy($payload["taxonomy"]);
 
             foreach ($payload as $acf_field => $value) {
                 if ($acf_field !== "taxonomy") {
-                    $vacancyModel->setProp($acf_field, $value, is_array($value));
+                    $update['acf'][$acf_field] = $vacancyModel->setProp($acf_field, $value, is_array($value));
                 }
             }
 
@@ -842,9 +898,9 @@ class VacancyCrudController
 
             if (isset($_FILES['video']['name'])) {
                 $video = ModelHelper::handle_upload('video');
-                $vacancyModel->setVideoUrl($video["video"]["url"]);
+                $update['acf']['video'] = $vacancyModel->setVideoUrl($video["video"]["url"]);
             } else {
-                $vacancyModel->setVideoUrl($payload["video_url"]);
+                $update['acf']['video'] = $vacancyModel->setVideoUrl($payload["video_url"]);
             }
 
             $vacancyGallery = $galleryIds ?? [];
@@ -855,24 +911,27 @@ class VacancyCrudController
                 }
             }
 
-            $vacancyModel->setProp($vacancyModel->acf_gallery, $vacancyGallery, false);
+            $update['acf']['gallery']   = $vacancyModel->setProp($vacancyModel->acf_gallery, $vacancyGallery, false);
 
-
-            if ($galleries) {
-                foreach ($galleries as $key => $gallery) {
-                    $vacancyGallery[] = wp_insert_attachment($gallery['attachment'], $gallery['file']);
-                }
-            }
+            // if ($galleries) {
+            //     foreach ($galleries as $key => $gallery) {
+            //         $vacancyGallery[] = wp_insert_attachment($gallery['attachment'], $gallery['file']);
+            //     }
+            // }
 
             /** Changes start here */
-            $vacancyModel->setCityLongLat($payload["placement_city"]);
+            $update['acf']['cityCoordinate'] = $vacancyModel->setCityLongLat($payload["placement_city"]);
             // $vacancyModel->setAddressLongLat($payload["placement_address"]);
-            $vacancyModel->setPlacementAddressLatitude($payload["placementAddressLatitude"]);
-            $vacancyModel->setPlacementAddressLongitude($payload["placementAddressLongitude"]);
-            $vacancyModel->setDistance($payload["placement_city"], $payload["placement_city"] . " " . $payload["placement_address"]);
+            $update['acf']['gallery']   = $vacancyModel->setPlacementAddressLatitude($payload["placementAddressLatitude"]);
+            $update['acf']['gallery']   = $vacancyModel->setPlacementAddressLongitude($payload["placementAddressLongitude"]);
+            $update['acf']['gallery']   = $vacancyModel->setDistance($payload["placement_city"], $payload["placement_city"] . " " . $payload["placement_address"]);
 
             /** Set language : 01 November Feedback */
-            $vacancyModel->setLanguage($payload['language']);
+            $update['acf']['gallery']   = $vacancyModel->setLanguage($payload['language']);
+
+            /** Log Attempt */
+            $logData['update']  = $update;
+            Log::error("END Paid Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_update_paid_vancancy');
 
             $wpdb->query('COMMIT');
 
@@ -883,13 +942,31 @@ class VacancyCrudController
                 ],
                 "message" => $this->_message->get("vacancy.update.paid.success")
             ];
-        } catch (\Throwable $th) {
+        } catch (\WP_Error $wp) {
+            /** Log Attempt */
+            $logData['message'] = $wp->get_error_message();
+            Log::error("FAIL Paid Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_update_paid_vancancy');
+
+            $wpdb->query('ROLLBACK');
+            return [
+                "status" => 500,
+                "message" => $wp->get_error_message(),
+            ];
+        } catch (Exception $e) {
+            /** Log Attempt */
+            $logData['message'] = $e->getMessage();
+            Log::error("FAIL Paid Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_update_paid_vancancy');
+
             $wpdb->query('ROLLBACK');
             return [
                 "status" => 400,
                 "message" => $this->_message->get("system.overall_failed")
             ];
-        } catch (Exception $e) {
+        } catch (\Throwable $th) {
+            /** Log Attempt */
+            $logData['message'] = $th->getMessage();
+            Log::error("FAIL Paid Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_update_paid_vancancy');
+
             $wpdb->query('ROLLBACK');
             return [
                 "status" => 400,
@@ -898,25 +975,48 @@ class VacancyCrudController
         }
     }
 
+    /**
+     * Soft delete / Move to trash vacancy function
+     *
+     * @param Array $request
+     * @return array
+     */
     public function trash($request)
     {
+        /** Log attempt */
+        $logData        = [
+            'request'   => $request
+        ];
+        Log::info("Trash vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_trash_vacancy');
+
         $vacancy = new Vacancy($request["vacancy_id"]);
 
         if ($request["user_id"] != $vacancy->getAuthor()) {
+            /** Log attempt */
+            $logData['message'] = 'UNAUTHORIZED!';
+            Log::error("Fail Trash vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_trash_vacancy');
+
             return [
-                "status" => 400,
-                "message" => $this->_message->get("vacancy.trash.not_authorized")
+                "status"    => 400,
+                "message"   => $this->_message->get("vacancy.trash.not_authorized")
             ];
         }
 
         $trashed = $vacancy->trash();
 
         if (is_wp_error($trashed)) {
+            /** Log attempt */
+            $logData['message'] = "WP_ERROR {$trashed->get_error_message()}!";
+            Log::error("Fail Trash vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_trash_vacancy');
+
             return [
-                "status" => 400,
-                "message" => $this->_message->get("vacancy.trash.fail")
+                "status"    => 500,
+                "message"   => $this->_message->get("vacancy.trash.fail")
             ];
         }
+        /** Log attempt */
+        $logData['trash']   = $trashed;
+        Log::info("End Trash vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_trash_vacancy');
 
         return [
             "status" => 200,

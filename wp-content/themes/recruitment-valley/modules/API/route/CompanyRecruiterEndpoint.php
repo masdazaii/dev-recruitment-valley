@@ -25,7 +25,7 @@ class CompanyRecruiterEndpoint
         $vacancyCrudService         = new VacancyCrudService();
 
         $endpoint = [
-            'path' => 'company-recruiter',
+            'path'      => 'recruiter',
             'endpoints' =>
             [
                 'setup_account'             => [
@@ -120,6 +120,18 @@ class CompanyRecruiterEndpoint
                     'methods'               => 'POST',
                     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
                     'callback'              => [$vacancyCrudService, 'createPaidJob']
+                ],
+                'update_paid_job' => [
+                    'url'                   => 'vacancy/paid/(?P<vacancy_id>[-\w]+)',
+                    'methods'               => 'POST',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
+                    'callback'              => [$vacancyCrudService, 'updatePaidJob']
+                ],
+                'vacancy_delete' => [
+                    'url'                   => 'vacancy/(?P<vacancy_id>[-\w]+)',
+                    'methods'               => 'DElETE',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
+                    'callback'              => [$vacancyCrudService, 'trash']
                 ],
             ]
 
