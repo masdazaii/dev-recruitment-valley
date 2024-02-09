@@ -523,7 +523,8 @@ class VacancyCrudController
 
                     if ($validateChildCompany['validate']) {
                         $payload["rv_vacancy_is_from_company_recruiter"]    = true;
-                        $payload["rv_vacancy_assigned_child_company"]       = $request["assignedChildCompany"];
+                        $payload["rv_vacancy_assigned_child_company"]       = $validateChildCompany['data']['id'];
+                        $payload["rv_vacancy_assigned_child_company_uuid"]  = $validateChildCompany['data']['id'];
                     } else {
                         /** Log Attempt */
                         $logData['message'] = 'CHILD COMPANY INVALID!';
@@ -1505,7 +1506,11 @@ class VacancyCrudController
                         if ($request['user_id'] == $owner->ID) {
                             return [
                                 "validate"  => true,
-                                "message"   => "Authorized!"
+                                "message"   => "Authorized!",
+                                "data"      => [
+                                    "id"    => $childCompany->user_id,
+                                    "uuid"  => $childCompany->getUUID()
+                                ]
                             ];
                         } else {
                             return [

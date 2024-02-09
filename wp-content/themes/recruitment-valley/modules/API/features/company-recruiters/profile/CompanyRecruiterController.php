@@ -2,6 +2,8 @@
 
 namespace Controller;
 
+use DateTime;
+use DateTimeImmutable;
 use Helper\Maphelper;
 use MI\Role\RecruiterRole;
 use Model\CompanyRecruiter;
@@ -9,8 +11,15 @@ use Model\ModelHelper;
 use Resource\CompanyRecruiterResource;
 use Log;
 use Exception;
+use Helper\ExcelHelper;
+use Model\ChildCompany;
+use Vacancy\Vacancy;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx as WriterXlsx;
 use Throwable;
 use WP_Error;
+use WP_Post;
 
 class CompanyRecruiterController extends BaseController
 {
@@ -525,5 +534,328 @@ class CompanyRecruiterController extends BaseController
 
             return $this->handleError($th, __CLASS__, __METHOD__, $logData, 'log_store_information_company_recruiter');
         }
+    }
+
+    public function report(array $request)
+    {
+        /** Log Attempt */
+        $logData    = [
+            'request'   => $request
+        ];
+        Log::info("Report Company Recruiter's vacancies Attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . "_log_report_company_recruiter_vacancy", false);
+
+        try {
+            /** Set filter */
+            if (array_key_exists('filter', $request)) {
+                if (array_key_exists('companyRecruiter', $request['filter'])) {
+                    if ($request['filter']['companyRecruiter'] == 'all') {
+                        /** Get all company recruiter user ID's */
+                        $companyRecruiterModel = CompanyRecruiter::select([
+                            'perPage'   => -1,
+                            'role'      => 'company-recruiter',
+                            'fields'    => 'ID'
+                        ]);
+
+                        $companyRecruiters = $companyRecruiterModel->get_results();
+                    } else if (is_array($request['filter']['companyRecruiter'])) {
+                        /** Filter value is company recruiter user id and is numeric */
+                        $companyRecruiters = array_filter($request['filter']['companyRecruiter'], function ($companyRecruiter) {
+                            return is_numeric($companyRecruiter);
+                        }, 0);
+                    } else if (is_numeric($request['filter']['companyRecruiter'])) {
+                        $companyRecruiters = [$request['filter']['companyRecruiter']];
+                    }
+                }
+            } else {
+                /** Get all company recruiter user ID's */
+                $companyRecruiterModel = CompanyRecruiter::select([
+                    'perPage'   => -1,
+                    'role'      => 'company-recruiter',
+                    'fields'    => 'ID'
+                ]);
+
+                $companyRecruiters = $companyRecruiterModel->get_results();
+            }
+
+            /** Log Data */
+            $logData['selectedCompanyRecruiters'] = $companyRecruiters;
+
+            $vacancyData    = [];
+            foreach ($companyRecruiters as $companyRecruiterID) {
+                $companyRecruiterModel  = CompanyRecruiter::find('ID', $companyRecruiterID);
+
+                /** Prepare filter */
+                $filters        = [
+                    'perPage'   => -1,
+                    'author'    => $companyRecruiterID
+                ];
+
+                /** Get vacancy each child company */
+                $vacancyModel   = new Vacancy();
+                $vacancies      = $vacancyModel->select($filters);
+
+                /** Log Data */
+                $logData['foundVacancies'][$companyRecruiterID]['total'] = $vacancies->found_posts;
+
+                /** Map vacancy to each child company */
+                $vacancyData[$companyRecruiterID] = [
+                    'companyRecruiterName'  => $companyRecruiterModel->getName(),
+                    'data' => []
+                ];
+
+                if ($vacancies->found_posts > 0) {
+                    foreach ($vacancies->posts as $vacancy) {
+                        /** Log Data */
+                        $logData['foundVacancies'][$companyRecruiterID]['vacancyIDs'] = $vacancy->ID;
+
+                        $eachVacancyModel       = new Vacancy($vacancy->ID);
+
+                        $assignedChildCompany   = $eachVacancyModel->getAssignedChildCompany();
+                        if ($assignedChildCompany && $assignedChildCompany instanceof WP_Post) {
+                            $childCompanyModel      = new ChildCompany($assignedChildCompany);
+                            $assignedChildCompanyID = $assignedChildCompany->ID;
+
+                            $vacancyStatus          = $eachVacancyModel->getStatus();
+
+                            $vacancyCreatedDate     = $eachVacancyModel->vacancy->post_date ?? NULL;
+                            if (isset($vacancyCreatedDate)) {
+                                $vacancyCreatedDate = new DateTime($vacancyCreatedDate);
+                                $vacancyCreatedDate = $vacancyCreatedDate->format('Y-m-d H:i:s');
+                            }
+
+                            $vacancyTaxonomy        = $eachVacancyModel->getTax(true);
+                            $vacancyTerms           = [];
+                            foreach ($vacancyTaxonomy as $taxonomy => $terms) {
+                                if (is_array($terms)) {
+                                    if (array_is_list($terms)) {
+                                        foreach ($terms as $term) {
+                                            $vacancyTerms[$taxonomy][] = $term['label'];
+                                        }
+                                    } else {
+                                        $vacancyTerms[$taxonomy][] = $terms['label'];
+                                    }
+                                } else {
+                                    $vacancyTerms[$taxonomy][] = $terms;
+                                }
+                            }
+
+                            /** Get edit URL */
+                            $editUrl = get_edit_post_link($eachVacancyModel->vacancy->ID); // This will return null if user doesn't have capability.
+                            if (!isset($editUrl) || empty($editUrl)) {
+                                $editUrl = admin_url('post.php?post=' . $eachVacancyModel->vacancy->ID . '&action=edit');
+                            }
+
+                            $vacancyData[$companyRecruiterID]['data'][$assignedChildCompanyID][$eachVacancyModel->vacancy->ID] = [
+                                'id'            => $eachVacancyModel->vacancy->ID,
+                                'title'         => $eachVacancyModel->vacancy->post_title,
+                                'status'        => $vacancyStatus && isset($vacancyStatus['name']) ? $vacancyStatus['name'] : '-',
+                                // 'taxonomy'      => $eachVacancyModel->getTaxonomy(true),
+
+                                'workingHours'  => $vacancyTerms['working-hours'] ?? null,
+                                'education'     => $vacancyTerms['education']  ?? null,
+                                'employmentType'    => $vacancyTerms['type'] ?? null,
+                                'experince'         => $vacancyTerms['experiences'] ?? null,
+                                'sector'            => $vacancyTerms['sector'] ?? null,
+                                'role'              => $vacancyTerms['role'] ?? null,
+                                'location'          => $vacancyTerms['location'] ?? null,
+
+                                'createDate'        => $vacancyCreatedDate,
+                                'expiredDate'       => $eachVacancyModel->getExpiredAt(),
+                                'editUrl'           => $editUrl,
+                                'childCompanyName'  => $childCompanyModel->getName(),
+                            ];
+                        }
+                    }
+                }
+
+                /** Log Data */
+                $logData['excelData'] = $vacancyData;
+            }
+
+            /** Set excel report */
+            $reportPath = $this->createExcelReport($vacancyData);
+            // $reportPath = 'aa';
+            $logData['report'] = [
+                'url'   => $reportPath
+            ];
+            Log::info("Report Company Recruiter's vacancies Attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . "_log_report_company_recruiter_vacancy", false);
+        } catch (\WP_Error $wp_error) {
+            return $this->handleError($wp_error, __CLASS__, __METHOD__, $logData, 'log_report_company_recruiter_vacancy');
+        } catch (Exception $e) {
+            return $this->handleError($e, __CLASS__, __METHOD__, $logData, 'log_report_company_recruiter_vacancy');
+        } catch (Throwable $th) {
+            return $this->handleError($th, __CLASS__, __METHOD__, $logData, 'log_report_company_recruiter_vacancy');
+        }
+
+        return [
+            "status"    => 200,
+            "message"   => "success create report"
+        ];
+    }
+
+    protected function createExcelReport(array $datas)
+    {
+        $spreadsheet = new Spreadsheet();
+
+        /** Create Sheet for each companyRecruiter */
+        $companyRecruiterIndex = 0;
+        foreach ($datas as $companyRecruiterID => $data) {
+            if ($companyRecruiterIndex <= 0) {
+                $sheet = $spreadsheet->getActiveSheet();
+                $sheet->setTitle($data['companyRecruiterName']);
+            } else {
+                $sheet = $spreadsheet->createSheet($companyRecruiterIndex);
+                $sheet->setTitle($data['companyRecruiterName']);
+
+                // $spreadsheet->setActiveSheetIndexByName($data['companyRecruiterName']);
+
+                // $sheet = $spreadsheet->getActiveSheet();
+            }
+
+            // $companyRecruiterModel  = CompanyRecruiter::find('ID', $companyRecruiterID);
+
+            /** Cell start */
+            $coloumn        = 'A';
+            $headerRow      = 1;
+            $subHeaderRow   = 2;
+            $dataRow        = 3;
+            $tableHeaders   = [
+                "no"            => "No",
+                "childCompany"  => "Child Company Name",
+                "vacancy"       => [
+                    "name"      => 'Vacancy',
+                    "subs"      => [
+                        "Vacancy Title",
+                        "Status",
+                        "Created Date",
+                        "Expired Date",
+                        "Working Hours",
+                        "Education",
+                        "Employment Type",
+                        "Working Experience",
+                        "Sector",
+                        "Role",
+                        "Location",
+                        "Edit Url"
+                    ]
+                ]
+            ];
+            $tableData      = ["no", "childCompanyName", "title", "status", "createDate", "expiredDate", "workingHours", "education", "employmentType", "experince", "sector", "role", "location", "editUrl"];
+
+            $hasSubHeader   = array_walk_recursive($tableHeaders, function ($value, $key) {
+                return is_array($value);
+            });
+
+            /** Loop each child company */
+            $index = 0;
+            foreach ($data['data'] as $childCompanyID => $vacancies) {
+                // Log::info("data-data {$childCompanyID}.", $vacancies, date('Y_m_d') . "_log_excel_create", false);
+
+                $no = 1;
+
+                /** Set Table Header */
+                $headerCol = $coloumn;
+
+                foreach ($tableHeaders as $key => $header) {
+                    $sheet->getColumnDimension($headerCol)->setAutoSize(true);
+
+                    if (is_array($header)) {
+                        $sheet->getColumnDimension($headerCol)->setAutoSize(true);
+
+                        $totalSub           = count($header['subs']);
+                        $endColoumnMerge    = ExcelHelper::getNextColumnLetter($headerCol, $totalSub);
+
+                        $sheet->mergeCells("{$headerCol}{$headerRow}:{$endColoumnMerge}{$headerRow}");
+                        $sheet->getStyle("{$headerCol}{$headerRow}:{$endColoumnMerge}{$headerRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER_CONTINUOUS);
+                        $sheet->getStyle("{$headerCol}{$headerRow}:{$endColoumnMerge}{$headerRow}")->getFont()->setBold(true);
+                        $sheet->setCellValue("{$headerCol}{$headerRow}", $header['name']);
+
+                        /** Set sub header */
+                        $subHeaderCol = $headerCol;
+                        foreach ($header['subs'] as $subHeader) {
+                            $sheet->getStyle("{$subHeaderCol}{$subHeaderRow}")->getFont()->setBold(true);
+                            $sheet->setCellValue("{$subHeaderCol}{$subHeaderRow}", $subHeader);
+                            $subHeaderCol = ExcelHelper::getNextColumnLetter($subHeaderCol, 1);
+                        }
+                    } else {
+                        if ($hasSubHeader) {
+                            $sheet->getStyle("{$headerCol}{$headerRow}:{$headerCol}{$subHeaderRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER_CONTINUOUS)->setVertical(Alignment::VERTICAL_CENTER);
+                            $sheet->getStyle("{$headerCol}{$headerRow}:{$headerCol}{$subHeaderRow}")->getFont()->setBold(true);
+                            $sheet->mergeCells("{$headerCol}{$headerRow}:{$headerCol}{$subHeaderRow}");
+                            $sheet->setCellValue("{$headerCol}{$headerRow}", $header);
+                        } else {
+                            $sheet->getStyle("{$headerCol}{$headerRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER_CONTINUOUS)->setVertical(Alignment::VERTICAL_CENTER);
+                            $sheet->getStyle("{$headerCol}{$headerRow}")->getFont()->setBold(true);
+                            $sheet->setCellValue("{$headerCol}{$headerRow}", $header);
+                        }
+                    }
+
+                    // $headerCol = ++$headerCol;
+                    $headerCol = ExcelHelper::getNextColumnLetter($headerCol, 1);
+                }
+
+                /** Set the data */
+                $dataCol   = $coloumn;
+
+                foreach ($vacancies as $vacancyID => $vacancy) {
+                    $dataCol   = $coloumn;
+
+                    foreach ($tableData as $key) {
+                        $sheet->getColumnDimension($dataCol)->setAutoSize(true);
+
+                        if ($key == $no) {
+                            $sheet->setCellValue("{$dataCol}{$dataRow}", $no);
+                        } else {
+                            if (is_array($vacancy)) {
+                                if (isset($vacancy[$key])) {
+                                    if (is_array($vacancy[$key])) {
+                                        $sheet->setCellValue("{$dataCol}{$dataRow}", implode(', ', $vacancy[$key]));
+                                    } else {
+                                        $sheet->setCellValue("{$dataCol}{$dataRow}", $vacancy[$key]);
+                                    }
+                                }
+                            }
+                        }
+
+                        $dataCol = ExcelHelper::getNextColumnLetter($dataCol, 1);
+                    }
+
+                    // $sheet[$companyRecruiterID]->setCellValue("A{$dataRow}", $no);
+                    // $sheet[$companyRecruiterID]->setCellValue("B{$dataRow}", $vacancy['childCompanyName']);
+                    // $sheet[$companyRecruiterID]->setCellValue("C{$dataRow}", $vacancy['title']);
+                    // $sheet[$companyRecruiterID]->setCellValue("D{$dataRow}", $vacancy['status']);
+                    // $sheet[$companyRecruiterID]->setCellValue("E{$dataRow}", $vacancy['status']);
+
+                    $no++;
+                    $dataRow++;
+                }
+
+                /** Set next start row */
+                $totalRow       = count($vacancies);
+                $headerRow      = (int)$headerRow + (int)$totalRow + 4;
+                $subHeaderRow   = (int)$subHeaderRow + (int)$totalRow + 4;
+                $dataRow        = (int)$dataRow + (int)$totalRow + 1;
+
+                // Log::info("coloumnIndex.", json_encode($columnIndex, JSON_PRETTY_PRINT), date('Y_m_d') . "_log_excel_create", false);
+            }
+
+            $companyRecruiterIndex++;
+        }
+
+        $writer = new WriterXlsx($spreadsheet);
+
+        $now = new DateTimeImmutable();
+        // $filepath = THEME_DIR . '/export/serial-request/' . date('Y-m-d');
+        $filepath = wp_upload_dir()["basedir"] . '/report/company_recruiter/' . $now->format('Y_m_d');
+        $fileuri  = wp_upload_dir()["baseurl"] . '/report/company_recruiter/' . $now->format('Y_m_d');
+
+        if (!file_exists($filepath)) {
+            mkdir($filepath, 0777, true);
+        }
+
+        $filename = 'Report-Company-Recruiter-' . date('Y-m-d-H-i-s') . ".xlsx";
+        $writer->save("{$filepath}/{$filename}");
+
+        return "{$fileuri}/{$filename}";
     }
 }
