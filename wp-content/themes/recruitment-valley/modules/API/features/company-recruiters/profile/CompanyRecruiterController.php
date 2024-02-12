@@ -536,6 +536,12 @@ class CompanyRecruiterController extends BaseController
         }
     }
 
+    /**
+     * Create Report to superadmin function
+     *
+     * @param array $request
+     * @return void
+     */
     public function report(array $request)
     {
         /** Log Attempt */
@@ -674,6 +680,10 @@ class CompanyRecruiterController extends BaseController
 
             /** Set excel report */
             $reportPath = $this->createExcelReport($vacancyData);
+
+            /** Set to database */
+
+
             // $reportPath = 'aa';
             $logData['report'] = [
                 'url'   => $reportPath
@@ -693,6 +703,12 @@ class CompanyRecruiterController extends BaseController
         ];
     }
 
+    /**
+     * Create Excel File function
+     *
+     * @param array $datas
+     * @return void
+     */
     protected function createExcelReport(array $datas)
     {
         $spreadsheet = new Spreadsheet();
@@ -746,6 +762,67 @@ class CompanyRecruiterController extends BaseController
                 return is_array($value);
             });
 
+            /** Set Table Header */
+            $headerCol = $coloumn;
+            foreach ($tableHeaders as $key => $header) {
+                $sheet->getColumnDimension($headerCol)->setAutoSize(true);
+
+                if (is_array($header)) {
+                    $sheet->getColumnDimension($headerCol)->setAutoSize(true);
+
+                    $totalSub           = count($header['subs']) - 1;
+                    $endColoumnMerge    = ExcelHelper::getNextColumnLetter($headerCol, $totalSub);
+
+                    $sheet->mergeCells("{$headerCol}{$headerRow}:{$endColoumnMerge}{$headerRow}");
+                    $sheet->getStyle("{$headerCol}{$headerRow}:{$endColoumnMerge}{$headerRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER_CONTINUOUS);
+                    $sheet->getStyle("{$headerCol}{$headerRow}:{$endColoumnMerge}{$headerRow}")->getFont()->setBold(true);
+                    $sheet->getStyle("{$headerCol}{$headerRow}:{$endColoumnMerge}{$headerRow}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('ddcf00');
+                    $sheet->getStyle("{$headerCol}{$headerRow}:{$endColoumnMerge}{$headerRow}")->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+                    $sheet->getStyle("{$headerCol}{$headerRow}:{$endColoumnMerge}{$headerRow}")->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+                    $sheet->getStyle("{$headerCol}{$headerRow}:{$endColoumnMerge}{$headerRow}")->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+                    $sheet->getStyle("{$headerCol}{$headerRow}:{$endColoumnMerge}{$headerRow}")->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+                    $sheet->setCellValue("{$headerCol}{$headerRow}", $header['name']);
+
+                    /** Set sub header */
+                    $subHeaderCol = $headerCol;
+                    foreach ($header['subs'] as $subHeader) {
+                        $sheet->getStyle("{$subHeaderCol}{$subHeaderRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER_CONTINUOUS)->setVertical(Alignment::VERTICAL_CENTER);
+                        $sheet->getStyle("{$subHeaderCol}{$subHeaderRow}")->getFont()->setBold(true);
+                        $sheet->getStyle("{$subHeaderCol}{$subHeaderRow}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('ddcf00');
+                        $sheet->getStyle("{$subHeaderCol}{$subHeaderRow}")->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+                        $sheet->getStyle("{$subHeaderCol}{$subHeaderRow}")->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+                        $sheet->getStyle("{$subHeaderCol}{$subHeaderRow}")->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+                        $sheet->getStyle("{$subHeaderCol}{$subHeaderRow}")->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+                        $sheet->setCellValue("{$subHeaderCol}{$subHeaderRow}", $subHeader);
+                        $subHeaderCol = ExcelHelper::getNextColumnLetter($subHeaderCol, 1);
+                    }
+                } else {
+                    if ($hasSubHeader) {
+                        $sheet->getStyle("{$headerCol}{$headerRow}:{$headerCol}{$subHeaderRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER_CONTINUOUS)->setVertical(Alignment::VERTICAL_CENTER);
+                        $sheet->getStyle("{$headerCol}{$headerRow}:{$headerCol}{$subHeaderRow}")->getFont()->setBold(true);
+                        $sheet->getStyle("{$headerCol}{$headerRow}:{$headerCol}{$subHeaderRow}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('ddcf00');
+                        $sheet->getStyle("{$headerCol}{$headerRow}:{$headerCol}{$subHeaderRow}")->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+                        $sheet->getStyle("{$headerCol}{$headerRow}:{$headerCol}{$subHeaderRow}")->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+                        $sheet->getStyle("{$headerCol}{$headerRow}:{$headerCol}{$subHeaderRow}")->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+                        $sheet->getStyle("{$headerCol}{$headerRow}:{$headerCol}{$subHeaderRow}")->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+                        $sheet->mergeCells("{$headerCol}{$headerRow}:{$headerCol}{$subHeaderRow}");
+                        $sheet->setCellValue("{$headerCol}{$headerRow}", $header);
+                    } else {
+                        $sheet->getStyle("{$headerCol}{$headerRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER_CONTINUOUS)->setVertical(Alignment::VERTICAL_CENTER);
+                        $sheet->getStyle("{$headerCol}{$headerRow}")->getFont()->setBold(true);
+                        $sheet->getStyle("{$headerCol}{$headerRow}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('ddcf00');
+                        $sheet->getStyle("{$headerCol}{$headerRow}")->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+                        $sheet->getStyle("{$headerCol}{$headerRow}")->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+                        $sheet->getStyle("{$headerCol}{$headerRow}")->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+                        $sheet->getStyle("{$headerCol}{$headerRow}")->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+                        $sheet->setCellValue("{$headerCol}{$headerRow}", $header);
+                    }
+                }
+
+                // $headerCol = ++$headerCol;
+                $headerCol = ExcelHelper::getNextColumnLetter($headerCol, 1);
+            }
+
             /** Loop each child company */
             $index = 0;
             foreach ($data['data'] as $childCompanyID => $vacancies) {
@@ -754,45 +831,45 @@ class CompanyRecruiterController extends BaseController
                 $no = 1;
 
                 /** Set Table Header */
-                $headerCol = $coloumn;
+                // $headerCol = $coloumn;
 
-                foreach ($tableHeaders as $key => $header) {
-                    $sheet->getColumnDimension($headerCol)->setAutoSize(true);
+                // foreach ($tableHeaders as $key => $header) {
+                //     $sheet->getColumnDimension($headerCol)->setAutoSize(true);
 
-                    if (is_array($header)) {
-                        $sheet->getColumnDimension($headerCol)->setAutoSize(true);
+                //     if (is_array($header)) {
+                //         $sheet->getColumnDimension($headerCol)->setAutoSize(true);
 
-                        $totalSub           = count($header['subs']);
-                        $endColoumnMerge    = ExcelHelper::getNextColumnLetter($headerCol, $totalSub);
+                //         $totalSub           = count($header['subs']);
+                //         $endColoumnMerge    = ExcelHelper::getNextColumnLetter($headerCol, $totalSub);
 
-                        $sheet->mergeCells("{$headerCol}{$headerRow}:{$endColoumnMerge}{$headerRow}");
-                        $sheet->getStyle("{$headerCol}{$headerRow}:{$endColoumnMerge}{$headerRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER_CONTINUOUS);
-                        $sheet->getStyle("{$headerCol}{$headerRow}:{$endColoumnMerge}{$headerRow}")->getFont()->setBold(true);
-                        $sheet->setCellValue("{$headerCol}{$headerRow}", $header['name']);
+                //         $sheet->mergeCells("{$headerCol}{$headerRow}:{$endColoumnMerge}{$headerRow}");
+                //         $sheet->getStyle("{$headerCol}{$headerRow}:{$endColoumnMerge}{$headerRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER_CONTINUOUS);
+                //         $sheet->getStyle("{$headerCol}{$headerRow}:{$endColoumnMerge}{$headerRow}")->getFont()->setBold(true);
+                //         $sheet->setCellValue("{$headerCol}{$headerRow}", $header['name']);
 
-                        /** Set sub header */
-                        $subHeaderCol = $headerCol;
-                        foreach ($header['subs'] as $subHeader) {
-                            $sheet->getStyle("{$subHeaderCol}{$subHeaderRow}")->getFont()->setBold(true);
-                            $sheet->setCellValue("{$subHeaderCol}{$subHeaderRow}", $subHeader);
-                            $subHeaderCol = ExcelHelper::getNextColumnLetter($subHeaderCol, 1);
-                        }
-                    } else {
-                        if ($hasSubHeader) {
-                            $sheet->getStyle("{$headerCol}{$headerRow}:{$headerCol}{$subHeaderRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER_CONTINUOUS)->setVertical(Alignment::VERTICAL_CENTER);
-                            $sheet->getStyle("{$headerCol}{$headerRow}:{$headerCol}{$subHeaderRow}")->getFont()->setBold(true);
-                            $sheet->mergeCells("{$headerCol}{$headerRow}:{$headerCol}{$subHeaderRow}");
-                            $sheet->setCellValue("{$headerCol}{$headerRow}", $header);
-                        } else {
-                            $sheet->getStyle("{$headerCol}{$headerRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER_CONTINUOUS)->setVertical(Alignment::VERTICAL_CENTER);
-                            $sheet->getStyle("{$headerCol}{$headerRow}")->getFont()->setBold(true);
-                            $sheet->setCellValue("{$headerCol}{$headerRow}", $header);
-                        }
-                    }
+                //         /** Set sub header */
+                //         $subHeaderCol = $headerCol;
+                //         foreach ($header['subs'] as $subHeader) {
+                //             $sheet->getStyle("{$subHeaderCol}{$subHeaderRow}")->getFont()->setBold(true);
+                //             $sheet->setCellValue("{$subHeaderCol}{$subHeaderRow}", $subHeader);
+                //             $subHeaderCol = ExcelHelper::getNextColumnLetter($subHeaderCol, 1);
+                //         }
+                //     } else {
+                //         if ($hasSubHeader) {
+                //             $sheet->getStyle("{$headerCol}{$headerRow}:{$headerCol}{$subHeaderRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER_CONTINUOUS)->setVertical(Alignment::VERTICAL_CENTER);
+                //             $sheet->getStyle("{$headerCol}{$headerRow}:{$headerCol}{$subHeaderRow}")->getFont()->setBold(true);
+                //             $sheet->mergeCells("{$headerCol}{$headerRow}:{$headerCol}{$subHeaderRow}");
+                //             $sheet->setCellValue("{$headerCol}{$headerRow}", $header);
+                //         } else {
+                //             $sheet->getStyle("{$headerCol}{$headerRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER_CONTINUOUS)->setVertical(Alignment::VERTICAL_CENTER);
+                //             $sheet->getStyle("{$headerCol}{$headerRow}")->getFont()->setBold(true);
+                //             $sheet->setCellValue("{$headerCol}{$headerRow}", $header);
+                //         }
+                //     }
 
-                    // $headerCol = ++$headerCol;
-                    $headerCol = ExcelHelper::getNextColumnLetter($headerCol, 1);
-                }
+                //     // $headerCol = ++$headerCol;
+                //     $headerCol = ExcelHelper::getNextColumnLetter($headerCol, 1);
+                // }
 
                 /** Set the data */
                 $dataCol   = $coloumn;
@@ -832,9 +909,9 @@ class CompanyRecruiterController extends BaseController
 
                 /** Set next start row */
                 $totalRow       = count($vacancies);
-                $headerRow      = (int)$headerRow + (int)$totalRow + 4;
-                $subHeaderRow   = (int)$subHeaderRow + (int)$totalRow + 4;
-                $dataRow        = (int)$dataRow + (int)$totalRow + 1;
+                // $headerRow      = (int)$headerRow + (int)$totalRow + 4;
+                // $subHeaderRow   = (int)$subHeaderRow + (int)$totalRow + 4;
+                // $dataRow        = (int)$dataRow + (int)$totalRow;
 
                 // Log::info("coloumnIndex.", json_encode($columnIndex, JSON_PRETTY_PRINT), date('Y_m_d') . "_log_excel_create", false);
             }

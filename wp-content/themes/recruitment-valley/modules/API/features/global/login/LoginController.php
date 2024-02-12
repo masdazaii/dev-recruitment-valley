@@ -127,6 +127,8 @@ class LoginController
                 'is_unlimited' => $company->checkUnlimited() ? true : false,
                 // 'unlimited_expired_date' => $company->getUnlimitedExpired()
             ];
+        } else if ($user->roles[0] == 'company-recruiter') {
+            $setupStatus = true;
         }
 
         /** Anggit's Syntax start here */
