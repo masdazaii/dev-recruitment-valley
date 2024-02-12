@@ -1948,6 +1948,85 @@ class Vacancy
             if (array_key_exists('in', $filters)) {
                 $args['post__in'] = $filters['in'];
             }
+
+            if (array_key_exists('date', $filters)) {
+                $args['date_query'] = [];
+                if (isset($filters['date']['year'])) {
+                    $args['date_query']['year']     = $filters['date']['year'] ?? '';
+                }
+
+                if (isset($filters['date']['month'])) {
+                    $args['date_query']['month']    = $filters['date']['month'] ?? '';
+                }
+
+                if (isset($filters['date']['week'])) {
+                    $args['date_query']['week']     = $filters['date']['week'] ?? '';
+                }
+
+                if (isset($filters['date']['day'])) {
+                    $args['date_query']['day']      = $filters['date']['day'] ?? '';
+                }
+
+                if (isset($filters['date']['hour'])) {
+                    $args['date_query']['hour']     = $filters['date']['hour'] ?? '';
+                }
+
+                if (isset($filters['date']['minute'])) {
+                    $args['date_query']['minute']   = $filters['date']['minute'] ?? '';
+                }
+
+                if (isset($filters['date']['second'])) {
+                    $args['date_query']['second']   = $filters['date']['second'] ?? '';
+                }
+
+                if (isset($filters['date']['after'])) {
+                    $args['date_query']['after']    = $filters['date']['after'] ?? '';
+                }
+
+                if (isset($filters['date']['year'])) {
+                    $args['date_query']['year']     = $filters['date']['year'] ?? '';
+                }
+
+                if (isset($filters['date']['month'])) {
+                    $args['date_query']['month']    = $filters['date']['month'] ?? '';
+                }
+
+                if (isset($filters['date']['day'])) {
+                    $args['date_query']['day']      = $filters['date']['day'] ?? '';
+                }
+
+                if (isset($filters['date']['before'])) {
+                    $args['date_query']['before']   = $filters['date']['before'] ?? '';
+                }
+
+                if (isset($filters['date']['year'])) {
+                    $args['date_query']['year']     = $filters['date']['year'] ?? '';
+                }
+
+                if (isset($filters['date']['month'])) {
+                    $args['date_query']['month']    = $filters['date']['month'] ?? '';
+                }
+
+                if (isset($filters['date']['day'])) {
+                    $args['date_query']['day']      = $filters['date']['day'] ?? '';
+                }
+
+                if (isset($filters['date']['inclusive'])) {
+                    $args['date_query']['inclusive'] = $filters['date']['inclusive'] ?? true;
+                }
+
+                if (isset($filters['date']['compare'])) {
+                    $args['date_query']['compare']   = $filters['date']['compare'] ?? '';
+                }
+
+                if (isset($filters['date']['column'])) {
+                    $args['date_query']['column']    = $filters['date']['column'] ?? 'post_date';
+                }
+
+                if (isset($filters['date']['relation'])) {
+                    $args['date_query']['relation']  = $filters['date']['relation'] ?? 'AND';
+                }
+            }
         }
 
         return $args;

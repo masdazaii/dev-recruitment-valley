@@ -42,15 +42,15 @@ class CreateChildCompanyRequest extends BaseRequest
             "longitude"                     => [],
             "latitude"                      => [],
             "countryCode"                   => [],
-            "companyEmail"                  => ["required", "email"]
+            "companyEmail"                  => ["email"]
         ];
     }
 
     public function messages(): array
     {
         return [
-            "companyName.required"  => __("Company Recruiter Name is required!", THEME_DOMAIN),
-            "sector.required"       => __("Company Recruiter sector is required!", THEME_DOMAIN),
+            "companyName.required"  => __("Company Name is required!", THEME_DOMAIN),
+            "sector.required"       => __("Company sector is required!", THEME_DOMAIN),
             "sector.*.exists"       => __("One of sector value is not exitst!", THEME_DOMAIN),
             "website.url"           => __("Website must be valid URL!", THEME_DOMAIN),
             "facebook.url"          => __("Facebook must be valid URL!", THEME_DOMAIN),
@@ -63,7 +63,6 @@ class CreateChildCompanyRequest extends BaseRequest
             "postCode.required"     => __("Post Code is required!", THEME_DOMAIN),
             "image.max_file_size"   => __("Max file size is 2MB", THEME_DOMAIN),
             "companyVideo.max_file_size"    => __("Max file size is 2MB", THEME_DOMAIN),
-            "companyEmail.required"         => __("Company Email is required!", THEME_DOMAIN),
             "companyEmail.email"            => __("Company Email is not valid!", THEME_DOMAIN)
         ];
     }

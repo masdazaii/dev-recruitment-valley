@@ -44,22 +44,18 @@ class CronCompanyRecruiterReport
         $todayDate  = $now->format('d');
 
         /** Check if first date of the month */
-        // if ($todayDate == 1) {
-        //     /** Create Report */
-        //     $companyRecruiterController = new CompanyRecruiterController();
-        //     $companyRecruiterController->report([
-        //         'filter'    => [
-        //             'companyRecruiter' => 'all'
-        //         ]
-        //     ]);
-        // }
-        /** Create Report */
-        $companyRecruiterController = new CompanyRecruiterController();
-        $companyRecruiterController->report([
-            'filter'    => [
-                'companyRecruiter' => 'all'
-            ]
-        ]);
+        if ($todayDate == 1) {
+            $lastMonth  = $now->modify('-1 month');
+            /** Create Report */
+            $companyRecruiterController = new CompanyRecruiterController();
+            $companyRecruiterController->report([
+                'filter'    => [
+                    'companyRecruiter'  => 'all',
+                    'submittedAfter'    => $lastMonth->format('Y-m-d'),
+                    'submittedBefore'   => $today,
+                ]
+            ]);
+        }
     }
 }
 

@@ -60,7 +60,6 @@ class ChildCompanyController extends BaseController
 
             /** Required */
             $setup['childCompanyName']  = $childCompany->setName($request['companyName']);
-            $setup['childCompanyEmail'] = $childCompany->setEmail($request['companyEmail']);
             $setup['country']       = $childCompany->setCountry($request['country']);
             $setup['countryCode']   = $childCompany->setCountryCode($request['countryCode']);
             $setup['city']          = $childCompany->setCity($request['city']);
@@ -123,6 +122,12 @@ class ChildCompanyController extends BaseController
                     // update_field('ucma_image', $imageID, 'user_' . $request['user_id']);
                     $setup['image']    = $childCompany->setImage($imageID);
                 }
+            }
+
+            /** Set Company Email */
+            // $setup['childCompanyEmail'] = isset($request['companyEmail']) ? $childCompany->setEmail($request['companyEmail']) : '';
+            if (isset($request['companyEmail'])) {
+                $update['childCompanyEmail'] = $childCompany->setEmail($request['companyEmail']);
             }
 
             /** Set Video File or URL */
@@ -399,7 +404,7 @@ class ChildCompanyController extends BaseController
                         $update['childCompanyName']  = $childCompany->setName($request['companyName']);
                     }
 
-                    if (array_key_exists('companyEmail', $request)) {
+                    if (array_key_exists('companyEmail', $request) && isset($request['companyEmail'])) {
                         $update['childCompanyEmail'] = $childCompany->setEmail($request['companyEmail']);
                     }
 

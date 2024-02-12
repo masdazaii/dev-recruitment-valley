@@ -2,6 +2,8 @@
 
 namespace Model;
 
+use Log;
+
 class PostModel extends BaseModel
 {
     public function __construct(Mixed $post = null)
@@ -12,7 +14,11 @@ class PostModel extends BaseModel
 
     public function create(array $data = [], array $args = [])
     {
+        $logData['args'] = $args;
+        $logData['filter'] = $data;
         $args = self::setArgument($data, $args);
+        $logData['arguments'] = $args;
+        Log::info("Create REPORT.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . "_log_report_company_recruiter_vacancy", false);
         return wp_insert_post($args, true, true);
     }
 
@@ -42,6 +48,10 @@ class PostModel extends BaseModel
                 $args['post_name']     = $data['slug'];
             } else if (array_key_exists('post_name', $data)) {
                 $args['post_name']    = $data['post_name'];
+            }
+
+            if (array_key_exists('post_type', $data)) {
+                $args['post_type']     = $data['post_type'];
             }
         }
 
@@ -109,6 +119,10 @@ class PostModel extends BaseModel
 
             if (array_key_exists('comment_status', $data)) {
                 $args['comment_status']  = $data['comment_status'];
+            }
+
+            if (array_key_exists('post_type', $data)) {
+                $args['post_type']     = $data['post_type'];
             }
         }
 

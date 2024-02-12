@@ -12,7 +12,9 @@ use Resource\CompanyRecruiterResource;
 use Log;
 use Exception;
 use Helper\ExcelHelper;
+use Helper\StringHelper;
 use Model\ChildCompany;
+use Model\PostModel;
 use Vacancy\Vacancy;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
@@ -593,7 +595,12 @@ class CompanyRecruiterController extends BaseController
                 /** Prepare filter */
                 $filters        = [
                     'perPage'   => -1,
-                    'author'    => $companyRecruiterID
+                    'author'    => $companyRecruiterID,
+                    'date'      => [
+                        'after'     => $request['filter']['submittedAfter'],
+                        'before'    => $request['filter']['submittedBefore'],
+                        'inclusive' => true,
+                    ]
                 ];
 
                 /** Get vacancy each child company */
@@ -679,14 +686,74 @@ class CompanyRecruiterController extends BaseController
             }
 
             /** Set excel report */
-            $reportPath = $this->createExcelReport($vacancyData);
+            $reportData = $this->createExcelReport($vacancyData);
 
-            /** Set to database */
+            /** Store to database */
+            // $reportFile = fopen($reportData['path'], 'r');
+            // $reportAttachment   = [
+            //     'url'           => $reportData['url'],
+            //     'attachment'    => [
+            //         'guid'           => $reportData['url'],
+            //         'post_mime_type' => $reportData['type'],
+            //         'post_title'     => preg_replace('/\.[^.]+$/', '', basename($reportData['name'])),
+            //         'post_content'   => '',
+            //         'post_status'    => 'inherit'
+            //     ],
+            //     'name'       => $reportData['name'],
+            //     'file'       => $reportFile
+            // ];
+            // $reportID = wp_insert_attachment($$reportAttachment['attachment'], $$reportAttachment['file']);
 
+            /** Create Post for report */
+            $cptSlug    = 'recruiter-report';
 
-            // $reportPath = 'aa';
+            $data       = [
+                'post_title'    => preg_replace('/\.[^.]+$/', '', $reportData['name']),
+                'post_name'     => StringHelper::makeSlug(preg_replace('/\.[^.]+$/', '', $reportData['name'])),
+                'post_type'     => $cptSlug,
+            ];
+
+            $postModel  = new PostModel();
+            $reportPost = $postModel->create($data);
+
+            /** Log data */
+            $logData['reportData']['postCreate']    = $reportPost;
+            $logData['reportData']['postData']      = $data;
+
+            if (!$reportPost || $reportPost instanceof WP_Error) {
+                if (!$reportPost) {
+                    /** Log Data */
+                    $logData['reportPost']  = $reportPost;
+                    $logData['message']     = 'Failed to create report post!';
+
+                    throw new Exception('Failed to create report post!');
+                } else if ($reportPost instanceof WP_Error) {
+                    /** Log Data */
+                    $logData['reportPost']  = $reportPost->get_error_message();
+                    $logData['message']     = 'Failed to create report post!';
+
+                    throw $reportPost;
+                }
+            }
+
+            /** Set periode */
+            $periodeStart   = new DateTimeImmutable($request['filter']['submittedAfter']);
+            $periodeEnd     = new DateTimeImmutable($request['filter']['submittedBefore']);
+
+            /** Set download url as meta */
+            $downloadURL    = update_post_meta($reportPost, 'rv_company_recruiter_report_url', $reportData['url']);
+            $periodeStart   = update_post_meta($reportPost, 'rv_company_recruiter_report_periode_start', "{$periodeStart->format('Y-m-d')}");
+            $periodeEnd     = update_post_meta($reportPost, 'rv_company_recruiter_report_periode_end', "{$periodeEnd->format('Y-m-d')}");
+
+            // $reportData = 'aa';
             $logData['report'] = [
-                'url'   => $reportPath
+                'data'  => $reportData,
+                'post'  => is_numeric($reportPost) ? $reportPost : $reportPost->ID,
+                'meta'  => [
+                    'periodeStart'  => $periodeStart,
+                    'periodeEnd'    => $periodeEnd,
+                    'download'      => $downloadURL
+                ]
             ];
             Log::info("Report Company Recruiter's vacancies Attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . "_log_report_company_recruiter_vacancy", false);
         } catch (\WP_Error $wp_error) {
@@ -825,10 +892,9 @@ class CompanyRecruiterController extends BaseController
 
             /** Loop each child company */
             $index = 0;
+            $no = 1;
             foreach ($data['data'] as $childCompanyID => $vacancies) {
                 // Log::info("data-data {$childCompanyID}.", $vacancies, date('Y_m_d') . "_log_excel_create", false);
-
-                $no = 1;
 
                 /** Set Table Header */
                 // $headerCol = $coloumn;
@@ -880,8 +946,9 @@ class CompanyRecruiterController extends BaseController
                     foreach ($tableData as $key) {
                         $sheet->getColumnDimension($dataCol)->setAutoSize(true);
 
-                        if ($key == $no) {
-                            $sheet->setCellValue("{$dataCol}{$dataRow}", $no);
+                        if ($key == "no") {
+                            // $urut = $no;
+                            $sheet->setCellValue("{$dataCol}{$dataRow}", "$no");
                         } else {
                             if (is_array($vacancy)) {
                                 if (isset($vacancy[$key])) {
@@ -903,6 +970,7 @@ class CompanyRecruiterController extends BaseController
                     // $sheet[$companyRecruiterID]->setCellValue("D{$dataRow}", $vacancy['status']);
                     // $sheet[$companyRecruiterID]->setCellValue("E{$dataRow}", $vacancy['status']);
 
+                    // $no = (int)$no + 1;
                     $no++;
                     $dataRow++;
                 }
@@ -933,6 +1001,13 @@ class CompanyRecruiterController extends BaseController
         $filename = 'Report-Company-Recruiter-' . date('Y-m-d-H-i-s') . ".xlsx";
         $writer->save("{$filepath}/{$filename}");
 
-        return "{$fileuri}/{$filename}";
+        // return "{$fileuri}/{$filename}";
+        $filemime = mime_content_type("{$filepath}/{$filename}");
+        return [
+            'name'  => $filename,
+            'url'   => "{$fileuri}/{$filename}",
+            'path'  => "{$filepath}/{$filename}",
+            'type'  => $filemime
+        ];
     }
 }
