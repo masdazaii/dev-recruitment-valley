@@ -241,6 +241,36 @@ class AuthMiddleware
         return true;
     }
 
+    public function authorize_all(WP_REST_Request $request)
+    {
+        $allowed = ['candidate', 'company', "company-recruiter"];
+        $handleToken = $this->_handle_token($request);
+
+        if (is_wp_error($handleToken)) {
+            return $handleToken;
+        }
+
+        $user = get_user_by('ID', $handleToken->user_id);
+
+        /** Check if user already verify the OTP */
+        $isVerified = get_user_meta($user->ID, 'otp_is_verified', true);
+
+        if ($isVerified <= 0 || $isVerified == '0') {
+            return new WP_Error("rest_forbidden", $this->_message->get('auth.unauthenticate'), array("status" => 403));
+        }
+
+        if (!in_array(strtolower($user->roles[0]), $allowed)) {
+            return new WP_Error("rest_forbidden", $this->_message->get('auth.unauthenticate'), array("status" => 403));
+        }
+
+        // $request->set_param('user_id', $request->user_id); // this will take the user_id of the currently logged in user
+        $request->set_param('user_id', $handleToken->user_id);
+        $request->set_param('email', $handleToken->user_email);
+        $request->set_param('role', $handleToken->role);
+        $request->set_param('user_role', $handleToken->role);
+        return true;
+    }
+
     public function logout_handle(WP_REST_Request $request)
     {
         $token = $request->get_header('Authorization');

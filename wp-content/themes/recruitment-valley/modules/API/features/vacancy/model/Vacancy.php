@@ -6,12 +6,15 @@ use DateTime;
 use Exception;
 use Helper;
 use Helper\Maphelper;
+use Log;
 use WP_Error;
 use WP_Post;
 use WP_Query;
+use WP_User_Query;
 
 class Vacancy
 {
+    public const post_type = 'vacancy';
     public $vacancy = 'vacancy';
 
     public $vacancy_id;
@@ -111,6 +114,10 @@ class Vacancy
 
     private const status_slug_open          = 'open';
     private const status_slug_processing    = 'processing';
+
+    public const _acf_is_from_company_recruiter = 'rv_vacancy_is_from_company_recruiter';
+    public const _acf_assigned_child_company    = 'rv_vacancy_assigned_child_company';
+    public const _meta_assigned_child_company_uuid   = 'rv_vacancy_assigned_child_company_uuid';
 
     /** Vacancy Meta */
     private $_meta_rv_vacancy_unused_data   = 'rv_vacancy_unused_data';
@@ -1724,5 +1731,225 @@ class Vacancy
         } else {
             throw new Exception('Please specify vacancy!');
         }
+    }
+
+    /**
+     * Select vacancy by status and userID function
+     *
+     * @param String $status
+     * @param Int $userID
+     * @return mixed
+     */
+    public function selectVacancyByStatus(String $status, Int $userID): mixed
+    {
+        $args = [
+            "post_type"     => $this->vacancy,
+            "author__in"    => [$userID],
+            "posts_per_page" => -1,
+            "tax_query" => [
+                [
+                    'taxonomy'  => 'status',
+                    'field'     => 'slug',
+                    'terms'     => array($status),
+                    'operator'  => 'IN'
+                ],
+            ],
+        ];
+
+        $vacancies = new WP_Query($args);
+        return $vacancies;
+    }
+
+    /**
+     * Check if vacancy is belong to company recruiter function
+     *
+     * @return bool
+     */
+    public function checkIsBelongToCompanyRecruiter(): bool
+    {
+        return $this->getProp(self::_acf_is_from_company_recruiter, true);
+    }
+
+    /**
+     * Get assgined Child Company function
+     *
+     * @return mixed
+     */
+    public function getAssignedChildCompany(): mixed
+    {
+        return $this->getProp(self::_acf_assigned_child_company, true);
+    }
+
+    /**
+     * Select Post in vacancy cpt function
+     *
+     * Has the same purpose with the getAllVacancies function,
+     * but have more flexibility.
+     *
+     * @param array $filters
+     * @param array $args
+     * @return WP_Query
+     */
+    public function select(array $filters = [], array $args = []): WP_Query
+    {
+        $args       = self::setArguments($filters, $args);
+        Log::info("FILTERS Vacancy.", json_encode($filters, JSON_PRETTY_PRINT), date('Y_m_d') . "_log_report_company_recruiter_vacancy", false);
+        Log::info("ARGS Vacancy.", json_encode($args, JSON_PRETTY_PRINT), date('Y_m_d') . "_log_report_company_recruiter_vacancy", false);
+        $results    = new WP_Query($args);
+
+        return $results;
+    }
+
+    /**
+     * Set arguments for select function
+     *
+     * @param array $filters
+     * @param array $args
+     * @return array
+     */
+    private function setArguments(array $filters = [], array $args = []): array
+    {
+        if (empty($args)) {
+            $args = [
+                "post_type"         => self::post_type,
+                "posts_per_page"    => $filters['perPage'] ?? -1,
+                "offset"            => $filters['offset'] ?? 0,
+                "orderby"           => $filters['orderBy'] ?? "date",
+                "order"             => $filters['sort'] ?? 'ASC',
+                "post_status"       => "publish",
+            ];
+        }
+
+        if (!empty($filters)) {
+            if (array_key_exists('perPage', $filters)) {
+                $args['posts_per_page'] = $filters['perPage'];
+            }
+
+            if (array_key_exists('offset', $filters)) {
+                $args['offset'] = $filters['offset'];
+            }
+
+            if (array_key_exists('search', $filters)) {
+                $args['search'] = $filters['search'];
+            } else if (array_key_exists('s', $filters)) {
+                $args['search'] = $filters['s'];
+            }
+
+            if (array_key_exists('name', $filters)) {
+                $args['name'] = $filters['name'];
+            } else if (array_key_exists('post_name', $filters)) {
+                $args['name'] = $filters['post_name'];
+            }
+
+            if (array_key_exists('search_columns', $filters)) {
+                $args['search_columns'] = $filters['search_columns'];
+            }
+
+            if (array_key_exists('orderBy', $filters)) {
+                if (is_array($filters['orderBy'])) {
+                    $args['meta_key']   = $filters['orderBy']['key'];
+                    $args['orderby']    = $filters['orderBy']['by'];
+
+                    if (isset($filters['orderBy']['type'])) {
+                        $args['meta_type']  = $filters['orderBy']['type'];
+                    }
+                } else {
+                    $args['orderby'] = $filters['orderBy'];
+                }
+            }
+
+            if (array_key_exists('sort', $filters)) {
+                $args['order'] = $filters['sort'];
+            }
+
+            if (array_key_exists('include', $filters)) {
+                if (is_array($filters['include'])) {
+                    $args['include'] = $filters['include'];
+                } else {
+                    $args['include'] = [$filters['include']];
+                }
+            }
+
+            if (array_key_exists('exclude', $filters)) {
+                if (is_array($filters['exclude'])) {
+                    $args['exclude'] = $filters['exclude'];
+                } else {
+                    $args['exclude'] = [$filters['exclude']];
+                }
+            }
+
+            if (array_key_exists('fields', $filters)) {
+                $args['fields'] = $filters['fields'];
+            }
+
+            if (array_key_exists('assigned', $filters)) {
+                $filters['meta'][] = [
+                    'key'       => self::_acf_assigned_child_company,
+                    'value'     => $filters['assigned'],
+                    'compare'   => '='
+                ];
+
+                $args['meta_query'] = $filters['meta'];
+            }
+
+            if (array_key_exists('meta', $filters)) {
+                $args['meta_query'] = $filters['meta'];
+            }
+
+            if (array_key_exists('taxonomy', $filters)) {
+                $args['tax_query'] = $filters['taxonomy'];
+            }
+
+            if (array_key_exists('postPerPage', $filters)) {
+                $args['posts_per_page'] = $filters['postPerPage'];
+            }
+
+            if (array_key_exists('offset', $filters)) {
+                $args['offset'] = $filters['offset'];
+            }
+
+            if (array_key_exists('orderBy', $filters)) {
+                /** Other orderby value please look at WP_Query docs. */
+                switch ($filters['orderBy']) {
+                    case 'ID':
+                    case 'id':
+                        $args['orderby'] = 'ID';
+                        break;
+                    default:
+                        $args['orderby'] = $filters['orderBy'];
+                        break;
+                }
+            }
+
+            if (array_key_exists('order', $filters)) {
+                switch ($filters['order']) {
+                    case 'DESC':
+                    case 'desc':
+                    case 'descending':
+                        $args['order'] = 'DESC';
+                        break;
+                    case 'ASC':
+                    case 'asc':
+                    case 'ascending':
+                    default:
+                        $args['order'] = 'ASC';
+                        break;
+                }
+            }
+
+            if (array_key_exists('post_status', $filters)) {
+                $args['post_status'] = $filters['post_status'];
+            }
+
+            if (array_key_exists('author', $filters)) {
+                $args['author'] = (int)$filters['author'];
+            }
+
+            if (array_key_exists('in', $filters)) {
+                $args['post__in'] = $filters['in'];
+            }
+        }
+
+        return $args;
     }
 }

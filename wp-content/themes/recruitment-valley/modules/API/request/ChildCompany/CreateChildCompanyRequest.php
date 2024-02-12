@@ -41,7 +41,8 @@ class CreateChildCompanyRequest extends BaseRequest
             "image"                         => ["max_file_size:2000000"],
             "longitude"                     => [],
             "latitude"                      => [],
-            "countryCode"                   => []
+            "countryCode"                   => [],
+            "companyEmail"                  => ["required", "email"]
         ];
     }
 
@@ -61,7 +62,9 @@ class CreateChildCompanyRequest extends BaseRequest
             "street.required"       => __("Street is required!", THEME_DOMAIN),
             "postCode.required"     => __("Post Code is required!", THEME_DOMAIN),
             "image.max_file_size"   => __("Max file size is 2MB", THEME_DOMAIN),
-            "companyVideo.max_file_size"    => __("Max file size is 2MB", THEME_DOMAIN)
+            "companyVideo.max_file_size"    => __("Max file size is 2MB", THEME_DOMAIN),
+            "companyEmail.required"         => __("Company Email is required!", THEME_DOMAIN),
+            "companyEmail.email"            => __("Company Email is not valid!", THEME_DOMAIN)
         ];
     }
 
@@ -93,7 +96,8 @@ class CreateChildCompanyRequest extends BaseRequest
             "image"                         => "",
             "longitude"                     => "",
             "latitude"                      => "",
-            "countryCode"                   => "text"
+            "countryCode"                   => "text",
+            "companyEmail"                  => "text"
         ];
     }
 }

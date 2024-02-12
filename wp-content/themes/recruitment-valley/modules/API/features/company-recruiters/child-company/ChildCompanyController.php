@@ -587,4 +587,58 @@ class ChildCompanyController extends BaseController
             return $this->handleError($th, __CLASS__, __METHOD__, $logData, 'log_update_child_company');
         }
     }
+
+    /**
+     * Get Child company data for vacacny default value function
+     *
+     * @param array $request
+     * @return array
+     */
+    public function getVacancyDefaultValue(array $request): array
+    {
+        /** Log Attempt */
+        $logData = [
+            'request'   => $request
+        ];
+        Log::info("Show Child Company attempt.", json_encode($logData, JSON_PRETTY_PRINT), date("Y_m_d") . "_log_vacancy_default_value_child_company");
+
+        try {
+            if (is_numeric($request['childCompany'])) {
+                $childCompanyModel = ChildCompany::find('id', $request['childCompany']);
+            } else if (is_string($request['childCompany']) && (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $request['childCompany']) == 1)) {
+                $childCompanyModel = ChildCompany::find('uuid', $request['childCompany']);
+            } else if (strpos($request['childCompany'], '-') != false) {
+                $childCompanyModel = ChildCompany::find('slug', $request['childCompany']);
+            } else {
+                $childCompanyModel = ChildCompany::find('slug', $request['childCompany']);
+            }
+
+            $videoUrl = $childCompanyModel->getVideoUrl() ?? null;
+            if ($videoUrl && !empty($videoUrl)) {
+                $videoUrl = strpos($childCompanyModel->getVideoUrl(), "youtu") ? ["type" => "url", "url" => $childCompanyModel->getVideoUrl()] : ["type" => "file", "url" => $childCompanyModel->getVideoUrl()];
+            }
+
+            return [
+                'status'    => 200,
+                'message'   => $this->message->get('company.profile.get_success'),
+                'data'      => [
+                    'videoUrl'      => !empty($videoUrl) ? $videoUrl : null,
+                    'socialMedia'   => [
+                        'facebook'  => $childCompanyModel->getFacebook(),
+                        'linkedin'  => $childCompanyModel->getLinkedin(),
+                        'instagram' => $childCompanyModel->getInstagram(),
+                        'twitter'   => $childCompanyModel->getTwitter(),
+                    ],
+                    'gallery'       => array_values($childCompanyModel->getGallery(true)),
+                    'secondaryEmploymentCondition' => $childCompanyModel->getSecondaryEmploymentCondition() ?? NULL,
+                ]
+            ];
+        } catch (\WP_Error $wp_error) {
+            return $this->handleError($wp_error, __CLASS__, __METHOD__, $logData, 'log_vacancy_default_value_child_company');
+        } catch (Exception $e) {
+            return $this->handleError($e, __CLASS__, __METHOD__, $logData, 'log_vacancy_default_value_child_company');
+        } catch (Throwable $th) {
+            return $this->handleError($th, __CLASS__, __METHOD__, $logData, 'log_vacancy_default_value_child_company');
+        }
+    }
 }

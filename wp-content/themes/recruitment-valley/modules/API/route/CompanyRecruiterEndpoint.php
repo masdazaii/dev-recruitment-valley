@@ -2,6 +2,7 @@
 
 namespace Route;
 
+use Company\Vacancy\VacancyService;
 use Middleware\AuthMiddleware;
 use Service\ChildCompanyService;
 use Service\CompanyRecruiterService;
@@ -23,6 +24,7 @@ class CompanyRecruiterEndpoint
         $companyRecruiterService    = new CompanyRecruiterService();
         $childCompanyService        = new ChildCompanyService();
         $vacancyCrudService         = new VacancyCrudService();
+        $vacancyService             = new VacancyService();
 
         $endpoint = [
             'path'      => 'recruiter',
@@ -83,6 +85,12 @@ class CompanyRecruiterEndpoint
                     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
                     'callback'              => [$childCompanyService, 'listChildCompany']
                 ],
+                'create-paid-vacancy-default-value' => [
+                    'url'                   => self::uri_child_company . "/(?P<childCompany>[-\w]+)/create-paid-vacancy-default-value",
+                    'methods'               => 'GET',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
+                    'callback'              => [$childCompanyService, 'getCreatePaidVacancyDefaultValue']
+                ],
                 'show_child_company'        => [
                     'url'                   => self::uri_child_company . "/(?P<childCompany>[-\w]+)",
                     'methods'               => 'GET',
@@ -109,19 +117,19 @@ class CompanyRecruiterEndpoint
                 // ],
 
                 /** Vacancy */
-                // 'create_free_job' => [
+                // 'create_free_vacancy' => [
                 //     'url'                   => 'vacancy/free',
                 //     'methods'               => 'POST',
                 //     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
                 //     'callback'              => [$vacancyCrudService, 'createFreeJob']
                 // ],
-                'create_paid_job' => [
+                'create_paid_vacancy' => [
                     'url'                   => 'vacancy/paid',
                     'methods'               => 'POST',
                     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
                     'callback'              => [$vacancyCrudService, 'createPaidJob']
                 ],
-                'update_paid_job' => [
+                'update_paid_vacancy' => [
                     'url'                   => 'vacancy/paid/(?P<vacancy_id>[-\w]+)',
                     'methods'               => 'POST',
                     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
@@ -133,6 +141,24 @@ class CompanyRecruiterEndpoint
                     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
                     'callback'              => [$vacancyCrudService, 'trash']
                 ],
+                'list_vacancies_dashbord' => [
+                    'url'                   => 'vacancies',
+                    'methods'               => 'GET',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
+                    'callback'              => [$vacancyService, 'getAll']
+                ],
+                'count_vacancy_each_status' => [
+                    'url'                   => 'dashboard/vacancy/status',
+                    'methods'               => 'GET',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
+                    'callback'              => [$vacancyService, 'getCountbyStatus']
+                ],
+                'show_vacancy_dashboard' => [
+                    'url'                   => 'vacancy/(?P<vacancy_id>[-\w]+)',
+                    'methods'               => 'GET',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
+                    'callback'              => [$vacancyService, 'get']
+                ]
             ]
 
         ];

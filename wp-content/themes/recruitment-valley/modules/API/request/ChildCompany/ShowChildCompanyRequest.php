@@ -18,8 +18,6 @@ class ShowChildCompanyRequest extends BaseRequest
 
     public function rules(): array
     {
-        // print('<pre>' . print_r($this->request->get_params(), true) . '</pre>');
-        // die;
         if (is_numeric($this->request->get_params()['childCompany'])) {
             return [
                 'childCompany'  => ['exists:post/child-company/id']

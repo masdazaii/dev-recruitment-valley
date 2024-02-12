@@ -3,6 +3,7 @@
 namespace Model;
 
 use Exception;
+use Log;
 use Model\Company;
 use WP_Error;
 use WP_User;
@@ -297,7 +298,7 @@ class CompanyRecruiter extends BaseModel
     {
         // print('<pre>' . print_r($this->get(self::acf_recruiter_name, true, 'acf'), true) . '</pre>');
         // print('<pre>' . print_r(get_field(self::acf_recruiter_name, "user_{$this->id}", true), true) . '</pre>');
-        print('<pre>' . print_r(get_field("rv_urecruiter_name", "user_{$this->id}", true), true) . '</pre>');
+        // print('<pre>' . print_r(get_field("rv_urecruiter_name", "user_{$this->id}", true), true) . '</pre>');
         return $this->get(self::acf_recruiter_name, true, 'acf');
     }
 

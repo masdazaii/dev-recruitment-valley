@@ -3,6 +3,7 @@
     "tgmpa/tgm-plugin-activation": "^2.6",
     "firebase/php-jwt": "^6.8",
     "stripe/stripe-php": "^10.21",
-    "aws/aws-sdk-php": "^3.283"
+    "aws/aws-sdk-php": "^3.283",
+    "phpoffice/phpspreadsheet": "^2.0"
   }
 }

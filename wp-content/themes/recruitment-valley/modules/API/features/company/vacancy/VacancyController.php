@@ -43,15 +43,20 @@ class VacancyController
 
     public function getTermCount($request)
     {
-        $this->company->setUserId($request["user_id"]);
+        // $this->company->setUserId($request["user_id"]);
+        $vacancyModel = new Vacancy();
 
         return [
             "status" => 200,
             "data" => [
-                "open" => $this->company->getVacancyByStatus('open'),
-                "close" => $this->company->getVacancyByStatus('close'),
-                "declined" => $this->company->getVacancyByStatus('declined'),
-                "processing" => $this->company->getVacancyByStatus('processing'),
+                // "open" => $this->company->getVacancyByStatus('open'),
+                // "close" => $this->company->getVacancyByStatus('close'),
+                // "declined" => $this->company->getVacancyByStatus('declined'),
+                // "processing" => $this->company->getVacancyByStatus('processing'),
+                "open"          => $vacancyModel->selectVacancyByStatus('open', $request['user_id'])->found_posts,
+                "close"         => $vacancyModel->selectVacancyByStatus('close', $request['user_id'])->found_posts,
+                "declined"      => $vacancyModel->selectVacancyByStatus('declined', $request['user_id'])->found_posts,
+                "processing"    => $vacancyModel->selectVacancyByStatus('processing', $request['user_id'])->found_posts,
             ],
         ];
     }

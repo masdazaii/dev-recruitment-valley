@@ -86,7 +86,27 @@ class ChildCompanyService
             ]);
         }
 
-        $response = $this->childCompanyController->store($updateChildCompanyRequest->sanitized());
+        $response = $this->childCompanyController->update($updateChildCompanyRequest->sanitized());
+        return ResponseHelper::build($response);
+    }
+
+    /**
+     * Get Child Company data for create vacancy default value service
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function getCreatePaidVacancyDefaultValue(WP_REST_Request $request)
+    {
+        $showChildCompanyRequest = new ShowChildCompanyRequest($request);
+        if (!$showChildCompanyRequest->validate()) {
+            return ResponseHelper::build([
+                'status'    => 400,
+                'message'   => $showChildCompanyRequest->getFirstError(),
+            ]);
+        }
+
+        $response = $this->childCompanyController->getVacancyDefaultValue($showChildCompanyRequest->sanitized());
         return ResponseHelper::build($response);
     }
 }

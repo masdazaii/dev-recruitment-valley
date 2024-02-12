@@ -223,13 +223,13 @@ class GlobalEndpoint
                 'check_unread'  => [
                     'url'                   => '/notifications/check-unread',
                     'methods'               => 'GET',
-                    'permission_callback'   => [$authMiddleware, 'authorize_both'],
+                    'permission_callback'   => [$authMiddleware, 'authorize_all'],
                     'callback'              => [$notificationService, 'countUnread']
                 ],
                 'read_all_notifications' => [
                     'url'                   => '/notifications/read-all',
                     'methods'               => 'POST',
-                    'permission_callback'   => [$authMiddleware, 'authorize_both'],
+                    'permission_callback'   => [$authMiddleware, 'authorize_all'],
                     'callback'              => [$notificationService, 'readAll']
                 ],
                 'read_notification' => [
@@ -241,7 +241,7 @@ class GlobalEndpoint
                 'delete_notification' => [
                     'url'                   => '/notifications/(?P<notif_id>[-\w]+)',
                     'methods'               => 'DELETE',
-                    'permission_callback'   => [$authMiddleware, 'authorize_both'],
+                    'permission_callback'   => [$authMiddleware, 'authorize_all'],
                     'callback'              => [$notificationService, 'delete']
                 ],
                 // import endpoint test start here,
