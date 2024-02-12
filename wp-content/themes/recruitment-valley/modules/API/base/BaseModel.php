@@ -78,7 +78,7 @@ abstract class BaseModel
             if (strpos($this->selector, 'user') !== false) {
                 return get_user_meta($this->id, $this->prefix . $key, $result);
             } else {
-                return get_post_meta($this->selector, $key, $result);
+                return get_post_meta($this->id, $this->prefix . $key, $result);
             }
         } else {
             return get_field($this->prefix . $key, $this->selector, $result);

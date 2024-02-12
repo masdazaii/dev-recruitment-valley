@@ -309,7 +309,7 @@ class VacancyResponse
                     'sector'        => $company->getTerms('sector'),
                     "totalEmployee" => $company->getTotalEmployees(),
                     "tel"   => $company->getPhoneCode() . $company->getPhone(),
-                    "email" => $company->getEmail(),
+                    "email" => $company->getEmail() ?? '-',
                     "gallery"   => $company->getGallery(true),
                     // "socialMedia"   =>
                     //     "facebook" => $company->getFacebook(),
