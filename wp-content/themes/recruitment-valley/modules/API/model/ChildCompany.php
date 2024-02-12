@@ -75,6 +75,7 @@ class ChildCompany extends Company
     public static function select(array $filters = [], array $args = []): WP_Query
     {
         $args       = self::setArguments($filters, $args);
+        print('<pre>' . print_r($args, true) . '</pre>');
         $results    = new WP_Query($args);
 
         return $results;
@@ -116,9 +117,9 @@ class ChildCompany extends Company
             }
 
             if (array_key_exists('name', $filters)) {
-                $args['name'] = $filters['name'];
+                $args['post_name'] = $filters['name'];
             } else if (array_key_exists('post_name', $filters)) {
-                $args['name'] = $filters['post_name'];
+                $args['post_name'] = $filters['post_name'];
             }
 
             if (array_key_exists('search_columns', $filters)) {

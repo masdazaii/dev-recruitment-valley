@@ -38,11 +38,31 @@ class ChildCompanyController extends BaseController
             /** Create UUID for child company */
             $uuid   = wp_generate_uuid4();
 
+            /** Create Slug */
+            $companySlug    = StringHelper::makeSlug($request['companyName'] . '-' . $uuid);
+
+            /** Check if name is used in same company recruiter */
+            $checkChildCompanyFilter = [
+                'owner' => $request['user_id'],
+                'name'  => $request['companyName'],
+            ];
+            $checkChildCompany  = ChildCompany::select($checkChildCompanyFilter);
+            if ($checkChildCompany->found_posts > 0) {
+                /** Log Attempt */
+                $logData['message'] = 'DUPLICATE NAME WITHIN SAME OWNER!';
+                $logData['foundChildCompany']   = $checkChildCompany->found_posts;
+                Log::error("FAIL Store Child Company attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . "_log_store_child_company");
+
+                return [
+                    'status'    => 400,
+                    'message'   => $this->message->get("company_recruiter.child_company.already_exists", [$request['companyName'], ""]),
+                ];
+            }
+
             /** Create post for child company */
-            $companySlug    = StringHelper::makeSlug($request['companyName']) . '-' . $uuid;
             $data           = [
                 'post_title'    => $request['companyName'],
-                'post_name'     => StringHelper::makeSlug($companySlug),
+                'post_name'     => $companySlug,
                 'post_type'     => 'child-company',
             ];
             $childCompany   = ChildCompany::insert($data);
