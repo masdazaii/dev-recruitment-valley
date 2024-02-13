@@ -23,8 +23,8 @@ class ChildCompanyResource
             $childCompany = ChildCompany::find('id', $company->ID);
 
             $results[] = [
-                // "ID"    => $company->ID,
-                "ID"    => $childCompany->getUUID(),
+                "ID"    => $company->ID,
+                // "ID"    => $childCompany->getUUID(),
                 "slug"  => $company->post_name,
                 "UUID"  => $childCompany->getUUID(),
                 "companyName"   => $childCompany->getName() ?? NULL,

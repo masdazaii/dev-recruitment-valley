@@ -44,9 +44,11 @@ class ChildCompanyController extends BaseController
             /** Check if name is used in same company recruiter */
             $checkChildCompanyFilter = [
                 'owner' => $request['user_id'],
-                'name'  => $request['companyName'],
+                'title' => $request['companyName'],
             ];
+            add_filter('posts_where', 'exact_title_search', 10, 2);
             $checkChildCompany  = ChildCompany::select($checkChildCompanyFilter);
+
             if ($checkChildCompany->found_posts > 0) {
                 /** Log Attempt */
                 $logData['message'] = 'DUPLICATE NAME WITHIN SAME OWNER!';
@@ -233,6 +235,11 @@ class ChildCompanyController extends BaseController
             return [
                 'status'    => 200,
                 'message'   => $this->message->get("profile.setup.success"),
+                'data'      => [
+                    'id'    => $childCompany->user_id,
+                    'slug'  => $companySlug,
+                    'uuid'  => $uuid
+                ]
             ];
         } catch (\WP_Error $wp_error) {
             $this->wpdb->query('ROLLBACK');

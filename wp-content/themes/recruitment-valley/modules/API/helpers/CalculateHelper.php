@@ -58,10 +58,11 @@ class CalculateHelper
         foreach ($haystack as $key => $keywordsHaystack) {
             // Count levenshtein cost for each keyword
             foreach ($keywordsHaystack as $word) {
-                $levenshteinCost = levenshtein($word, $string, 1, 1, 1);
+                // $levenshteinCost = levenshtein($word, $string, 1, 1, 1);
+                $levenshteinCost = levenshtein($word, $string, $insertion, $replacement, $deletion);
 
                 // Store if cost is not pass the threshold
-                if ((int)$levenshteinCost < $threshold) {
+                if ((int)$levenshteinCost <= $threshold) {
                     // Check if cost is already stored
                     if (array_key_exists($key, $levenshteinValue) && $levenshteinValue[$key] !== "" && $levenshteinValue[$key] !== null) {
                         // Set only lowest cost for each term

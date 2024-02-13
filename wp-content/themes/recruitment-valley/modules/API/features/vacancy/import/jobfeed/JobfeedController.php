@@ -631,7 +631,10 @@ class JobfeedController
                             ];
 
                             /** Get closest role */
-                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession['label'])), 5, 1, 1, 1, 'array');
+                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession['label'])), 8, 1, 1, 1, 'array');
+                            if (!$taxonomy['role'] || empty($taxonomy['role'])) {
+                                $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], htmlspecialchars(strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession['label']))), 8, 1, 1, 1, 'array');
+                            }
 
                             /** Unset used key */
                             // unset($vacancy->profession);
@@ -642,7 +645,10 @@ class JobfeedController
                                 'label' => property_exists($vacancy->profession, 'label') ? $vacancy->profession->label : ''
                             ];
 
-                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession->label)), 5, 1, 1, 1, 'array');
+                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession->label)), 8, 1, 1, 1, 'array');
+                            if (!$taxonomy['role'] || empty($taxonomy['role'])) {
+                                $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], htmlspecialchars(strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession->label))), 8, 1, 1, 1, 'array');
+                            }
                         }
                     } else if (isset($vacancy->profession_group)) {
                         if (is_array($vacancy->profession_group) && array_key_exists('label', $vacancy->profession_group)) {
@@ -653,7 +659,10 @@ class JobfeedController
                             ];
 
                             /** Get closest role */
-                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_group['label'])), 5, 1, 1, 1, 'array');
+                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_group['label'])), 8, 1, 1, 1, 'array');
+                            if (!$taxonomy['role'] || empty($taxonomy['role'])) {
+                                $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], htmlspecialchars(strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_group['label']))), 8, 1, 1, 1, 'array');
+                            }
 
                             /** Unset used key */
                             // unset($vacancy->profession_group);
@@ -664,7 +673,10 @@ class JobfeedController
                                 'label' => property_exists($vacancy->profession_group, 'label') ? $vacancy->profession_group->label : ''
                             ];
 
-                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_group->label)), 5, 1, 1, 1, 'array');
+                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_group->label)), 8, 1, 1, 1, 'array');
+                            if (!$taxonomy['role'] || empty($taxonomy['role'])) {
+                                $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], htmlspecialchars(strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_group->label))), 8, 1, 1, 1, 'array');
+                            }
                         }
                     } else if (isset($vacancy->profession_class)) {
                         if (is_array($vacancy->profession_class) && array_key_exists('label', $vacancy->profession_class)) {
@@ -675,7 +687,10 @@ class JobfeedController
                             ];
 
                             /** Get closest role */
-                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_class['label'])), 5, 1, 1, 1, 'array');
+                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_class['label'])), 8, 1, 1, 1, 'array');
+                            if (!$taxonomy['role'] || empty($taxonomy['role'])) {
+                                $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], htmlspecialchars(strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_class['label']))), 8, 1, 1, 1, 'array');
+                            }
 
                             /** Unset used key */
                             // unset($vacancy->profession_class);
@@ -686,7 +701,10 @@ class JobfeedController
                                 'label' => property_exists($vacancy->profession_class, 'label') ? $vacancy->profession_class->label : ''
                             ];
 
-                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_class->label)), 5, 1, 1, 1, 'array');
+                            $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_class->label)), 8, 1, 1, 1, 'array');
+                            if (!$taxonomy['role'] || empty($taxonomy['role'])) {
+                                $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords['role'], htmlspecialchars(strtolower(preg_replace('/[\n\t]+/', '', $vacancy->profession_class->label))), 8, 1, 1, 1, 'array');
+                            }
                         }
                     }
 
@@ -762,7 +780,10 @@ class JobfeedController
                             ];
 
                             /** Get closest role */
-                            $taxonomy['sector'] = CalculateHelper::calcLevenshteinCost($this->_keywords['sector'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->organization_industry['label'])), 5, 1, 1, 1, 'array');
+                            $taxonomy['sector'] = CalculateHelper::calcLevenshteinCost($this->_keywords['sector'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->organization_industry['label'])), 8, 1, 1, 1, 'array');
+                            if (!$taxonomy['sector'] || empty($taxonomy['sector'])) {
+                                $taxonomy['sector'] = CalculateHelper::calcLevenshteinCost($this->_keywords['sector'], htmlspecialchars(strtolower(preg_replace('/[\n\t]+/', '', $vacancy->organization_industry['label']))), 8, 1, 1, 1, 'array');
+                            }
 
                             /** Unset used key */
                             // unset($vacancy->organization_industry);
@@ -773,7 +794,10 @@ class JobfeedController
                                 'label' => property_exists($vacancy->organization_industry, 'label') ? $vacancy->organization_industry->label : ''
                             ];
 
-                            $taxonomy['sector'] = CalculateHelper::calcLevenshteinCost($this->_keywords['sector'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->organization_industry->label)), 5, 1, 1, 1, 'array');
+                            $taxonomy['sector'] = CalculateHelper::calcLevenshteinCost($this->_keywords['sector'], strtolower(preg_replace('/[\n\t]+/', '', $vacancy->organization_industry->label)), 8, 1, 1, 1, 'array');
+                            if (!$taxonomy['sector'] || empty($taxonomy['sector'])) {
+                                $taxonomy['sector'] = CalculateHelper::calcLevenshteinCost($this->_keywords['sector'], htmlspecialchars(strtolower(preg_replace('/[\n\t]+/', '', $vacancy->organization_industry->label))), 8, 1, 1, 1, 'array');
+                            }
                         }
                     }
 

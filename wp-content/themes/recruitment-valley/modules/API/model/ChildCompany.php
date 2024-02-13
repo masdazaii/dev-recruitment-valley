@@ -122,6 +122,12 @@ class ChildCompany extends Company
                 $args['post_name'] = $filters['post_name'];
             }
 
+            if (array_key_exists('title', $filters)) {
+                $args['post_title'] = $filters['title'];
+            } else if (array_key_exists('post_title', $filters)) {
+                $args['post_title'] = $filters['post_title'];
+            }
+
             if (array_key_exists('search_columns', $filters)) {
                 $args['search_columns'] = $filters['search_columns'];
             }

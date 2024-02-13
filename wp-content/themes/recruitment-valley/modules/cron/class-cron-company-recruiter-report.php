@@ -36,6 +36,11 @@ class CronCompanyRecruiterReport
         }
     }
 
+    /**
+     * Create Report function
+     *
+     * @return void
+     */
     public function createReport()
     {
         /** Get today's date */
@@ -46,13 +51,15 @@ class CronCompanyRecruiterReport
         /** Check if first date of the month */
         if ($todayDate == 1) {
             $lastMonth  = $now->modify('-1 month');
+            $yesterday  = $now->modify('-1 day');
+
             /** Create Report */
             $companyRecruiterController = new CompanyRecruiterController();
             $companyRecruiterController->report([
                 'filter'    => [
                     'companyRecruiter'  => 'all',
                     'submittedAfter'    => $lastMonth->format('Y-m-d'),
-                    'submittedBefore'   => $today,
+                    'submittedBefore'   => $yesterday->format('Y-m-d'),
                 ]
             ]);
         }
