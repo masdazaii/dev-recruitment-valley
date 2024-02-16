@@ -37,6 +37,7 @@ class UserService
             $decodedToken = JWT::decode($jwtoken, new Key(JWT_SECRET, "HS256"));
 
             $user = get_user_by('ID', $decodedToken->user_id);
+
             $params['user_id'] = $decodedToken->user_id;
             $params['roles'] = $user->roles[0];
         } catch (DomainException $e) {
@@ -61,21 +62,21 @@ class UserService
         return ResponseHelper::build($response);
     }
 
-    public function deleteAccount( WP_REST_Request $request )
+    public function deleteAccount(WP_REST_Request $request)
     {
-        $response = $this->userController->deleteAccount( $request );
-        return ResponseHelper::build( $response );
+        $response = $this->userController->deleteAccount($request);
+        return ResponseHelper::build($response);
     }
 
-    public function deleteAccountPermanent( WP_REST_Request $request )
+    public function deleteAccountPermanent(WP_REST_Request $request)
     {
-        $response = $this->userController->deleteAccountPermanent( $request );
-        return ResponseHelper::build( $response );
+        $response = $this->userController->deleteAccountPermanent($request);
+        return ResponseHelper::build($response);
     }
 
-    public function reactivate( WP_REST_Request $request )
+    public function reactivate(WP_REST_Request $request)
     {
         $response = $this->userController->reactivate($request);
-        return ResponseHelper::build( $response );
+        return ResponseHelper::build($response);
     }
 }

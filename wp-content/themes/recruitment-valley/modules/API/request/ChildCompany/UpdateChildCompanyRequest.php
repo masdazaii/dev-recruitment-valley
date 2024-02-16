@@ -37,7 +37,7 @@ class UpdateChildCompanyRequest extends BaseRequest
             "postCode"          => ["required"],
             "shortDescription"              => [],
             "secondaryEmploymentConditions" => [],
-            "companyVideo"                  => ["max_file_size:2000000"],
+            "companyVideo"                  => ["max_file_size:10000000"],
             "image"                         => ["max_file_size:2000000"],
             "longitude"                     => [],
             "latitude"                      => [],
@@ -62,7 +62,7 @@ class UpdateChildCompanyRequest extends BaseRequest
             "street.required"       => __("Street is required!", THEME_DOMAIN),
             "postCode.required"     => __("Post Code is required!", THEME_DOMAIN),
             "image.max_file_size"   => __("Max file size is 2MB", THEME_DOMAIN),
-            "companyVideo.max_file_size"    => __("Max file size is 2MB", THEME_DOMAIN),
+            "companyVideo.max_file_size"    => __("Max file size is 10MB", THEME_DOMAIN),
             "companyEmail.email"            => __("Company Email is not valid email address!", THEME_DOMAIN)
         ];
     }

@@ -30,7 +30,7 @@ class RecruiterRole
 
         /** Override the email function for case : Send link to change password. */
         add_filter('wp_new_user_notification_email', [$this, 'customWPUserNotificationEmail'], 10, 3);
-        // add_filter('wp_new_user_notification_email_admin', [$this, 'customAdminWPUserNotificationEmail'], 10, 3);
+        add_filter('wp_new_user_notification_email_admin', [$this, 'customAdminWPUserNotificationEmail'], 10, 3);
     }
 
     public function addCompanyRecruiterRole()
@@ -106,6 +106,32 @@ class RecruiterRole
         $newUserNotificationEmail['message']  = Email::render_html_email('new-recruiter-registered-email.php', $args);
 
         return $newUserNotificationEmail;
+    }
+
+    public function customAdminWPUserNotificationEmail(array $newUserNotificationEmail, WP_User $user, string $blogname)
+    {
+        /** Log attempt */
+        $logData = [
+            'request'   => [
+                'userNotifEmail'    => $newUserNotificationEmail,
+                'user'              => $user->ID,
+                'blogname'          => $blogname
+            ],
+            'currentUserID' => get_current_user_id(),
+        ];
+
+        /** Log Data */
+        Log::info('ADMIN New Recruiter Account.', $logData, date('Y_m_d') . '_log_new_recruiter_registered', false);
+
+        $args = [
+            'site_name'     => $blogname ?? get_bloginfo('name') ?? 'Recruitment Valley',
+            'user_email'    => isset($user->user_email) ? $user->user_email : '',
+            'user_role'     => isset($user->user_email) ? $user->roles[0] : ''
+        ];
+
+        $site_title = $blogname ?? get_bloginfo('name') ?? 'Recruitment Valley';
+        $newUserNotificationEmail['subject']  = "{$site_title} - New User Registration";
+        $newUserNotificationEmail['message']  = Email::render_html_email('new-recruiter-registered-email-admin.php', $args);
     }
 
     public function addCompanyRecruiterMeta(Int $userID, array $userdata = [])

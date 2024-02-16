@@ -55,11 +55,14 @@ class FlexFeedController
     {
         error_log('Import Flexfeed Called.');
 
+        /** Get All terms */
+        $this->_getTerms();
+
         /** Get Mapped Keyword from option */
         $this->_getMappedKeyword();
 
         /** Get All terms */
-        $this->_getTerms();
+        // $this->_getTerms();
 
         /** Parse and store data */
         $this->_parse($limit, $offset);
@@ -99,6 +102,7 @@ class FlexFeedController
 
                 /** Log the response */
                 error_log(json_encode($response));
+                Log::info('FLEEXFEED RESPONSE.' . json_encode($response), JSON_PRETTY_PRINT, date('Y_m_d') . '_flexfeed_response');
 
                 /** Map the data only if response is 200 */
                 if ($responseCode != 200) {

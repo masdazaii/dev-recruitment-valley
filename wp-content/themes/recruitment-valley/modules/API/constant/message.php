@@ -234,11 +234,16 @@ class Message
             ],
             'company_recruiter' => [
                 "child_company" => [
+                    "store_success"     => __("Success registering data of child company!", THEME_DOMAIN),
+                    "already_exists"    => __("Child company with name : \"%s\" is already exists!%s", THEME_DOMAIN),
                     "list_success"      => __("Show %s data of child company!", THEME_DOMAIN),
                     "show_not_found"    => __("Child Company not found!", THEME_DOMAIN),
                     "show_success"      => __("Success Child Company data!", THEME_DOMAIN),
                     "show_unauthorized" => __("Your Child Company not found!", THEME_DOMAIN),
                 ],
+                'profile'   => [
+                    "get_success"   => __("Success get company recruiter profile!%s", THEME_DOMAIN)
+                ]
             ],
             'package' => [
                 "package" => [

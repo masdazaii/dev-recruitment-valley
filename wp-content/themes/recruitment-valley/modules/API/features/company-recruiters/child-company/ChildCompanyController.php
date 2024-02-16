@@ -38,11 +38,33 @@ class ChildCompanyController extends BaseController
             /** Create UUID for child company */
             $uuid   = wp_generate_uuid4();
 
+            /** Create Slug */
+            $companySlug    = StringHelper::makeSlug($request['companyName'] . '-' . $uuid);
+
+            /** Check if name is used in same company recruiter */
+            $checkChildCompanyFilter = [
+                'owner' => $request['user_id'],
+                'title' => $request['companyName'],
+            ];
+            add_filter('posts_where', 'exact_title_search', 10, 2);
+            $checkChildCompany  = ChildCompany::select($checkChildCompanyFilter);
+
+            if ($checkChildCompany->found_posts > 0) {
+                /** Log Attempt */
+                $logData['message'] = 'DUPLICATE NAME WITHIN SAME OWNER!';
+                $logData['foundChildCompany']   = $checkChildCompany->found_posts;
+                Log::error("FAIL Store Child Company attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . "_log_store_child_company");
+
+                return [
+                    'status'    => 400,
+                    'message'   => $this->message->get("company_recruiter.child_company.already_exists", [$request['companyName'], ""]),
+                ];
+            }
+
             /** Create post for child company */
-            $companySlug    = StringHelper::makeSlug($request['companyName']) . '-' . $uuid;
             $data           = [
                 'post_title'    => $request['companyName'],
-                'post_name'     => StringHelper::makeSlug($companySlug),
+                'post_name'     => $companySlug,
                 'post_type'     => 'child-company',
             ];
             $childCompany   = ChildCompany::insert($data);
@@ -213,6 +235,11 @@ class ChildCompanyController extends BaseController
             return [
                 'status'    => 200,
                 'message'   => $this->message->get("profile.setup.success"),
+                'data'      => [
+                    'id'    => $childCompany->user_id,
+                    'slug'  => $companySlug,
+                    'uuid'  => $uuid
+                ]
             ];
         } catch (\WP_Error $wp_error) {
             $this->wpdb->query('ROLLBACK');
@@ -321,7 +348,7 @@ class ChildCompanyController extends BaseController
                 $childCompanyModel = ChildCompany::find('id', $request['childCompany']);
             } else if (is_string($request['childCompany']) && (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $request['childCompany']) == 1)) {
                 $childCompanyModel = ChildCompany::find('uuid', $request['childCompany']);
-            } else if (strpos($request['childCompany'], '-') != false) {
+            } else if (is_string($request['childCompany']) && strpos($request['childCompany'], '-') != false) {
                 $childCompanyModel = ChildCompany::find('slug', $request['childCompany']);
             } else {
                 $childCompanyModel = ChildCompany::find('slug', $request['childCompany']);
@@ -388,7 +415,7 @@ class ChildCompanyController extends BaseController
                 $childCompany = ChildCompany::find('id', $request['childCompany']);
             } else if (is_string($request['childCompany']) && (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $request['childCompany']) == 1)) {
                 $childCompany = ChildCompany::find('uuid', $request['childCompany']);
-            } else if (strpos($request['childCompany'], '-') != false) {
+            } else if (is_string($request['childCompany']) && strpos($request['childCompany'], '-') != false) {
                 $childCompany = ChildCompany::find('slug', $request['childCompany']);
             } else {
                 $childCompany = ChildCompany::find('slug', $request['childCompany']);
@@ -612,7 +639,7 @@ class ChildCompanyController extends BaseController
                 $childCompanyModel = ChildCompany::find('id', $request['childCompany']);
             } else if (is_string($request['childCompany']) && (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $request['childCompany']) == 1)) {
                 $childCompanyModel = ChildCompany::find('uuid', $request['childCompany']);
-            } else if (strpos($request['childCompany'], '-') != false) {
+            } else if (is_string($request['childCompany']) && strpos($request['childCompany'], '-') != false) {
                 $childCompanyModel = ChildCompany::find('slug', $request['childCompany']);
             } else {
                 $childCompanyModel = ChildCompany::find('slug', $request['childCompany']);
