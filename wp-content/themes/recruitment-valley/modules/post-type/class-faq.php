@@ -16,6 +16,7 @@ class FaqCPT extends RegisterCPT
         $title  = __('FAQ', THEME_DOMAIN);
         $slug   = 'faq';
         $args   = [
+            'publicly_queryable' => false,
             'menu_position' => 5,
             'supports'      => array('title', 'editor', 'author', 'thumbnail'),
         ];

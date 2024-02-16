@@ -19,6 +19,7 @@ class ApplicantCPT extends RegisterCPT
     {
         $additionalArgs = [
             'menu_posisiton' => 5,
+            'publicly_queryable' => false,
             'has_archive' => true,
             'public' => true,
             'hierarchical' => false,

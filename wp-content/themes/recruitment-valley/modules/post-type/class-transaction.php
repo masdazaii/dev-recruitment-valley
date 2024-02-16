@@ -14,6 +14,7 @@ class Transaction extends RegisterCPT
         $title = __('Transactions', THEME_DOMAIN);
         $slug = 'transaction';
         $args = [
+            'publicly_queryable' => false,
             'menu_position' => 10,
             'supports' => array('title', 'editor', 'author', 'thumbnail')
         ];

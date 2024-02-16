@@ -16,6 +16,7 @@ class Coupon extends RegisterCPT
     public function CreateCouponCPT()
     {
         $additionalArgs = [
+            'publicly_queryable' => false,
             'menu_posisiton' => 5,
             'has_archive' => true,
             'public' => true,

@@ -22,6 +22,7 @@ class ContactCPT extends RegisterCPT
     public function contactCreateCPT()
     {
         $additionalArgs = [
+            'publicly_queryable' => false,
             'menu_posisiton' => 5,
             'has_archive' => true,
             'public' => true,

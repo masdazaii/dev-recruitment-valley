@@ -14,6 +14,7 @@ class Package extends RegisterCPT
         $title = __('Packages', THEME_DOMAIN);
         $slug = 'package';
         $args = [
+            'publicly_queryable' => false,
             'menu_position' => 6
         ];
 

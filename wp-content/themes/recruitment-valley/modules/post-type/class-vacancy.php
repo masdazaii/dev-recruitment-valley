@@ -62,6 +62,7 @@ class Vacancy extends RegisterCPT
         $title = __('Vacancies', THEME_DOMAIN);
         $slug = 'vacancy';
         $args = [
+            'publicly_queryable' => false,
             'menu_position' => 5,
             'supports' => array('title', 'editor', 'author', 'thumbnail')
         ];
