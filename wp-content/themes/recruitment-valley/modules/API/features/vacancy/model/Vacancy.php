@@ -71,8 +71,11 @@ class Vacancy
     public $acf_distance_from_city = "distance_from_city";
     public $acf_country_code = "rv_vacancy_country_code";
 
+    /** 01 11 2023 added acf */
+    private $acf_rv_vacancy_language = "rv_vacancy_language";
+
     /** ACF for imported vacancy */
-    private $_acf_is_imported = "rv_vacancy_is_imported";
+    public $_acf_is_imported = "rv_vacancy_is_imported";
     private $_acf_imported_vacancy_source_id = "rv_vacancy_imported_source_id";
     private $_acf_imported_company_name = "rv_vacancy_imported_company_name";
     private $_acf_imported_company_city = "rv_vacancy_imported_company_city";
@@ -80,22 +83,48 @@ class Vacancy
     private $_acf_imported_company_email = "rv_vacancy_imported_company_email";
     private $_acf_imported_company_city_longitude = "rv_vacancy_imported_company_city_longitude";
     private $_acf_imported_company_city_latitude = "rv_vacancy_imported_company_city_latitude";
+    private $_acf_imported_company_sector = "rv_vacancy_imported_company_sector";
+    private $_acf_imported_company_total_employees = "rv_vacancy_imported_company_total_employees";
 
     private $_acf_imported_approved_by      = "rv_vacancy_imported_approved_by";
     private $_acf_imported_approved_status  = "rv_vacancy_imported_approval_status";
 
+    /** ACF For Vacancy is for another company (Vonq case) */
+    private $_acf_rv_vacancy_is_for_another_company = "rv_vacancy_is_for_another_company";
+    private $_acf_rv_vacancy_use_existing_company   = "rv_vacancy_use_existing_company";
+    private $_acf_rv_vacancy_selected_company       = "rv_vacancy_selected_company";
+    private $_acf_rv_vacancy_custom_company_logo    = "rv_vacancy_custom_company_logo";
+    private $_acf_rv_vacancy_custom_company_name    = "rv_vacancy_custom_company_name";
+    private $_acf_rv_vacancy_custom_company_sector  = "rv_vacancy_custom_company_sector";
+    private $_acf_rv_vacancy_custom_company_email   = "rv_vacancy_custom_company_email";
+    private $_acf_rv_vacancy_custom_company_phone_code      = "rv_vacancy_custom_company_phone_code";
+    private $_acf_rv_vacancy_custom_company_phone_number    = "rv_vacancy_custom_company_phone_number";
+    private $_acf_rv_vacancy_custom_company_total_employees = "rv_vacancy_custom_company_total_employees";
+    private $_acf_rv_vacancy_custom_company_description     = "rv_vacancy_custom_company_description";
+    private $_acf_rv_vacancy_custom_company_country     = "rv_vacancy_custom_company_country";
+    private $_acf_rv_vacancy_custom_company_city        = "rv_vacancy_custom_company_city";
+    private $_acf_rv_vacancy_custom_company_address     = "rv_vacancy_custom_company_address";
+    private $_acf_vacancy_custom_company_longitude      = "rv_vacancy_custom_company_longitude";
+    private $_acf_vacancy_custom_company_latitude       = "rv_vacancy_custom_company_latitude";
+
     private $_taxonomies = ["sector", "role", "type", "education", "working-hours", "status", "location", "experiences"];
+
+    private const status_slug_open          = 'open';
+    private const status_slug_processing    = 'processing';
 
     /** Vacancy Meta */
     private $_meta_rv_vacancy_unused_data   = 'rv_vacancy_unused_data';
     private $_meta_rv_vacancy_imported_at   = 'rv_vacancy_imported_at';
     public $meta_rv_vacancy_approved_at     = 'rv_vacancy_approved_at';
     public $meta_rv_vacancy_source        = 'rv_vacancy_source';
+    public $meta_rv_vacancy_jobfeed_is_expired = 'rv_vacancy_jobfeed_is_expired';
+    public $meta_rv_vacancy_original_api_term = 'rv_vacancy_original_api_term';
 
     public function __construct($vacancy_id = false)
     {
         if ($vacancy_id) {
             $this->vacancy_id = $vacancy_id;
+            $this->vacancy = get_post($vacancy_id);
         }
     }
 
@@ -524,6 +553,7 @@ class Vacancy
             $tempTax = $tax->taxonomy;
             $taxField = [
                 "id" => $tax->term_id,
+                "slug" => $tax->slug,
                 "name" => html_entity_decode($tax->name)
             ];
 
@@ -611,12 +641,36 @@ class Vacancy
     public function setCityLongLat(string $city, Bool $withCompanyAsWell = false)
     {
         $coordinat = Maphelper::generateLongLat($city);
-        $this->setProp($this->acf_city_latitude, $coordinat["lat"]);
-        $this->setProp($this->acf_city_longitude, $coordinat["long"]);
+        $lat  = $this->setProp($this->acf_city_latitude, $coordinat["lat"]);
+        $long = $this->setProp($this->acf_city_longitude, $coordinat["long"]);
 
         if ($withCompanyAsWell) {
             $this->setProp($this->_acf_imported_company_city_latitude, $coordinat["lat"]);
             $this->setProp($this->_acf_imported_company_city_longitude, $coordinat["long"]);
+        }
+
+        if ($lat && $long) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function getCityLongLat(String $result = 'all')
+    {
+        if ($this->vacancy_id) {
+            if ($result == 'latitude') {
+                return $this->getProp($this->acf_city_latitude);
+            } else if ($result == 'longitude') {
+                return $this->getProp($this->acf_city_longitude);
+            } else {
+                return [
+                    'latitude'  => $this->getProp($this->acf_city_latitude),
+                    'longitude' => $this->getProp($this->acf_city_longitude)
+                ];
+            }
+        } else {
+            throw new Exception('Please specify vacancy');
         }
     }
 
@@ -657,6 +711,15 @@ class Vacancy
         return $this->setProp($this->acf_distance_from_city, $distance);
     }
 
+    public function getDistance()
+    {
+        if ($this->vacancy_id) {
+            return $this->getProp($this->acf_distance_from_city);
+        } else {
+            throw new Exception("Please specify vacancy!");
+        }
+    }
+
     /**
      * Get All Vacancies function
      *
@@ -681,7 +744,7 @@ class Vacancy
                 "posts_per_page" => $filters['postPerPage'] ?? -1,
                 "offset" => $filters['offset'] ?? 0,
                 "orderby" => $filters['orderBy'] ?? "date",
-                "order" => $filters['sort'] ?? ($filters['orderBy'] && $filters['orderBy'] == 'title' ? 'aaaaa' : 'dddddd'),
+                "order" => $filters['sort'] ?? 'ASC',
                 "post_status" => "publish",
                 "meta_query" => [
                     "relation" => "AND",
@@ -822,6 +885,7 @@ class Vacancy
     public function setCoordinateDistance($cityCoordinate, $placementAddressCoordinate)
     {
         $distance = Maphelper::calculateDistance($cityCoordinate, $placementAddressCoordinate);
+        error_log(json_encode($distance));
 
         return $this->setProp($this->acf_distance_from_city, $distance);
     }
@@ -878,6 +942,60 @@ class Vacancy
     public function getImportedSource()
     {
         return $this->getterMeta($this->meta_rv_vacancy_source);
+    }
+
+    public function getImportedSourceID()
+    {
+        return $this->getProp($this->_acf_imported_vacancy_source_id);
+    }
+
+    public function getImportedCompanySector()
+    {
+        $sectors = $this->getProp($this->_acf_imported_company_sector);
+        if ($sectors && is_array($sectors)) {
+            $terms = get_terms([
+                'taxonomy'   => 'sector',
+                'hide_empty' => false,
+                'term_taxonomy_id' => $sectors
+            ]);
+
+            if ($terms instanceof \WP_Error) {
+                throw $terms;
+            } else if ($terms && is_array($terms)) {
+                $result = [];
+                foreach ($terms as $term) {
+                    $result[] = [
+                        'value' => $term->term_id,
+                        'slug'  => $term->slug,
+                        'label' => $term->name,
+                    ];
+                }
+                return $result;
+            }
+        } else {
+            return $sectors;
+        }
+    }
+
+    public function setImportedCompanySector($value)
+    {
+        return $this->setProp($this->_acf_imported_company_sector, $value);
+    }
+
+    public function getImportedCompanyTotalEmployees()
+    {
+        return $this->getProp($this->_acf_imported_company_total_employees, true);
+    }
+
+    // public function getImportedUnusedData()
+    // {
+    //     return $this->getterMeta($this->_meta_rv_vacancy_unused_data);
+    // }
+
+    public function checkIfJobfeedExpired()
+    {
+        $isExpired = $this->getterMeta($this->meta_rv_vacancy_jobfeed_is_expired, true);
+        return $isExpired;
     }
 
     /**
@@ -978,7 +1096,7 @@ class Vacancy
                 "post_type"         => $this->vacancy,
                 "posts_per_page"    => $filters['postPerPage'] ?? -1,
                 "offset"            => $filters['offset'] ?? 0,
-                "orderby"           => $filters['orderBy'] ?? "date",
+                "orderby"           => $filters['orderBy'] ?? "post_date",
                 "order"             => $filters['sort'] ?? 'ASC',
                 "post_status"       => "publish",
             ];
@@ -1010,7 +1128,16 @@ class Vacancy
             }
 
             if (array_key_exists('orderBy', $filters)) {
-                $args['orderby'] = $filters['orderBy'];
+                if (is_array($filters['orderBy'])) {
+                    $args['meta_key']   = $filters['orderBy']['key'];
+                    $args['orderby']    = $filters['orderBy']['by'];
+
+                    if (isset($filters['orderBy']['type'])) {
+                        $args['meta_type']  = $filters['orderBy']['type'];
+                    }
+                } else {
+                    $args['orderby'] = $filters['orderBy'];
+                }
             }
 
             if (array_key_exists('sort', $filters)) {
@@ -1022,11 +1149,18 @@ class Vacancy
             }
 
             if (array_key_exists('author', $filters)) {
-                $args['author '] = $filters['author'];
+                // $args['author'] = $filters['author'];
+                $args['author__in'] = $filters['author'];
             }
 
             if (array_key_exists('in', $filters)) {
                 $args['post__in'] = $filters['in'];
+            }
+
+            if (array_key_exists('search', $filters)) {
+                $args['s'] = $filters['search'];
+            } else if (array_key_exists('s', $filters)) {
+                $args['s'] = $filters['s'];
             }
         }
 
@@ -1059,6 +1193,11 @@ class Vacancy
     public function setApprovedBy($value)
     {
         return $this->setProp($this->_acf_imported_approved_by, $value);
+    }
+
+    public function getApprovedBy()
+    {
+        return $this->getProp($this->_acf_imported_approved_by, true);
     }
 
     public function getApprovedAt($format = 'Y-m-d H:i:s')
@@ -1106,6 +1245,11 @@ class Vacancy
         } else {
             throw new Exception('Please specify vacancy!');
         }
+    }
+
+    public function getImportedUnusedData()
+    {
+        return $this->getterMeta($this->_meta_rv_vacancy_unused_data, true);
     }
     /** Method for related to imported vacancy end here */
 
@@ -1162,6 +1306,8 @@ class Vacancy
                     foreach ($terms as $term) {
                         if ($formatted === 'id') {
                             $result[] = $term->term_id;
+                        } else if ($formatted === 'slug') {
+                            $result[] = $term->slug;
                         } else {
                             $result[] = [
                                 'term_id'   => $term->term_id,
@@ -1193,6 +1339,390 @@ class Vacancy
             }
         } else {
             throw new Exception('Taxonomy not found!');
+        }
+    }
+
+    public function setEmptyVacancyTerms($taxonomy, $value)
+    {
+        if (taxonomy_exists($taxonomy)) {
+            return wp_set_post_terms($this->vacancy_id, '', $taxonomy);
+        } else {
+            throw new Exception('Taxonomy not found!');
+        }
+    }
+
+    public function getPostStatus()
+    {
+        if ($this->vacancy_id) {
+            $vacancy = get_post($this->vacancy_id);
+            if ($vacancy) {
+                return $vacancy->post_status;
+            }
+        } else {
+            throw new Exception('Please specify vacancy!');
+        }
+    }
+
+    /** 02 11 2023 : Added Function */
+    public function getLanguage()
+    {
+        if ($this->vacancy_id) {
+            return $this->getProp($this->acf_rv_vacancy_language, true);
+        } else {
+            throw new Exception('Please specify vacancy!');
+        }
+    }
+
+    public function setLanguage($value)
+    {
+        if ($this->vacancy_id) {
+            return $this->setProp($this->acf_rv_vacancy_language, $value);
+        } else {
+            throw new Exception('Please specify vacancy!');
+        }
+    }
+
+    /** Vacancy for another company related */
+    public function checkIsForAnotherCompany()
+    {
+        return $this->getProp($this->_acf_rv_vacancy_is_for_another_company) == 1 ? true : false;
+    }
+
+    /**
+     * Get selected company function
+     *
+     * This is for case where vacancy is inputed for another company.
+     * ACF only has value if the acf : rv_vacancy_is_for_another_company is true.
+     *
+     * example case: Vonq marketing company
+     *
+     * @return void
+     */
+    public function getSelectedCompany()
+    {
+        if ($this->vacancy_id) {
+            return $this->getProp($this->_acf_rv_vacancy_selected_company, true);
+        } else {
+            throw new Exception('Please specify the vacancy!');
+        }
+    }
+
+    public function checkUseExistingCompany()
+    {
+        if ($this->vacancy_id) {
+            return $this->getProp($this->_acf_rv_vacancy_use_existing_company, true) == 1 ? true : false;
+            // return $this->getProp($this->_acf_rv_vacancy_use_existing_company, true);
+        } else {
+            throw new Exception('Please specify the vacancy!');
+        }
+    }
+
+    public function getCustomCompanyName()
+    {
+        if ($this->vacancy_id) {
+            return $this->getProp($this->_acf_rv_vacancy_custom_company_name, true);
+        } else {
+            throw new Exception('Please specify the vacancy!');
+        }
+    }
+
+    public function getCustomCompanyDescription()
+    {
+        if ($this->vacancy_id) {
+            return $this->getProp($this->_acf_rv_vacancy_custom_company_description, true);
+        } else {
+            throw new Exception('Please specify the vacancy!');
+        }
+    }
+
+    public function getCustomCompanyLogo($result = 'object')
+    {
+        if ($this->vacancy_id) {
+            if ($result == 'url') {
+                $logo = $this->getProp($this->_acf_rv_vacancy_custom_company_logo, true);
+                if ($logo) {
+                    return $logo['url'];
+                } else {
+                    return false;
+                }
+            } else {
+                $logo = $this->getProp($this->_acf_rv_vacancy_custom_company_logo, true);
+                if ($logo) {
+                    return [
+                        'id' => $logo['id'],
+                        'title' => $logo['title'],
+                        'url' => $logo['url'],
+                    ];
+                }
+                return $logo;
+            }
+        } else {
+            throw new Exception('Please specify the vacancy!');
+        }
+    }
+
+    public function getCustomCompanySector()
+    {
+        if ($this->vacancy_id) {
+            $sectors = $this->getProp($this->_acf_rv_vacancy_custom_company_sector);
+            if ($sectors && is_array($sectors)) {
+                $terms = get_terms([
+                    'taxonomy'   => 'sector',
+                    'hide_empty' => false,
+                    'term_taxonomy_id' => $sectors
+                ]);
+
+                if ($terms instanceof \WP_Error) {
+                    throw $terms;
+                } else if ($terms && is_array($terms)) {
+                    $result = [];
+                    foreach ($terms as $term) {
+                        $result[] = [
+                            'value'  => $term->term_id,
+                            'label'  => $term->name,
+                        ];
+                    }
+                    return $result;
+                }
+            } else {
+                return $sectors;
+            }
+        } else {
+            throw new Exception('Please specify the vacancy!');
+        }
+    }
+
+    public function getCustomCompanyEmail()
+    {
+        if ($this->vacancy_id) {
+            return $this->getProp($this->_acf_rv_vacancy_custom_company_email, true);
+        } else {
+            throw new Exception('Please specify the vacancy!');
+        }
+    }
+
+    public function getCustomCompanyPhoneCode($result = 'array')
+    {
+        if ($this->vacancy_id) {
+            $phoneCode = $this->getProp($this->_acf_rv_vacancy_custom_company_phone_code, true);
+            if ($phoneCode) {
+                if ($result == 'label') {
+                    if (is_array($phoneCode)) {
+                        return $phoneCode['label'];
+                    } else {
+                        return $phoneCode;
+                    }
+                } else if ($result == 'value') {
+                    if (is_array($phoneCode)) {
+                        return $phoneCode['value'];
+                    } else {
+                        return $phoneCode;
+                    }
+                } else {
+                    return $phoneCode;
+                }
+            }
+        } else {
+            throw new Exception('Please specify the vacancy!');
+        }
+    }
+
+    public function getCustomCompanyPhoneNumber()
+    {
+        if ($this->vacancy_id) {
+            return $this->getProp($this->_acf_rv_vacancy_custom_company_phone_number, true);
+        } else {
+            throw new Exception('Please specify the vacancy!');
+        }
+    }
+
+    public function getCustomCompanyTotalEmployees($result = 'array')
+    {
+        if ($this->vacancy_id) {
+            $totalEmplooyees = $this->getProp($this->_acf_rv_vacancy_custom_company_total_employees, true);
+            if ($totalEmplooyees) {
+                if ($result == 'label') {
+                    if (is_array($totalEmplooyees)) {
+                        return $totalEmplooyees['label'];
+                    } else {
+                        return $totalEmplooyees;
+                    }
+                } else if ($result == 'value') {
+                    if (is_array($totalEmplooyees)) {
+                        return $totalEmplooyees['value'];
+                    } else {
+                        return $totalEmplooyees;
+                    }
+                } else {
+                    return $totalEmplooyees;
+                }
+            }
+        } else {
+            throw new Exception('Please specify the vacancy!');
+        }
+    }
+
+    /**
+     * Get custom company country function
+     * this acf only return value and
+     * if you can please do not change the return value to array.
+     *
+     * @param string $result
+     * @return mixed
+     */
+    public function getCustomCompanyCountry($result = 'array')
+    {
+        if ($this->vacancy_id) {
+            $value = $this->getProp($this->_acf_rv_vacancy_custom_company_country, true);
+            if ($value) {
+                if ($result == 'label') {
+                    return $value;
+                } else if ($result == 'value') {
+                    return $value;
+                } else {
+                    return [
+                        'value' => $value,
+                        'label' => $value
+                    ];
+                }
+            } else {
+                return $value;
+            }
+        } else {
+            throw new Exception('Please specify the vacancy!');
+        }
+    }
+
+    /**
+     * Get custom company country function
+     * this acf only return value and
+     * if you can please do not change the return value to array.
+     *
+     * @param string $result
+     * @return mixed
+     */
+    public function getCustomCompanyCity($result = 'array')
+    {
+        if ($this->vacancy_id) {
+            $value = $this->getProp($this->_acf_rv_vacancy_custom_company_city, true);
+            if ($value) {
+                if ($result == 'label') {
+                    return $value;
+                } else if ($result == 'value') {
+                    return $value;
+                } else {
+                    return [
+                        'value' => $value,
+                        'label' => $value
+                    ];
+                }
+            } else {
+                return $value;
+            }
+        } else {
+            throw new Exception('Please specify the vacancy!');
+        }
+    }
+
+    public function getCustomCompanyAddress()
+    {
+        if ($this->vacancy_id) {
+            return $this->getProp($this->_acf_rv_vacancy_custom_company_address, true);
+        } else {
+            throw new Exception('Please specify vacancy!');
+        }
+    }
+
+    public function getCustomCompanyCoordinate($result = 'all')
+    {
+        if ($this->vacancy_id) {
+            if ($result == 'latitude') {
+                return $this->getProp($this->_acf_vacancy_custom_company_latitude, true);
+            } else if ($result == 'longitude') {
+                return $this->getProp($this->_acf_vacancy_custom_company_longitude, true);
+            } else {
+                return [
+                    'latitude' => $this->getProp($this->_acf_vacancy_custom_company_latitude, true),
+                    'longitude' => $this->getProp($this->_acf_vacancy_custom_company_longitude, true)
+                ];
+            }
+        } else {
+            throw new Exception('Please specify vacancy!');
+        }
+    }
+
+    public function setCustomCompanyLatitude($value)
+    {
+        if ($this->vacancy_id) {
+            return $this->setProp($this->_acf_vacancy_custom_company_longitude, $value);
+        } else {
+            throw new Exception('Please specify vacancy!');
+        }
+    }
+
+    public function setCustomCompanyLongitude($value)
+    {
+        if ($this->vacancy_id) {
+            return $this->setProp($this->_acf_vacancy_custom_company_latitude, $value);
+        } else {
+            throw new Exception('Please specify vacancy!');
+        }
+    }
+
+    /**
+     * Check if vacancy status is open function
+     *
+     * @return boolean
+     */
+    public function isOpen()
+    {
+        if ($this->vacancy_id) {
+            $status = $this->getStatus();
+            if ($status) {
+                if (isset($status['slug'])) {
+                    if ($status['slug'] == self::status_slug_open) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        } else {
+            throw new Exception('Please specify vacancy!');
+        }
+    }
+
+    /**
+     * Set property original api term that will assign to taxonomy / term function
+     *
+     * @param array $data
+     * @return mixed
+     */
+    public function setVacancyOriginalCategory(array $data): mixed
+    {
+        if ($this->vacancy_id) {
+            return $this->setterMeta($this->meta_rv_vacancy_original_api_term, $data);
+        } else {
+            throw new Exception('Please specify vacancy!');
+        }
+    }
+
+    /**
+     * Get property original api term that will assign to taxonomy / term function
+     *
+     * @param array $data
+     * @return mixed
+     */
+    public function getVacancyOriginalCategory($single = true): mixed
+    {
+        if ($this->vacancy_id) {
+            return $this->getterMeta($this->meta_rv_vacancy_original_api_term, $single);
+        } else {
+            throw new Exception('Please specify vacancy!');
         }
     }
 }

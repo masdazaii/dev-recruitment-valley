@@ -17,6 +17,7 @@ class RssCPT extends RegisterCPT
         add_action('add_meta_boxes', [$this, 'addRSSMetaboxes'], 10, 2);
         add_filter('manage_rss_posts_columns', [$this, 'rssColoumn'], 10, 1);
         add_action('manage_rss_posts_custom_column', [$this, 'rssCustomColoumn'], 10, 2);
+        add_action('admin_menu', [$this, 'rssGeneralSubMenu']);
 
         global $wpdb;
         $this->wpdb = $wpdb;
@@ -38,8 +39,6 @@ class RssCPT extends RegisterCPT
     {
         if ($post->post_type == 'rss') {
             $this->wpdb->query('START TRANSACTION');
-            // print('<pre>' . print_r($_POST, true) . '</pre>');
-            // die;
             try {
                 $rssModel = new \Model\Rss($post_id);
 
@@ -101,7 +100,25 @@ class RssCPT extends RegisterCPT
 
                 /** Get vacancy by selected company */
                 $vacancies = $vacancyModel->getVacancies([
-                    'author' => $selectedCompany
+                    'author' => $selectedCompany,
+                    'meta'  => [
+                        "relation" => "AND",
+                        [
+                            'key' => 'expired_at',
+                            'value' => date("Y-m-d H:i:s"),
+                            'compare' => '>',
+                            'type' => "DATE"
+                        ],
+                    ],
+                    'taxonomy'  => [
+                        "relation" => "AND",
+                        [
+                            'taxonomy' => 'status',
+                            'field'    => 'slug',
+                            'terms'    => 'open',
+                            'compare'  => 'IN'
+                        ],
+                    ]
                 ]);
 
                 /** Get selected vacancies */
@@ -113,7 +130,7 @@ class RssCPT extends RegisterCPT
                             $vacanciesOption[] = [
                                 'value' => $vacancy->ID,
                                 'label' => $vacancy->post_title,
-                                'selected' => in_array($vacancy->ID, $selectedVacancies)
+                                'selected' => is_array($selectedVacancies) ? in_array($vacancy->ID, $selectedVacancies) : false
                             ];
                         }
                     }
@@ -123,7 +140,7 @@ class RssCPT extends RegisterCPT
 
         echo '<div style="display: flex; flex-direction: column; gap: 0.5rem;">';
         echo '<div class="cs-flex cs-flex-col cs-flex-nowrap cs-items-start cs-gap-2">';
-        echo '<label style="display; block; font-weight: bold; color: rgba(0, 0, 0, 1);" for="rss-url-endpoint">Select Vacancies</label>';
+        echo '<label style="display: block; font-weight: bold; color: rgba(0, 0, 0, 1);" for="rss-url-endpoint">Select Vacancies</label>';
         echo '<select id="metabox-' . $rssModel->_meta_rss_vacancy . '" name="' . $rssModel->_meta_rss_vacancy . '[]" style="width: 100%; border: 1px solid rgba(209, 213, 219, 1); padding: 0.375rem 0.5rem; font-size: 1rem; line-height: 1.5rem; font-weight: 400;" multiple>';
         foreach ($vacanciesOption as $option) {
             echo '<option value="' . $option['value'] . '" ' . ($option['selected'] ? 'selected="selected"' : '') . '>' . $option['label'] . '</option>';
@@ -152,7 +169,7 @@ class RssCPT extends RegisterCPT
         $rssModel = new \Model\Rss($post->ID);
         echo '<div style="display: flex; flex-direction: column; gap: 0.5rem;">';
         echo '<div class="cs-flex cs-flex-col cs-flex-nowrap cs-items-start cs-gap-2">';
-        echo '<label style="display; block; font-weight: bold; color: rgba(0, 0, 0, 1);" for="rss-url-endpoint">RSS URL</label>';
+        echo '<label style="display: block; font-weight: bold; color: rgba(0, 0, 0, 1);" for="rss-url-endpoint">RSS URL</label>';
         echo '<input style="width: 100%; border: 1px solid rgba(209, 213, 219, 1); padding: 0.375rem 0.5rem; font-size: 1rem; line-height: 1.5rem; font-weight: 400;" type="text" id="rss-url-endpoint" readonly disabled value="' . rest_url() . 'mi/v1' . $rssModel->getRssEndpointURL() . '"/>';
         echo '</div>';
         echo '</div>';
@@ -174,6 +191,29 @@ class RssCPT extends RegisterCPT
                 echo rest_url() . 'mi/v1' . $rssModel->getRssEndpointURL();
                 break;
         }
+    }
+
+    public function rssGeneralSubMenu()
+    {
+        if (is_admin() && current_user_can('administrator')) {
+            add_submenu_page(
+                $parent_slug = 'edit.php?post_type=rss',
+                $page_title = __('RSS General', THEME_DOMAIN),
+                $menu_title = __('RSS General', THEME_DOMAIN),
+                $capability = 'manage_options',
+                $menu_slug  = 'rss-general',
+                $callback   = [$this, 'rssGeneralRenderPage'],
+            );
+        }
+    }
+
+    public function rssGeneralRenderPage()
+    {
+        ob_start();
+        // include THEME_DIR . '/templates/admin/rss-general-template.php';
+        include THEME_DIR . '/templates/admin/rss-general-template.php';
+        $output = ob_get_clean();
+        echo $output;
     }
 }
 

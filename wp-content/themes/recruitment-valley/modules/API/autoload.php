@@ -10,6 +10,8 @@ defined('ABSPATH') || die("Can't access directly");
 
 $API = [
     __DIR__ . '/constant/*.php',
+    __DIR__ . '/base/*Bag.php',
+    __DIR__ . '/base/Base*.php',
     __DIR__ . '/validator/*.php',
     __DIR__ . '/validator/*/*.php',
     __DIR__ . '/helpers/*.php',

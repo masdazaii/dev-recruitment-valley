@@ -4,7 +4,7 @@ class Package
 {
     private $post_type = "package";
 
-    private $package;
+    public $package;
 
     private $package_id;
     private $price = "rv_package_price";
@@ -22,7 +22,7 @@ class Package
             if ($package) {
                 $this->package = $package;
             } else {
-                throw new Exception("Package not found!");
+                // throw new Exception("Package not found!");
             }
         }
     }

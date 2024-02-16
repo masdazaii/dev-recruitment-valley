@@ -49,7 +49,8 @@ class CreatePaidJobRequest implements MiRequest
             "galleryJob.*" => [], // Added Line
             "galleryCompany.*" => [], // Added Line
             "country" => ["required"], // Added Line
-            "countryCode" => [] // Added Line
+            "countryCode" => [], // Added Line
+            "language"  => ["in:nl,en,de,fr,es"] // Added feedback 01 Nov 2023
         ];
     }
 
@@ -81,7 +82,8 @@ class CreatePaidJobRequest implements MiRequest
             "review" => "",
             "experiences.*" => "text",
             "country" => "text",
-            "countryCode" => "text"
+            "countryCode" => "text",
+            "language"  => "text" // Added feedback 01 Nov 2023
         ];
     }
 

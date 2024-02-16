@@ -327,7 +327,10 @@ class VacancyCrudController
                 "experiences" => $request["experiences"] ?? [], // Added Line
                 "status" => [31] // set free job become pending category
             ],
-            "countryCode" => $request["countryCode"]
+            "countryCode" => $request["countryCode"],
+
+            /** Addition Feedback 01 Nov 2023 */
+            "language"  => $request["language"]
         ];
 
         $this->wpdb->query("START TRANSACTION");
@@ -362,6 +365,10 @@ class VacancyCrudController
 
             $vacancyModel->setStatus('processing');
             // $vacancyModel->setProp("expired_at", $expiredAt);
+
+            /** Set language : 01 November Feedback */
+            $vacancyModel->setLanguage($payload['language']);
+
             $this->wpdb->query("COMMIT");
 
             /** Create notification */
@@ -426,7 +433,10 @@ class VacancyCrudController
             ],
             "application_process_step" => $request["applicationProcedureSteps"],
             'rv_vacancy_country' => $request['country'], // Added Line
-            'rv_vacancy_country_code' => $request['countryCode'] // Added Line
+            'rv_vacancy_country_code' => $request['countryCode'], // Added Line
+
+            /** Addition Feedback 01 Nov 2023 */
+            "language"  => $request["language"]
         ];
 
         global $wpdb;
@@ -525,6 +535,9 @@ class VacancyCrudController
                 $companyCredit -= $paidJobPrice;
                 $company->setCredit($companyCredit);
             }
+
+            /** Set language : 01 November Feedback */
+            $vacancyModel->setLanguage($payload['language']);
 
             /** Changes End Here */
 
@@ -685,6 +698,9 @@ class VacancyCrudController
             $vacancyModel->setPlacementAddressLongitude($payload["placementAddressLongitude"]);
             $vacancyModel->setDistance($payload["placement_city"], $payload["placement_city"] . " " . $payload["placement_address"]);
 
+            /** Set language : 01 November Feedback */
+            $vacancyModel->setLanguage($payload['language']);
+
             $wpdb->query('COMMIT');
 
             /** Create notification if current status is rejected */
@@ -777,6 +793,9 @@ class VacancyCrudController
             $vacancyModel->setPlacementAddressLatitude($payload["placementAddressLatitude"]);
             $vacancyModel->setPlacementAddressLongitude($payload["placementAddressLongitude"]);
             $vacancyModel->setDistance($payload["placement_city"], $payload["placement_city"] . " " . $payload["placement_address"]);
+
+            /** Set language : 01 November Feedback */
+            $vacancyModel->setLanguage($payload['language']);
 
             $wpdb->query('COMMIT');
 
@@ -872,6 +891,9 @@ class VacancyCrudController
                 'rv_vacancy_country_code' => $request['countryCode'], // Added Line
                 "placementAddressLongitude" => $request["longitude"],
                 "placementAddressLatitude" => $request["latitude"],
+
+                /** Addition Feedback 01 Nov 2023 */
+                "language"  => $request["language"]
             ];
         }
 
@@ -894,7 +916,10 @@ class VacancyCrudController
                     "education" => $request["education"],
                     "type" => $request["employmentType"],
                     "experiences" => $request["experiences"] ?? [], // Added Line
-                    "status" => [31] // set free job become pending category
+                    "status" => [31], // set free job become pending category
+
+                    /** Addition Feedback 01 Nov 2023 */
+                    "language"  => $request["language"]
                 ],
             ];
         }
@@ -927,7 +952,10 @@ class VacancyCrudController
                 "experiences" => $request["experiences"] ?? [], // Added Line
             ],
             'rv_vacancy_country' => $request['country'],
-            'rv_vacancy_country_code' => $request['countryCode'] // Added Line
+            'rv_vacancy_country_code' => $request['countryCode'], // Added Line,
+
+            /** Addition Feedback 01 Nov 2023 */
+            "language"  => $request["language"]
         ];
 
         return $payload;
@@ -968,7 +996,10 @@ class VacancyCrudController
             ],
             "application_process_step" => $request["applicationProcedureSteps"],
             'rv_vacancy_country' => $request['country'],
-            'rv_vacancy_country_code' => $request['countryCode'] // Added Line
+            'rv_vacancy_country_code' => $request['countryCode'], // Added Line,
+
+            /** Addition Feedback 01 Nov 2023 */
+            "language"  => $request["language"]
         ];
 
         return $payload;
@@ -1181,16 +1212,20 @@ class VacancyCrudController
      */
     public function getVacancyByCompany(Mixed $companyID, Int $limit = -1, String $result = 'posts', $filter = [])
     {
-        $company = is_array($companyID) ? $companyID : [ $companyID ];
+        $company = is_array($companyID) ? $companyID : [$companyID];
 
 
 
         try {
             $vacancyModel   = new Vacancy();
 
-            $filters        = [
-                'author__in'    => $company,
-            ];
+            if (is_array($companyID)) {
+                $filters = [
+                    'author'    => $companyID,
+                ];
+            } else {
+                $filters['author'] = [$companyID];
+            }
 
             if (!empty($filter)) {
                 if (array_key_exists('with_expired', $filter) && !$filter['with_expired']) {
@@ -1237,7 +1272,6 @@ class VacancyCrudController
             }
 
             $vacancies      = $vacancyModel->getVacancies($filters, []);
-
             switch (strtolower($result)) {
                 case 'options':
                 case 'option-value':
@@ -1259,6 +1293,184 @@ class VacancyCrudController
             }
         } catch (\Exception $e) {
             error_log($e->getMessage());
+        }
+    }
+
+    public function export($request)
+    {
+        $vacancyModel = new Vacancy();
+        $filters = [
+            'meta' => [
+                'relation' => 'AND',
+                [
+                    'key'   => 'rv_vacancy_is_imported',
+                    'value' => 1,
+                    'compare'   => '='
+                ]
+            ]
+        ];
+
+        if (isset($request['source'])) {
+            if ($request['source'] == 'flexfeed') {
+                $filters['meta'][] = [
+                    'key'   => 'rv_vacancy_source',
+                    'value' => 'flexfeed',
+                    'compare'   => '='
+                ];
+            } else if ($request['source'] == 'flexfeed') {
+                $filters['meta'][] = [
+                    'key'   => 'rv_vacancy_source',
+                    'value' => 'jobfeed',
+                    'compare'   => '='
+                ];
+            }
+        }
+
+        if (isset($request['status'])) {
+            if (is_array($request['status'])) {
+                $taxFilter = $request['status'];
+            } else {
+                $taxFilter = 'processing';
+                switch (strtolower($request['status'])) {
+                    case 'open':
+                        $taxFilter = ['open'];
+                        break;
+                    case 'close':
+                        $taxFilter = ['close'];
+                        break;
+                    case 'processing':
+                        $taxFilter = ['processing'];
+                        break;
+                    case 'declined':
+                        $taxFilter = ['declined'];
+                        break;
+                    case 'all':
+                    default:
+                        $taxFilter = ['open', 'close', 'processing', 'declined'];
+                        break;
+                }
+            }
+
+            $filters['taxonomy'][] = [
+                'taxonomy'  => 'status',
+                'field'     => 'slug',
+                'terms'     => $taxFilter,
+                'compare'   => 'IN'
+            ];
+        }
+
+        $vacancies = $vacancyModel->getVacancies($filters, []);
+
+        if ($vacancies && $vacancies->found_posts > 0) {
+            foreach ($vacancies->posts as $vacancy) {
+                $eachVacancy = new Vacancy($vacancy->ID);
+                $author = get_user_by('id', $vacancy->post_author);
+                $terms = $eachVacancy->getTaxonomy(true);
+
+                $mappedVacancy = [
+                    'vacancy_post_id'       => $vacancy->ID,
+                    'vacancy_post_title'    => $vacancy->post_title,
+                    'vacancy_post_slug'     => $vacancy->post_name,
+                    'vacancy_post_status'   => $vacancy->post_status,
+                    'vacancy_post_date'     => $vacancy->post_date,
+                    'author_name'   => $author->display_name,
+                    'author_login'  => $author->user_login,
+                    'author_email'  => $author->user_email,
+                    'author_role'   => $author->roles[0],
+                    'description'   => $eachVacancy->getDescription(),
+                    'term'  => $eachVacancy->getTerm(),
+                    'apply_from_this_platform'  => $eachVacancy->getApplyFromThisPlatform() ? 1 : 0,
+                    'video_url' => $eachVacancy->getVideoUrl(),
+                    'facebook_url'  => $eachVacancy->getFacebookUrl(),
+                    'linkedin_url'  => $eachVacancy->getLinkedinUrl(),
+                    'instagram_url' => $eachVacancy->getInstagramUrl(),
+                    'twitter_url'   => $eachVacancy->getTwitterUrl(),
+                    'gallery'   => serialize($eachVacancy->getGallery()),
+                    'reviews'   => serialize($eachVacancy->getReviews()),
+                    'is_paid'   => $eachVacancy->getIsPaid() ? 1 : 0,
+                    'salary_start'  => $eachVacancy->getSalaryStart(),
+                    'salary_end'    => $eachVacancy->getSalaryEnd(),
+                    'external_url'  => $eachVacancy->getExternalUrl(),
+                    'expired_at'    => $eachVacancy->getExpiredAt(),
+                    'country'   => $eachVacancy->getCountry(),
+                    'country_code'  => $eachVacancy->getCountryCode(),
+                    'placement_city'    => $eachVacancy->getCity(),
+                    'city_latitude' => $eachVacancy->getCityLongLat('latitude'),
+                    'city_longitude'    => $eachVacancy->getCityLongLat('longitude'),
+                    'placement_address' => $eachVacancy->getPlacementAddress(),
+                    'placement_address_longitude'   => $eachVacancy->getPlacementAddressLongitude(),
+                    'placement_address_latitude'    => $eachVacancy->getPlacementAddressLatitude(),
+                    'distance_from_city'    => $eachVacancy->getDistance(),
+                    'rv_vacancy_language'   => serialize($eachVacancy->getLanguage()),
+                    'application_process_title' => $eachVacancy->getApplicationProcessTitle(),
+                    'application_process_description'   => $eachVacancy->getApplicationProcessDescription(),
+                    'application_process_step'  => serialize($eachVacancy->getApplicationProcessStep()),
+                    'rv_is_for_another_company' => $eachVacancy->checkIsForAnotherCompany() ? 1 : 0,
+                    'rv_vacancy_use_existing_company'   => $eachVacancy->checkUseExistingCompany() ? 1 : 0,
+                    'rv_vacancy_selected_company'   => $eachVacancy->getSelectedCompany(),
+                    'rv_vacancy_custom_company_name'    => $eachVacancy->getCustomCompanyName(),
+                    'rv_vacancy_custom_company_logo'    => $eachVacancy->getCustomCompanyLogo(),
+                    'rv_vacancy_custom_company_email'   => $eachVacancy->getCustomCompanyEmail(),
+                    'rv_vacancy_custom_company_phone_code'  => $eachVacancy->getCustomCompanyPhoneCode(),
+                    'rv_vacancy_custom_company_phone_number'    => $eachVacancy->getCustomCompanyPhoneNumber(),
+                    'rv_vacancy_custom_company_sector'  => $eachVacancy->getCustomCompanySector(),
+                    'rv_vacancy_custom_company_total_employees' => $eachVacancy->getCustomCompanyTotalEmployees(),
+                    'rv_vacancy_custom_company_description' => $eachVacancy->getCustomCompanyDescription(),
+                    'rv_vacancy_custom_company_country' => $eachVacancy->getCustomCompanyCountry(),
+                    'rv_vacancy_custom_company_city'    => $eachVacancy->getCustomCompanyCity(),
+                    'rv_vacancy_custom_company_address' => $eachVacancy->getCustomCompanyAddress(),
+                    'rv_vacancy_custom_company_longitude'   => $eachVacancy->getCustomCompanyCoordinate('longitude'),
+                    'rv_vacancy_custom_company_latitude'    => $eachVacancy->getCustomCompanyCoordinate('latitude'),
+                    'rv_vacancy_is_imported'    => $eachVacancy->checkImported() ? 1 : 0,
+                    'rv_vacancy_imported_source_id' => $eachVacancy->getImportedSourceID(),
+                    'rv_vacancy_imported_company_name'  => $eachVacancy->getImportedCompanyName(),
+                    'rv_vacancy_imported_company_email' => $eachVacancy->getImportedCompanyEmail(),
+                    'rv_vacancy_imported_company_sector'    => $eachVacancy->getImportedCompanySector(),
+                    'rv_vacancy_imported_company_total_employees'   => $eachVacancy->getImportedCompanyTotalEmployees(),
+                    'rv_vacancy_imported_company_country'   => $eachVacancy->getImportedCompanyCountry(),
+                    'rv_vacancy_imported_company_city'  => $eachVacancy->getImportedCompanyCity(),
+                    'rv_vacancy_imported_company_city_longitude'    => $eachVacancy->getImportedCompanyLongitude(),
+                    'rv_vacancy_imported_company_city_latitude' => $eachVacancy->getImportedCompanyLatitude(),
+                    'rv_vacancy_imported_source'    => $eachVacancy->getImportedSource(),
+                    'rv_vacancy_imported_at'    => $eachVacancy->getImportedAt(),
+                    'rv_vacancy_approved_at'    => $eachVacancy->getApprovedAt(),
+                    'rv_vacancy_approved_by'    => $eachVacancy->getApprovedBy(),
+                    'rv_vacancy_approval_status'    => $eachVacancy->getApprovedStatus(),
+                    'rv_vacancy_unused_data'    => serialize($eachVacancy->getImportedUnusedData()),
+                    'status_terms'  => isset($terms['status']) ? $terms['status'] : NULL,
+                    'sector_terms'  => isset($terms['sector']) ? $terms['sector'] : NULL,
+                    'role_terms'    => isset($terms['role']) ? $terms['role'] : NULL,
+                    'type_terms'    => isset($terms['type']) ? $terms['type'] : NULL,
+                    'education_terms'   => isset($terms['education']) ? $terms['education'] : NULL,
+                    'working_hours_terms'   => isset($terms['working-hours']) ? $terms['working-hours'] : NULL,
+                    'location_terms'    => isset($terms['location']) ? $terms['location'] : NULL,
+                    'working_experience_terms'  => isset($terms['experience']) ? $terms['experience'] : NULL,
+                ];
+                $mappedVacancies[] = $mappedVacancy;
+
+                // $this->wpdb->insert('rv_backup_vacancy_imported', $mappedVacancy);
+                $insert[$vacancy->ID] = $this->wpdb->insert('rv_backup_vacancy_imported', $mappedVacancy, null, ['rv_vacancy_imported_source_id' => $mappedVacancy['rv_vacancy_imported_source_id']]);
+                if (isset($request['delete'])) {
+                    if ($request['delete'] && $insert[$vacancy->ID]) {
+                        wp_delete_post($vacancy->ID);
+                    }
+                }
+            }
+
+            // $insert = $this->wpdb->insert('rv_backup_vacancy_imported', $mappedVacancies, null, 'rv_vacancy_imported_source_id' => $mapped);
+            if ($insert) {
+                return [
+                    'status' => 200,
+                    'message' => 'Exported to another table!',
+                    'data'  => $insert
+                ];
+            } else {
+                return [
+                    'status' => 500,
+                    'message' => 'Failed to export to another table!',
+                    'data'  => $insert
+                ];
+            }
         }
     }
 }
