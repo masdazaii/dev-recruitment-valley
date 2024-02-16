@@ -571,9 +571,18 @@ class CompanyRecruiterController extends BaseController
                 ];
             }
 
+            $image = $recruiter->getThumbnail('object');
+            if (!isset($image)) {
+                $image = [
+                    'id'    => null,
+                    'title' => null,
+                    'url'   => null
+                ];
+            }
+
             return [
                 'status'    => 200,
-                'data'      => $recruiter->getThumbnail('object'),
+                'data'      => $image,
                 'message'   => $this->message->get('company.profile.get_image_success'),
             ];
         } catch (\WP_Error $wp_error) {
