@@ -539,6 +539,53 @@ class CompanyRecruiterController extends BaseController
     }
 
     /**
+     * Get image function
+     *
+     * @param array $request
+     * @return array
+     */
+    public function getPhoto(array $request): array
+    {
+        /** Log Attempt */
+        $logData = [
+            'request'   => $request
+        ];
+        Log::info("My profile attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_get_profile_image', false);
+
+        try {
+            $recruiter = CompanyRecruiter::find('id', $request['user_id']);
+
+            if (!$recruiter->user || $recruiter->user instanceof WP_Error) {
+                if ($recruiter->user instanceof WP_Error) {
+                    throw $recruiter->user;
+                }
+
+                /** Log attempt */
+                $logData['message'] = "User not found! POSSIBLE SYSTEM ERROR!";
+                $logData['user_id'] = $request['user_id'];
+                Log::error("Fail My profile attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_get_my_profile', false);
+
+                return [
+                    "status"    => 500,
+                    "message"   => $this->message->get("system.overall_failed", [" {$this->message->get("auth.not_found_user")}"])
+                ];
+            }
+
+            return [
+                'status'    => 200,
+                'data'      => $recruiter->getThumbnail('object'),
+                'message'   => $this->message->get('company.profile.get_image_success'),
+            ];
+        } catch (\WP_Error $wp_error) {
+            return $this->handleError($wp_error, __CLASS__, __METHOD__, $logData, 'log_get_profile_image');
+        } catch (Exception $e) {
+            return $this->handleError($e, __CLASS__, __METHOD__, $logData, 'log_get_profile_image');
+        } catch (Throwable $th) {
+            return $this->handleError($th, __CLASS__, __METHOD__, $logData, 'log_get_profile_image');
+        }
+    }
+
+    /**
      * Create Report to superadmin function
      *
      * @param array $request
