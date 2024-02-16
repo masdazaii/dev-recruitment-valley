@@ -44,10 +44,13 @@ class ChildCompanyController extends BaseController
             /** Check if name is used in same company recruiter */
             $checkChildCompanyFilter = [
                 'owner' => $request['user_id'],
-                'title' => $request['companyName'],
+                's' => $request['companyName'],
             ];
-            add_filter('posts_where', 'exact_title_search', 10, 2);
+
+            add_filter('posts_search', [$this, 'exactTitleSearch'], 10, 2);
             $checkChildCompany  = ChildCompany::select($checkChildCompanyFilter);
+            apply_filters('posts_search', $checkChildCompany->request, $checkChildCompany);
+            remove_filter('posts_search', [$this, 'exactTitleSearch'], 10, 2);
 
             if ($checkChildCompany->found_posts > 0) {
                 /** Log Attempt */
@@ -356,6 +359,8 @@ class ChildCompanyController extends BaseController
 
             if ($childCompanyModel->user) {
                 $owner = $childCompanyModel->getChildCompanyOwner();
+
+                // print('<pre>'.print_r($owner, true).'</pre>'.PHP_EOL);
                 if ($owner->ID == $request['user_id']) {
                     /** Log Attempt */
                     $logData['message'] = 'SUCCESS!';
@@ -411,14 +416,14 @@ class ChildCompanyController extends BaseController
 
         $this->wpdb->query('START TRANSACTION');
         try {
-            if (is_numeric($request['childCompany'])) {
-                $childCompany = ChildCompany::find('id', $request['childCompany']);
-            } else if (is_string($request['childCompany']) && (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $request['childCompany']) == 1)) {
-                $childCompany = ChildCompany::find('uuid', $request['childCompany']);
-            } else if (is_string($request['childCompany']) && strpos($request['childCompany'], '-') != false) {
-                $childCompany = ChildCompany::find('slug', $request['childCompany']);
+            if (is_numeric($request['assignedChildCompany'])) {
+                $childCompany = ChildCompany::find('id', $request['assignedChildCompany']);
+            } else if (is_string($request['assignedChildCompany']) && (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $request['assignedChildCompany']) == 1)) {
+                $childCompany = ChildCompany::find('uuid', $request['assignedChildCompany']);
+            } else if (is_string($request['assignedChildCompany']) && strpos($request['assignedChildCompany'], '-') != false) {
+                $childCompany = ChildCompany::find('slug', $request['assignedChildCompany']);
             } else {
-                $childCompany = ChildCompany::find('slug', $request['childCompany']);
+                $childCompany = ChildCompany::find('slug', $request['assignedChildCompany']);
             }
 
             if ($childCompany->user) {
@@ -672,5 +677,31 @@ class ChildCompanyController extends BaseController
         } catch (Throwable $th) {
             return $this->handleError($th, __CLASS__, __METHOD__, $logData, 'log_vacancy_default_value_child_company');
         }
+    }
+
+    public function exactTitleSearch($search,  $query)
+    {
+        global $wpdb;
+
+        if ($query->is_search && $query->get('post_type') == 'child-company') {
+            $searchKeyword = $query->get('s');
+
+
+            if (!empty($searchKeyword)) {
+                if (is_string($searchKeyword)) {
+                    $arrayOfKeyword = explode(' ', $searchKeyword);
+                    $regexPattern = '';
+                    for ($i = 0; $i < count($arrayOfKeyword); $i++) {
+                        $regexPattern .= $arrayOfKeyword[$i];
+                        if ($i < (count($arrayOfKeyword) - 1)) {
+                            $regexPattern .= '|';
+                        }
+                    }
+                    $search = "AND $wpdb->posts.post_title = '" . esc_sql($searchKeyword) . "'";
+                }
+            }
+        }
+
+        return $search;
     }
 }
