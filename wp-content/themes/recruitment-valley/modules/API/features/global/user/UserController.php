@@ -9,6 +9,8 @@ use WP_REST_Request;
 use Candidate\Profile\Candidate;
 use Helper\UserHelper;
 use Model\Company;
+use Model\CompanyRecruiter;
+
 // use Global\NotificationService;
 // use constant\NotificationConstant;
 
@@ -54,6 +56,18 @@ class UserController
                         "image" => $user->getThumbnail(),
                         "firstName" => $user->getName(),
                         "lastName" => '',
+                    ]
+                ];
+            } else if (in_array($request['roles'], ['recruiter', 'company-recruiter'])) {
+                $user = new CompanyRecruiter($request['user_id']);
+
+                return [
+                    'status' => 200,
+                    'message' => $this->_message->get('company_recruiter.profile.get_success'),
+                    'data' => [
+                        "image"     => $user->getThumbnail(),
+                        "firstName" => $user->getName(),
+                        "lastName"  => '',
                     ]
                 ];
             }

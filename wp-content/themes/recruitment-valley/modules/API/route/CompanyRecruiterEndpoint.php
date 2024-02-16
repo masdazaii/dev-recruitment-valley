@@ -133,7 +133,7 @@ class CompanyRecruiterEndpoint
                     'url'                   => 'vacancy/paid/(?P<vacancy_id>[-\w]+)',
                     'methods'               => 'POST',
                     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
-                    'callback'              => [$vacancyCrudService, 'updatePaidJob']
+                    'callback'              => [$vacancyCrudService, 'updatePaid']
                 ],
                 'vacancy_delete' => [
                     'url'                   => 'vacancy/(?P<vacancy_id>[-\w]+)',

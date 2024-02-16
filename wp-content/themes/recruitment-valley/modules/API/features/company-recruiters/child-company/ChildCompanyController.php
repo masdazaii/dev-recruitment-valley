@@ -348,7 +348,7 @@ class ChildCompanyController extends BaseController
                 $childCompanyModel = ChildCompany::find('id', $request['childCompany']);
             } else if (is_string($request['childCompany']) && (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $request['childCompany']) == 1)) {
                 $childCompanyModel = ChildCompany::find('uuid', $request['childCompany']);
-            } else if (strpos($request['childCompany'], '-') != false) {
+            } else if (is_string($request['childCompany']) && strpos($request['childCompany'], '-') != false) {
                 $childCompanyModel = ChildCompany::find('slug', $request['childCompany']);
             } else {
                 $childCompanyModel = ChildCompany::find('slug', $request['childCompany']);
@@ -415,7 +415,7 @@ class ChildCompanyController extends BaseController
                 $childCompany = ChildCompany::find('id', $request['childCompany']);
             } else if (is_string($request['childCompany']) && (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $request['childCompany']) == 1)) {
                 $childCompany = ChildCompany::find('uuid', $request['childCompany']);
-            } else if (strpos($request['childCompany'], '-') != false) {
+            } else if (is_string($request['childCompany']) && strpos($request['childCompany'], '-') != false) {
                 $childCompany = ChildCompany::find('slug', $request['childCompany']);
             } else {
                 $childCompany = ChildCompany::find('slug', $request['childCompany']);
@@ -639,7 +639,7 @@ class ChildCompanyController extends BaseController
                 $childCompanyModel = ChildCompany::find('id', $request['childCompany']);
             } else if (is_string($request['childCompany']) && (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $request['childCompany']) == 1)) {
                 $childCompanyModel = ChildCompany::find('uuid', $request['childCompany']);
-            } else if (strpos($request['childCompany'], '-') != false) {
+            } else if (is_string($request['childCompany']) && strpos($request['childCompany'], '-') != false) {
                 $childCompanyModel = ChildCompany::find('slug', $request['childCompany']);
             } else {
                 $childCompanyModel = ChildCompany::find('slug', $request['childCompany']);

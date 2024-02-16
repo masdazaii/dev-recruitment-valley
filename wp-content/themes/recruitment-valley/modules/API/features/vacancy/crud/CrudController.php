@@ -1492,7 +1492,7 @@ class VacancyCrudController
                     $childCompany = ChildCompany::find('id', $request['assignedChildCompany']);
                 } else if (is_string($request['assignedChildCompany']) && (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $request['assignedChildCompany']) == 1)) {
                     $childCompany = ChildCompany::find('uuid', $request['assignedChildCompany']);
-                } else if (strpos($request['assignedChildCompany'], '-') != false) {
+                } else if (is_string($request['childCompany']) && strpos($request['assignedChildCompany'], '-') != false) {
                     $childCompany = ChildCompany::find('slug', $request['assignedChildCompany']);
                 } else {
                     $childCompany = ChildCompany::find('slug', $request['assignedChildCompany']);

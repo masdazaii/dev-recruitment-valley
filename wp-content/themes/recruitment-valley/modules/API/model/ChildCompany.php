@@ -75,7 +75,6 @@ class ChildCompany extends Company
     public static function select(array $filters = [], array $args = []): WP_Query
     {
         $args       = self::setArguments($filters, $args);
-        print('<pre>' . print_r($args, true) . '</pre>');
         $results    = new WP_Query($args);
 
         return $results;

@@ -11,6 +11,7 @@ use Helper\StringHelper;
 use Helper\DateHelper;
 use Model\Option;
 use Constant\LanguageConstant;
+use Exception;
 use Model\ChildCompany;
 
 class VacancyResponse
@@ -60,7 +61,7 @@ class VacancyResponse
                         $childCompanyModel = ChildCompany::find('id', $assignedChildCompany);
                     } else if (is_string($assignedChildCompany) && (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $assignedChildCompany) == 1)) {
                         $childCompanyModel = ChildCompany::find('uuid', $assignedChildCompany);
-                    } else if (strpos($assignedChildCompany, '-') != false) {
+                    } else if (is_string($assignedChildCompany) && strpos($assignedChildCompany, '-') != false) {
                         $childCompanyModel = ChildCompany::find('slug', $assignedChildCompany);
                     } else {
                         $childCompanyModel = ChildCompany::find('slug', $assignedChildCompany);
@@ -277,7 +278,7 @@ class VacancyResponse
                     $childCompanyModel = ChildCompany::find('id', $assignedChildCompany);
                 } else if (is_string($assignedChildCompany) && (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $assignedChildCompany) == 1)) {
                     $childCompanyModel = ChildCompany::find('uuid', $assignedChildCompany);
-                } else if (strpos($assignedChildCompany, '-') != false) {
+                } else if (is_string($assignedChildCompany) && strpos($assignedChildCompany, '-') != false) {
                     $childCompanyModel = ChildCompany::find('slug', $assignedChildCompany);
                 } else {
                     $childCompanyModel = ChildCompany::find('slug', $assignedChildCompany);
@@ -285,8 +286,8 @@ class VacancyResponse
 
                 $companyData = [
                     'id'    => $childCompanyModel->user->user_id,
-                    'name'  => $childCompanyModel->user->getName(),
-                    'about' => $childCompanyModel->user->getDescription(),
+                    'name'  => $childCompanyModel->getName(),
+                    'about' => $childCompanyModel->getDescription(),
                     'logo'  => $childCompanyModel->getThumbnail(),
                     'sector'        => $childCompanyModel->getTerms('sector'),
                     "totalEmployee" => $childCompanyModel->getTotalEmployees(),
@@ -431,7 +432,7 @@ class VacancyResponse
             $vacancyModel = new Vacancy($vacancy->ID);
             $vacancyTaxonomy = $vacancyModel->getTaxonomy(true);
 
-            return [
+            $vacancy = [
                 "id" => $vacancy->ID,
                 "name" => $vacancy->post_title,
                 "employmentType" => $vacancyTaxonomy["type"] ?? [],
@@ -442,6 +443,29 @@ class VacancyResponse
                 "status" => $vacancyTaxonomy["status"][0]["name"] ?? null,
                 "slug" => $vacancy->post_name
             ];
+
+            if ($vacancyModel->checkIsBelongToCompanyRecruiter()) {
+                $assignedChildCompany   = $vacancyModel->getAssignedChildCompany();
+
+                if ($assignedChildCompany && $assignedChildCompany instanceof WP_Post) {
+                    $childCompanyModel      = new ChildCompany($assignedChildCompany);
+                    $vacancy['companyName'] = $childCompanyModel->getName();
+                } else {
+                    $vacancy['companyName'] = "";
+                }
+            } else if ($vacancyModel->checkImported()) {
+                $vacancy['companyName'] = $vacancyModel->getImportedCompanyName();
+            } else {
+                $companyAuthor = $vacancyModel->getAuthor();
+                if ($companyAuthor && $companyAuthor instanceof WP_Post) {
+                    $company      = new Company($companyAuthor);
+                    $vacancy['companyName'] = $company->getName();
+                } else {
+                    $vacancy['companyName'] = "";
+                }
+            }
+
+            return $vacancy;
         }, $this->vacancyCollection);
 
         return $formattedResponse;
@@ -529,6 +553,14 @@ class VacancyResponse
         ];
 
         $vacancyTax = $vacancyModel->getTax();
+
+        $languageResponse = $vacancyModel->getLanguage();
+        if ($languageResponse) {
+            $formattedResponse['language'] = [
+                'id' => $languageResponse['value'],
+                'name' => LanguageConstant::get('fe', $languageResponse['value'])
+            ];
+        }
 
         /** Changes Start here
          * convert key to camelCase

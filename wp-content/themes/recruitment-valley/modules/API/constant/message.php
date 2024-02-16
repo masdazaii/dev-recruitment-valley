@@ -241,6 +241,9 @@ class Message
                     "show_success"      => __("Success Child Company data!", THEME_DOMAIN),
                     "show_unauthorized" => __("Your Child Company not found!", THEME_DOMAIN),
                 ],
+                'profile'   => [
+                    "get_success"   => __("Success get company recruiter profile!%s", THEME_DOMAIN)
+                ]
             ],
             'package' => [
                 "package" => [
