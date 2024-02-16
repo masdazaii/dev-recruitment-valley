@@ -14,6 +14,8 @@ class JobAlert extends RegisterCPT
         $title = __('JobAlerts', THEME_DOMAIN);
         $slug = 'JobAlert';
         $args = [
+            'has_archive' => false,
+            'publicly_queryable' => false,
             'menu_position' => 7,
             'supports' => ['title'], 
         ];

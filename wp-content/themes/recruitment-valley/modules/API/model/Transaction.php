@@ -139,12 +139,12 @@ class Transaction
         $valid_statuses = array('pending', 'success', 'failed'); // Add more as needed
 
         if (in_array($status, $valid_statuses)) {
-            // Remove any existing payment status terms
-            wp_set_post_terms($this->transaction_id, null, 'payment_status', false);
             $termExist = term_exists($status, 'payment_status');
-
-            // Set the new payment status term
-            wp_set_post_terms($this->transaction_id, $termExist["term_id"], 'payment_status', false);
+            if($termExist)
+            {
+                // Set the new payment status term
+                wp_set_post_terms($this->transaction_id, $termExist["term_id"], 'payment_status', false);
+            }
         }
     }
 
