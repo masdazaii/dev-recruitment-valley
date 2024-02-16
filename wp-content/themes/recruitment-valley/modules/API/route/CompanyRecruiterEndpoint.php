@@ -60,6 +60,12 @@ class CompanyRecruiterEndpoint
                     'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
                     'callback'              => [$companyRecruiterService, 'storeInformation']
                 ],
+                'profile_get_photo' => [
+                    'url'                   => 'profile/image',
+                    'methods'               => 'GET',
+                    'permission_callback'   => [$authMiddleware, 'authorize_company_recruiter'],
+                    'callback'              => [$companyRecruiterService, 'getPhoto']
+                ],
                 // 'delete_profile_gallery'    => [
                 //     'url'                   => 'profile/gallery/(?P<id>[-\w]+)',
                 //     'methods'               => 'DELETE',

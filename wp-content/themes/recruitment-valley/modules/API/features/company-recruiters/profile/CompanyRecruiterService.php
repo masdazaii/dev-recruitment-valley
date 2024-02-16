@@ -171,4 +171,10 @@ class CompanyRecruiterService
     //     $response = $this->companyRecruiterController->deleteGalleryItem();
     //     return ResponseHelper::build($response);
     // }
+
+    public function getPhoto(WP_REST_Request $request)
+    {
+        $response = $this->companyRecruiterController->getPhoto($request->get_params());
+        return ResponseHelper::build($response);
+    }
 }
