@@ -619,16 +619,21 @@ class Vacancy
         return $vacancies;
     }
 
-    public function allSlug()
+    public function allSlug(array $filter)
     {
         $args = array(
             'post_type' => $this->vacancy,
-            'posts_per_page' => -1, // Retrieve all posts of the type
+            // 'posts_per_page' => -1, // Retrieve all posts of the type
             'fields' => 'post_name', // Retrieve only post IDs to improve performance
-            'post_status' => "publish"
+            'posts_per_page'    => isset($filter['postPerPage']) ? $filter['postPerPage'] : -1,
+            'offset'            => isset($filter['offset']) ? $filter['offset'] : 0,
+            "orderby"           => isset($filter['orderBy']) ? $filter['orderBy'] : "date",
+            "order"             => isset($filter['sort']) ? $filter['sort'] : 'ASC',
+            'post_status' => "publish",
         );
 
-        $vacancySitemap = get_posts($args);
+        // $vacancySitemap = get_posts($args);
+        $vacancySitemap = new WP_Query($args);
 
         return $vacancySitemap;
     }

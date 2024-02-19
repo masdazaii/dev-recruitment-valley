@@ -15,9 +15,9 @@ class SitemapService
         $this->sitemapController = new SitemapController;
     }
 
-    public function vacancies()
+    public function vacancies(WP_REST_Request $request)
     {
-        $response = $this->sitemapController->vacancy();
+        $response = $this->sitemapController->vacancy($request->get_params());
         return ResponseHelper::build($response);
     }
 

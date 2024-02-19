@@ -19,14 +19,81 @@ class SitemapController
         $this->_message = new Message();
     }
 
-    public function vacancy()
+    public function vacancy(array $request)
     {
         $vacancy = new Vacancy;
-        $vacancySlugs = $vacancy->allSlug();
+        $filters = [
+            'orderBy'   => 'date',
+            'sort'      => 'asc',
+            'page'      => array_key_exists('page', $request) && is_numeric($request['page']) ? (int)$request['page'] : 1,
+            'postPerPage'   => array_key_exists('perPage', $request) && is_numeric($request['perPage']) ? (int)$request['perPage'] : -1,
+        ];
+
+        if (isset($request['sort'])) {
+            switch (strtolower($request['sort'])) {
+                case 'desc':
+                case 'descending':
+                    $filters['sort']    = 'desc';
+                    break;
+                case 'asc':
+                case 'ascending':
+                default;
+                    $filters['sort']    = 'asc';
+                    break;
+            }
+        }
+
+        if (isset($request['orderBy'])) {
+            switch (strtolower(($request['orderBy']))) {
+                case 'none':
+                    $filters['orderBy'] = 'none';
+                    break;
+                case 'id':
+                case 'postId':
+                case 'postID':
+                    $filters['orderBy'] = 'ID';
+                    break;
+                case 'author':
+                    $filters['orderBy'] = 'author';
+                    break;
+                case 'title':
+                    $filters['orderBy'] = 'title';
+                    break;
+                case 'name':
+                case 'postName':
+                case 'slug':
+                    $filters['orderBy'] = 'name';
+                    break;
+                case 'type':
+                case 'postType':
+                    $filters['orderBy'] = 'type';
+                    break;
+                case 'modified':
+                    $filters['orderBy'] = 'modified';
+                    break;
+                case 'parent':
+                    $filters['orderBy'] = 'parent';
+                    break;
+                case 'rand':
+                case 'random':
+                case 'randomOrder':
+                    $filters['orderBy'] = 'rand';
+                    break;
+                case 'date':
+                case 'postDate':
+                default:
+                    $filters['orderBy'] = 'date';
+                    break;
+            }
+        }
+
+        $filters['offset']  = $filters['page'] <= 1 ? 0 : ((intval($filters['page']) - 1) * intval($filters['postPerPage']));
+
+        $vacancySlugs = $vacancy->allSlug($filters);
 
         $vacancySlugs = array_map(function (WP_Post $vacancy) {
             return $vacancy->post_name;
-        }, $vacancySlugs);
+        }, $vacancySlugs->posts);
 
         return [
             "status" => 200,
@@ -40,7 +107,7 @@ class SitemapController
         $filters = [
             'orderBy'   => 'date',
             'sort'      => (array_key_exists('orderBy', $request) && $request['orderBy'] && $request['orderBy'] == 'title' ? 'asc' : 'desc'),
-            'page'      => array_key_exists('perPage', $request) && is_numeric($request['page']) ? (int)$request['page'] : 1,
+            'page'      => array_key_exists('page', $request) && is_numeric($request['page']) ? (int)$request['page'] : 1,
             'postPerPage'   => array_key_exists('perPage', $request) && is_numeric($request['perPage']) ? (int)$request['perPage'] : 10,
         ];
 
@@ -81,7 +148,7 @@ class SitemapController
 
         $response = [];
 
-        if ($vacancies) {
+        if ($vacancies && is_object($vacancies)) {
             foreach ($vacancies->posts as $key => $values) {
                 $vacancy    = new vacancy($values->ID);
                 $response[] = [
@@ -102,8 +169,8 @@ class SitemapController
             return [
                 'page'  => (int)$filters['page'],
                 'perPage'  => (int)$filters['postPerPage'],
-                'total' => (int)$vacancies->found_posts ?? 0,
-                'totalPage' => (int)$vacancies->max_num_pages ?? 0,
+                'total' => $vacancies && is_object($vacancies) ? (int)$vacancies->found_posts : 0,
+                'totalPage' => $vacancies && is_object($vacancies) ? (int)$vacancies->max_num_pages : 0,
                 'data'  => array_values($response)
             ];
         }
