@@ -1,18 +1,19 @@
 <?php
+
 /**
  * Autoloading
  *
- * @package BornDigital
+ * @package MadeIndonesia
  */
 
 namespace BD\Dashboard\Restrictions;
 
-defined( 'ABSPATH' ) || die( "Can't access directly" );
+defined('ABSPATH') || die("Can't access directly");
 
 // for quick testing.
 $is_enabled = true;
 
-if ( ! $is_enabled ) {
+if (!$is_enabled) {
 	return;
 }
 

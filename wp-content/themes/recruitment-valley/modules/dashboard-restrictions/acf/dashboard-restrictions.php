@@ -1,11 +1,12 @@
 <?php
+
 /**
  * Dashboard restriction's custom fields.
  *
- * @package BornDigital
+ * @package MadeIndonesia
  */
 
-if ( ! function_exists( 'acf_add_local_field_group' ) ) {
+if (!function_exists('acf_add_local_field_group')) {
 	return;
 }
 

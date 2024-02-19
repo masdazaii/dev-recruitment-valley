@@ -15,7 +15,9 @@ class JobAlert extends RegisterCPT
         $slug = 'JobAlert';
         $args = [
             'menu_position' => 7,
-            'supports' => ['title'], 
+            'publicly_queryable' => false,
+            'has_archive' => false,
+            'supports' => ['title'],
         ];
 
         $this->customPostType($title, $slug, $args);

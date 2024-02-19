@@ -17,7 +17,8 @@ class Coupon extends RegisterCPT
     {
         $additionalArgs = [
             'menu_posisiton' => 5,
-            'has_archive' => true,
+            'publicly_queryable' => false,
+            'has_archive' => false,
             'public' => true,
             'hierarchical' => false,
             'show_in_rest' => true

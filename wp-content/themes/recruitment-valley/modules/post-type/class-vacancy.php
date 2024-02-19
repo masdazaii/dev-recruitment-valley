@@ -63,6 +63,8 @@ class Vacancy extends RegisterCPT
         $slug = 'vacancy';
         $args = [
             'menu_position' => 5,
+            'publicly_queryable' => false,
+            'has_archive' => false,
             'supports' => array('title', 'editor', 'author', 'thumbnail')
         ];
 

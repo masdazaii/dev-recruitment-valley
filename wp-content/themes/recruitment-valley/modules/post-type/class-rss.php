@@ -29,6 +29,8 @@ class RssCPT extends RegisterCPT
         $slug = 'rss';
         $args = [
             'menu_position' => 5,
+            'publicly_queryable' => false,
+            'has_archive' => false,
             'supports' => array('title', 'editor', 'author', 'thumbnail')
         ];
 

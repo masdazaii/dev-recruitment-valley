@@ -1,28 +1,30 @@
 <?php
+
 /**
  * List Table
  *
- * @package BornDigital
+ * @package MadeIndonesia
  */
 
 namespace BD\Password\Expiration\Admin;
 
-defined( 'ABSPATH' ) || die( "Can't access directly" );
+defined('ABSPATH') || die("Can't access directly");
 
 /**
  * List Table class
  */
-final class List_Table {
+final class List_Table
+{
 
 	/**
 	 * Class constructor.
 	 */
-	public function __construct() {
+	public function __construct()
+	{
 
-		add_action( 'admin_head', array( $this, 'admin_css' ) );
-		add_filter( 'manage_users_columns', array( $this, 'users_column' ) );
-		add_action( 'manage_users_custom_column', array( $this, 'render_users_column' ), 10, 3 );
-
+		add_action('admin_head', array($this, 'admin_css'));
+		add_filter('manage_users_columns', array($this, 'users_column'));
+		add_action('manage_users_custom_column', array($this, 'render_users_column'), 10, 3);
 	}
 
 	/**
@@ -30,31 +32,33 @@ final class List_Table {
 	 *
 	 * @action admin_head
 	 */
-	public function admin_css() {
+	public function admin_css()
+	{
 
 		$screen = get_current_screen();
 
-		if ( ! isset( $screen->id ) || 'users' !== $screen->id ) {
+		if (!isset($screen->id) || 'users' !== $screen->id) {
 
 			return;
-
 		}
 
-		?>
+?>
 		<style type="text/css">
-		.fixed .column-bdpass {
-			width: 150px;
-		}
-		@media screen and (max-width: 782px) {
 			.fixed .column-bdpass {
-				display: none;
+				width: 150px;
 			}
-		}
-		.bdpass-is-expired {
-			color: #a00;
-		}
+
+			@media screen and (max-width: 782px) {
+				.fixed .column-bdpass {
+					display: none;
+				}
+			}
+
+			.bdpass-is-expired {
+				color: #a00;
+			}
 		</style>
-		<?php
+<?php
 
 	}
 
@@ -67,12 +71,12 @@ final class List_Table {
 	 *
 	 * @return array
 	 */
-	public function users_column( $columns ) {
+	public function users_column($columns)
+	{
 
-		$columns['bdpass'] = esc_html__( 'Password Reset', 'themedomain' );
+		$columns['bdpass'] = esc_html__('Password Reset', 'themedomain');
 
 		return $columns;
-
 	}
 
 	/**
@@ -86,29 +90,28 @@ final class List_Table {
 	 *
 	 * @return string
 	 */
-	public function render_users_column( $value, $column_name, $user_id ) {
+	public function render_users_column($value, $column_name, $user_id)
+	{
 
-		if ( 'bdpass' !== $column_name ) {
+		if ('bdpass' !== $column_name) {
 			return $value;
 		}
 
-		$reset = Setup::get_user_meta( $user_id );
+		$reset = Setup::get_user_meta($user_id);
 
-		if ( false === $reset || ! Setup::has_expirable_role( $user_id ) ) {
+		if (false === $reset || !Setup::has_expirable_role($user_id)) {
 			return '&mdash;';
 		}
 
 		// translators: %1$s: time.
-		$time_diff = sprintf( __( '%1$s ago', 'themedomain' ), human_time_diff( $reset, time() ) );
-		$class     = Setup::is_expired( $user_id ) ? 'bdpass-is-expired' : 'bdpass-not-expired';
+		$time_diff = sprintf(__('%1$s ago', 'themedomain'), human_time_diff($reset, time()));
+		$class     = Setup::is_expired($user_id) ? 'bdpass-is-expired' : 'bdpass-not-expired';
 
 		return sprintf(
 			// translators: %s: time.
 			'<span class="%s">%s</span>',
-			esc_attr( $class ),
-			esc_html( $time_diff )
+			esc_attr($class),
+			esc_html($time_diff)
 		);
-
 	}
-
 }

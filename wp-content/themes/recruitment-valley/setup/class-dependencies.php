@@ -1,8 +1,9 @@
 <?php
+
 /**
  * Plugin dependency management
  *
- * @package BornDigital
+ * @package MadeIndonesia
  */
 
 namespace BD_Theme\Setup;
@@ -10,18 +11,21 @@ namespace BD_Theme\Setup;
 /**
  * Dependencies class to manage plugin dependency
  */
-class Dependencies {
+class Dependencies
+{
 	/**
 	 * Main flow
 	 */
-	public function __construct() {
-		add_action( 'tgmpa_register', [ $this, 'plugin_dependencies' ] );
+	public function __construct()
+	{
+		add_action('tgmpa_register', [$this, 'plugin_dependencies']);
 	}
 
 	/**
 	 * Plugin dependecies
 	 */
-	public function plugin_dependencies() {
+	public function plugin_dependencies()
+	{
 		$plugins = array(
 			array(
 				'name'               => 'Advanced Custom Fields Pro', // The plugin name.
@@ -41,7 +45,7 @@ class Dependencies {
 		 * leave the strings uncommented.
 		 * Some of the strings are added into a sprintf, so see the comments at the
 		 * end of each line for what each argument will be.
-		*/
+		 */
 		$config = array(
 			'domain'       => 'beyourbest', // Text domain - likely want to be the same as your theme.
 			'default_path' => '', // Default absolute path to pre-packaged plugins.
@@ -51,39 +55,38 @@ class Dependencies {
 			'is_automatic' => false, // Automatically activate plugins after installation or not.
 			'message'      => '', // Message to output right before the plugins table.
 			'strings'      => array(
-				'page_title'                      => __( 'Install Required Plugins', 'themedomain' ),
-				'menu_title'                      => __( 'Install Plugins', 'themedomain' ),
+				'page_title'                      => __('Install Required Plugins', 'themedomain'),
+				'menu_title'                      => __('Install Plugins', 'themedomain'),
 				// translators: %s: plugin name.
-				'installing'                      => __( 'Installing Plugin: %s', 'themedomain' ),
-				'oops'                            => __( 'Something went wrong with the plugin API.', 'themedomain' ),
+				'installing'                      => __('Installing Plugin: %s', 'themedomain'),
+				'oops'                            => __('Something went wrong with the plugin API.', 'themedomain'),
 				// translators: %1$s: plugin name(s).
-				'notice_can_install_required'     => _n_noop( 'This theme requires the following plugin: %1$s.', 'This theme requires the following plugins: %1$s.' ),
+				'notice_can_install_required'     => _n_noop('This theme requires the following plugin: %1$s.', 'This theme requires the following plugins: %1$s.'),
 				// translators: %1$s: plugin name(s).
-				'notice_can_install_recommended'  => _n_noop( 'This theme recommends the following plugin: %1$s.', 'This theme recommends the following plugins: %1$s.' ),
+				'notice_can_install_recommended'  => _n_noop('This theme recommends the following plugin: %1$s.', 'This theme recommends the following plugins: %1$s.'),
 				// translators: %1$s: plugin name(s).
-				'notice_cannot_install'           => _n_noop( 'Sorry, but you do not have the correct permissions to install the %s plugin. Contact the administrator of this site for help on getting the plugin installed.', 'Sorry, but you do not have the correct permissions to install the %s plugins. Contact the administrator of this site for help on getting the plugins installed.' ),
+				'notice_cannot_install'           => _n_noop('Sorry, but you do not have the correct permissions to install the %s plugin. Contact the administrator of this site for help on getting the plugin installed.', 'Sorry, but you do not have the correct permissions to install the %s plugins. Contact the administrator of this site for help on getting the plugins installed.'),
 				// translators: %1$s: plugin name(s).
-				'notice_can_activate_required'    => _n_noop( 'The following required plugin is currently inactive: %1$s.', 'The following required plugins are currently inactive: %1$s.' ),
+				'notice_can_activate_required'    => _n_noop('The following required plugin is currently inactive: %1$s.', 'The following required plugins are currently inactive: %1$s.'),
 				// translators: %1$s: plugin name(s).
-				'notice_can_activate_recommended' => _n_noop( 'The following recommended plugin is currently inactive: %1$s.', 'The following recommended plugins are currently inactive: %1$s.' ),
+				'notice_can_activate_recommended' => _n_noop('The following recommended plugin is currently inactive: %1$s.', 'The following recommended plugins are currently inactive: %1$s.'),
 				// translators: %1$s: plugin name(s).
-				'notice_cannot_activate'          => _n_noop( 'Sorry, but you do not have the correct permissions to activate the %s plugin. Contact the administrator of this site for help on getting the plugin activated.', 'Sorry, but you do not have the correct permissions to activate the %s plugins. Contact the administrator of this site for help on getting the plugins activated.' ),
+				'notice_cannot_activate'          => _n_noop('Sorry, but you do not have the correct permissions to activate the %s plugin. Contact the administrator of this site for help on getting the plugin activated.', 'Sorry, but you do not have the correct permissions to activate the %s plugins. Contact the administrator of this site for help on getting the plugins activated.'),
 				// translators: %1$s: plugin name(s).
-				'notice_ask_to_update'            => _n_noop( 'The following plugin needs to be updated to its latest version to ensure maximum compatibility with this theme: %1$s.', 'The following plugins need to be updated to their latest version to ensure maximum compatibility with this theme: %1$s.' ),
+				'notice_ask_to_update'            => _n_noop('The following plugin needs to be updated to its latest version to ensure maximum compatibility with this theme: %1$s.', 'The following plugins need to be updated to their latest version to ensure maximum compatibility with this theme: %1$s.'),
 				// translators: %s: plugin name.
-				'notice_cannot_update'            => _n_noop( 'Sorry, but you do not have the correct permissions to update the %s plugin. Contact the administrator of this site for help on getting the plugin updated.', 'Sorry, but you do not have the correct permissions to update the %s plugins. Contact the administrator of this site for help on getting the plugins updated.' ),
-				'install_link'                    => _n_noop( 'Begin installing plugin', 'Begin installing plugins' ),
-				'activate_link'                   => _n_noop( 'Activate installed plugin', 'Activate installed plugins' ),
-				'return'                          => __( 'Return to Required Plugins Installer', 'themedomain' ),
-				'plugin_activated'                => __( 'Plugin activated successfully.', 'themedomain' ),
+				'notice_cannot_update'            => _n_noop('Sorry, but you do not have the correct permissions to update the %s plugin. Contact the administrator of this site for help on getting the plugin updated.', 'Sorry, but you do not have the correct permissions to update the %s plugins. Contact the administrator of this site for help on getting the plugins updated.'),
+				'install_link'                    => _n_noop('Begin installing plugin', 'Begin installing plugins'),
+				'activate_link'                   => _n_noop('Activate installed plugin', 'Activate installed plugins'),
+				'return'                          => __('Return to Required Plugins Installer', 'themedomain'),
+				'plugin_activated'                => __('Plugin activated successfully.', 'themedomain'),
 				// translators: %1$s: dashboard link.
-				'complete'                        => __( 'All plugins installed and activated successfully. %s', 'themedomain' ),
+				'complete'                        => __('All plugins installed and activated successfully. %s', 'themedomain'),
 			),
 		);
 
-		tgmpa( $plugins, $config );
+		tgmpa($plugins, $config);
 	}
-
 }
 
 new Dependencies();

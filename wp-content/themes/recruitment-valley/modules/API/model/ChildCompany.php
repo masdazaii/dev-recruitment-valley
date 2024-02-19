@@ -110,9 +110,9 @@ class ChildCompany extends Company
             }
 
             if (array_key_exists('search', $filters)) {
-                $args['search'] = $filters['search'];
+                $args['s'] = $filters['search'];
             } else if (array_key_exists('s', $filters)) {
-                $args['search'] = $filters['s'];
+                $args['s'] = $filters['s'];
             }
 
             if (array_key_exists('name', $filters)) {

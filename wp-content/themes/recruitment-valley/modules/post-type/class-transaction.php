@@ -15,6 +15,8 @@ class Transaction extends RegisterCPT
         $slug = 'transaction';
         $args = [
             'menu_position' => 10,
+            'publicly_queryable' => false,
+            'has_archive' => false,
             'supports' => array('title', 'editor', 'author', 'thumbnail')
         ];
 

@@ -1,11 +1,12 @@
 <?php
+
 /**
  * Autoloading
  *
- * @package BornDigital
+ * @package MadeIndonesia
  */
 
-defined( 'ABSPATH' ) || die( "Can't access directly" );
+defined('ABSPATH') || die("Can't access directly");
 
 // require_once __DIR__ . '/admin/class-login-limit.php';
 // require_once __DIR__ . '/admin/class-lockdown.php';

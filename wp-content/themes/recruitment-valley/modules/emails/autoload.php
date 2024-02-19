@@ -3,7 +3,7 @@
 /**
  * Autoloading
  *
- * @package BornDigital
+ * @package MadeIndonesia
  */
 
 defined('ABSPATH') || die("Can't access directly");
