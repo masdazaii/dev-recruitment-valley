@@ -9,7 +9,7 @@ class RecommendedJobController
     {
         $filters = [
             'page' => isset($request['page']) ? intval($request['page']) : 1,
-            'perPage' => (int) $request['perPage'] ?? 6,
+            'perPage' =>  !empty($request['perPage']) || isset($request['perPage']) ? (int) $request['perPage'] : 6,
         ];
 
         $vacancy = new Vacancy;
