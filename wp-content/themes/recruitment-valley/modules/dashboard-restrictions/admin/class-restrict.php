@@ -1,8 +1,9 @@
 <?php
+
 /**
  * Dashboard restrictions
  *
- * @package BornDigital
+ * @package MadeIndonesia
  */
 
 namespace BD\Dashboard\Restrictions\Admin;
@@ -10,14 +11,16 @@ namespace BD\Dashboard\Restrictions\Admin;
 /**
  * Setting up dashboard restrictions
  */
-class Restrict {
+class Restrict
+{
 	/**
 	 * Setup the flow
 	 */
-	public function __construct() {
+	public function __construct()
+	{
 		$this->add_option_page();
-		add_action( 'admin_init', [ $this, 'restrict_by_role' ] );
-		add_action( 'admin_init', [ $this, 'restrict_by_ip' ] );
+		add_action('admin_init', [$this, 'restrict_by_role']);
+		add_action('admin_init', [$this, 'restrict_by_ip']);
 	}
 
 	/**
@@ -25,8 +28,9 @@ class Restrict {
 	 *
 	 * @return void
 	 */
-	public function add_option_page() {
-		if ( ! function_exists( 'acf_add_options_page' ) ) {
+	public function add_option_page()
+	{
+		if (!function_exists('acf_add_options_page')) {
 			return;
 		}
 
@@ -45,14 +49,15 @@ class Restrict {
 	 *
 	 * @return void
 	 */
-	public function restrict_by_role() {
-		if ( defined( 'DOING_AJAX' ) ) {
+	public function restrict_by_role()
+	{
+		if (defined('DOING_AJAX')) {
 			return;
 		}
 
-		$is_enabled = (bool) get_option( 'options_enable_role_restriction' );
+		$is_enabled = (bool) get_option('options_enable_role_restriction');
 
-		if ( ! $is_enabled ) {
+		if (!$is_enabled) {
 			return;
 		}
 
@@ -64,9 +69,10 @@ class Restrict {
 	 *
 	 * @return void
 	 */
-	public function restrict_by_ip() {
+	public function restrict_by_ip()
+	{
 		// allow ajax request.
-		if ( defined( 'DOING_AJAX' ) ) {
+		if (defined('DOING_AJAX')) {
 			return;
 		}
 
@@ -75,15 +81,15 @@ class Restrict {
 		$current_screen = get_current_screen();
 
 		// allow comment deletion.
-		if ( 'comment.php' === $pagenow && isset( $_GET['action'] ) && 'deletecomment' === $_GET['action'] ) {
+		if ('comment.php' === $pagenow && isset($_GET['action']) && 'deletecomment' === $_GET['action']) {
 			return;
 		}
 
 		$current_user = wp_get_current_user();
 
-		$is_enabled = (bool) get_option( 'options_enable_ip_restriction' );
+		$is_enabled = (bool) get_option('options_enable_ip_restriction');
 
-		if ( ! $is_enabled ) {
+		if (!$is_enabled) {
 			return;
 		}
 
@@ -95,11 +101,12 @@ class Restrict {
 	 *
 	 * @param ? $cidr ?.
 	 */
-	public function cidr_to_range( $cidr ) {
+	public function cidr_to_range($cidr)
+	{
 		$range    = array();
-		$cidr     = explode( '/', $cidr );
-		$range[0] = long2ip( ( ip2long( $cidr[0] ) ) & ( ( -1 << ( 32 - (int) $cidr[1] ) ) ) );
-		$range[1] = long2ip( ( ip2long( $cidr[0] ) ) + pow( 2, ( 32 - (int) $cidr[1] ) ) - 1 );
+		$cidr     = explode('/', $cidr);
+		$range[0] = long2ip((ip2long($cidr[0])) & ((-1 << (32 - (int) $cidr[1]))));
+		$range[1] = long2ip((ip2long($cidr[0])) + pow(2, (32 - (int) $cidr[1])) - 1);
 		return $range;
 	}
 
@@ -108,11 +115,12 @@ class Restrict {
 	 *
 	 * @param string $to destination url.
 	 */
-	public function redirect( $to = '' ) {
-		if ( ! $to ) {
+	public function redirect($to = '')
+	{
+		if (!$to) {
 			$to = get_site_url();
 		}
-		wp_safe_redirect( $to );
+		wp_safe_redirect($to);
 		exit;
 	}
 
@@ -122,30 +130,30 @@ class Restrict {
 	 * @link http://stackoverflow.com/a/41382472
 	 * @return string user ip
 	 */
-	public function get_user_ip() {
+	public function get_user_ip()
+	{
 		$ipaddress = '';
 
-		if ( isset( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+		if (isset($_SERVER['HTTP_CLIENT_IP'])) {
 			$ipaddress = $_SERVER['HTTP_CLIENT_IP'];
-		} elseif ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+		} elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
 			$ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
-		} elseif ( isset( $_SERVER['HTTP_X_FORWARDED'] ) ) {
+		} elseif (isset($_SERVER['HTTP_X_FORWARDED'])) {
 			$ipaddress = $_SERVER['HTTP_X_FORWARDED'];
-		} elseif ( isset( $_SERVER['HTTP_X_CLUSTER_CLIENT_IP'] ) ) {
+		} elseif (isset($_SERVER['HTTP_X_CLUSTER_CLIENT_IP'])) {
 			$ipaddress = $_SERVER['HTTP_X_CLUSTER_CLIENT_IP'];
-		} elseif ( isset( $_SERVER['HTTP_FORWARDED_FOR'] ) ) {
+		} elseif (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
 			$ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
-		} elseif ( isset( $_SERVER['HTTP_FORWARDED'] ) ) {
+		} elseif (isset($_SERVER['HTTP_FORWARDED'])) {
 			$ipaddress = $_SERVER['HTTP_FORWARDED'];
-		} elseif ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
+		} elseif (isset($_SERVER['REMOTE_ADDR'])) {
 			$ipaddress = $_SERVER['REMOTE_ADDR'];
 		} else {
 			$ipaddress = 'UNKNOWN';
 		}
 
-		return sanitize_text_field( $ipaddress );
+		return sanitize_text_field($ipaddress);
 	}
-
 }
 
 new Restrict();

@@ -65,6 +65,8 @@ class Vacancy extends RegisterCPT
             'has_archive' => false,
             'publicly_queryable' => false,
             'menu_position' => 5,
+            'publicly_queryable' => false,
+            'has_archive' => false,
             'supports' => array('title', 'editor', 'author', 'thumbnail')
         ];
 
@@ -543,7 +545,7 @@ class Vacancy extends RegisterCPT
 
     public function vacancyCustomFilterRender($post_type, $which)
     {
-        if (is_admin()) {
+        if (is_admin() && current_user_can('administrator')) {
             if ($post_type == 'vacancy' && $which == 'top') {
                 try {
                     /** Get status terms */

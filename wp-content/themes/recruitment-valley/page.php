@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The template for displaying all pages
  *
@@ -9,34 +10,34 @@
  *
  * @link https://codex.wordpress.org/Template_Hierarchy
  *
- * @package BornDigital
+ * @package MadeIndonesia
  */
 
-defined( 'ABSPATH' ) || die( "Can't access directly" );
+defined('ABSPATH') || die("Can't access directly");
 
 get_header(); ?>
 
-	<div id="primary" class="content-area">
-		<main id="main" class="site-main">
+<div id="primary" class="content-area">
+	<main id="main" class="site-main">
 
-			<?php
-			while ( have_posts() ) : the_post();
+		<?php
+		while (have_posts()) : the_post();
 
-				get_template_part( 'partials/content', 'page' );
+			get_template_part('partials/content', 'page');
 
-				the_title();
-				the_content();
+			the_title();
+			the_content();
 
-				// If comments are open or we have at least one comment, load up the comment template.
-				if ( comments_open() || get_comments_number() ) :
-					comments_template();
-				endif;
+			// If comments are open or we have at least one comment, load up the comment template.
+			if (comments_open() || get_comments_number()) :
+				comments_template();
+			endif;
 
-			endwhile; // End of the loop.
-			?>
+		endwhile; // End of the loop.
+		?>
 
-		</main><!-- #main -->
-	</div><!-- #primary -->
+	</main><!-- #main -->
+</div><!-- #primary -->
 
 <?php
 get_sidebar();

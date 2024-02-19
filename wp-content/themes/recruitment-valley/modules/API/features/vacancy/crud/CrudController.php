@@ -14,9 +14,16 @@ use WP_Query;
 use Global\NotificationService;
 use constant\NotificationConstant;
 use DateTime;
+use Log;
+use Model\ChildCompany;
+use Model\CompanyRecruiter;
+use WP_Error;
+use WP_User;
 
 class VacancyCrudController
 {
+    private const company_role              = ["company"];
+    private const company_recruiter_role    = ["company-recruiter", "recruiter"];
     private $_posttype = 'vacancy';
     private $_message;
     private $_notification;
@@ -303,6 +310,12 @@ class VacancyCrudController
 
     public function createFree($request)
     {
+        /** Log Attempt */
+        $logData        = [
+            'request'   => $request
+        ];
+        Log::info("Create Free Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_create_free_vancancy');
+
         $payload = [
             "title" => $request["name"],
             "country" => $request['country'], // Added Line
@@ -397,46 +410,67 @@ class VacancyCrudController
         }
     }
 
+    /**
+     * Create paid vacancy function
+     *
+     * @param array $request
+     * @return array
+     */
     public function createPaid($request)
     {
+        /** Log Attempt */
+        $logData        = [
+            'request'   => $request
+        ];
+        Log::info("Create Paid Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_create_paid_vancancy');
+
         $payload = [
-            "title" => $request["name"],
-            "city" => $request["city"],
-            "placementAddress" => $request["placementAddress"],
-            "description" => $request["description"],
-            "term" => $request["terms"],
-            "salary_start" => $request["salaryStart"],
-            "salary_end" => $request["salaryEnd"],
-            "external_url" => $request["externalUrl"],
-            "apply_from_this_platform" => isset($request["externalUrl"]) ? true : false,
-            "is_paid" => true,
-            "user_id" => $request["user_id"],
-            "application_process_title" => $request["applicationProcedureTitle"],
-            "application_process_description" => $request["applicationProcedureText"],
-            "video_url" => $request["video"],
-            "facebook_url" => $request["facebook"],
-            "linkedin_url" => $request["linkedin"],
-            "instagram_url" => $request["instagram"],
-            "twitter_url" => $request["twitter"],
-            "reviews" => $request["review"],
-            "placementAddressLongitude" => $request["longitude"],
-            "placementAddressLatitude" => $request["latitude"],
-            "taxonomy" => [
-                "sector" => $request["sector"],
-                "role" => $request["role"],
-                "working-hours" => $request["workingHours"],
-                "location" => $request["location"],
-                "education" => $request["education"],
-                "type" => $request["employmentType"],
-                "experiences" => $request["experiences"] ?? [], // Added Line
-                "status" => [32] // set free job become pending category
+            "title"         => array_key_exists('name', $request) ? $request["name"] : NULL,
+            "city"          => array_key_exists('city', $request) ? $request["city"] : NULL,
+            "placementAddress"  => array_key_exists('placementAddress', $request) ? $request["placementAddress"] : NULL,
+            "description"       => array_key_exists('description', $request) ? $request["description"] : NULL,
+            "term"              => array_key_exists('terms', $request) ? $request["terms"] : NULL,
+            "salary_start"      => array_key_exists('salaryStart', $request) ? $request["salaryStart"] : NULL,
+            "salary_end"        => array_key_exists('salaryEnd', $request) ? $request["salaryEnd"] : NULL,
+            "external_url"      => array_key_exists('externalUrl', $request) ? $request["externalUrl"] : NULL,
+            "apply_from_this_platform"      => isset($request["externalUrl"]) ? true : false,
+            "is_paid"                       => true,
+            "user_id"                       => $request["user_id"],
+            "application_process_title"         => array_key_exists('applicationProcedureTitle', $request) ? $request["applicationProcedureTitle"] : NULL,
+            "application_process_description"   => array_key_exists('applicationProcedureText', $request) ? $request["applicationProcedureText"] : NULL,
+            "video_url"     => array_key_exists('video', $request) ? $request["video"] : NULL,
+            "facebook_url"  => array_key_exists('facebook', $request) ? $request["facebook"] : NULL,
+            "linkedin_url"  => array_key_exists('linkedin', $request) ? $request["linkedin"] : NULL,
+            "instagram_url" => array_key_exists('instagram', $request) ? $request["instagram"] : NULL,
+            "twitter_url"   => array_key_exists('twitter', $request) ? $request["twitter"] : NULL,
+            "reviews"       => array_key_exists('review', $request) ? $request["review"] : NULL,
+            "placementAddressLongitude" => array_key_exists('longitude', $request) ? $request["longitude"] : NULL,
+            "placementAddressLatitude"  => array_key_exists('latitude', $request) ? $request["latitude"] : NULL,
+            "taxonomy"      => [
+                "sector"    => array_key_exists('sector', $request) ? $request["sector"] : NULL,
+                "role"      => array_key_exists('role', $request) ? $request["role"] : NULL,
+                "working-hours" => array_key_exists('workingHours', $request) ? $request["workingHours"] : NULL,
+                "location"      => array_key_exists('location', $request) ? $request["location"] : NULL,
+                "education"     => array_key_exists('education', $request) ? $request["education"] : NULL,
+                "type"          => array_key_exists('employmentType', $request) ? $request["employmentType"] : NULL,
+                "experiences"   => array_key_exists('experiences', $request) ? $request["experiences"] : NULL ?? [], // Added Line
+                "status"        => [32] // set free job become pending category
             ],
-            "application_process_step" => $request["applicationProcedureSteps"],
-            'rv_vacancy_country' => $request['country'], // Added Line
-            'rv_vacancy_country_code' => $request['countryCode'], // Added Line
+            "application_process_step"  => array_key_exists('applicationProcedureSteps', $request) ? $request["applicationProcedureSteps"] : NULL,
+            'rv_vacancy_country'        => array_key_exists('country', $request) ? $request['country'] : NULL, // Added Line
+            'rv_vacancy_country_code'   => array_key_exists('countryCode', $request) ? $request['countryCode'] : NULL, // Added Line
 
             /** Addition Feedback 01 Nov 2023 */
-            "language"  => $request["language"]
+            "language"  => array_key_exists('language', $request) ? $request["language"] : NULL,
+
+            /** Additional new Role : Company Recruiter */
+            "rv_vacancy_assigned_child_company"     => NULL,
+            "rv_vacancy_is_from_company_recruiter"  => false
+        ];
+
+        /** LogData */
+        $logData        = [
+            'payload'   => $payload
         ];
 
         global $wpdb;
@@ -454,35 +488,86 @@ class VacancyCrudController
             /** Anggit's syntax end here */
 
             /** Changes start here */
-            $company = new Company($payload["user_id"]);
+            // $company = new Company($payload["user_id"]);
 
-            // Check if user is on unlimited and check if unlimited package is expired or not
-            $isUnlimited = $this->_checkUserUnlimitedPackage($payload["user_id"]);
-            if (!$isUnlimited) {
-                $companyCredit = $company->getCredit();
-                $paidJobPrice = 1;
-                if ($companyCredit < $paidJobPrice) return ["status" => 402, "message" => $this->_message->get('company.profile.insufficient_credit')];
+            /** Changes new role : company recruiter */
+            if (in_array($request['user_role'], self::company_role)) {
+                $company = new Company($payload["user_id"]);
+
+                // Check if user is on unlimited and check if unlimited package is expired or not
+                $isUnlimited = $this->_checkUserUnlimitedPackage($payload["user_id"]);
+                if (!$isUnlimited) {
+                    $companyCredit  = $company->getCredit();
+                    $paidJobPrice   = 1;
+                    if ($companyCredit < $paidJobPrice) {
+                        /** Log Attempt */
+                        $logData['message'] = 'COMPANY CREDIT INSUFFICIENT';
+                        Log::error("FAIL Create Paid Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_create_paid_vancancy');
+
+                        return [
+                            "status" => 402,
+                            "message" => $this->_message->get('company.profile.insufficient_credit')
+                        ];
+                    }
+                }
+
+                /** Log Data */
+                $logData['company']['isCreditUnlimited'] = $isUnlimited ? 'true' : 'false';
+            } else if (in_array($request['user_role'], self::company_recruiter_role)) {
+                /** Check if assigned child company is exists */
+                if (array_key_exists('assignedChildCompany', $request) && isset($request['assignedChildCompany'])) {
+                    $validateChildCompany   = $this->_checkAssignedChildCompany($request);
+
+                    /** Log Data */
+                    $logData['company-recruiter']['childCompany'] = $validateChildCompany;
+
+                    if ($validateChildCompany['validate']) {
+                        $payload["rv_vacancy_is_from_company_recruiter"]    = true;
+                        $payload["rv_vacancy_assigned_child_company"]       = $validateChildCompany['data']['id'];
+                        $payload["rv_vacancy_assigned_child_company_uuid"]  = $validateChildCompany['data']['id'];
+                    } else {
+                        /** Log Attempt */
+                        $logData['message'] = 'CHILD COMPANY INVALID!';
+                        Log::error("FAIL Create Paid Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_create_paid_vancancy');
+
+                        return [
+                            "status"    => 400,
+                            "message"   => $validateChildCompany['message']
+                        ];
+                    }
+                } else {
+                    /** Log Attempt */
+                    $logData['message'] = 'CHILD COMPANY SHOULDN\'T EMPTY!';
+                    Log::error("FAIL Create Paid Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_create_paid_vancancy');
+
+                    return [
+                        "status"    => 400,
+                        "message"   => $this->_message->get('vacancy.company_recruiter.child_company_required')
+                    ];
+                }
             }
 
             //end job validation
 
-            $vacancyModel->storePost($payload);
-            $vacancyModel->setTaxonomy($payload["taxonomy"]);
+            $vacancyID          = $vacancyModel->storePost($payload);
+            $create['post']     = $vacancyID;
+            $create['taxonomy'] = $vacancyModel->setTaxonomy($payload["taxonomy"]);
 
             foreach ($payload as $acf_field => $value) {
                 if ($acf_field !== "taxonomy") {
-                    $vacancyModel->setProp($acf_field, $value, is_array($value));
+                    $create['taxonomy'][$acf_field] = $vacancyModel->setProp($acf_field, $value, is_array($value));
                 }
             }
 
-            $vacancyID = $vacancyModel->setProp($vacancyModel->acf_placement_city, $payload["city"]);
-            $vacancyModel->setProp($vacancyModel->acf_placement_address, $payload["placementAddress"]);
+            // $vacancyID = $vacancyModel->setProp($vacancyModel->acf_placement_city, $payload["city"]); // changed below
+            $create['acf']['city']     = $vacancyModel->setProp($vacancyModel->acf_placement_city, $payload["city"]);
+            $create['acf']['address']  = $vacancyModel->setProp($vacancyModel->acf_placement_address, $payload["placementAddress"]);
 
             $expiredAt = new DateTimeImmutable();
             $expiredAt = $expiredAt->modify("+30 days")->format("Y-m-d H:i:s");
 
-            $vacancyModel->setStatus('open');
-            $vacancyModel->setProp("expired_at", $expiredAt);
+            $create['acf']['status']   = $vacancyModel->setStatus('open');
+            $create['acf']['expired']  = $vacancyModel->setProp("expired_at", $expiredAt);
 
             /** Added syntax for gallery */
             $galleries = ModelHelper::handle_uploads('galleryJob', 'vacancy/' . $vacancyID);
@@ -509,31 +594,36 @@ class VacancyCrudController
                 }
             }
 
-            $vacancyModel->setProp($vacancyModel->acf_gallery, $vacancyGallery, false);
+            $create['acf']['gallery']          = $vacancyModel->setProp($vacancyModel->acf_gallery, $vacancyGallery, false);
+            $create['acf']['cityCoordinate']   = $vacancyModel->setCityLongLat($payload["city"]);
 
-            $vacancyModel->setCityLongLat($payload["city"]);
-            // $vacancyModel->setAddressLongLat($payload["placementAddress"]);
-            $vacancyModel->setPlacementAddressLatitude($payload["placementAddressLatitude"]);
-            $vacancyModel->setPlacementAddressLongitude($payload["placementAddressLongitude"]);
-            $vacancyModel->setDistance($payload["city"], $payload["city"] . " " . $payload["placementAddress"]);
+            // $create['acf']['']    = $vacancyModel->setAddressLongLat($payload["placementAddress"]);
+            $create['acf']['addressLatitude']  = $vacancyModel->setPlacementAddressLatitude($payload["placementAddressLatitude"]);
+            $create['acf']['addressLongitude'] = $vacancyModel->setPlacementAddressLongitude($payload["placementAddressLongitude"]);
+            $create['acf']['distance']         = $vacancyModel->setDistance($payload["city"], $payload["city"] . " " . $payload["placementAddress"]);
 
             $this->add_expired_date_to_option([
                 'post_id' => $vacancyModel->vacancy_id,
                 'expired_at' => $expiredAt
             ]);
 
-            /** Anggit's syntax */
-            // charge credit
-            // $companyCredit -= $paidJobPrice;
-            // $company->setCredit($companyCredit);
-
-            /** Changes for unlimited package :
-             * check user_meta if company is on unlimited package
+            /** Changes : new role Company Recruiter
+             * Only run this if user is company
              */
-            if (!$isUnlimited) {
+            if (in_array($request['user_role'], self::company_role)) {
+                /** Anggit's syntax */
                 // charge credit
-                $companyCredit -= $paidJobPrice;
-                $company->setCredit($companyCredit);
+                // $companyCredit -= $paidJobPrice;
+                // $company->setCredit($companyCredit);
+
+                /** Changes for unlimited package :
+                 * check user_meta if company is on unlimited package
+                 */
+                if (!$isUnlimited) {
+                    // charge credit
+                    $companyCredit -= $paidJobPrice;
+                    $company->setCredit($companyCredit);
+                }
             }
 
             /** Set language : 01 November Feedback */
@@ -557,20 +647,37 @@ class VacancyCrudController
                 ],
                 "message" => $this->_message->get("vacancy.create.paid.success"),
             ];
+        } catch (\WP_Error $wp) {
+            /** Log Attempt */
+            $logData['message'] = $wp->get_error_message();
+            Log::error("FAIL Paid Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_create_paid_vancancy');
+
+            $wpdb->query('ROLLBACK');
+            return [
+                "status" => 500,
+                "message" => $wp->get_error_message(),
+                // "message" => $this->_message->get("vacancy.create.paid.fail"),
+            ];
+        } catch (\Exception $e) {
+            /** Log Attempt */
+            $logData['message'] = $e->getMessage();
+            Log::error("FAIL Paid Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_create_paid_vancancy');
+
+            $wpdb->query('ROLLBACK');
+            return [
+                "status"    => 500,
+                "message"   => $e->getMessage(),
+            ];
         } catch (\Throwable $th) {
+            /** Log Attempt */
+            $logData['message'] = $th->getMessage();
+            Log::error("FAIL Paid Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_create_paid_vancancy');
+
             $wpdb->query('ROLLBACK');
             return [
                 "status" => 500,
                 // "message" => $this->_message->get("vacancy.create.paid.fail"),
                 "message" => $th->getMessage(),
-
-            ];
-        } catch (\WP_Error $e) {
-            $wpdb->query('ROLLBACK');
-            return [
-                "status" => 500,
-                "message" => $e->get_error_message(),
-                // "message" => $this->_message->get("vacancy.create.paid.fail"),
             ];
         }
     }
@@ -611,6 +718,12 @@ class VacancyCrudController
 
     public function update($request)
     {
+        /** Log Attempt */
+        $logData        = [
+            'request'   => $request
+        ];
+        Log::info("Update Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_update_vancancy');
+
         $vacancy_id = $request["vacancy_id"];
         $vacancyModel = new Vacancy($vacancy_id);
 
@@ -634,6 +747,12 @@ class VacancyCrudController
 
     public function updateFree($request)
     {
+        /** Log Attempt */
+        $logData        = [
+            'request'   => $request
+        ];
+        Log::info("Update Free Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_update_free_vancancy');
+
         $vacancy_id = $request["vacancy_id"];
 
         /** Anggit's syntax start here */
@@ -735,8 +854,20 @@ class VacancyCrudController
         ];
     }
 
+    /**
+     * Update paid vacancy function
+     *
+     * @param Array $request
+     * @return array
+     */
     public function updatePaid($request)
     {
+        /** Log Attempt */
+        $logData        = [
+            'request'   => $request
+        ];
+        Log::info("Update Paid Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_update_paid_vancancy');
+
         $vacancy_id = $request["vacancy_id"];
         global $wpdb;
 
@@ -746,11 +877,14 @@ class VacancyCrudController
             $vacancyModel = new Vacancy($vacancy_id);
             $payload = $this->createPaidVacancyPayload($request);
 
-            $vacancyModel->setTaxonomy($payload["taxonomy"]);
+            /** Log Data */
+            $logData['payload'] = $payload;
+
+            $update['taxonomy'] = $vacancyModel->setTaxonomy($payload["taxonomy"]);
 
             foreach ($payload as $acf_field => $value) {
                 if ($acf_field !== "taxonomy") {
-                    $vacancyModel->setProp($acf_field, $value, is_array($value));
+                    $update['acf'][$acf_field] = $vacancyModel->setProp($acf_field, $value, is_array($value));
                 }
             }
 
@@ -765,9 +899,9 @@ class VacancyCrudController
 
             if (isset($_FILES['video']['name'])) {
                 $video = ModelHelper::handle_upload('video');
-                $vacancyModel->setVideoUrl($video["video"]["url"]);
+                $update['acf']['video'] = $vacancyModel->setVideoUrl($video["video"]["url"]);
             } else {
-                $vacancyModel->setVideoUrl($payload["video_url"]);
+                $update['acf']['video'] = $vacancyModel->setVideoUrl($payload["video_url"]);
             }
 
             $vacancyGallery = $galleryIds ?? [];
@@ -778,24 +912,27 @@ class VacancyCrudController
                 }
             }
 
-            $vacancyModel->setProp($vacancyModel->acf_gallery, $vacancyGallery, false);
+            $update['acf']['gallery']   = $vacancyModel->setProp($vacancyModel->acf_gallery, $vacancyGallery, false);
 
-
-            if ($galleries) {
-                foreach ($galleries as $key => $gallery) {
-                    $vacancyGallery[] = wp_insert_attachment($gallery['attachment'], $gallery['file']);
-                }
-            }
+            // if ($galleries) {
+            //     foreach ($galleries as $key => $gallery) {
+            //         $vacancyGallery[] = wp_insert_attachment($gallery['attachment'], $gallery['file']);
+            //     }
+            // }
 
             /** Changes start here */
-            $vacancyModel->setCityLongLat($payload["placement_city"]);
+            $update['acf']['cityCoordinate'] = $vacancyModel->setCityLongLat($payload["placement_city"]);
             // $vacancyModel->setAddressLongLat($payload["placement_address"]);
-            $vacancyModel->setPlacementAddressLatitude($payload["placementAddressLatitude"]);
-            $vacancyModel->setPlacementAddressLongitude($payload["placementAddressLongitude"]);
-            $vacancyModel->setDistance($payload["placement_city"], $payload["placement_city"] . " " . $payload["placement_address"]);
+            $update['acf']['gallery']   = $vacancyModel->setPlacementAddressLatitude($payload["placementAddressLatitude"]);
+            $update['acf']['gallery']   = $vacancyModel->setPlacementAddressLongitude($payload["placementAddressLongitude"]);
+            $update['acf']['gallery']   = $vacancyModel->setDistance($payload["placement_city"], $payload["placement_city"] . " " . $payload["placement_address"]);
 
             /** Set language : 01 November Feedback */
-            $vacancyModel->setLanguage($payload['language']);
+            $update['acf']['gallery']   = $vacancyModel->setLanguage($payload['language']);
+
+            /** Log Attempt */
+            $logData['update']  = $update;
+            Log::error("END Paid Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_update_paid_vancancy');
 
             $wpdb->query('COMMIT');
 
@@ -806,13 +943,31 @@ class VacancyCrudController
                 ],
                 "message" => $this->_message->get("vacancy.update.paid.success")
             ];
-        } catch (\Throwable $th) {
+        } catch (\WP_Error $wp) {
+            /** Log Attempt */
+            $logData['message'] = $wp->get_error_message();
+            Log::error("FAIL Paid Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_update_paid_vancancy');
+
+            $wpdb->query('ROLLBACK');
+            return [
+                "status" => 500,
+                "message" => $wp->get_error_message(),
+            ];
+        } catch (Exception $e) {
+            /** Log Attempt */
+            $logData['message'] = $e->getMessage();
+            Log::error("FAIL Paid Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_update_paid_vancancy');
+
             $wpdb->query('ROLLBACK');
             return [
                 "status" => 400,
                 "message" => $this->_message->get("system.overall_failed")
             ];
-        } catch (Exception $e) {
+        } catch (\Throwable $th) {
+            /** Log Attempt */
+            $logData['message'] = $th->getMessage();
+            Log::error("FAIL Paid Vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_update_paid_vancancy');
+
             $wpdb->query('ROLLBACK');
             return [
                 "status" => 400,
@@ -821,25 +976,48 @@ class VacancyCrudController
         }
     }
 
+    /**
+     * Soft delete / Move to trash vacancy function
+     *
+     * @param Array $request
+     * @return array
+     */
     public function trash($request)
     {
+        /** Log attempt */
+        $logData        = [
+            'request'   => $request
+        ];
+        Log::info("Trash vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_trash_vacancy');
+
         $vacancy = new Vacancy($request["vacancy_id"]);
 
         if ($request["user_id"] != $vacancy->getAuthor()) {
+            /** Log attempt */
+            $logData['message'] = 'UNAUTHORIZED!';
+            Log::error("Fail Trash vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_trash_vacancy');
+
             return [
-                "status" => 400,
-                "message" => $this->_message->get("vacancy.trash.not_authorized")
+                "status"    => 400,
+                "message"   => $this->_message->get("vacancy.trash.not_authorized")
             ];
         }
 
         $trashed = $vacancy->trash();
 
         if (is_wp_error($trashed)) {
+            /** Log attempt */
+            $logData['message'] = "WP_ERROR {$trashed->get_error_message()}!";
+            Log::error("Fail Trash vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_trash_vacancy');
+
             return [
-                "status" => 400,
-                "message" => $this->_message->get("vacancy.trash.fail")
+                "status"    => 500,
+                "message"   => $this->_message->get("vacancy.trash.fail")
             ];
         }
+        /** Log attempt */
+        $logData['trash']   = $trashed;
+        Log::info("End Trash vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_trash_vacancy');
 
         return [
             "status" => 200,
@@ -1293,6 +1471,66 @@ class VacancyCrudController
             }
         } catch (\Exception $e) {
             error_log($e->getMessage());
+        }
+    }
+
+    /**
+     * Validate assigned child company function
+     *
+     * @param array $request
+     * @return array
+     */
+    private function _checkAssignedChildCompany(array $request): array
+    {
+        $companyRecruiter = CompanyRecruiter::find('id', $request['user_id']);
+        if ($companyRecruiter->user) {
+            if ($companyRecruiter->user instanceof WP_Error) {
+                throw $companyRecruiter->user;
+            } else {
+                /** Check assigned child company */
+                if (is_numeric($request['assignedChildCompany'])) {
+                    $childCompany = ChildCompany::find('id', $request['assignedChildCompany']);
+                } else if (is_string($request['assignedChildCompany']) && (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $request['assignedChildCompany']) == 1)) {
+                    $childCompany = ChildCompany::find('uuid', $request['assignedChildCompany']);
+                } else if (is_string($request['childCompany']) && strpos($request['assignedChildCompany'], '-') != false) {
+                    $childCompany = ChildCompany::find('slug', $request['assignedChildCompany']);
+                } else {
+                    $childCompany = ChildCompany::find('slug', $request['assignedChildCompany']);
+                }
+
+                if ($childCompany->user) {
+                    if ($childCompany->user instanceof WP_Error) {
+                        throw $childCompany->user;
+                    } else {
+                        $owner = $childCompany->getChildCompanyOwner();
+                        if ($request['user_id'] == $owner->ID) {
+                            return [
+                                "validate"  => true,
+                                "message"   => "Authorized!",
+                                "data"      => [
+                                    "id"    => $childCompany->user_id,
+                                    "uuid"  => $childCompany->getUUID()
+                                ]
+                            ];
+                        } else {
+                            return [
+                                "validate"  => false,
+                                "message"   => $this->_message->get("company_recruiter.child_company.show_unauthorized", [""]),
+                            ];
+                        }
+                    }
+                } else {
+                    return [
+                        "validate"  => false,
+                        "message"   => $this->_message->get("company_recruiter.child_company.show_not_found", [""]),
+                    ];
+                }
+            }
+        } else {
+            return [
+                "validate"  => false,
+                "message"   => $this->_message->get("auth.not_found_user", [""]),
+            ];
         }
     }
 

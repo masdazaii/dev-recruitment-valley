@@ -5,6 +5,7 @@ namespace constant;
 class NotificationConstant
 {
     public $list;
+    public $site_title;
 
     const VACANCY_REJECTED = "vacancy.rejected";
     const VACANCY_SUBMITTED = "vacancy.submitted";
@@ -28,6 +29,7 @@ class NotificationConstant
 
     public function __construct()
     {
+        $this->site_title = get_bloginfo('name') ?? 'Recruitment Valley';
         $this->list = [
             "vacancy" => [
                 "rejected"  => __("Helaas is je vacature {job_title} afgewezen. Maak je geen zorgen, je kunt ze opnieuw plaatsen door onze instructies te volgen.", THEME_DOMAIN),
@@ -42,7 +44,7 @@ class NotificationConstant
             ],
             "payment" => [
                 "successfull" => __("Gefeliciteerd! Uw betaling is succesvol verwerkt.", THEME_DOMAIN),
-                "confirmation" => __("Hierbij bevestigen wij uw aankoop Recruitment Valley. Bedankt voor uw vertrouwen. De factuur sturen wij u later per e-mail toe.", THEME_DOMAIN),
+                "confirmation" => __("Hierbij bevestigen wij uw aankoop {$this->site_title}. Bedankt voor uw vertrouwen. De factuur sturen wij u later per e-mail toe.", THEME_DOMAIN),
             ],
             "account" => [
                 "created" => __("Gefeliciteerd, u bent klaar met het registreren van uw account! Uw account is nu klaar voor gebruik.", THEME_DOMAIN),

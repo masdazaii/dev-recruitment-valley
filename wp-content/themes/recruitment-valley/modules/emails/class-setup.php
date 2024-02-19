@@ -3,7 +3,7 @@
 /**
  * Example of component
  *
- * @package BornDigital
+ * @package MadeIndonesia
  */
 
 namespace BD\Emails;

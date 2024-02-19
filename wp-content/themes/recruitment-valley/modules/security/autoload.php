@@ -1,13 +1,14 @@
 <?php
+
 /**
  * Autoloading
  *
- * @package BornDigital
+ * @package MadeIndonesia
  */
 
 namespace BD\Security;
 
-defined( 'ABSPATH' ) || die( "Can't access directly" );
+defined('ABSPATH') || die("Can't access directly");
 
 require_once __DIR__ . '/admin/class-disable-file-editing.php';
 

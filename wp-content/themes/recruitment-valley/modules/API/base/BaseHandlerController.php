@@ -1,6 +1,6 @@
 <?php
 
-namespace MI\Base\Controller;
+namespace Controller;
 
 class BaseHandlerController extends BaseController
 {

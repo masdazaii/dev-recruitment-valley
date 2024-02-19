@@ -1,39 +1,40 @@
 <?php
+
 /**
  * The template for displaying search results pages
  *
  * @link https://developer.wordpress.org/themes/basics/template-hierarchy/#search-result
  *
- * @package BornDigital
+ * @package MadeIndonesia
  */
 
-defined( 'ABSPATH' ) || die( "Can't access directly" );
+defined('ABSPATH') || die("Can't access directly");
 
 get_header(); ?>
 
-	<section id="primary" class="content-area">
-		<main id="main" class="site-main">
+<section id="primary" class="content-area">
+	<main id="main" class="site-main">
 
 		<?php
-		if ( have_posts() ) : ?>
+		if (have_posts()) : ?>
 
 			<header class="page-header">
 				<h1 class="page-title"><?php
-					/* translators: %s: search query. */
-					printf( esc_html__( 'Search Results for: %s', 'themedomain' ), '<span>' . get_search_query() . '</span>' );
-				?></h1>
+										/* translators: %s: search query. */
+										printf(esc_html__('Search Results for: %s', 'themedomain'), '<span>' . get_search_query() . '</span>');
+										?></h1>
 			</header><!-- .page-header -->
 
-			<?php
+		<?php
 			/* Start the Loop */
-			while ( have_posts() ) : the_post();
+			while (have_posts()) : the_post();
 
 				/**
 				 * Run the loop for the search to output the results.
 				 * If you want to overload this in a child theme then include a file
 				 * called content-search.php and that will be used instead.
 				 */
-				get_template_part( 'partials/content', 'search' );
+				get_template_part('partials/content', 'search');
 
 			endwhile;
 
@@ -41,12 +42,12 @@ get_header(); ?>
 
 		else :
 
-			get_template_part( 'partials/content', 'none' );
+			get_template_part('partials/content', 'none');
 
 		endif; ?>
 
-		</main><!-- #main -->
-	</section><!-- #primary -->
+	</main><!-- #main -->
+</section><!-- #primary -->
 
 <?php
 get_sidebar();

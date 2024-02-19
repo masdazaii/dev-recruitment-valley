@@ -431,7 +431,17 @@ class ProfileController
             update_field('ucma_street', $request['street'], 'user_' . $request['user_id']);
             update_field('ucma_city', $request['city'], 'user_' . $request['user_id']);
             update_field('ucma_postcode', $request['postCode'], 'user_' . $request['user_id']);
-            update_field('ucma_employees', $request['employeesTotal'], 'user_' . $request['user_id']);
+
+            if (isset($request['employeesTotal'])) {
+                if (is_array($request['employeesTotal'])) {
+                    if (array_key_exists('value', $request['employeesTotal'])) {
+                        update_field('ucma_employees', $request['employeesTotal']['value'], 'user_' . $request['user_id']);
+                    }
+                } else {
+                    update_field('ucma_employees', $request['employeesTotal'], 'user_' . $request['user_id']);
+                }
+            }
+
             update_field('ucma_sector', $request['sector'], 'user_' . $request['user_id']);
             update_field('ucma_kvk_number', $request['kvkNumber'], 'user_' . $request['user_id']);
             update_field('ucma_btw_number', $request['btwNumber'], 'user_' . $request['user_id']);

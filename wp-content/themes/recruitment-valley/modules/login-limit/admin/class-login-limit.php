@@ -1,18 +1,20 @@
 <?php
+
 /**
  * Login Limit
  *
- * @package BornDigital
+ * @package MadeIndonesia
  */
 
 namespace BD\Login\Limit\Admin;
 
-defined( 'ABSPATH' ) || die( "Can't access directly" );
+defined('ABSPATH') || die("Can't access directly");
 
 /**
  * Login Limit class
  */
-class Login_Limit {
+class Login_Limit
+{
 
 	/**
 	 * Default settings
@@ -24,7 +26,8 @@ class Login_Limit {
 	/**
 	 * Setup the flow
 	 */
-	public function __construct() {
+	public function __construct()
+	{
 
 		global $wpdb;
 
@@ -40,7 +43,7 @@ class Login_Limit {
 			'db_lockdowns'         => $wpdb->prefix . 'login_limit_lockdowns',
 
 			// emails.
-			'admin_email_subject'  => __( '[{site_url}] Site Lockout Notification', 'asmlexploration' ),
+			'admin_email_subject'  => __('[{site_url}] Site Lockout Notification', 'asmlexploration'),
 			'admin_email_body'     => __(
 				"A lockdown event has occurred due to too many failed login attempts. \n\n
 				<strong style='color: #ee782e;'>Username:</strong> {username} \n
@@ -48,7 +51,7 @@ class Login_Limit {
 				<strong style='color: #ee782e;'>IP Range:</strong> {ip_range}.* \n",
 				'asmlexploration'
 			),
-			'unlock_email_subject' => __( '[{site_url}] Unlock Request Notification', 'asmlexploration' ),
+			'unlock_email_subject' => __('[{site_url}] Unlock Request Notification', 'asmlexploration'),
 			'unlock_email_body'    => __(
 				"You have requested for the account with email address {email} to be unlocked. Please click the link below to unlock your account:\n\n
 				<strong style='color: #ee782e;'>Unlock link:</strong> {unlock_link}\n\n
@@ -57,8 +60,7 @@ class Login_Limit {
 			),
 		);
 
-		add_action( 'after_switch_theme', [ $this, 'activate_theme' ], 10, 2 );
-
+		add_action('after_switch_theme', [$this, 'activate_theme'], 10, 2);
 	}
 
 	/**
@@ -68,7 +70,8 @@ class Login_Limit {
 	 * @param  WP_Theme|boolean $oldtheme old theme.
 	 * @return void
 	 */
-	public function activate_theme( $oldname, $oldtheme = false ) {
+	public function activate_theme($oldname, $oldtheme = false)
+	{
 		// run when plugin activated.
 		global $wpdb;
 		$charset_collate = $wpdb->get_charset_collate();
@@ -85,7 +88,7 @@ class Login_Limit {
 			login_attempt_ip varchar(100) NOT NULL default '',
 			PRIMARY KEY  (login_attempt_ID)
 		) $charset_collate;";
-		dbDelta( $sql );
+		dbDelta($sql);
 
 		// create table bundle log.
 		$lockdowns_db_name = self::$default_settings['db_lockdowns'];
@@ -100,7 +103,7 @@ class Login_Limit {
 			whitelists_ip longtext,
 			PRIMARY KEY  (lockdown_ID)
 		) $charset_collate;";
-		dbDelta( $sql );
+		dbDelta($sql);
 	}
 
 	/**
@@ -111,17 +114,16 @@ class Login_Limit {
 	 * @param  mixed  $value value.
 	 * @return mixed
 	 */
-	public static function get_setting( $name, $value = null ) {
+	public static function get_setting($name, $value = null)
+	{
 
 		// check settings.
-		if ( isset( self::$default_settings[ $name ] ) ) {
+		if (isset(self::$default_settings[$name])) {
 
-			$value = self::$default_settings[ $name ];
-
+			$value = self::$default_settings[$name];
 		}
 
 		return $value;
-
 	}
 
 	/**
@@ -131,15 +133,16 @@ class Login_Limit {
 	 * @param  string $option option.
 	 * @return mixed
 	 */
-	public static function get_saved_settings( $option ) {
-		$saved_settings = (array) get_option( 'login_limit_settings', array() );
+	public static function get_saved_settings($option)
+	{
+		$saved_settings = (array) get_option('login_limit_settings', array());
 
 
-		if ( isset( $saved_settings[ $option ] ) ) {
-			return $saved_settings[ $option ];
+		if (isset($saved_settings[$option])) {
+			return $saved_settings[$option];
 		}
 
-		return self::$default_settings[ $option ];
+		return self::$default_settings[$option];
 	}
 
 
@@ -150,15 +153,16 @@ class Login_Limit {
 	 * @param  string $option option.
 	 * @return mixed
 	 */
-	public static function get_saved_admin_email( $option ) {
+	public static function get_saved_admin_email($option)
+	{
 
-		$saved_admin_email = (array) get_option( 'login_limit_admin_email', array() );
+		$saved_admin_email = (array) get_option('login_limit_admin_email', array());
 
-		if ( isset( $saved_admin_email[ $option ] ) && ! empty( $saved_admin_email[ $option ] ) ) {
-			return $saved_admin_email[ $option ];
+		if (isset($saved_admin_email[$option]) && !empty($saved_admin_email[$option])) {
+			return $saved_admin_email[$option];
 		}
 
-		return self::$default_settings[ $option ];
+		return self::$default_settings[$option];
 	}
 
 
@@ -169,15 +173,16 @@ class Login_Limit {
 	 * @param  string $option the options.
 	 * @return mixed
 	 */
-	public static function get_saved_unlock_email( $option ) {
+	public static function get_saved_unlock_email($option)
+	{
 
-		$saved_unlock_email = (array) get_option( 'login_limit_unlock_email', array() );
+		$saved_unlock_email = (array) get_option('login_limit_unlock_email', array());
 
-		if ( isset( $saved_unlock_email[ $option ] ) && ! empty( $saved_unlock_email[ $option ] ) ) {
-			return $saved_unlock_email[ $option ];
+		if (isset($saved_unlock_email[$option]) && !empty($saved_unlock_email[$option])) {
+			return $saved_unlock_email[$option];
 		}
 
-		return self::$default_settings[ $option ];
+		return self::$default_settings[$option];
 	}
 
 	/**
@@ -186,30 +191,30 @@ class Login_Limit {
 	 * @since 1.0.0
 	 * @return string ip address
 	 */
-	public static function get_user_ip() {
+	public static function get_user_ip()
+	{
 
 		$ipaddress = '';
 
-		if ( isset( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+		if (isset($_SERVER['HTTP_CLIENT_IP'])) {
 			$ipaddress = $_SERVER['HTTP_CLIENT_IP'];
-		} elseif ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+		} elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
 			$ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
-		} elseif ( isset( $_SERVER['HTTP_X_FORWARDED'] ) ) {
+		} elseif (isset($_SERVER['HTTP_X_FORWARDED'])) {
 			$ipaddress = $_SERVER['HTTP_X_FORWARDED'];
-		} elseif ( isset( $_SERVER['HTTP_X_CLUSTER_CLIENT_IP'] ) ) {
+		} elseif (isset($_SERVER['HTTP_X_CLUSTER_CLIENT_IP'])) {
 			$ipaddress = $_SERVER['HTTP_X_CLUSTER_CLIENT_IP'];
-		} elseif ( isset( $_SERVER['HTTP_FORWARDED_FOR'] ) ) {
+		} elseif (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
 			$ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
-		} elseif ( isset( $_SERVER['HTTP_FORWARDED'] ) ) {
+		} elseif (isset($_SERVER['HTTP_FORWARDED'])) {
 			$ipaddress = $_SERVER['HTTP_FORWARDED'];
-		} elseif ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
+		} elseif (isset($_SERVER['REMOTE_ADDR'])) {
 			$ipaddress = $_SERVER['REMOTE_ADDR'];
 		} else {
 			$ipaddress = 'UNKNOWN';
 		}
 
-		return sanitize_text_field( $ipaddress );
-
+		return sanitize_text_field($ipaddress);
 	}
 
 
@@ -220,16 +225,17 @@ class Login_Limit {
 	 * @param  string $ip the ip.
 	 * @return string ip range.
 	 */
-	public static function get_ip_range( $ip ) {
+	public static function get_ip_range($ip)
+	{
 		$ip_range = '';
-		$valid_ip = filter_var( $ip, FILTER_VALIDATE_IP ); // sanitize the IP address.
+		$valid_ip = filter_var($ip, FILTER_VALIDATE_IP); // sanitize the IP address.
 
-		if ( $valid_ip ) {
-			$ip_type = \WP_Http::is_ip_address( $ip ); // returns 4 or 6 if ipv4 or ipv6 or false if invalid.
-			if ( false === $ip_type || 6 == $ip_type ) {
+		if ($valid_ip) {
+			$ip_type = \WP_Http::is_ip_address($ip); // returns 4 or 6 if ipv4 or ipv6 or false if invalid.
+			if (false === $ip_type || 6 == $ip_type) {
 				return ''; // for now return empty if ipv6 or invalid IP.
 			}
-			$ip_range = substr( $valid_ip, 0, strrpos( $valid_ip, '.' ) ); // strip last portion of address to leave an IP range.
+			$ip_range = substr($valid_ip, 0, strrpos($valid_ip, '.')); // strip last portion of address to leave an IP range.
 		}
 		return $ip_range;
 	}

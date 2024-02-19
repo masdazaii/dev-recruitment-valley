@@ -17,7 +17,9 @@ class JobAlert extends RegisterCPT
             'has_archive' => false,
             'publicly_queryable' => false,
             'menu_position' => 7,
-            'supports' => ['title'], 
+            'publicly_queryable' => false,
+            'has_archive' => false,
+            'supports' => ['title'],
         ];
 
         $this->customPostType($title, $slug, $args);

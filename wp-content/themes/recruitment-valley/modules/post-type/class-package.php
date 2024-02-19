@@ -14,9 +14,9 @@ class Package extends RegisterCPT
         $title = __('Packages', THEME_DOMAIN);
         $slug = 'package';
         $args = [
+            'menu_position' => 6,
             'has_archive' => false,
             'publicly_queryable' => false,
-            'menu_position' => 6
         ];
 
         $this->customPostType($title, $slug, $args);

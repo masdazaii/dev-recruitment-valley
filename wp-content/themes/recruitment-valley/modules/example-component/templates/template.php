@@ -1,21 +1,22 @@
 <?php
+
 /**
  * The template for a component
  *
  * @link https://codex.wordpress.org/Template_Hierarchy
  *
- * @package BornDigital
+ * @package MadeIndonesia
  */
 
-defined( 'ABSPATH' ) || die( "Can't access directly" );
+defined('ABSPATH') || die("Can't access directly");
 
 get_header(); ?>
 
-	<main id="main" class="site-main">
+<main id="main" class="site-main">
 
-		Sample template
+	Sample template
 
-	</main><!-- #main -->
+</main><!-- #main -->
 
 <?php
 get_footer();

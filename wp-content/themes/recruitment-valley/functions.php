@@ -1,11 +1,12 @@
 <?php
+
 /**
  * Setting up theme
  *
- * @package BornDigital
+ * @package MadeIndonesia
  */
 
-defined( 'ABSPATH' ) || die( "Can't access directly" );
+defined('ABSPATH') || die("Can't access directly");
 
 require_once __DIR__ . '/setup/class-theme.php';
 
@@ -16,10 +17,11 @@ require_once __DIR__ . '/setup/class-theme.php';
  * @since 1.0.0
  * @return object main object of theme
  */
-function setup_theme() {
+function setup_theme()
+{
 	global $bd_theme;
 
-	if ( ! isset( $bd_theme ) ) {
+	if (!isset($bd_theme)) {
 		$bd_theme = new Theme();
 		$bd_theme->initialize();
 	}

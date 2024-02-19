@@ -1,6 +1,6 @@
 <?php
 
-namespace MI\Base\Controller;
+namespace Controller;
 
 defined("ABSPATH") or die("Direct access not allowed!");
 
@@ -19,7 +19,7 @@ abstract class BaseController
     public function __construct()
     {
         global $wpdb;
-        // $this->message  = new Message();
+        $this->message  = new Message();
         $this->wpdb     = $wpdb;
     }
 
