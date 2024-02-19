@@ -17,6 +17,8 @@ class FaqCPT extends RegisterCPT
         $slug   = 'faq';
         $args   = [
             'menu_position' => 5,
+            'publicly_queryable' => false,
+            'has_archive' => false,
             'supports'      => array('title', 'editor', 'author', 'thumbnail'),
         ];
 
