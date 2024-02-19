@@ -1,8 +1,9 @@
 <?php
+
 /**
  * Restrict some pages
  *
- * @package BornDigital
+ * @package MadeIndonesia
  */
 
 namespace BD\Access;
@@ -10,13 +11,15 @@ namespace BD\Access;
 /**
  * Setup class to restrict some pages
  */
-class Setup {
+class Setup
+{
 	/**
 	 * Setup the flow
 	 */
-	public function __construct() {
-		add_action( 'wp', [ $this, 'restrict_guest' ] );
-		add_action( 'wp', [ $this, 'restrict_users' ] );
+	public function __construct()
+	{
+		add_action('wp', [$this, 'restrict_guest']);
+		add_action('wp', [$this, 'restrict_users']);
 	}
 
 	/**
@@ -29,9 +32,10 @@ class Setup {
 	 *
 	 * @return void
 	 */
-	public function restrict_guest() {
+	public function restrict_guest()
+	{
 		// if user is logged-in, then return.
-		if ( is_user_logged_in() ) {
+		if (is_user_logged_in()) {
 			return;
 		}
 
@@ -46,15 +50,15 @@ class Setup {
 	 *
 	 * @return void
 	 */
-	public function restrict_users() {
+	public function restrict_users()
+	{
 		// if user is not logged-in, then return.
-		if ( ! is_user_logged_in() ) {
+		if (!is_user_logged_in()) {
 			return;
 		}
 
 		// write your restriction rule here.
 	}
-
 }
 
 new Setup();

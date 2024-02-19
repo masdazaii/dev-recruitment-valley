@@ -1,8 +1,9 @@
 <?php
+
 /**
  * Restrict some pages
  *
- * @package BornDigital
+ * @package MadeIndonesia
  */
 
 namespace BD\Dashboard\Restrictions\Admin;
@@ -10,15 +11,17 @@ namespace BD\Dashboard\Restrictions\Admin;
 /**
  * Setup class
  */
-class Setup {
+class Setup
+{
 	/**
 	 * Setup the flow
 	 */
-	public function __construct() {
-		add_filter('acf/load_field/key=field_5bbc188c5c8e7', array($this , 'acf_load_role_selecition_field_choices'));
+	public function __construct()
+	{
+		add_filter('acf/load_field/key=field_5bbc188c5c8e7', array($this, 'acf_load_role_selecition_field_choices'));
 	}
 
-	public function acf_load_role_selecition_field_choices( $field )
+	public function acf_load_role_selecition_field_choices($field)
 	{
 		global $wp_roles;
 
@@ -26,7 +29,7 @@ class Setup {
 		$editable_roles = apply_filters('editable_roles', $all_roles);
 		$select_options = array();
 
-		if ( !empty($editable_roles) ) {
+		if (!empty($editable_roles)) {
 			foreach ($editable_roles as $role_key => $role) {
 				//exclude andminitrator and manager from select options
 				if ($role_key != 'administrator' && $role_key != 'manager') {

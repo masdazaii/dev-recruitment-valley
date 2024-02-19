@@ -3,7 +3,7 @@
 /**
  * Api Auth
  *
- * @package BornDigital
+ * @package MadeIndonesia
  */
 
 namespace BD\Security;

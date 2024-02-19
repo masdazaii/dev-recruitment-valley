@@ -1,38 +1,42 @@
 <?php
+
 /**
-* Setting up theme settings
-*
-* @package BornDigital
-*/
+ * Setting up theme settings
+ *
+ * @package MadeIndonesia
+ */
 
 namespace BD_Theme\Setup;
 
-defined( 'ABSPATH' ) || die( "Can't access directly" );
+defined('ABSPATH') || die("Can't access directly");
 
 /**
-* Settings class to setup theme settings
-*/
-class Settings {
+ * Settings class to setup theme settings
+ */
+class Settings
+{
 
 	/**
-	* Setup the flow
-	*/
-	public function __construct() {
+	 * Setup the flow
+	 */
+	public function __construct()
+	{
 		// phpcs:ignore
 		// add_action( 'init', [ $this, 'add_image_sizes' ] );
-		add_filter( 'show_admin_bar', '__return_false' );
+		add_filter('show_admin_bar', '__return_false');
 		add_action('init', [$this, 'cleanup_wp_unnecessary_scripts']);
 	}
 
 	/**
-	* Adding image sizes
-	*/
-	public function add_image_sizes() {
+	 * Adding image sizes
+	 */
+	public function add_image_sizes()
+	{
 		/**
-		* You can add images size in here
-		*
-		* @link https://developer.wordpress.org/reference/functions/add_image_size/
-		*/
+		 * You can add images size in here
+		 *
+		 * @link https://developer.wordpress.org/reference/functions/add_image_size/
+		 */
 		// adjust the sizes below according to your need
 		$sizes = [
 			[
@@ -64,7 +68,9 @@ class Settings {
 
 	public function cleanup_wp_unnecessary_scripts()
 	{
-		if (!is_admin()) { wp_deregister_script('wp-embed'); }
+		if (!is_admin()) {
+			wp_deregister_script('wp-embed');
+		}
 
 		// REMOVE EMOJI ICONS
 		remove_action('wp_head', 'print_emoji_detection_script', 7);
@@ -109,7 +115,6 @@ class Settings {
 		//REST API
 		remove_action('wp_head', 'rest_output_link_wp_head');
 	}
-
 }
 
 new Settings();

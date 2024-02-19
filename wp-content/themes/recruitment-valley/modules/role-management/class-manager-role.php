@@ -1,27 +1,30 @@
 <?php
+
 /**
  * Mananger Role
  *
- * @package BornDigital
+ * @package MadeIndonesia
  */
 
 namespace BD\Security;
 
-defined( 'ABSPATH' ) || die( "Can't access directly" );
+defined('ABSPATH') || die("Can't access directly");
 
 /**
  * Manager Role class
  */
-class Manager_Role {
+class Manager_Role
+{
 	/**
 	 * Setup the flow
 	 */
-	public function __construct() {
+	public function __construct()
+	{
 		// theme activated.
-		add_action( 'admin_init', [ $this, 'add_manager_role' ] );
+		add_action('admin_init', [$this, 'add_manager_role']);
 
 		// theme deactivated.
-		add_action( 'switch_theme', [ $this, 'theme_deactivated' ], 10, 3 );
+		add_action('switch_theme', [$this, 'theme_deactivated'], 10, 3);
 	}
 
 	/**
@@ -29,10 +32,13 @@ class Manager_Role {
 	 * https://codex.wordpress.org/Roles_and_Capabilities
 	 * @return void
 	 */
-	public function add_manager_role( ) {
+	public function add_manager_role()
+	{
 		remove_role('manager');
 		add_role(
-			'manager', 'Manager', array(
+			'manager',
+			'Manager',
+			array(
 				// 'switch_themes'       => true,
 				// 'edit_themes'         => true,
 				// 'activate_plugins'    => true,
@@ -90,8 +96,8 @@ class Manager_Role {
 			)
 		);
 
-		$role = get_role( 'administrator' );
-		$role->add_cap( 'manager' );
+		$role = get_role('administrator');
+		$role->add_cap('manager');
 	}
 
 	/**
@@ -102,8 +108,9 @@ class Manager_Role {
 	 * @param  WP_Theme $old_theme the old theme.
 	 * @return void
 	 */
-	public function theme_deactivated( $new_name, $new_theme, $old_theme ) {
-		remove_role( 'manager' );
+	public function theme_deactivated($new_name, $new_theme, $old_theme)
+	{
+		remove_role('manager');
 	}
 }
 
