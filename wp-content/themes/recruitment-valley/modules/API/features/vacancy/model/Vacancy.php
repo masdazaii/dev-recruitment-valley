@@ -129,6 +129,8 @@ class Vacancy
     public $meta_rv_vacancy_jobfeed_is_expired = 'rv_vacancy_jobfeed_is_expired';
     public $meta_rv_vacancy_original_api_term = 'rv_vacancy_original_api_term';
 
+    public $option_page_recommended_jobs = 'rv_recommended_jobs';
+
     public function __construct($vacancy_id = false)
     {
         if ($vacancy_id) {
@@ -1754,6 +1756,13 @@ class Vacancy
         }
     }
 
+    public function getRecommendedJobs()
+    {
+        $recommendedJobs = get_field( $this->option_page_recommended_jobs, 'option'  );
+
+        return $recommendedJobs ?? [];
+    }
+    
     /**
      * Select vacancy by status and userID function
      *

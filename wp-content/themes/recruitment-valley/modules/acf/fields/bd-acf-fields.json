@@ -77,7 +77,12 @@
                     "class": "",
                     "id": ""
                 },
-                "choices": [],
+                "choices": {
+                    "1": "Vacancy Recruitment Valley",
+                    "2": "Custom Tag 1",
+                    "3": "Master Tag",
+                    "4": "test tag 1"
+                },
                 "default_value": [],
                 "return_format": "value",
                 "multiple": 1,
@@ -298,11 +303,11 @@
         "show_in_rest": 0
     },
     {
-        "key": "group_653f589068590",
+        "key": "group_653f1b7a9d765",
         "title": "Aws Settings",
         "fields": [
             {
-                "key": "field_653f58904c48e",
+                "key": "field_653f1b7b329dc",
                 "label": "AWS key ID",
                 "name": "aws_key_id",
                 "aria-label": "",
@@ -322,7 +327,7 @@
                 "append": ""
             },
             {
-                "key": "field_653f58b94c48f",
+                "key": "field_653f1bad329dd",
                 "label": "AWS Secret key",
                 "name": "aws_secret_key",
                 "aria-label": "",
@@ -931,214 +936,12 @@
         "show_in_rest": 0
     },
     {
-        "key": "group_6541c4fe565f8",
-        "title": "Email Approval Field Group",
-        "fields": [
-            {
-                "key": "field_6541c4ff199c0",
-                "label": "Approval main email address",
-                "name": "rv_email_approval_main_address",
-                "aria-label": "",
-                "type": "email",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "placeholder": "",
-                "prepend": "",
-                "append": ""
-            },
-            {
-                "key": "field_6541c546199c1",
-                "label": "Approval CC email address",
-                "name": "rv_email_approval_cc",
-                "aria-label": "",
-                "type": "repeater",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "layout": "table",
-                "pagination": 0,
-                "min": 0,
-                "max": 0,
-                "collapsed": "",
-                "button_label": "Add Row",
-                "rows_per_page": 20,
-                "sub_fields": [
-                    {
-                        "key": "field_6541c582199c2",
-                        "label": "CC Email Address",
-                        "name": "rv_email_approval_cc_address",
-                        "aria-label": "",
-                        "type": "email",
-                        "instructions": "",
-                        "required": 0,
-                        "conditional_logic": 0,
-                        "wrapper": {
-                            "width": "",
-                            "class": "",
-                            "id": ""
-                        },
-                        "default_value": "",
-                        "placeholder": "",
-                        "prepend": "",
-                        "append": "",
-                        "parent_repeater": "field_6541c546199c1"
-                    }
-                ]
-            },
-            {
-                "key": "field_6541d7283f590",
-                "label": "Approval BCC email address",
-                "name": "rv_email_approval_bcc",
-                "aria-label": "",
-                "type": "repeater",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "layout": "table",
-                "pagination": 0,
-                "min": 0,
-                "max": 0,
-                "collapsed": "",
-                "button_label": "Add Row",
-                "rows_per_page": 20,
-                "sub_fields": [
-                    {
-                        "key": "field_6541d73f3f591",
-                        "label": "BCC Email Address",
-                        "name": "rv_email_approval_bcc_address",
-                        "aria-label": "",
-                        "type": "email",
-                        "instructions": "",
-                        "required": 0,
-                        "conditional_logic": 0,
-                        "wrapper": {
-                            "width": "",
-                            "class": "",
-                            "id": ""
-                        },
-                        "default_value": "",
-                        "placeholder": "",
-                        "prepend": "",
-                        "append": "",
-                        "parent_repeater": "field_6541d7283f590"
-                    }
-                ]
-            }
-        ],
-        "location": [
-            [
-                {
-                    "param": "options_page",
-                    "operator": "==",
-                    "value": "email-settings"
-                }
-            ]
-        ],
-        "menu_order": 0,
-        "position": "normal",
-        "style": "default",
-        "label_placement": "top",
-        "instruction_placement": "label",
-        "hide_on_screen": "",
-        "active": true,
-        "description": "",
-        "show_in_rest": 0
-    },
-    {
-        "key": "group_6539d648b59cd",
-        "title": "FAQ Field Group",
-        "fields": [
-            {
-                "key": "field_6539d649eefa0",
-                "label": "Type",
-                "name": "rv_faq_type",
-                "aria-label": "",
-                "type": "select",
-                "instructions": "",
-                "required": 1,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "choices": {
-                    "company": "Question from company",
-                    "candidate": "Question from candidate",
-                    "both": "Question from both (company and candidate)"
-                },
-                "default_value": false,
-                "return_format": "array",
-                "multiple": 0,
-                "allow_null": 0,
-                "ui": 0,
-                "ajax": 0,
-                "placeholder": ""
-            },
-            {
-                "key": "field_6540a54a66404",
-                "label": "Is Favorite",
-                "name": "rv_faq_display_on_contact",
-                "aria-label": "",
-                "type": "true_false",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "message": "Also show the question in Contact Page",
-                "default_value": 0,
-                "ui": 0,
-                "ui_on_text": "",
-                "ui_off_text": ""
-            }
-        ],
-        "location": [
-            [
-                {
-                    "param": "post_type",
-                    "operator": "==",
-                    "value": "faq"
-                }
-            ]
-        ],
-        "menu_order": 0,
-        "position": "normal",
-        "style": "default",
-        "label_placement": "top",
-        "instruction_placement": "label",
-        "hide_on_screen": "",
-        "active": true,
-        "description": "",
-        "show_in_rest": 0
-    },
-    {
         "key": "group_652506a4e8ee7",
         "title": "Import API",
         "fields": [
             {
                 "key": "field_652506a5aa773",
-                "label": "Flexfeed Refresh per day",
+                "label": "Refresh per day",
                 "name": "import_api_refresh_per_day",
                 "aria-label": "",
                 "type": "number",
@@ -1295,102 +1098,6 @@
                                 "parent_repeater": "field_652e487fc0206"
                             }
                         ]
-                    }
-                ]
-            },
-            {
-                "key": "field_65486be8d6936",
-                "label": "Import Mapping Sector",
-                "name": "import_api_mapping_sector",
-                "aria-label": "",
-                "type": "repeater",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "layout": "table",
-                "pagination": 0,
-                "min": 0,
-                "max": 0,
-                "collapsed": "",
-                "button_label": "Add Row",
-                "rows_per_page": 20,
-                "sub_fields": [
-                    {
-                        "key": "field_65486c1ed6937",
-                        "label": "Select Term",
-                        "name": "import_api_mapping_sector_term",
-                        "aria-label": "",
-                        "type": "taxonomy",
-                        "instructions": "",
-                        "required": 0,
-                        "conditional_logic": 0,
-                        "wrapper": {
-                            "width": "",
-                            "class": "",
-                            "id": ""
-                        },
-                        "taxonomy": "sector",
-                        "add_term": 1,
-                        "save_terms": 1,
-                        "load_terms": 0,
-                        "return_format": "id",
-                        "field_type": "select",
-                        "allow_null": 0,
-                        "bidirectional": 0,
-                        "multiple": 0,
-                        "bidirectional_target": [],
-                        "parent_repeater": "field_65486be8d6936"
-                    },
-                    {
-                        "key": "field_65486c57d6938",
-                        "label": "Accepted Keyword",
-                        "name": "import_api_mapping_sector_keywords",
-                        "aria-label": "",
-                        "type": "repeater",
-                        "instructions": "",
-                        "required": 0,
-                        "conditional_logic": 0,
-                        "wrapper": {
-                            "width": "",
-                            "class": "",
-                            "id": ""
-                        },
-                        "layout": "table",
-                        "pagination": 0,
-                        "min": 0,
-                        "max": 0,
-                        "collapsed": "",
-                        "button_label": "Add Row",
-                        "rows_per_page": 20,
-                        "sub_fields": [
-                            {
-                                "key": "field_65486c86d6939",
-                                "label": "Keywords",
-                                "name": "import_api_mapping_sector_eachword",
-                                "aria-label": "",
-                                "type": "text",
-                                "instructions": "",
-                                "required": 0,
-                                "conditional_logic": 0,
-                                "wrapper": {
-                                    "width": "",
-                                    "class": "",
-                                    "id": ""
-                                },
-                                "default_value": "",
-                                "maxlength": "",
-                                "placeholder": "",
-                                "prepend": "",
-                                "append": "",
-                                "parent_repeater": "field_65486c57d6938"
-                            }
-                        ],
-                        "parent_repeater": "field_65486be8d6936"
                     }
                 ]
             },
@@ -1875,6 +1582,60 @@
         "show_in_rest": 0
     },
     {
+        "key": "group_65d2b50ef36e6",
+        "title": "Recommended Jobs Group Field",
+        "fields": [
+            {
+                "key": "field_65d2b50f4975a",
+                "label": "Jobs",
+                "name": "rv_recommended_jobs",
+                "aria-label": "",
+                "type": "post_object",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "post_type": [
+                    "vacancy"
+                ],
+                "post_status": [
+                    "publish"
+                ],
+                "taxonomy": [
+                    "status:open"
+                ],
+                "return_format": "object",
+                "multiple": 1,
+                "allow_null": 0,
+                "bidirectional": 0,
+                "ui": 1,
+                "bidirectional_target": []
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "options_page",
+                    "operator": "==",
+                    "value": "recommended-job-settings"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": "",
+        "show_in_rest": 0
+    },
+    {
         "key": "group_65323cc4d240a",
         "title": "RSS Field Group",
         "fields": [
@@ -1902,12 +1663,12 @@
                 "bidirectional_target": []
             },
             {
-                "key": "field_654353b383384",
-                "label": "Select Language",
-                "name": "rv_rss_select_language",
+                "key": "field_65323cf4cd7be",
+                "label": "Select Vacancy(es)",
+                "name": "rv_rss_select_vacancy",
                 "aria-label": "",
-                "type": "select",
-                "instructions": "",
+                "type": "post_object",
+                "instructions": "Select vacancy (vacancies) based on selected company.",
                 "required": 0,
                 "conditional_logic": 0,
                 "wrapper": {
@@ -1915,47 +1676,17 @@
                     "class": "",
                     "id": ""
                 },
-                "choices": {
-                    "nl": "Dutch - Nederlands, Vlaams",
-                    "en": "Engels - English",
-                    "de": "Duits \/ German - Deutsch",
-                    "fr": "Frans \/ French - français, langue française",
-                    "es": "Spaans\/Spanish; Castilian - español, castellano"
-                },
-                "default_value": false,
-                "return_format": "array",
-                "multiple": 0,
-                "allow_null": 1,
+                "post_type": [
+                    "vacancy"
+                ],
+                "post_status": "",
+                "taxonomy": "",
+                "return_format": "object",
+                "multiple": 1,
+                "allow_null": 0,
+                "bidirectional": 0,
                 "ui": 1,
-                "ajax": 0,
-                "placeholder": ""
-            },
-            {
-                "key": "field_655ac0aab6dbe",
-                "label": "Select Paid Status",
-                "name": "rv_rss_select_paid_status",
-                "aria-label": "",
-                "type": "select",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "choices": {
-                    "paid": "Paid vacancy only",
-                    "free": "Free vacancy only",
-                    "both": "Both vacancy"
-                },
-                "default_value": "both",
-                "return_format": "array",
-                "multiple": 0,
-                "allow_null": 1,
-                "ui": 1,
-                "ajax": 0,
-                "placeholder": ""
+                "bidirectional_target": []
             }
         ],
         "location": [
@@ -3101,6 +2832,26 @@
                 "ui_off_text": ""
             },
             {
+                "key": "field_64cb507ad3670",
+                "label": "Placement City",
+                "name": "placement_city",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
                 "key": "field_64cb56b2d3671",
                 "label": "Application process title",
                 "name": "application_process_title",
@@ -3503,221 +3254,9 @@
                 "first_day": 1
             },
             {
-                "key": "field_64f55417533da",
-                "label": "Country",
-                "name": "rv_vacancy_country",
-                "aria-label": "",
-                "type": "select",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "choices": {
-                    "Afghanistan": "Afghanistan",
-                    "Albanië": "Albanië",
-                    "Algerije": "Algerije",
-                    "Andorra": "Andorra",
-                    "Angola": "Angola",
-                    "Antigua en Barbuda": "Antigua en Barbuda",
-                    "Argentinië": "Argentinië",
-                    "Armenië": "Armenië",
-                    "Australië": "Australië",
-                    "Azerbeidzjan": "Azerbeidzjan",
-                    "Bahama's": "Bahama's",
-                    "Bahrein": "Bahrein",
-                    "Bangladesh": "Bangladesh",
-                    "Barbados": "Barbados",
-                    "België": "België",
-                    "Belize": "Belize",
-                    "Benin": "Benin",
-                    "Bhutan": "Bhutan",
-                    "Bolivia": "Bolivia",
-                    "Bosnië en Herzegovina": "Bosnië en Herzegovina",
-                    "Botswana": "Botswana",
-                    "Brazilië": "Brazilië",
-                    "Brunei": "Brunei",
-                    "Bulgarije": "Bulgarije",
-                    "Burkina Faso": "Burkina Faso",
-                    "Burundi": "Burundi",
-                    "Cambodja": "Cambodja",
-                    "Canada": "Canada",
-                    "Centraal-Afrikaanse Republiek": "Centraal-Afrikaanse Republiek",
-                    "Chili": "Chili",
-                    "China": "China",
-                    "Colombia": "Colombia",
-                    "Comoren": "Comoren",
-                    "Congo-Brazzaville": "Congo-Brazzaville",
-                    "Costa Rica": "Costa Rica",
-                    "Cuba": "Cuba",
-                    "Cyprus": "Cyprus",
-                    "Denemarken": "Denemarken",
-                    "Djibouti": "Djibouti",
-                    "Dominica": "Dominica",
-                    "Dominicaanse Republiek": "Dominicaanse Republiek",
-                    "Duitsland": "Duitsland",
-                    "Ecuador": "Ecuador",
-                    "Egypte": "Egypte",
-                    "El Salvador": "El Salvador",
-                    "Equatoriaal-Guinea": "Equatoriaal-Guinea",
-                    "Eritrea": "Eritrea",
-                    "Estland": "Estland",
-                    "Ethiopië": "Ethiopië",
-                    "Fiji": "Fiji",
-                    "Filipijnen": "Filipijnen",
-                    "Finland": "Finland",
-                    "Frankrijk": "Frankrijk",
-                    "Gabon": "Gabon",
-                    "Gambia": "Gambia",
-                    "Georgië": "Georgië",
-                    "Ghana": "Ghana",
-                    "Grenada": "Grenada",
-                    "Griekenland": "Griekenland",
-                    "Guatemala": "Guatemala",
-                    "Guinee": "Guinee",
-                    "Guinee-Bissau": "Guinee-Bissau",
-                    "Guyana": "Guyana",
-                    "Haïti": "Haïti",
-                    "Honduras": "Honduras",
-                    "Hongarije": "Hongarije",
-                    "Ierland": "Ierland",
-                    "IJsland": "IJsland",
-                    "India": "India",
-                    "Indonesië": "Indonesië",
-                    "Irak": "Irak",
-                    "Iran": "Iran",
-                    "Israël": "Israël",
-                    "Italië": "Italië",
-                    "Ivoorkust": "Ivoorkust",
-                    "Jamaica": "Jamaica",
-                    "Japan": "Japan",
-                    "Jemen": "Jemen",
-                    "Jordanië": "Jordanië",
-                    "Kaapverdië": "Kaapverdië",
-                    "Kameroen": "Kameroen",
-                    "Kazachstan": "Kazachstan",
-                    "Kenia": "Kenia",
-                    "Kirgizië": "Kirgizië",
-                    "Kiribati": "Kiribati",
-                    "Koeweit": "Koeweit",
-                    "Kroatië": "Kroatië",
-                    "Laos": "Laos",
-                    "Lesotho": "Lesotho",
-                    "Letland": "Letland",
-                    "Libanon": "Libanon",
-                    "Liberia": "Liberia",
-                    "Libië": "Libië",
-                    "Liechtenstein": "Liechtenstein",
-                    "Litouwen": "Litouwen",
-                    "Luxemburg": "Luxemburg",
-                    "Madagaskar": "Madagaskar",
-                    "Malawi": "Malawi",
-                    "Malediven": "Malediven",
-                    "Maleisië": "Maleisië",
-                    "Mali": "Mali",
-                    "Malta": "Malta",
-                    "Marokko": "Marokko",
-                    "Marshalleilanden": "Marshalleilanden",
-                    "Mauritanië": "Mauritanië",
-                    "Mauritius": "Mauritius",
-                    "Mexico": "Mexico",
-                    "Moldavië": "Moldavië",
-                    "Monaco": "Monaco",
-                    "Mongolië": "Mongolië",
-                    "Montenegro": "Montenegro",
-                    "Mozambique": "Mozambique",
-                    "Myanmar": "Myanmar",
-                    "Namibië": "Namibië",
-                    "Nauru": "Nauru",
-                    "Nederland": "Nederland",
-                    "Nepal": "Nepal",
-                    "Nicaragua": "Nicaragua",
-                    "Nieuw-Zeeland": "Nieuw-Zeeland",
-                    "Niger": "Niger",
-                    "Nigeria": "Nigeria",
-                    "Noord-Korea": "Noord-Korea",
-                    "Noord-Macedonië": "Noord-Macedonië",
-                    "Noorwegen": "Noorwegen",
-                    "Oeganda": "Oeganda",
-                    "Oekraïne": "Oekraïne",
-                    "Oezbekistan": "Oezbekistan",
-                    "Oman": "Oman",
-                    "Oostenrijk": "Oostenrijk",
-                    "Oost-Timor": "Oost-Timor",
-                    "Pakistan": "Pakistan",
-                    "Palau": "Palau",
-                    "Panama": "Panama",
-                    "Papoea-Nieuw-Guinea": "Papoea-Nieuw-Guinea",
-                    "Paraguay": "Paraguay",
-                    "Peru": "Peru",
-                    "Polen": "Polen",
-                    "Portugal": "Portugal",
-                    "Qatar": "Qatar",
-                    "Roemenië": "Roemenië",
-                    "Rusland": "Rusland",
-                    "Rwanda": "Rwanda",
-                    "Saint Kitts en Nevis": "Saint Kitts en Nevis",
-                    "Saint Lucia": "Saint Lucia",
-                    "Saint Vincent en de Grenadines": "Saint Vincent en de Grenadines",
-                    "Salomonseilanden": "Salomonseilanden",
-                    "Samoa": "Samoa",
-                    "San Marino": "San Marino",
-                    "Saoedi-Arabië": "Saoedi-Arabië",
-                    "Sao Tomé en Principe": "Sao Tomé en Principe",
-                    "Senegal": "Senegal",
-                    "Servië": "Servië",
-                    "Seychellen": "Seychellen",
-                    "Sierra Leone": "Sierra Leone",
-                    "Singapore": "Singapore",
-                    "Slovenië": "Slovenië",
-                    "Slowakije": "Slowakije",
-                    "Soedan": "Soedan",
-                    "Somalië": "Somalië",
-                    "Spanje": "Spanje",
-                    "Sri Lanka": "Sri Lanka",
-                    "Suriname": "Suriname",
-                    "Swaziland": "Swaziland",
-                    "Syrië": "Syrië",
-                    "Tanzania": "Tanzania",
-                    "Thailand": "Thailand",
-                    "Togo": "Togo",
-                    "Tonga": "Tonga",
-                    "Trinidad en Tobago": "Trinidad en Tobago",
-                    "Tsjaad": "Tsjaad",
-                    "Tsjechië": "Tsjechië",
-                    "Tunesië": "Tunesië",
-                    "Turkije": "Turkije",
-                    "Turkmenistan": "Turkmenistan",
-                    "Uruguay": "Uruguay",
-                    "Vanuatu": "Vanuatu",
-                    "Venezuela": "Venezuela",
-                    "Verenigde Arabische Emiraten": "Verenigde Arabische Emiraten",
-                    "Verenigde Staten": "Verenigde Staten",
-                    "Verenigd Koninkrijk": "Verenigd Koninkrijk",
-                    "Vietnam": "Vietnam",
-                    "Wit-Rusland": "Wit-Rusland",
-                    "Zambia": "Zambia",
-                    "Zimbabwe": "Zimbabwe",
-                    "Zuid-Afrika": "Zuid-Afrika",
-                    "Zuid-Korea": "Zuid-Korea",
-                    "Zweden": "Zweden",
-                    "Zwitserland": "Zwitserland"
-                },
-                "default_value": false,
-                "return_format": "value",
-                "multiple": 0,
-                "allow_null": 1,
-                "ui": 1,
-                "ajax": 0,
-                "placeholder": ""
-            },
-            {
-                "key": "field_6508120ebe96b",
-                "label": "Country Code",
-                "name": "rv_vacancy_country_code",
+                "key": "field_64dc4f9285e75",
+                "label": "Placement Address",
+                "name": "placement_address",
                 "aria-label": "",
                 "type": "text",
                 "instructions": "",
@@ -3735,35 +3274,12 @@
                 "append": ""
             },
             {
-                "key": "field_64cb507ad3670",
-                "label": "Placement City",
-                "name": "placement_city",
-                "aria-label": "",
-                "type": "select",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "choices": [],
-                "default_value": false,
-                "return_format": "value",
-                "multiple": 0,
-                "allow_null": 0,
-                "ui": 1,
-                "ajax": 0,
-                "placeholder": ""
-            },
-            {
                 "key": "field_64eead8639890",
                 "label": "City Latitude",
                 "name": "city_latitude",
                 "aria-label": "",
                 "type": "text",
-                "instructions": "Will generated automatically if value is empty.",
+                "instructions": "",
                 "required": 0,
                 "conditional_logic": 0,
                 "wrapper": {
@@ -3781,26 +3297,6 @@
                 "key": "field_64eead9a39891",
                 "label": "City Longitude",
                 "name": "city_longitude",
-                "aria-label": "",
-                "type": "text",
-                "instructions": "Will generated automatically if value is empty.",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "maxlength": "",
-                "placeholder": "",
-                "prepend": "",
-                "append": ""
-            },
-            {
-                "key": "field_64dc4f9285e75",
-                "label": "Placement Address",
-                "name": "placement_address",
                 "aria-label": "",
                 "type": "text",
                 "instructions": "",
@@ -3823,7 +3319,7 @@
                 "name": "placement_address_latitude",
                 "aria-label": "",
                 "type": "text",
-                "instructions": "Will generated automatically if value is empty.",
+                "instructions": "",
                 "required": 0,
                 "conditional_logic": 0,
                 "wrapper": {
@@ -3843,7 +3339,7 @@
                 "name": "placement_address_longitude",
                 "aria-label": "",
                 "type": "text",
-                "instructions": "Will generated automatically if value is empty.",
+                "instructions": "",
                 "required": 0,
                 "conditional_logic": 0,
                 "wrapper": {
@@ -3863,7 +3359,27 @@
                 "name": "distance_from_city",
                 "aria-label": "",
                 "type": "text",
-                "instructions": "Will generated automatically if value is empty.",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_64f55417533da",
+                "label": "Country",
+                "name": "rv_vacancy_country",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
                 "required": 0,
                 "conditional_logic": 0,
                 "wrapper": {
@@ -3878,985 +3394,14 @@
                 "append": ""
             },
             {
-                "key": "field_65433fabb6525",
-                "label": "Vacancy Language",
-                "name": "rv_vacancy_language",
+                "key": "field_6508120ebe96b",
+                "label": "Vacancy Country Code",
+                "name": "rv_vacancy_country_code",
                 "aria-label": "",
-                "type": "select",
+                "type": "text",
                 "instructions": "",
                 "required": 0,
                 "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "choices": {
-                    "nl": "Dutch - Nederlands, Vlaams",
-                    "en": "Engels - English",
-                    "de": "Duits \/ German - Deutsch",
-                    "fr": "Frans \/ French - français, langue française",
-                    "es": "Spaans\/Spanish; Castilian - español, castellano"
-                },
-                "default_value": false,
-                "return_format": "array",
-                "multiple": 0,
-                "allow_null": 1,
-                "ui": 0,
-                "ajax": 0,
-                "placeholder": ""
-            },
-            {
-                "key": "field_6549dc44ff28a",
-                "label": "Is for another company",
-                "name": "rv_vacancy_is_for_another_company",
-                "aria-label": "",
-                "type": "true_false",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "message": "Check this option if vacancy is inputed for another company",
-                "default_value": 0,
-                "ui": 0,
-                "ui_on_text": "",
-                "ui_off_text": ""
-            },
-            {
-                "key": "field_6549e6f321f6a",
-                "label": "Use Existing Company",
-                "name": "rv_vacancy_use_existing_company",
-                "aria-label": "",
-                "type": "true_false",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": [
-                    [
-                        {
-                            "field": "field_6549dc44ff28a",
-                            "operator": "==",
-                            "value": "1"
-                        }
-                    ]
-                ],
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "message": "Check if want to use curently existing company user",
-                "default_value": 0,
-                "ui": 0,
-                "ui_on_text": "",
-                "ui_off_text": ""
-            },
-            {
-                "key": "field_6549dcc4c2f80",
-                "label": "Select Company (vacancy for another company)",
-                "name": "rv_vacancy_selected_company",
-                "aria-label": "",
-                "type": "user",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": [
-                    [
-                        {
-                            "field": "field_6549dc44ff28a",
-                            "operator": "==",
-                            "value": "1"
-                        },
-                        {
-                            "field": "field_6549e6f321f6a",
-                            "operator": "==",
-                            "value": "1"
-                        }
-                    ]
-                ],
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "role": [
-                    "company"
-                ],
-                "return_format": "id",
-                "multiple": 0,
-                "allow_null": 0,
-                "bidirectional": 0,
-                "bidirectional_target": []
-            },
-            {
-                "key": "field_6549e54621f63",
-                "label": "Company Name (vacancy for another company)",
-                "name": "rv_vacancy_custom_company_name",
-                "aria-label": "",
-                "type": "text",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": [
-                    [
-                        {
-                            "field": "field_6549dc44ff28a",
-                            "operator": "==",
-                            "value": "1"
-                        },
-                        {
-                            "field": "field_6549e6f321f6a",
-                            "operator": "!=",
-                            "value": "1"
-                        }
-                    ]
-                ],
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "maxlength": "",
-                "placeholder": "",
-                "prepend": "",
-                "append": ""
-            },
-            {
-                "key": "field_6549e5a721f64",
-                "label": "Company Logo  (vacancy for another company)",
-                "name": "rv_vacancy_custom_company_logo",
-                "aria-label": "",
-                "type": "image",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": [
-                    [
-                        {
-                            "field": "field_6549dc44ff28a",
-                            "operator": "==",
-                            "value": "1"
-                        },
-                        {
-                            "field": "field_6549e6f321f6a",
-                            "operator": "!=",
-                            "value": "1"
-                        }
-                    ]
-                ],
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "return_format": "array",
-                "library": "all",
-                "min_width": "",
-                "min_height": "",
-                "min_size": "",
-                "max_width": "",
-                "max_height": "",
-                "max_size": "",
-                "mime_types": "",
-                "preview_size": "medium"
-            },
-            {
-                "key": "field_654b448274656",
-                "label": "Company Email (vacancy for another company)",
-                "name": "rv_vacancy_custom_company_email",
-                "aria-label": "",
-                "type": "email",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": [
-                    [
-                        {
-                            "field": "field_6549dc44ff28a",
-                            "operator": "==",
-                            "value": "1"
-                        },
-                        {
-                            "field": "field_6549e6f321f6a",
-                            "operator": "!=",
-                            "value": "1"
-                        }
-                    ]
-                ],
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "placeholder": "",
-                "prepend": "",
-                "append": ""
-            },
-            {
-                "key": "field_654b4296b8d9a",
-                "label": "Company Phone Code (vacancy for another company)",
-                "name": "rv_vacancy_custom_company_phone_code",
-                "aria-label": "",
-                "type": "select",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": [
-                    [
-                        {
-                            "field": "field_6549dc44ff28a",
-                            "operator": "==",
-                            "value": "1"
-                        },
-                        {
-                            "field": "field_6549e6f321f6a",
-                            "operator": "!=",
-                            "value": "1"
-                        }
-                    ]
-                ],
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "choices": {
-                    "+93": "+93",
-                    "+355": "+355",
-                    "+213": "+213",
-                    "+1684": "+1684",
-                    "+376": "+376",
-                    "+244": "+244",
-                    "+1264": "+1264",
-                    "+672": "+672",
-                    "+1268": "+1268",
-                    "+54": "+54",
-                    "+374": "+374",
-                    "+297": "+297",
-                    "+61": "+61",
-                    "+43": "+43",
-                    "+994": "+994",
-                    "+1242": "+1242",
-                    "+973": "+973",
-                    "+880": "+880",
-                    "+1246": "+1246",
-                    "+375": "+375",
-                    "+32": "+32",
-                    "+501": "+501",
-                    "+229": "+229",
-                    "+1441": "+1441",
-                    "+975": "+975",
-                    "+591": "+591",
-                    "+387": "+387",
-                    "+267": "+267",
-                    "+55": "+55",
-                    "+246": "+246",
-                    "+673": "+673",
-                    "+359": "+359",
-                    "+226": "+226",
-                    "+257": "+257",
-                    "+855": "+855",
-                    "+237": "+237",
-                    "+1": "+1",
-                    "+238": "+238",
-                    "+345": "+345",
-                    "+236": "+236",
-                    "+235": "+235",
-                    "+56": "+56",
-                    "+86": "+86",
-                    "+57": "+57",
-                    "+269": "+269",
-                    "+242": "+242",
-                    "+243": "+243",
-                    "+682": "+682",
-                    "+506": "+506",
-                    "+225": "+225",
-                    "+385": "+385",
-                    "+53": "+53",
-                    "+357": "+357",
-                    "+420": "+420",
-                    "+45": "+45",
-                    "+253": "+253",
-                    "+1767": "+1767",
-                    "+1849": "+1849",
-                    "+593": "+593",
-                    "+20": "+20",
-                    "+503": "+503",
-                    "+240": "+240",
-                    "+291": "+291",
-                    "+372": "+372",
-                    "+251": "+251",
-                    "+500": "+500",
-                    "+298": "+298",
-                    "+679": "+679",
-                    "+358": "+358",
-                    "+33": "+33",
-                    "+594": "+594",
-                    "+689": "+689",
-                    "+241": "+241",
-                    "+220": "+220",
-                    "+995": "+995",
-                    "+49": "+49",
-                    "+233": "+233",
-                    "+350": "+350",
-                    "+30": "+30",
-                    "+299": "+299",
-                    "+1473": "+1473",
-                    "+590": "+590",
-                    "+1671": "+1671",
-                    "+502": "+502",
-                    "+44": "+44",
-                    "+224": "+224",
-                    "+245": "+245",
-                    "+592": "+592",
-                    "+509": "+509",
-                    "+379": "+379",
-                    "+504": "+504",
-                    "+852": "+852",
-                    "+36": "+36",
-                    "+354": "+354",
-                    "+91": "+91",
-                    "+62": "+62",
-                    "+98": "+98",
-                    "+964": "+964",
-                    "+353": "+353",
-                    "+972": "+972",
-                    "+39": "+39",
-                    "+1876": "+1876",
-                    "+81": "+81",
-                    "+962": "+962",
-                    "+77": "+77",
-                    "+254": "+254",
-                    "+686": "+686",
-                    "+850": "+850",
-                    "+82": "+82",
-                    "+965": "+965",
-                    "+996": "+996",
-                    "+856": "+856",
-                    "+371": "+371",
-                    "+961": "+961",
-                    "+266": "+266",
-                    "+231": "+231",
-                    "+218": "+218",
-                    "+423": "+423",
-                    "+370": "+370",
-                    "+352": "+352",
-                    "+853": "+853",
-                    "+389": "+389",
-                    "+261": "+261",
-                    "+265": "+265",
-                    "+60": "+60",
-                    "+960": "+960",
-                    "+223": "+223",
-                    "+356": "+356",
-                    "+692": "+692",
-                    "+596": "+596",
-                    "+222": "+222",
-                    "+230": "+230",
-                    "+262": "+262",
-                    "+52": "+52",
-                    "+691": "+691",
-                    "+373": "+373",
-                    "+377": "+377",
-                    "+976": "+976",
-                    "+382": "+382",
-                    "+1664": "+1664",
-                    "+212": "+212",
-                    "+258": "+258",
-                    "+95": "+95",
-                    "+264": "+264",
-                    "+674": "+674",
-                    "+977": "+977",
-                    "+31": "+31",
-                    "+599": "+599",
-                    "+687": "+687",
-                    "+64": "+64",
-                    "+505": "+505",
-                    "+227": "+227",
-                    "+234": "+234",
-                    "+683": "+683",
-                    "+1670": "+1670",
-                    "+47": "+47",
-                    "+968": "+968",
-                    "+92": "+92",
-                    "+680": "+680",
-                    "+970": "+970",
-                    "+507": "+507",
-                    "+675": "+675",
-                    "+595": "+595",
-                    "+51": "+51",
-                    "+63": "+63",
-                    "+872": "+872",
-                    "+48": "+48",
-                    "+351": "+351",
-                    "+1939": "+1939",
-                    "+974": "+974",
-                    "+40": "+40",
-                    "+7": "+7",
-                    "+250": "+250",
-                    "+290": "+290",
-                    "+1869": "+1869",
-                    "+1758": "+1758",
-                    "+508": "+508",
-                    "+1784": "+1784",
-                    "+685": "+685",
-                    "+378": "+378",
-                    "+239": "+239",
-                    "+966": "+966",
-                    "+221": "+221",
-                    "+381": "+381",
-                    "+248": "+248",
-                    "+232": "+232",
-                    "+65": "+65",
-                    "+421": "+421",
-                    "+386": "+386",
-                    "+677": "+677",
-                    "+252": "+252",
-                    "+27": "+27",
-                    "+34": "+34",
-                    "+94": "+94",
-                    "+249": "+249",
-                    "+211": "+211",
-                    "+597": "+597",
-                    "+268": "+268",
-                    "+46": "+46",
-                    "+41": "+41",
-                    "+963": "+963",
-                    "+886": "+886",
-                    "+992": "+992",
-                    "+255": "+255",
-                    "+66": "+66",
-                    "+670": "+670",
-                    "+228": "+228",
-                    "+690": "+690",
-                    "+676": "+676",
-                    "+1868": "+1868",
-                    "+216": "+216",
-                    "+90": "+90",
-                    "+993": "+993",
-                    "+1649": "+1649",
-                    "+688": "+688",
-                    "+256": "+256",
-                    "+380": "+380",
-                    "+971": "+971",
-                    "+598": "+598",
-                    "+998": "+998",
-                    "+678": "+678",
-                    "+58": "+58",
-                    "+84": "+84",
-                    "+1284": "+1284",
-                    "+1340": "+1340",
-                    "+681": "+681",
-                    "+967": "+967",
-                    "+260": "+260",
-                    "+263": "+263"
-                },
-                "default_value": false,
-                "return_format": "array",
-                "multiple": 0,
-                "allow_null": 1,
-                "ui": 1,
-                "ajax": 0,
-                "placeholder": ""
-            },
-            {
-                "key": "field_654b420720865",
-                "label": "Company Phone Number (vacancy for another company)",
-                "name": "rv_vacancy_custom_company_phone_number",
-                "aria-label": "",
-                "type": "text",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": [
-                    [
-                        {
-                            "field": "field_6549dc44ff28a",
-                            "operator": "==",
-                            "value": "1"
-                        },
-                        {
-                            "field": "field_6549e6f321f6a",
-                            "operator": "!=",
-                            "value": "1"
-                        }
-                    ]
-                ],
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "maxlength": "",
-                "placeholder": "",
-                "prepend": "",
-                "append": ""
-            },
-            {
-                "key": "field_6549e5c221f65",
-                "label": "Company Sector (vacancy for another company)",
-                "name": "rv_vacancy_custom_company_sector",
-                "aria-label": "",
-                "type": "taxonomy",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": [
-                    [
-                        {
-                            "field": "field_6549dc44ff28a",
-                            "operator": "==",
-                            "value": "1"
-                        },
-                        {
-                            "field": "field_6549e6f321f6a",
-                            "operator": "!=",
-                            "value": "1"
-                        }
-                    ]
-                ],
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "taxonomy": "sector",
-                "add_term": 1,
-                "save_terms": 0,
-                "load_terms": 0,
-                "return_format": "id",
-                "field_type": "multi_select",
-                "allow_null": 1,
-                "bidirectional": 0,
-                "multiple": 0,
-                "bidirectional_target": []
-            },
-            {
-                "key": "field_654b3c5020864",
-                "label": "Company Total Employees (vacancy for another company)",
-                "name": "rv_vacancy_custom_company_total_employees",
-                "aria-label": "",
-                "type": "select",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": [
-                    [
-                        {
-                            "field": "field_6549dc44ff28a",
-                            "operator": "==",
-                            "value": "1"
-                        },
-                        {
-                            "field": "field_6549e6f321f6a",
-                            "operator": "!=",
-                            "value": "1"
-                        }
-                    ]
-                ],
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "choices": {
-                    "1 - 10 medewerkers": "1 - 10 medewerkers",
-                    "11 - 50 medewerkers": "11 - 50 medewerkers",
-                    "51 - 200 medewerkers": "51 - 200 medewerkers",
-                    "201 - 500 medewerkers": "201 - 500 medewerkers",
-                    "501 - 1000 medewerkers": "501 - 1000 medewerkers",
-                    "1001 - 5000 medewerkers": "1001 - 5000 medewerkers",
-                    "5001 - 10000 medewerkers": "5001 - 10000 medewerkers",
-                    "10000+ medewerkers": "10000+ medewerkers"
-                },
-                "default_value": false,
-                "return_format": "array",
-                "multiple": 0,
-                "allow_null": 1,
-                "ui": 0,
-                "ajax": 0,
-                "placeholder": ""
-            },
-            {
-                "key": "field_6549e5f721f66",
-                "label": "Company Description (vacancy for another company)",
-                "name": "rv_vacancy_custom_company_description",
-                "aria-label": "",
-                "type": "textarea",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": [
-                    [
-                        {
-                            "field": "field_6549dc44ff28a",
-                            "operator": "==",
-                            "value": "1"
-                        },
-                        {
-                            "field": "field_6549e6f321f6a",
-                            "operator": "!=",
-                            "value": "1"
-                        }
-                    ]
-                ],
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "maxlength": "",
-                "rows": "",
-                "placeholder": "",
-                "new_lines": ""
-            },
-            {
-                "key": "field_654c55a89b2d3",
-                "label": "Company Country (vacancy for another company)",
-                "name": "rv_vacancy_custom_company_country",
-                "aria-label": "",
-                "type": "select",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": [
-                    [
-                        {
-                            "field": "field_6549dc44ff28a",
-                            "operator": "==",
-                            "value": "1"
-                        },
-                        {
-                            "field": "field_6549e6f321f6a",
-                            "operator": "!=",
-                            "value": "1"
-                        }
-                    ]
-                ],
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "choices": {
-                    "Afghanistan": "Afghanistan",
-                    "Albanië": "Albanië",
-                    "Algerije": "Algerije",
-                    "Andorra": "Andorra",
-                    "Angola": "Angola",
-                    "Antigua en Barbuda": "Antigua en Barbuda",
-                    "Argentinië": "Argentinië",
-                    "Armenië": "Armenië",
-                    "Australië": "Australië",
-                    "Azerbeidzjan": "Azerbeidzjan",
-                    "Bahama's": "Bahama's",
-                    "Bahrein": "Bahrein",
-                    "Bangladesh": "Bangladesh",
-                    "Barbados": "Barbados",
-                    "België": "België",
-                    "Belize": "Belize",
-                    "Benin": "Benin",
-                    "Bhutan": "Bhutan",
-                    "Bolivia": "Bolivia",
-                    "Bosnië en Herzegovina": "Bosnië en Herzegovina",
-                    "Botswana": "Botswana",
-                    "Brazilië": "Brazilië",
-                    "Brunei": "Brunei",
-                    "Bulgarije": "Bulgarije",
-                    "Burkina Faso": "Burkina Faso",
-                    "Burundi": "Burundi",
-                    "Cambodja": "Cambodja",
-                    "Canada": "Canada",
-                    "Centraal-Afrikaanse Republiek": "Centraal-Afrikaanse Republiek",
-                    "Chili": "Chili",
-                    "China": "China",
-                    "Colombia": "Colombia",
-                    "Comoren": "Comoren",
-                    "Congo-Brazzaville": "Congo-Brazzaville",
-                    "Costa Rica": "Costa Rica",
-                    "Cuba": "Cuba",
-                    "Cyprus": "Cyprus",
-                    "Denemarken": "Denemarken",
-                    "Djibouti": "Djibouti",
-                    "Dominica": "Dominica",
-                    "Dominicaanse Republiek": "Dominicaanse Republiek",
-                    "Duitsland": "Duitsland",
-                    "Ecuador": "Ecuador",
-                    "Egypte": "Egypte",
-                    "El Salvador": "El Salvador",
-                    "Equatoriaal-Guinea": "Equatoriaal-Guinea",
-                    "Eritrea": "Eritrea",
-                    "Estland": "Estland",
-                    "Ethiopië": "Ethiopië",
-                    "Fiji": "Fiji",
-                    "Filipijnen": "Filipijnen",
-                    "Finland": "Finland",
-                    "Frankrijk": "Frankrijk",
-                    "Gabon": "Gabon",
-                    "Gambia": "Gambia",
-                    "Georgië": "Georgië",
-                    "Ghana": "Ghana",
-                    "Grenada": "Grenada",
-                    "Griekenland": "Griekenland",
-                    "Guatemala": "Guatemala",
-                    "Guinee": "Guinee",
-                    "Guinee-Bissau": "Guinee-Bissau",
-                    "Guyana": "Guyana",
-                    "Haïti": "Haïti",
-                    "Honduras": "Honduras",
-                    "Hongarije": "Hongarije",
-                    "Ierland": "Ierland",
-                    "IJsland": "IJsland",
-                    "India": "India",
-                    "Indonesië": "Indonesië",
-                    "Irak": "Irak",
-                    "Iran": "Iran",
-                    "Israël": "Israël",
-                    "Italië": "Italië",
-                    "Ivoorkust": "Ivoorkust",
-                    "Jamaica": "Jamaica",
-                    "Japan": "Japan",
-                    "Jemen": "Jemen",
-                    "Jordanië": "Jordanië",
-                    "Kaapverdië": "Kaapverdië",
-                    "Kameroen": "Kameroen",
-                    "Kazachstan": "Kazachstan",
-                    "Kenia": "Kenia",
-                    "Kirgizië": "Kirgizië",
-                    "Kiribati": "Kiribati",
-                    "Koeweit": "Koeweit",
-                    "Kroatië": "Kroatië",
-                    "Laos": "Laos",
-                    "Lesotho": "Lesotho",
-                    "Letland": "Letland",
-                    "Libanon": "Libanon",
-                    "Liberia": "Liberia",
-                    "Libië": "Libië",
-                    "Liechtenstein": "Liechtenstein",
-                    "Litouwen": "Litouwen",
-                    "Luxemburg": "Luxemburg",
-                    "Madagaskar": "Madagaskar",
-                    "Malawi": "Malawi",
-                    "Malediven": "Malediven",
-                    "Maleisië": "Maleisië",
-                    "Mali": "Mali",
-                    "Malta": "Malta",
-                    "Marokko": "Marokko",
-                    "Marshalleilanden": "Marshalleilanden",
-                    "Mauritanië": "Mauritanië",
-                    "Mauritius": "Mauritius",
-                    "Mexico": "Mexico",
-                    "Moldavië": "Moldavië",
-                    "Monaco": "Monaco",
-                    "Mongolië": "Mongolië",
-                    "Montenegro": "Montenegro",
-                    "Mozambique": "Mozambique",
-                    "Myanmar": "Myanmar",
-                    "Namibië": "Namibië",
-                    "Nauru": "Nauru",
-                    "Nederland": "Nederland",
-                    "Nepal": "Nepal",
-                    "Nicaragua": "Nicaragua",
-                    "Nieuw-Zeeland": "Nieuw-Zeeland",
-                    "Niger": "Niger",
-                    "Nigeria": "Nigeria",
-                    "Noord-Korea": "Noord-Korea",
-                    "Noord-Macedonië": "Noord-Macedonië",
-                    "Noorwegen": "Noorwegen",
-                    "Oeganda": "Oeganda",
-                    "Oekraïne": "Oekraïne",
-                    "Oezbekistan": "Oezbekistan",
-                    "Oman": "Oman",
-                    "Oostenrijk": "Oostenrijk",
-                    "Oost-Timor": "Oost-Timor",
-                    "Pakistan": "Pakistan",
-                    "Palau": "Palau",
-                    "Panama": "Panama",
-                    "Papoea-Nieuw-Guinea": "Papoea-Nieuw-Guinea",
-                    "Paraguay": "Paraguay",
-                    "Peru": "Peru",
-                    "Polen": "Polen",
-                    "Portugal": "Portugal",
-                    "Qatar": "Qatar",
-                    "Roemenië": "Roemenië",
-                    "Rusland": "Rusland",
-                    "Rwanda": "Rwanda",
-                    "Saint Kitts en Nevis": "Saint Kitts en Nevis",
-                    "Saint Lucia": "Saint Lucia",
-                    "Saint Vincent en de Grenadines": "Saint Vincent en de Grenadines",
-                    "Salomonseilanden": "Salomonseilanden",
-                    "Samoa": "Samoa",
-                    "San Marino": "San Marino",
-                    "Saoedi-Arabië": "Saoedi-Arabië",
-                    "Sao Tomé en Principe": "Sao Tomé en Principe",
-                    "Senegal": "Senegal",
-                    "Servië": "Servië",
-                    "Seychellen": "Seychellen",
-                    "Sierra Leone": "Sierra Leone",
-                    "Singapore": "Singapore",
-                    "Slovenië": "Slovenië",
-                    "Slowakije": "Slowakije",
-                    "Soedan": "Soedan",
-                    "Somalië": "Somalië",
-                    "Spanje": "Spanje",
-                    "Sri Lanka": "Sri Lanka",
-                    "Suriname": "Suriname",
-                    "Swaziland": "Swaziland",
-                    "Syrië": "Syrië",
-                    "Tanzania": "Tanzania",
-                    "Thailand": "Thailand",
-                    "Togo": "Togo",
-                    "Tonga": "Tonga",
-                    "Trinidad en Tobago": "Trinidad en Tobago",
-                    "Tsjaad": "Tsjaad",
-                    "Tsjechië": "Tsjechië",
-                    "Tunesië": "Tunesië",
-                    "Turkije": "Turkije",
-                    "Turkmenistan": "Turkmenistan",
-                    "Uruguay": "Uruguay",
-                    "Vanuatu": "Vanuatu",
-                    "Venezuela": "Venezuela",
-                    "Verenigde Arabische Emiraten": "Verenigde Arabische Emiraten",
-                    "Verenigde Staten": "Verenigde Staten",
-                    "Verenigd Koninkrijk": "Verenigd Koninkrijk",
-                    "Vietnam": "Vietnam",
-                    "Wit-Rusland": "Wit-Rusland",
-                    "Zambia": "Zambia",
-                    "Zimbabwe": "Zimbabwe",
-                    "Zuid-Afrika": "Zuid-Afrika",
-                    "Zuid-Korea": "Zuid-Korea",
-                    "Zweden": "Zweden",
-                    "Zwitserland": "Zwitserland"
-                },
-                "default_value": false,
-                "return_format": "value",
-                "multiple": 0,
-                "allow_null": 1,
-                "ui": 1,
-                "ajax": 0,
-                "placeholder": ""
-            },
-            {
-                "key": "field_654c5973563cf",
-                "label": "Company City (vacancy for another company)",
-                "name": "rv_vacancy_custom_company_city",
-                "aria-label": "",
-                "type": "select",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": [
-                    [
-                        {
-                            "field": "field_6549dc44ff28a",
-                            "operator": "==",
-                            "value": "1"
-                        },
-                        {
-                            "field": "field_6549e6f321f6a",
-                            "operator": "!=",
-                            "value": "1"
-                        }
-                    ]
-                ],
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "choices": [],
-                "default_value": false,
-                "return_format": "value",
-                "multiple": 0,
-                "allow_null": 1,
-                "ui": 1,
-                "ajax": 0,
-                "placeholder": ""
-            },
-            {
-                "key": "field_654c9adfedc37",
-                "label": "Company Address (vacancy for another company)",
-                "name": "rv_vacancy_custom_company_address",
-                "aria-label": "",
-                "type": "text",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": [
-                    [
-                        {
-                            "field": "field_6549dc44ff28a",
-                            "operator": "==",
-                            "value": "1"
-                        },
-                        {
-                            "field": "field_6549e6f321f6a",
-                            "operator": "!=",
-                            "value": "1"
-                        }
-                    ]
-                ],
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "maxlength": "",
-                "placeholder": "",
-                "prepend": "",
-                "append": ""
-            },
-            {
-                "key": "field_654c99dd94b6f",
-                "label": "Company Longitude (vacancy for another company)",
-                "name": "rv_vacancy_custom_company_longitude",
-                "aria-label": "",
-                "type": "text",
-                "instructions": "Will automatically fill by system if one of longitude or latitude is empty.",
-                "required": 0,
-                "conditional_logic": [
-                    [
-                        {
-                            "field": "field_6549dc44ff28a",
-                            "operator": "==",
-                            "value": "1"
-                        },
-                        {
-                            "field": "field_6549e6f321f6a",
-                            "operator": "!=",
-                            "value": "1"
-                        }
-                    ]
-                ],
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "maxlength": "",
-                "placeholder": "",
-                "prepend": "",
-                "append": ""
-            },
-            {
-                "key": "field_654c9a5094b70",
-                "label": "Company Latitude (vacancy for another company)",
-                "name": "rv_vacancy_custom_company_latitude",
-                "aria-label": "",
-                "type": "text",
-                "instructions": "Will automatically fill by system if one of longitude or latitude is empty.",
-                "required": 0,
-                "conditional_logic": [
-                    [
-                        {
-                            "field": "field_6549dc44ff28a",
-                            "operator": "==",
-                            "value": "1"
-                        },
-                        {
-                            "field": "field_6549e6f321f6a",
-                            "operator": "!=",
-                            "value": "1"
-                        }
-                    ]
-                ],
                 "wrapper": {
                     "width": "",
                     "class": "",
@@ -4882,132 +3427,16 @@
                     "class": "",
                     "id": ""
                 },
-                "message": "Check this option if vacancy is imported.",
+                "message": "",
                 "default_value": 0,
                 "ui": 0,
                 "ui_on_text": "",
                 "ui_off_text": ""
             },
             {
-                "key": "field_6524e6f54ddc2",
-                "label": "Vacancy Import ID",
-                "name": "rv_vacancy_imported_source_id",
-                "aria-label": "",
-                "type": "text",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": [
-                    [
-                        {
-                            "field": "field_64fe7b3186a6b",
-                            "operator": "==",
-                            "value": "1"
-                        }
-                    ]
-                ],
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "maxlength": "",
-                "placeholder": "",
-                "prepend": "",
-                "append": ""
-            },
-            {
                 "key": "field_64fe7b3f86a6c",
                 "label": "Company Name (Imported Vacancy)",
                 "name": "rv_vacancy_imported_company_name",
-                "aria-label": "",
-                "type": "text",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": [
-                    [
-                        {
-                            "field": "field_64fe7b3186a6b",
-                            "operator": "==",
-                            "value": "1"
-                        }
-                    ]
-                ],
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "maxlength": "",
-                "placeholder": "",
-                "prepend": "",
-                "append": ""
-            },
-            {
-                "key": "field_64fe85ba2eade",
-                "label": "Company Email (Imported Vacancy)",
-                "name": "rv_vacancy_imported_company_email",
-                "aria-label": "",
-                "type": "email",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": [
-                    [
-                        {
-                            "field": "field_64fe7b3186a6b",
-                            "operator": "==",
-                            "value": "1"
-                        }
-                    ]
-                ],
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "placeholder": "",
-                "prepend": "",
-                "append": ""
-            },
-            {
-                "key": "field_6544b98440385",
-                "label": "Company Sector (Imported Vacancy)",
-                "name": "rv_vacancy_imported_company_sector",
-                "aria-label": "",
-                "type": "taxonomy",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": [
-                    [
-                        {
-                            "field": "field_64fe7b3186a6b",
-                            "operator": "==",
-                            "value": "1"
-                        }
-                    ]
-                ],
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "taxonomy": "sector",
-                "add_term": 1,
-                "save_terms": 1,
-                "load_terms": 0,
-                "return_format": "id",
-                "field_type": "multi_select",
-                "allow_null": 1,
-                "bidirectional": 0,
-                "multiple": 0,
-                "bidirectional_target": []
-            },
-            {
-                "key": "field_6544b9c940386",
-                "label": "Company Total Employees (Imported Vacancy)",
-                "name": "rv_vacancy_imported_company_total_employees",
                 "aria-label": "",
                 "type": "text",
                 "instructions": "",
@@ -5089,6 +3518,33 @@
                 "append": ""
             },
             {
+                "key": "field_64fe85ba2eade",
+                "label": "Company Email (Imported Vacancy)",
+                "name": "rv_vacancy_imported_company_email",
+                "aria-label": "",
+                "type": "email",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_64fe7b3186a6b",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
                 "key": "field_64fe8bdef8bfa",
                 "label": "Company City Longitude (Imported Vacancy)",
                 "name": "rv_vacancy_imported_company_city_longitude",
@@ -5118,7 +3574,7 @@
             },
             {
                 "key": "field_64fe8dc3f8bfb",
-                "label": "Company City Latitude (Imported Vacancy)",
+                "label": "Company City Latitude (Importd Vacancy)",
                 "name": "rv_vacancy_imported_company_city_latitude",
                 "aria-label": "",
                 "type": "text",
@@ -5145,8 +3601,36 @@
                 "append": ""
             },
             {
+                "key": "field_6524e6f54ddc2",
+                "label": "Vacancy Import ID",
+                "name": "rv_vacancy_imported_source_id",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_64fe7b3186a6b",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
                 "key": "field_652cac3eeacdb",
-                "label": "Vacancy Approved By",
+                "label": "Vacancy import approved by",
                 "name": "rv_vacancy_imported_approved_by",
                 "aria-label": "",
                 "type": "user",
@@ -5157,13 +3641,6 @@
                         {
                             "field": "field_64fe7b3186a6b",
                             "operator": "==",
-                            "value": "1"
-                        }
-                    ],
-                    [
-                        {
-                            "field": "field_64d0a7570f8f2",
-                            "operator": "!=",
                             "value": "1"
                         }
                     ]
@@ -5184,7 +3661,7 @@
             },
             {
                 "key": "field_652cb51d484bd",
-                "label": "Vacancy Approval Status",
+                "label": "Vacancy import approval status",
                 "name": "rv_vacancy_imported_approval_status",
                 "aria-label": "",
                 "type": "select",
@@ -5197,13 +3674,6 @@
                             "operator": "==",
                             "value": "1"
                         }
-                    ],
-                    [
-                        {
-                            "field": "field_64d0a7570f8f2",
-                            "operator": "!=",
-                            "value": "1"
-                        }
                     ]
                 ],
                 "wrapper": {
@@ -5212,7 +3682,7 @@
                     "id": ""
                 },
                 "choices": {
-                    "admin-approved": "Admin Approved",
+                    "admin-approved": "Approved",
                     "system-approved": "System Approved",
                     "rejected": "Rejected",
                     "waiting": "Waiting for approval"
