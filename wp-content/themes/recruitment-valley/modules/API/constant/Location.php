@@ -11,7 +11,7 @@ class LocationConstant
 
     public static function cities(String $country = 'all')
     {
-        if ($country == 'all') {
+        if ($country == 'all' || empty($country)) {
             $cities = file_get_contents(self::cityDir . 'all.json');
         } else {
             $cities = file_get_contents(self::cityDir . $country . '.json');

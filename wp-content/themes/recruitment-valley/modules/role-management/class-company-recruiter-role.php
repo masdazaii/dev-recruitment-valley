@@ -132,6 +132,8 @@ class RecruiterRole
         $site_title = $blogname ?? get_bloginfo('name') ?? 'Recruitment Valley';
         $newUserNotificationEmail['subject']  = "{$site_title} - New User Registration";
         $newUserNotificationEmail['message']  = Email::render_html_email('new-recruiter-registered-email-admin.php', $args);
+
+        return $newUserNotificationEmail;
     }
 
     public function addCompanyRecruiterMeta(Int $userID, array $userdata = [])
