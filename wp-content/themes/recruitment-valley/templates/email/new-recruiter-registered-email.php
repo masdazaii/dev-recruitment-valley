@@ -415,13 +415,13 @@
                                         line-height: 24px;
                                         color: #1f1f1f;
                                       ">
-                                    Welcome to our site {{ site_name }}. <br /><br />
+                                    Welkom op onze site {{ site_name }}. <br /><br />
 
-                                    With your account you can post and maintain your vacancies yourself. <br /><br />
+                                    Met uw account kunt u zelf uw vacatures plaatsen en onderhouden. <br /><br />
 
-                                    Your login information is as follow : <br />
-                                    Your email / username : {{ user_email }} <br />
-                                    You can set your password by following this url : <a href="{{ set_password_url }}">change password</a>
+                                    De inloggegevens zijn als volgt: <br />
+                                    Uw e-mailadres / gebruikersnaam: <b>{{ user_email }}</b> <br />
+                                    U kunt uw wachtwoord instellen door op deze url te klikken: <a href="{{ set_password_url }}">wachtwoord wijzigen</a>
                                     <br /><br />
 
                                     Tip: Vergeet je bedrijfsprofiel niet volledig in te vullen!
