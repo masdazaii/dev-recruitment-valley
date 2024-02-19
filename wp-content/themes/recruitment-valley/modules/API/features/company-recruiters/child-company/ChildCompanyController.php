@@ -348,12 +348,24 @@ class ChildCompanyController extends BaseController
 
         try {
             if (is_numeric($request['childCompany'])) {
+                /** Log Data */
+                $logData['findBy'] = 'id';
+
                 $childCompanyModel = ChildCompany::find('id', $request['childCompany']);
             } else if (is_string($request['childCompany']) && (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $request['childCompany']) == 1)) {
+                /** Log Data */
+                $logData['findBy'] = 'uuid';
+
                 $childCompanyModel = ChildCompany::find('uuid', $request['childCompany']);
             } else if (is_string($request['childCompany']) && strpos($request['childCompany'], '-') != false) {
+                /** Log Data */
+                $logData['findBy'] = 'slug';
+
                 $childCompanyModel = ChildCompany::find('slug', $request['childCompany']);
             } else {
+                /** Log Data */
+                $logData['findBy'] = 'slug';
+
                 $childCompanyModel = ChildCompany::find('slug', $request['childCompany']);
             }
 
