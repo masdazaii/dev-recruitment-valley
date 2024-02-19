@@ -405,6 +405,14 @@ class FlexFeedController
                             /** Get closest role */
                             $taxonomy['role'] = CalculateHelper::calcLevenshteinCost($this->_keywords, strtolower(preg_replace('/[\n\t]+/', '', $jobs[$i]->category)), 5, 1, 1, 1, 'array');
 
+                            /** Set Meta
+                             * This to accommodate the imported data from text kernel structure which is label-value
+                             */
+                            $apiTerms['experiences'][] = [
+                                'value' => $jobs[$i]->category,
+                                'label' => $jobs[$i]->category
+                            ];
+
                             /** Set Role
                              *
                              * update 23 January 2024

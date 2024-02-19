@@ -1758,11 +1758,11 @@ class Vacancy
 
     public function getRecommendedJobs()
     {
-        $recommendedJobs = get_field( $this->option_page_recommended_jobs, 'option'  );
+        $recommendedJobs = get_field($this->option_page_recommended_jobs, 'option');
 
         return $recommendedJobs ?? [];
     }
-    
+
     /**
      * Select vacancy by status and userID function
      *
@@ -1797,7 +1797,12 @@ class Vacancy
      */
     public function checkIsBelongToCompanyRecruiter(): bool
     {
-        return $this->getProp(self::_acf_is_from_company_recruiter, true);
+        $value = $this->getProp(self::_acf_is_from_company_recruiter, true);
+        if ($value) {
+            return $value;
+        } else {
+            return false;
+        }
     }
 
     /**
