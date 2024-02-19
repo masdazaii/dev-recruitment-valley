@@ -23,3 +23,4 @@ require_once __DIR__ . '/class-import-api-option.php';
 require_once __DIR__ . '/class-aws-option.php';
 // require_once __DIR__ . '/class-rss-option.php';
 require_once __DIR__ . '/class-dev-option.php';
+require_once __DIR__ . '/class-recommended-job-option.php';

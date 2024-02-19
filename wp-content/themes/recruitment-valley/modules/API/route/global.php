@@ -20,6 +20,7 @@ use Global\CouponService;
 use Global\Rss\RssService;
 use Global\FAQ\FaqService;
 use Middleware\DevMiddleware;
+use RecommendedJobService;
 
 class GlobalEndpoint
 {
@@ -53,6 +54,7 @@ class GlobalEndpoint
         $rssService = new RssService;
         $faqService = new FaqService;
         $devMiddleware = new DevMiddleware; // Middleware to handle endpoint that only for Developer
+        $recommendedJobService = new RecommendedJobService;
 
         $endpoint = [
             'path' => '',
@@ -319,6 +321,14 @@ class GlobalEndpoint
                     'method'                => 'GET',
                     'permission_callback'   => '__return_true',
                     'callback'              => [$faqService, 'list']
+                ],
+
+                // recommended jobs
+                'recommended_job' => [
+                    'url'                   => 'recommended-vacancies',
+                    'method'                => 'GET',
+                    'permission_callback'   => '__return_true',
+                    'callback'              => [$recommendedJobService, 'lists']
                 ]
             ]
 
