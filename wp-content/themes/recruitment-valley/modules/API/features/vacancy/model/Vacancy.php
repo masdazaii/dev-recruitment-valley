@@ -44,6 +44,8 @@ class Vacancy
     public $thumbnail;
     public $desscription;
 
+    public const trash_status = 'trash';
+
     // acf field
     public $acf_description = "description";
     public $acf_term = "term";
@@ -629,6 +631,11 @@ class Vacancy
         return $vacancySitemap;
     }
 
+    /**
+     * Soft Delete function
+     *
+     * @return integer|WP_Error
+     */
     public function trash(): int|WP_Error
     {
         $trashed = wp_update_post([
@@ -637,6 +644,20 @@ class Vacancy
         ]);
 
         return $trashed;
+    }
+
+    /**
+     * Check if vacancy is trashed function
+     *
+     * @return boolean
+     */
+    public function isTrash(): bool
+    {
+        if (isset($this->vacancy)) {
+            return $this->vacancy->post_status === self::trash_status;
+        } else {
+            throw new Exception('Please specify vacancy!');
+        }
     }
 
     public function getBySlug(String $slug)

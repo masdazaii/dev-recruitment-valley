@@ -990,39 +990,87 @@ class VacancyCrudController
         ];
         Log::info("Trash vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_trash_vacancy');
 
-        $vacancy = new Vacancy($request["vacancy_id"]);
+        $this->wpdb->query("START TRANSACTION");
+        try {
+            $vacancy = new Vacancy($request["vacancy_id"]);
 
-        if ($request["user_id"] != $vacancy->getAuthor()) {
+            if ($vacancy->isTrash()) {
+                /** Log attempt */
+                $logData['message'] = "ALREADY DELETED!";
+                $logData['status']  = $vacancy->vacancy->post_status;
+                Log::error("Fail Trash vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_trash_vacancy');
+
+                return [
+                    "status"    => 400,
+                    "message"   => $this->_message->get("vacancy.trash.fail")
+                ];
+            }
+
+            if ($request["user_id"] != $vacancy->getAuthor()) {
+                /** Log attempt */
+                $logData['message'] = 'UNAUTHORIZED!';
+                Log::error("Fail Trash vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_trash_vacancy');
+
+                return [
+                    "status"    => 400,
+                    "message"   => $this->_message->get("vacancy.trash.not_authorized")
+                ];
+            }
+
+            $trashed = $vacancy->trash();
+
+            if (is_wp_error($trashed)) {
+                /** Log attempt */
+                $logData['message'] = "WP_ERROR {$trashed->get_error_message()}!";
+                Log::error("Fail Trash vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_trash_vacancy');
+
+                return [
+                    "status"    => 500,
+                    "message"   => $this->_message->get("vacancy.trash.fail")
+                ];
+            }
+
+            $this->wpdb->query('COMMIT');
+
             /** Log attempt */
-            $logData['message'] = 'UNAUTHORIZED!';
-            Log::error("Fail Trash vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_trash_vacancy');
+            $logData['trash']   = $trashed;
+            Log::info("End Trash vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_trash_vacancy');
 
             return [
-                "status"    => 400,
-                "message"   => $this->_message->get("vacancy.trash.not_authorized")
+                "status" => 200,
+                "message" => $this->_message->get("vacancy.trash.success")
             ];
-        }
+        } catch (\WP_Error $wp) {
+            /** Log Attempt */
+            $logData['message'] = $wp->get_error_message();
+            Log::error("FAIL trash vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_trash_vacancy');
 
-        $trashed = $vacancy->trash();
-
-        if (is_wp_error($trashed)) {
-            /** Log attempt */
-            $logData['message'] = "WP_ERROR {$trashed->get_error_message()}!";
-            Log::error("Fail Trash vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_trash_vacancy');
-
+            $this->wpdb->query('ROLLBACK');
             return [
-                "status"    => 500,
-                "message"   => $this->_message->get("vacancy.trash.fail")
+                "status" => 500,
+                "message" => $wp->get_error_message(),
+            ];
+        } catch (Exception $e) {
+            /** Log Attempt */
+            $logData['message'] = $e->getMessage();
+            Log::error("FAIL trash vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_trash_vacancy');
+
+            $this->wpdb->query('ROLLBACK');
+            return [
+                "status" => 400,
+                "message" => $this->_message->get("system.overall_failed")
+            ];
+        } catch (\Throwable $th) {
+            /** Log Attempt */
+            $logData['message'] = $th->getMessage();
+            Log::error("FAIL trash vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_trash_vacancy');
+
+            $this->wpdb->query('ROLLBACK');
+            return [
+                "status" => 400,
+                "message" => $this->_message->get("system.overall_failed")
             ];
         }
-        /** Log attempt */
-        $logData['trash']   = $trashed;
-        Log::info("End Trash vacancy attempt.", json_encode($logData, JSON_PRETTY_PRINT), date('Y_m_d') . '_log_trash_vacancy');
-
-        return [
-            "status" => 200,
-            "message" => $this->_message->get("vacancy.trash.success")
-        ];
     }
 
     /**
