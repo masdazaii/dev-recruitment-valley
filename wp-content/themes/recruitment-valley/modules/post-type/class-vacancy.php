@@ -418,127 +418,129 @@ class Vacancy extends RegisterCPT
     public function vacancySubmitHandle($post_id, $post, $update)
     {
         if ($post->post_type == 'vacancy') {
-            $this->wpdb->query('START TRANSACTION');
-            try {
-                $vacancyModel = new VacancyModel($post_id);
-                $vacancyData = [];
+            if ($post->post_status !== 'trash') {
+                $this->wpdb->query('START TRANSACTION');
+                try {
+                    $vacancyModel = new VacancyModel($post_id);
+                    $vacancyData = [];
 
-                /** Calculate Vacancy City Coordiante */
-                // Check if city is not empty,
-                $vacancyData['city'] = $vacancyModel->getCity();
-                $vacancyData['city_latitude'] = $vacancyModel->getCityLongLat('latitude');
-                $vacancyData['city_longitude'] = $vacancyModel->getCityLongLat('longitude');
-                error_log(json_encode($vacancyData));
+                    /** Calculate Vacancy City Coordiante */
+                    // Check if city is not empty,
+                    $vacancyData['city'] = $vacancyModel->getCity();
+                    $vacancyData['city_latitude'] = $vacancyModel->getCityLongLat('latitude');
+                    $vacancyData['city_longitude'] = $vacancyModel->getCityLongLat('longitude');
+                    error_log(json_encode($vacancyData));
 
-                if ($vacancyData['city']) {
-                    if (!$vacancyData['city_longitude'] || empty($vacancyData['city_longitude']) || !$vacancyData['city_longitude'] || empty($vacancyData['city_longitude'])) {
-                        /** Calculate Coordinate */
-                        $vacancyModel->setCityLongLat($vacancyData['city']);
-                        $vacancyData['city_latitude'] = $vacancyModel->getCityLongLat('latitude');
-                        $vacancyData['city_longitude'] = $vacancyModel->getCityLongLat('longitude');
+                    if ($vacancyData['city']) {
+                        if (!$vacancyData['city_longitude'] || empty($vacancyData['city_longitude']) || !$vacancyData['city_longitude'] || empty($vacancyData['city_longitude'])) {
+                            /** Calculate Coordinate */
+                            $vacancyModel->setCityLongLat($vacancyData['city']);
+                            $vacancyData['city_latitude'] = $vacancyModel->getCityLongLat('latitude');
+                            $vacancyData['city_longitude'] = $vacancyModel->getCityLongLat('longitude');
+                        }
                     }
-                }
 
-                /** Vacancy Placement Address Coordinatee */
-                $vacancyData['placement_address'] = $vacancyModel->getPlacementAddress();
+                    /** Vacancy Placement Address Coordinatee */
+                    $vacancyData['placement_address'] = $vacancyModel->getPlacementAddress();
 
-                /** Check if placement address is not empty */
-                if (isset($vacancyData['placement_address']) && !empty($vacancyData['placement_address'])) {
-                    $vacancyData['placement_address_latitude']   = $vacancyModel->getPlacementAddressLatitude();
-                    $vacancyData['placement_address_longitude']  = $vacancyModel->getPlacementAddressLongitude();
-                    if (!$vacancyData['placement_address_latitude'] || !$vacancyData['placement_address_longitude']) {
-                        /** Calculate Coordinate */
-                        $vacancyModel->setPlacementAddressLongitude($vacancyData['placement_address']);
-
+                    /** Check if placement address is not empty */
+                    if (isset($vacancyData['placement_address']) && !empty($vacancyData['placement_address'])) {
                         $vacancyData['placement_address_latitude']   = $vacancyModel->getPlacementAddressLatitude();
                         $vacancyData['placement_address_longitude']  = $vacancyModel->getPlacementAddressLongitude();
+                        if (!$vacancyData['placement_address_latitude'] || !$vacancyData['placement_address_longitude']) {
+                            /** Calculate Coordinate */
+                            $vacancyModel->setPlacementAddressLongitude($vacancyData['placement_address']);
+
+                            $vacancyData['placement_address_latitude']   = $vacancyModel->getPlacementAddressLatitude();
+                            $vacancyData['placement_address_longitude']  = $vacancyModel->getPlacementAddressLongitude();
+                        }
                     }
-                }
 
-                /** Set Distance */
-                error_log('the distance : ' . json_encode($vacancyModel->getDistance()));
-                if (!$vacancyModel->getDistance()) {
-                    error_log($post_id . ' - no distance');
-                    if ($vacancyData['city_latitude'] && $vacancyData['city_longitude'] && $vacancyData['placement_address_latitude'] && $vacancyData['placement_address_longitude']) {
-                        error_log($post_id . ' - setCoordinateDistance');
-                        $setCD = $vacancyModel->setCoordinateDistance([
-                            'lat' => $vacancyData['city_latitude'],
-                            'long' => $vacancyData['city_longitude']
-                        ], [
-                            'lat' => $vacancyData['placement_address_latitude'],
-                            'long' => $vacancyData['placement_address_longitude']
-                        ]);
-                        error_log($post_id . ' - setCoordinateDistance. ' . json_encode($setCD));
-                    } else if ($vacancyData['city'] && $vacancyData['placement_address']) {
-                        error_log($post_id . ' - setDistance');
-                        $setCD = $vacancyModel->setDistance($vacancyData["placement_city"], $vacancyData["placement_city"] . " " . $vacancyData["placement_address"]);
-                        error_log($post_id . ' - setDistance. ' . json_encode($setCD));
+                    /** Set Distance */
+                    error_log('the distance : ' . json_encode($vacancyModel->getDistance()));
+                    if (!$vacancyModel->getDistance()) {
+                        error_log($post_id . ' - no distance');
+                        if ($vacancyData['city_latitude'] && $vacancyData['city_longitude'] && $vacancyData['placement_address_latitude'] && $vacancyData['placement_address_longitude']) {
+                            error_log($post_id . ' - setCoordinateDistance');
+                            $setCD = $vacancyModel->setCoordinateDistance([
+                                'lat' => $vacancyData['city_latitude'],
+                                'long' => $vacancyData['city_longitude']
+                            ], [
+                                'lat' => $vacancyData['placement_address_latitude'],
+                                'long' => $vacancyData['placement_address_longitude']
+                            ]);
+                            error_log($post_id . ' - setCoordinateDistance. ' . json_encode($setCD));
+                        } else if ($vacancyData['city'] && $vacancyData['placement_address']) {
+                            error_log($post_id . ' - setDistance');
+                            $setCD = $vacancyModel->setDistance($vacancyData["placement_city"], $vacancyData["placement_city"] . " " . $vacancyData["placement_address"]);
+                            error_log($post_id . ' - setDistance. ' . json_encode($setCD));
+                        }
                     }
-                }
 
-                /** Custom Company Address Coordinate */
-                /** Check if is_for_another_company */
-                if ($vacancyModel->checkIsForAnotherCompany()) {
-                    /** Check if not use_existing_company */
-                    if (!$vacancyModel->checkUseExistingCompany()) {
-                        $companyData['address_longitude'] = $vacancyModel->getCustomCompanyCoordinate('longitude');
-                        $companyData['address_latitude'] = $vacancyModel->getCustomCompanyCoordinate('latitude');
-                        $companyData['address'] = $vacancyModel->getCustomCompanyAddress();
+                    /** Custom Company Address Coordinate */
+                    /** Check if is_for_another_company */
+                    if ($vacancyModel->checkIsForAnotherCompany()) {
+                        /** Check if not use_existing_company */
+                        if (!$vacancyModel->checkUseExistingCompany()) {
+                            $companyData['address_longitude'] = $vacancyModel->getCustomCompanyCoordinate('longitude');
+                            $companyData['address_latitude'] = $vacancyModel->getCustomCompanyCoordinate('latitude');
+                            $companyData['address'] = $vacancyModel->getCustomCompanyAddress();
 
-                        if (!$companyData['address_longitude'] || !$companyData['address_latitude']) {
-                            if ($companyData['address']) {
-                                $coordinat = Maphelper::generateLongLat($companyData['address']);
-                                $vacancyModel->setCustomCompanyLatitude($coordinat["lat"]);
-                                $vacancyModel->setCustomCompanyLongitude($coordinat["long"]);
+                            if (!$companyData['address_longitude'] || !$companyData['address_latitude']) {
+                                if ($companyData['address']) {
+                                    $coordinat = Maphelper::generateLongLat($companyData['address']);
+                                    $vacancyModel->setCustomCompanyLatitude($coordinat["lat"]);
+                                    $vacancyModel->setCustomCompanyLongitude($coordinat["long"]);
+                                }
                             }
                         }
                     }
-                }
 
-                $this->wpdb->query('COMMIT');
+                    $this->wpdb->query('COMMIT');
 
-                /** Set status
-                 * IF free vacancy :
-                 *   - if new vacancy & if no status : set to processing.
-                 * IF paid vacancy :
-                 *   - if new vacancy & if no status : set to open.
-                 *
-                 * IF UPDATE then skip.
-                 *  */
-                if (!$update || !wp_is_post_revision($post)) {
-                    if ($vacancyModel->getIsPaid()) {
-                        /** if vacancy has no status, set to open */
-                        $vacancyStatus = $vacancyModel->getStatus();
-                        if (isset($vacancyStatus) && is_array($vacancyStatus)) {
-                            if (!empty($vacancyStatus['name'])) {
-                                if ($vacancyStatus['name'] !== 'open') {
+                    /** Set status
+                     * IF free vacancy :
+                     *   - if new vacancy & if no status : set to processing.
+                     * IF paid vacancy :
+                     *   - if new vacancy & if no status : set to open.
+                     *
+                     * IF UPDATE then skip.
+                     *  */
+                    if (!$update || !wp_is_post_revision($post)) {
+                        if ($vacancyModel->getIsPaid()) {
+                            /** if vacancy has no status, set to open */
+                            $vacancyStatus = $vacancyModel->getStatus();
+                            if (isset($vacancyStatus) && is_array($vacancyStatus)) {
+                                if (!empty($vacancyStatus['name'])) {
+                                    if ($vacancyStatus['name'] !== 'open') {
+                                        $test = $vacancyModel->setStatus('open');
+                                    }
+                                } else {
                                     $test = $vacancyModel->setStatus('open');
                                 }
                             } else {
-                                $test = $vacancyModel->setStatus('open');
+                                $vacancyModel->setStatus('open');
                             }
                         } else {
-                            $vacancyModel->setStatus('open');
-                        }
-                    } else {
-                        $vacancyStatus = $vacancyModel->getStatus();
+                            $vacancyStatus = $vacancyModel->getStatus();
 
-                        if (isset($vacancyStatus) && is_array($vacancyStatus)) {
-                            if (!empty($vacancyStatus['name'])) {
-                                if ($vacancyStatus['name'] !== 'processing') {
+                            if (isset($vacancyStatus) && is_array($vacancyStatus)) {
+                                if (!empty($vacancyStatus['name'])) {
+                                    if ($vacancyStatus['name'] !== 'processing') {
+                                        $vacancyModel->setStatus('processing');
+                                    }
+                                } else {
                                     $vacancyModel->setStatus('processing');
                                 }
                             } else {
                                 $vacancyModel->setStatus('processing');
                             }
-                        } else {
-                            $vacancyModel->setStatus('processing');
                         }
                     }
+                } catch (\Exception $e) {
+                    $this->wpdb->query('ROLLBACK');
+                    error_log($e->getMessage());
                 }
-            } catch (\Exception $e) {
-                $this->wpdb->query('ROLLBACK');
-                error_log($e->getMessage());
             }
         }
     }
