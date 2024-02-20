@@ -2080,7 +2080,7 @@ class Vacancy
      * 
      * @return void
      */
-    public function getCompanyName() : string
+    public function getCompanyName()
     {
         if($this->checkImported())
         {
