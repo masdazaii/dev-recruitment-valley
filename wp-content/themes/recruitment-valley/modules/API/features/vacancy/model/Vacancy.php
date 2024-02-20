@@ -7,6 +7,8 @@ use Exception;
 use Helper;
 use Helper\Maphelper;
 use Log;
+use Model\ChildCompany;
+use Model\Company;
 use WP_Error;
 use WP_Post;
 use WP_Query;
@@ -2070,5 +2072,39 @@ class Vacancy
         }
 
         return $args;
+    }
+    
+    /**
+     * getAdvanceAuthor
+     * check wheter the job is stand alone job, job for another company, or jon that companyrecruiter job
+     * 
+     * @return void
+     */
+    public function getCompanyName() : string
+    {
+        if($this->checkImported())
+        {
+            return $this->getImportedCompanyName() ?? '';
+        }else if($this->checkIsForAnotherCompany()){
+            if($this->checkUseExistingCompany()){
+                $selectedCompany = $this->getSelectedCompany();
+                if($selectedCompany){
+                    $company = new Company($selectedCompany);
+                    return $company->getName();
+                }else{
+                    return $this->getCustomCompanyName();    
+                }
+            }else{
+                return $this->getCustomCompanyName();
+            }
+        }else if( $this->checkIsBelongToCompanyRecruiter() ){
+            $childCompany = $this->getAssignedChildCompany();
+            $childCompany = ChildCompany::find('id', $childCompany);
+
+            return $childCompany->getName();
+        }else{
+            $company = new Company($this->getAuthor());
+            return $company->getName();
+        }
     }
 }

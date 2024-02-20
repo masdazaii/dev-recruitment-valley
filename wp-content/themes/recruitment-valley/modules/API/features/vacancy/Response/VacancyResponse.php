@@ -95,6 +95,7 @@ class VacancyResponse
                 "description" => StringHelper::shortenString($vacancyModel->getDescription(), 0, 10000),
                 // "postedDate" => date_format(new DateTime($vacancy->post_date_gmt), "Y-m-d H:i A")
                 "postedDate" => DateHelper::doLocale($vacancy->post_date_gmt, 'nl_NL'),
+                "company" => $vacancyModel->getCompanyName(),
                 "isNew" => date('Y-m-d') === date('Y-m-d', strtotime($vacancy->post_date_gmt)),
                 "experiences" => $vacancyTaxonomy["experiences"] ?? null,
                 "status" => $vacancyTaxonomy["status"] ?? null,
