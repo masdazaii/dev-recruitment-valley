@@ -25,7 +25,7 @@ class CompanyRecruiterReportCPT extends RegisterCPT
         global $wpdb;
         $this->wpdb             = $wpdb;
         $this->_message         = new Message();
-        error_log('CompanyRecruiterReportCPT');
+
         add_action('init', [$this, 'registerCompanyRecruiterReportCPT']);
         add_filter("manage_recruiter-report_posts_columns", [$this, 'companyRecruiterReportColoumn'], 10, 1);
         add_action("manage_recruiter-report_posts_custom_column", [$this, 'companyRecruiterReportCustomColoumn'], 10, 2);

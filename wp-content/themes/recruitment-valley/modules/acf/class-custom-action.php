@@ -19,7 +19,7 @@ class AcfCustomAction
         try {
             $this->wpdb->query("START TRANSACTION");
             $post = get_post($post_id);
-            if (property_exists($post, 'post_type')) {
+            if ($post instanceof WP_Post && property_exists($post, 'post_type')) {
                 if ($post->post_type == "vacancy") {
                     $vacancy = new Vacancy($post_id);
 

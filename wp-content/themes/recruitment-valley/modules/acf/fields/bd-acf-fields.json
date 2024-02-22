@@ -1511,6 +1511,26 @@
         "title": "Import API Byner Settings",
         "fields": [
             {
+                "key": "field_65d720c9ff708",
+                "label": "Byner Grant Type",
+                "name": "rv_byner_grant_type",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
                 "key": "field_65d5b364646e7",
                 "label": "Byner Client ID",
                 "name": "rv_byner_client_id",
@@ -1582,6 +1602,26 @@
                     "class": "",
                     "id": ""
                 },
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_65d71239c2c1d",
+                "label": "Byner Internal Channel",
+                "name": "rv_byner_internal_channel",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
                 "placeholder": "",
                 "prepend": "",
                 "append": ""

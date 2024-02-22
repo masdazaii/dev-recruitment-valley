@@ -13,13 +13,15 @@ class ImportService
     private $_nvbController;
     private $_flexFeedController;
     private $_jobfeedController;
+    private $_bynerController;
 
     public function __construct()
     {
         // $this->flexFeedController = new FlexFeedController;
-        $this->_flexFeedController = new FlexFeedController(FLEXFEED_API_URL ?? NULL);
-        $this->_nvbController = new NVBController();
-        $this->_jobfeedController = new JobfeedController();
+        $this->_flexFeedController  = new FlexFeedController(FLEXFEED_API_URL ?? NULL);
+        $this->_nvbController       = new NVBController();
+        $this->_jobfeedController   = new JobfeedController();
+        $this->_bynerController     = new BynerController(BYNER_AUTH_PATH ?? NULL);
     }
 
     // public function flexFeed()
@@ -61,6 +63,16 @@ class ImportService
     {
         $params = $request->get_params();
         $this->_jobfeedController->expire($params, 1, 0);
+        return ResponseHelper::build([
+            'status' => 200,
+            'message' => 'done'
+        ]);
+    }
+
+    public function bynerImport(WP_REST_Request $request)
+    {
+        $params = $request->get_params();
+        $this->_jobfeedController->import($params, 1, 0);
         return ResponseHelper::build([
             'status' => 200,
             'message' => 'done'

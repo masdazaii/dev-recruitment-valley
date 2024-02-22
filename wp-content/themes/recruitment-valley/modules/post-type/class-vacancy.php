@@ -13,6 +13,7 @@ use Helper\Maphelper;
 use MI\Base\Bag\CollectionBag;
 use Model\Term;
 use WP_Error;
+use WP_Post;
 
 class Vacancy extends RegisterCPT
 {
@@ -131,85 +132,87 @@ class Vacancy extends RegisterCPT
     public function setExpiredDate($object_id, $terms = [], $tt_ids = [], $taxonomy = '', $append = true, $old_tt_ids = [])
     {
         $post = get_post($object_id, 'object');
-        if ($post->post_type == 'vacancy') {
-            $this->wpdb->query("START TRANSACTION");
+        if ($post instanceof WP_Post && property_exists($post, 'post_type')) {
+            if ($post->post_type == 'vacancy') {
+                $this->wpdb->query("START TRANSACTION");
 
-            error_log('class-vacancy - method : setExpiredDate - Before try to update the expired date.');
-            error_log('class-vacancy - method : setExpiredDate - post : ' . $object_id . ' - terms : ' . json_encode($terms));
+                error_log('class-vacancy - method : setExpiredDate - Before try to update the expired date.');
+                error_log('class-vacancy - method : setExpiredDate - post : ' . $object_id . ' - terms : ' . json_encode($terms));
 
-            try {
-                $openTerm = get_term_by('slug', 'open', 'status', 'OBJECT');
-                $declineTerm = get_term_by('slug', 'declined', 'status', 'OBJECT');
-                $vacancyModel = new VacancyModel($object_id);
+                try {
+                    $openTerm = get_term_by('slug', 'open', 'status', 'OBJECT');
+                    $declineTerm = get_term_by('slug', 'declined', 'status', 'OBJECT');
+                    $vacancyModel = new VacancyModel($object_id);
 
-                if ($taxonomy === 'status' && in_array($openTerm->term_id, $terms)) {
-                    /** Do only if vacancy is free */
-                    if (!get_field('is_paid', $object_id, true)) {
-                        /** Only set expired date if vacancy is free and not imported vacancy */
-                        if ($vacancyModel->checkImported()) {
-                            if ($vacancyModel->getImportedSource() == 'flexfeed') {
-                                /** Get imported expired Date */
-                                $vacancyExpiredDate = $vacancyModel->getExpiredAt('Y-m-d H:i:s');
+                    if ($taxonomy === 'status' && in_array($openTerm->term_id, $terms)) {
+                        /** Do only if vacancy is free */
+                        if (!get_field('is_paid', $object_id, true)) {
+                            /** Only set expired date if vacancy is free and not imported vacancy */
+                            if ($vacancyModel->checkImported()) {
+                                if ($vacancyModel->getImportedSource() == 'flexfeed') {
+                                    /** Get imported expired Date */
+                                    $vacancyExpiredDate = $vacancyModel->getExpiredAt('Y-m-d H:i:s');
 
-                                /** Update options "job_expires" */
-                                $optionController       = new OptionController();
-                                $updateOptionJobExpires = $optionController->updateExpiredOptions($object_id, $vacancyExpiredDate, 'class-vacancy.php', 'setExpiredDate');
-                                error_log("[IMPORT][flexfeed][{$object_id}] Set expired date option : is updated : " . $updateOptionJobExpires . " - updated data : " . json_encode(get_option("job_expires")) . " - Logged By Vacancy::setExpiredDate");
+                                    /** Update options "job_expires" */
+                                    $optionController       = new OptionController();
+                                    $updateOptionJobExpires = $optionController->updateExpiredOptions($object_id, $vacancyExpiredDate, 'class-vacancy.php', 'setExpiredDate');
+                                    error_log("[IMPORT][flexfeed][{$object_id}] Set expired date option : is updated : " . $updateOptionJobExpires . " - updated data : " . json_encode(get_option("job_expires")) . " - Logged By Vacancy::setExpiredDate");
+                                }
+                            } else {
+                                /** Update the expired date */
+                                $today = new DateTimeImmutable("now");
+                                $vacancyExpiredDate = $today->modify("+30 days")->format("Y-m-d H:i:s");
+
+                                $setExpired = $vacancyModel->setProp($vacancyModel->acf_expired_at, $vacancyExpiredDate);
+
+                                /** If success update vacancy expired date */
+                                if ($setExpired) {
+                                    /** Update options "job_expires" */
+                                    $optionController       = new OptionController();
+                                    $updateOptionJobExpires = $optionController->updateExpiredOptions($object_id, $vacancyExpiredDate, 'class-vacancy.php', 'setExpiredDate');
+                                    error_log("[SUBMITED][{$object_id}] Set expired date option : is updated : " . $updateOptionJobExpires . " - updated data : " . json_encode(get_option('job_expires')) . " - Logged By Vacancy::setExpiredDate");
+                                }
                             }
-                        } else {
-                            /** Update the expired date */
-                            $today = new DateTimeImmutable("now");
-                            $vacancyExpiredDate = $today->modify("+30 days")->format("Y-m-d H:i:s");
 
-                            $setExpired = $vacancyModel->setProp($vacancyModel->acf_expired_at, $vacancyExpiredDate);
+                            /** Set Approval status */
+                            $vacancyModel->setApprovedStatus('admin-approved');
+                            $vacancyModel->setApprovedBy(get_current_user_id());
+                            $vacancyModel->setApprovedAt('now');
 
-                            /** If success update vacancy expired date */
-                            if ($setExpired) {
-                                /** Update options "job_expires" */
-                                $optionController       = new OptionController();
-                                $updateOptionJobExpires = $optionController->updateExpiredOptions($object_id, $vacancyExpiredDate, 'class-vacancy.php', 'setExpiredDate');
-                                error_log("[SUBMITED][{$object_id}] Set expired date option : is updated : " . $updateOptionJobExpires . " - updated data : " . json_encode(get_option('job_expires')) . " - Logged By Vacancy::setExpiredDate");
-                            }
+                            /** Create notification : vacancy is approved */
+                            $this->_notification->write($this->_notificationConstant::VACANCY_PUBLISHED, $vacancyModel->getAuthor(), [
+                                'id'    => $object_id,
+                                'slug'  => $vacancyModel->getSlug(),
+                                'title' => $vacancyModel->getTitle()
+                            ]);
                         }
+                    }
 
+                    if ($taxonomy === 'status' && in_array($declineTerm->term_id, $terms)) {
                         /** Set Approval status */
                         $vacancyModel->setApprovedStatus('admin-approved');
                         $vacancyModel->setApprovedBy(get_current_user_id());
                         $vacancyModel->setApprovedAt('now');
 
                         /** Create notification : vacancy is approved */
-                        $this->_notification->write($this->_notificationConstant::VACANCY_PUBLISHED, $vacancyModel->getAuthor(), [
+                        $this->_notification->write($this->_notificationConstant::VACANCY_REJECTED, $vacancyModel->getAuthor(), [
                             'id'    => $object_id,
                             'slug'  => $vacancyModel->getSlug(),
                             'title' => $vacancyModel->getTitle()
                         ]);
                     }
+
+                    $this->wpdb->query("COMMIT");
+                } catch (\WP_Error $err) {
+                    $this->wpdb->query("ROLLBACK");
+                    error_log($err->get_error_message());
+                } catch (\Exception $e) {
+                    $this->wpdb->query("ROLLBACK");
+                    error_log($e->getMessage());
+                } catch (\Throwable $th) {
+                    $this->wpdb->query("ROLLBACK");
+                    error_log($th->getMessage());
                 }
-
-                if ($taxonomy === 'status' && in_array($declineTerm->term_id, $terms)) {
-                    /** Set Approval status */
-                    $vacancyModel->setApprovedStatus('admin-approved');
-                    $vacancyModel->setApprovedBy(get_current_user_id());
-                    $vacancyModel->setApprovedAt('now');
-
-                    /** Create notification : vacancy is approved */
-                    $this->_notification->write($this->_notificationConstant::VACANCY_REJECTED, $vacancyModel->getAuthor(), [
-                        'id'    => $object_id,
-                        'slug'  => $vacancyModel->getSlug(),
-                        'title' => $vacancyModel->getTitle()
-                    ]);
-                }
-
-                $this->wpdb->query("COMMIT");
-            } catch (\WP_Error $err) {
-                $this->wpdb->query("ROLLBACK");
-                error_log($err->get_error_message());
-            } catch (\Exception $e) {
-                $this->wpdb->query("ROLLBACK");
-                error_log($e->getMessage());
-            } catch (\Throwable $th) {
-                $this->wpdb->query("ROLLBACK");
-                error_log($th->getMessage());
             }
         }
     }
